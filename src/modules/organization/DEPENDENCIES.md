@@ -25,10 +25,12 @@ This file documents the required dependencies and their versions for the Organiz
 ### Graph Database
 ```json
 {
-  "@nestjs-modules/neo4j": "^3.0.0",
   "neo4j-driver": "^5.0.0"
 }
 ```
+
+> **Note**: Neo4j integration is provided by the internal `src/core/neo4j` module, not an external package.
+> Import via: `import { Neo4jModule, Neo4jService } from '../../../core/neo4j';`
 
 ### Validation & Utilities
 ```json
@@ -79,7 +81,6 @@ This file documents the required dependencies and their versions for the Organiz
     "@nestjs/cqrs": "^10.0.0",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/typeorm": "^10.0.0",
-    "@nestjs-modules/neo4j": "^3.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "neo4j-driver": "^5.0.0",
@@ -374,6 +375,8 @@ query-docs: { libraryId: "/typeorm/typeorm", topic: "entity decorators" }
 # Verify Neo4j driver usage
 resolve-library-id: "neo4j-driver"
 query-docs: { libraryId: "/neo4j/neo4j-javascript-driver", topic: "session management" }
+
+# Note: Neo4j integration uses internal src/core/neo4j module (not @nestjs-modules/neo4j)
 ```
 
 See [AGENTS.md](../../AGENTS.md) for the complete MCP verification workflow.

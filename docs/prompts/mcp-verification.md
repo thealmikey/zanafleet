@@ -11,7 +11,7 @@ Before generating code, execute these MCP verification steps:
 List all external libraries your code will use:
 - [ ] NestJS modules (`@nestjs/*`)
 - [ ] TypeORM (`typeorm`, `@nestjs/typeorm`)
-- [ ] Neo4j (`neo4j-driver`, `@nestjs-modules/neo4j`)
+- [ ] Neo4j (`neo4j-driver`, internal `src/core/neo4j` module)
 - [ ] Validation (`zod`, `class-validator`)
 - [ ] Other: _________________
 
