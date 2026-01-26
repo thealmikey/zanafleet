@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,7 @@ import { CreateWorkspaceCommand } from '../commands/create-workspace.command';
 import { WorkspaceCreatedEventV1 } from '../events/workspace-created.event';
 import { WorkspaceEntity } from '../entities/workspace.entity';
 import { OrganizationEntity } from '../../organization/entities/organization.entity';
+import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 
 /**
  * CreateWorkspaceCommandHandler
@@ -36,6 +37,7 @@ export class CreateWorkspaceCommandHandler
     @InjectRepository(OrganizationEntity)
     private readonly organizationRepository: Repository<OrganizationEntity>,
     private readonly eventBus: EventBus,
+    @Optional() private readonly eventBusService?: EventBusService,
   ) {}
 
   /**
@@ -104,6 +106,13 @@ export class CreateWorkspaceCommandHandler
       this.logger.log(
         `WorkspaceCreatedEvent-V1 emitted to event bus: ${eventId}`,
       );
+
+      if (this.eventBusService) {
+        await this.eventBusService.publish(
+          NatsSubjects.Workspace.CREATED_V1,
+          event,
+        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+      }
 
       return workspaceId;
     } catch (error) {

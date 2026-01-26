@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { DataSource, EntityManager } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,6 +9,7 @@ import { TransactionStatus } from '../dto/transaction.enums';
 import { WalletEntity } from '../../wallet/entities/wallet.entity';
 import { InsufficientFundsException } from '../../wallet/exceptions/insufficient-funds.exception';
 import { TransactionFailedException } from '../exceptions/transaction-failed.exception';
+import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 
 /**
  * CreateTransactionCommandHandler
@@ -35,6 +36,7 @@ export class CreateTransactionCommandHandler
   constructor(
     private readonly dataSource: DataSource,
     private readonly eventBus: EventBus,
+    @Optional() private readonly eventBusService?: EventBusService,
   ) {}
 
   async execute(command: CreateTransactionCommand): Promise<string> {
@@ -136,6 +138,13 @@ export class CreateTransactionCommandHandler
 
       this.eventBus.publish(event);
       this.logger.log(`TransactionCreatedEvent-V1 emitted: ${eventId}`);
+
+      if (this.eventBusService) {
+        await this.eventBusService.publish(
+          NatsSubjects.Transaction.CREATED_V1,
+          event,
+        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+      }
 
       return transactionId;
     } catch (error) {

@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreditWalletCommand } from '../commands/credit-wallet.command';
 import { WalletCreditedEventV1 } from '../events/wallet-credited.event';
 import { WalletEntity } from '../entities/wallet.entity';
+import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 
 /**
  * CreditWalletCommandHandler
@@ -27,6 +28,7 @@ export class CreditWalletCommandHandler
     @InjectRepository(WalletEntity)
     private readonly walletRepository: Repository<WalletEntity>,
     private readonly eventBus: EventBus,
+    @Optional() private readonly eventBusService?: EventBusService,
   ) {}
 
   async execute(command: CreditWalletCommand): Promise<number> {
@@ -65,6 +67,13 @@ export class CreditWalletCommandHandler
 
       this.eventBus.publish(event);
       this.logger.log(`WalletCreditedEvent-V1 emitted to event bus: ${eventId}`);
+
+      if (this.eventBusService) {
+        await this.eventBusService.publish(
+          NatsSubjects.Wallet.CREDITED_V1,
+          event,
+        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+      }
 
       return newBalance;
     } catch (error) {

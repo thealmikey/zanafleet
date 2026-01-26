@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateWalletCommand } from '../commands/create-wallet.command';
 import { WalletCreatedEventV1 } from '../events/wallet-created.event';
 import { WalletEntity } from '../entities/wallet.entity';
+import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 
 /**
  * CreateWalletCommandHandler
@@ -25,6 +26,7 @@ export class CreateWalletCommandHandler
     @InjectRepository(WalletEntity)
     private readonly walletRepository: Repository<WalletEntity>,
     private readonly eventBus: EventBus,
+    @Optional() private readonly eventBusService?: EventBusService,
   ) {}
 
   async execute(command: CreateWalletCommand): Promise<string> {
@@ -63,6 +65,13 @@ export class CreateWalletCommandHandler
 
       this.eventBus.publish(event);
       this.logger.log(`WalletCreatedEvent-V1 emitted to event bus: ${eventId}`);
+
+      if (this.eventBusService) {
+        await this.eventBusService.publish(
+          NatsSubjects.Wallet.CREATED_V1,
+          event,
+        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+      }
 
       return walletId;
     } catch (error) {

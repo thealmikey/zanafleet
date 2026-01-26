@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateOrganizationCommand } from '../commands/create-organization.command';
 import { OrganizationCreatedEventV1 } from '../events/organization-created.event';
 import { OrganizationEntity } from '../entities/organization.entity';
+import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 
 /**
  * CreateOrganizationCommandHandler
@@ -32,6 +33,7 @@ export class CreateOrganizationCommandHandler
     @InjectRepository(OrganizationEntity)
     private readonly organizationRepository: Repository<OrganizationEntity>,
     private readonly eventBus: EventBus,
+    @Optional() private readonly eventBusService?: EventBusService,
   ) {}
 
   /**
@@ -79,12 +81,17 @@ export class CreateOrganizationCommandHandler
         occurredAt: now,
       });
 
-      // Emit event to NATS event bus
-      // The event bus will serialize and publish to NATS subject: organization.events.created-v1
       this.eventBus.publish(event);
       this.logger.log(
         `OrganizationCreatedEvent-V1 emitted to event bus: ${eventId}`,
       );
+
+      if (this.eventBusService) {
+        await this.eventBusService.publish(
+          NatsSubjects.Organization.CREATED_V1,
+          event,
+        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+      }
 
       return organizationId;
     } catch (error) {

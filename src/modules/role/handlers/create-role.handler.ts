@@ -1,4 +1,4 @@
-import { Injectable, Logger, ConflictException } from '@nestjs/common';
+import { Injectable, Logger, ConflictException, Optional } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateRoleCommand } from '../commands/create-role.command';
 import { RoleCreatedEventV1 } from '../events/role-created.event';
 import { RoleEntity } from '../entities/role.entity';
+import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 
 /**
  * CreateRoleCommandHandler
@@ -32,6 +33,7 @@ export class CreateRoleCommandHandler
     @InjectRepository(RoleEntity)
     private readonly roleRepository: Repository<RoleEntity>,
     private readonly eventBus: EventBus,
+    @Optional() private readonly eventBusService?: EventBusService,
   ) {}
 
   /**
@@ -95,6 +97,13 @@ export class CreateRoleCommandHandler
 
       this.eventBus.publish(event);
       this.logger.log(`RoleCreatedEvent-V1 emitted to event bus: ${eventId}`);
+
+      if (this.eventBusService) {
+        await this.eventBusService.publish(
+          NatsSubjects.Role.CREATED_V1,
+          event,
+        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+      }
 
       return roleId;
     } catch (error) {

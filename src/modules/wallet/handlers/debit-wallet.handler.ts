@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,7 @@ import { DebitWalletCommand } from '../commands/debit-wallet.command';
 import { WalletDebitedEventV1 } from '../events/wallet-debited.event';
 import { WalletEntity } from '../entities/wallet.entity';
 import { InsufficientFundsException } from '../exceptions/insufficient-funds.exception';
+import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 
 /**
  * DebitWalletCommandHandler
@@ -29,6 +30,7 @@ export class DebitWalletCommandHandler
     @InjectRepository(WalletEntity)
     private readonly walletRepository: Repository<WalletEntity>,
     private readonly eventBus: EventBus,
+    @Optional() private readonly eventBusService?: EventBusService,
   ) {}
 
   async execute(command: DebitWalletCommand): Promise<number> {
@@ -79,6 +81,13 @@ export class DebitWalletCommandHandler
 
       this.eventBus.publish(event);
       this.logger.log(`WalletDebitedEvent-V1 emitted to event bus: ${eventId}`);
+
+      if (this.eventBusService) {
+        await this.eventBusService.publish(
+          NatsSubjects.Wallet.DEBITED_V1,
+          event,
+        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+      }
 
       return newBalance;
     } catch (error) {

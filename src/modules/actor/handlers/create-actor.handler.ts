@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -9,6 +9,7 @@ import { WorkspaceEntity } from '../../workspace/entities/workspace.entity';
 import { CreateActorCommand } from '../commands/create-actor.command';
 import { ActorEntity } from '../entities/actor.entity';
 import { ActorOnboardedEventV1 } from '../events/actor-onboarded.event';
+import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 
 /**
  * CreateActorCommandHandler
@@ -38,6 +39,7 @@ export class CreateActorCommandHandler
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
     private readonly eventBus: EventBus,
+    @Optional() private readonly eventBusService?: EventBusService,
   ) {}
 
   /**
@@ -110,6 +112,13 @@ export class CreateActorCommandHandler
 
       this.eventBus.publish(event);
       this.logger.log(`ActorOnboardedEventV1 emitted to event bus: ${eventId}`);
+
+      if (this.eventBusService) {
+        await this.eventBusService.publish(
+          NatsSubjects.Actor.ONBOARDED_V1,
+          event,
+        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+      }
 
       return actorId;
     } catch (error) {
