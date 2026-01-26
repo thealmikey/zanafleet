@@ -1,0 +1,43 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# ============================================================================
+# ZanaFleet Pre-Commit Hook
+# ============================================================================
+# This hook runs linting and formatting checks on staged files before commit.
+# It ensures code quality and consistency across the project.
+#
+# Checks performed:
+#   1. ESLint on TypeScript files
+#   2. Prettier formatting on TypeScript files
+#
+# If any check fails, the commit will be prevented.
+# ============================================================================
+
+echo "🔍 Running pre-commit checks..."
+echo ""
+
+# Run lint-staged to check staged files
+# This tool will:
+#   - Run ESLint with auto-fix on .ts files
+#   - Run Prettier with format on .ts files
+#   - Only check files that are staged for commit
+npx lint-staged
+
+exit_code=$?
+
+if [ $exit_code -eq 0 ]; then
+  echo ""
+  echo "✅ All pre-commit checks passed!"
+  echo "   Proceeding with commit..."
+else
+  echo ""
+  echo "❌ Pre-commit checks failed!"
+  echo "   Please fix the errors above and try again."
+  echo ""
+  echo "   💡 Quick fixes:"
+  echo "     - Run: npm run lint"
+  echo "     - Run: npm run format"
+  echo "     - Then stage and commit again"
+  exit 1
+fi

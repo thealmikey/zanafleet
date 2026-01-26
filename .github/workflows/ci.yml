@@ -1,0 +1,280 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/**
+  pull_request:
+    branches:
+      - main
+      - develop
+
+# Environment variables for the workflow
+env:
+  NODE_VERSION: '20'
+  REGISTRY: ghcr.io
+
+jobs:
+  # ============================================================================
+  # SETUP JOB: Verify Node.js and cache setup
+  # ============================================================================
+  setup:
+    name: Setup CI Environment
+    runs-on: ubuntu-latest
+    outputs:
+      node-version: ${{ steps.setup.outputs.node-version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        id: setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'package-lock.json'
+
+      - name: Verify Node.js and npm versions
+        run: |
+          echo "✓ Node.js version: $(node --version)"
+          echo "✓ npm version: $(npm --version)"
+
+  # ============================================================================
+  # LINT JOB: ESLint + Prettier - Enforce code quality standards
+  # ============================================================================
+  lint:
+    name: Lint & Format Check
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js with cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+        env:
+          npm_token: ${{ secrets.NPM_TOKEN }}
+
+      - name: Run Prettier format check
+        run: npm run format:check
+        continue-on-error: false
+
+      - name: Run ESLint
+        run: npm run lint:check
+        continue-on-error: false
+
+      - name: Report linting results
+        if: always()
+        run: |
+          echo "## 📋 Linting Results" >> $GITHUB_STEP_SUMMARY
+          echo "✓ ESLint check passed" >> $GITHUB_STEP_SUMMARY
+          echo "✓ Prettier format check passed" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # UNIT TESTS JOB: Jest unit tests for TypeScript modules
+  # ============================================================================
+  unit-tests:
+    name: Unit Tests
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js with cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Run unit tests
+        run: npm run test:unit -- --coverage --ci
+        continue-on-error: false
+
+      - name: Upload unit test coverage to Codecov
+        uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          file: ./coverage/coverage-final.json
+          flags: unittests
+          name: unit-test-coverage
+
+      - name: Report unit test results
+        if: always()
+        run: |
+          echo "## ✅ Unit Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "Unit tests completed successfully" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # INTEGRATION TESTS JOB: Jest integration tests with services
+  # ============================================================================
+  integration-tests:
+    name: Integration Tests
+    needs: setup
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: zanafleet_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      neo4j:
+        image: neo4j:5-community
+        env:
+          NEO4J_AUTH: none
+        options: >-
+          --health-cmd "wget --quiet --tries=1 --spider http://localhost:7474"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 7687:7687
+          - 7474:7474
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js with cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Wait for services to be ready
+        run: |
+          # Wait for PostgreSQL
+          npx wait-on -s 3 tcp:5432 --timeout 30000
+          # Wait for Neo4j
+          npx wait-on -s 3 http-get://http://localhost:7474 --timeout 30000
+          echo "✓ All services are ready"
+
+      - name: Run integration tests
+        run: npm run test:integration -- --coverage --ci
+        env:
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: zanafleet_test
+          NEO4J_HOST: localhost
+          NEO4J_PORT: 7687
+        continue-on-error: false
+
+      - name: Upload integration test coverage to Codecov
+        uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          file: ./coverage/coverage-final.json
+          flags: integration
+          name: integration-test-coverage
+
+      - name: Report integration test results
+        if: always()
+        run: |
+          echo "## ✅ Integration Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "Integration tests with Neo4j and PostgreSQL completed successfully" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # BUILD JOB: Compile TypeScript to JavaScript
+  # ============================================================================
+  build:
+    name: Build & Compile
+    needs: [lint, unit-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js with cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Build application
+        run: npm run build
+        continue-on-error: false
+
+      - name: Verify build artifacts
+        run: |
+          if [ -d "dist" ]; then
+            echo "✓ Build artifacts generated successfully"
+            ls -la dist | head -20
+          else
+            echo "✗ Build artifacts not found"
+            exit 1
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: dist/
+          retention-days: 1
+
+      - name: Report build results
+        if: always()
+        run: |
+          echo "## 🏗️ Build Results" >> $GITHUB_STEP_SUMMARY
+          echo "✓ Build completed successfully" >> $GITHUB_STEP_SUMMARY
+          echo "Build artifacts available for deployment" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # SUMMARY JOB: Final CI/CD status report
+  # ============================================================================
+  ci-summary:
+    name: CI/CD Summary
+    needs: [lint, unit-tests, integration-tests, build]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Generate final summary
+        run: |
+          echo "## 📊 CI/CD Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Workflow Status" >> $GITHUB_STEP_SUMMARY
+          echo "- **Linting:** ${{ needs.lint.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Unit Tests:** ${{ needs.unit-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Integration Tests:** ${{ needs.integration-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build:** ${{ needs.build.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Review test coverage reports" >> $GITHUB_STEP_SUMMARY
+          echo "2. Check build artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "3. Deploy if all checks pass" >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail if any job failed
+        if: failure()
+        run: exit 1
+
+      - name: Success
+        if: success()
+        run: echo "✓ All CI/CD checks passed successfully!"

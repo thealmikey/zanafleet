@@ -1,0 +1,80 @@
+version: '3.9'
+
+services:
+  # ========================================================================
+  # PostgreSQL - Primary data store for ZanaFleet primitives
+  # ========================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: zanafleet-postgres-test
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: zanafleet_test
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zanafleet-test
+
+  # ========================================================================
+  # Neo4j - Graph database for projections and relationships
+  # ========================================================================
+  neo4j:
+    image: neo4j:5-community
+    container_name: zanafleet-neo4j-test
+    environment:
+      NEO4J_AUTH: none
+      NEO4J_apoc_import_file_enabled: 'true'
+      NEO4J_apoc_export_file_enabled: 'true'
+    ports:
+      - '7687:7687'  # Bolt protocol
+      - '7474:7474'  # HTTP (Browser)
+    volumes:
+      - neo4j_data:/var/lib/neo4j/data
+      - neo4j_logs:/var/lib/neo4j/logs
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'wget --quiet --tries=1 --spider http://localhost:7474 || exit 1',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zanafleet-test
+
+  # ========================================================================
+  # Redis (Optional) - Event bus / caching for future use
+  # ========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: zanafleet-redis-test
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zanafleet-test
+
+volumes:
+  postgres_data:
+    driver: local
+  neo4j_data:
+    driver: local
+  neo4j_logs:
+    driver: local
+
+networks:
+  zanafleet-test:
+    driver: bridge

@@ -1,0 +1,81 @@
+# ============================================================================
+# ZanaFleet .gitignore
+# ============================================================================
+# Prevents tracking of files that shouldn't be in version control
+# ============================================================================
+
+# Dependencies
+node_modules/
+npm-debug.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Build & Dist
+dist/
+build/
+*.tsbuildinfo
+
+# Testing
+coverage/
+.jest-coverage/
+.nyc_output/
+*.lcov
+test-results/
+
+# IDE & Editor
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+*~
+*.sublime-project
+*.sublime-workspace
+.editorconfig
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.production
+.pem
+*.pem
+
+# Logs
+logs/
+*.log
+lerna-debug.log*
+
+# Runtime data
+tmp/
+temp/
+cache/
+
+# Database
+*.sql
+*.sqlite
+*.sqlite3
+.db/
+
+# OS
+Thumbs.db
+.directory
+
+# Misc
+.cache/
+.parcel-cache/
+*.seed
+*.pid.lock
+
+# Generated files
+tsconfig.tsbuildinfo
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# CI/CD
+.github/workflows/logs/
