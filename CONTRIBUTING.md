@@ -75,6 +75,25 @@ If your organization uses a private npm registry, configure `.npmrc` locally:
 
 This is **not required** for the open-source ZanaFleet project.
 
+#### npm Configuration Notes
+
+The `.npmrc` file is configured for developer-friendly local development:
+
+| Setting | Local Dev | CI Pipeline |
+|---------|-----------|-------------|
+| Lock file validation | Flexible (`npm install`) | Strict (`npm ci`) |
+| Security audits | Optional | Enforced separately |
+| Package lock | Enabled | Enabled |
+
+If you encounter audit-related installation failures due to transitive dependency vulnerabilities:
+
+```bash
+# Bypass audit temporarily (review vulnerabilities manually)
+npm install --no-audit
+```
+
+**Note:** Always address security vulnerabilities before merging to main.
+
 ---
 
 ## Development Workflow
