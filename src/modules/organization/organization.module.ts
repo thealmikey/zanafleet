@@ -21,7 +21,7 @@ import { OrganizationEntity } from './entities/organization.entity';
  * Dependencies:
  * - @nestjs/cqrs: Command/Event handling
  * - @nestjs/typeorm: PostgreSQL ORM
- * - @nestjs-modules/neo4j: Graph database
+ * - neo4j-driver: Graph database (via core/neo4j module)
  * - zod: Input validation
  * - uuid: ID generation
  */

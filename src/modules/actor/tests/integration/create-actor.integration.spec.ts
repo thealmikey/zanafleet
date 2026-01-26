@@ -2,8 +2,8 @@ import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandBus, CqrsModule, EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
-import { Neo4jService } from '@nestjs-modules/neo4j';
 import { Repository } from 'typeorm';
+import { Neo4jService } from '../../../../core/neo4j';
 import { v4 as uuidv4 } from 'uuid';
 
 import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';

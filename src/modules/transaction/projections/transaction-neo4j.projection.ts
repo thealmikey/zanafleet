@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
-import { Neo4jService } from '@nestjs-modules/neo4j';
+import { Neo4jService } from '../../../core/neo4j';
 import { TransactionCreatedEventV1 } from '../events/transaction-created.event';
 
 /**
