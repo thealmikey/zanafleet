@@ -38,6 +38,43 @@ npm install
 npm run ci:all
 ```
 
+### Tokens and Secrets (Optional)
+
+**Good news!** No tokens or secrets are required for local development. You can run the full development workflow immediately after cloning:
+
+```bash
+# All of these work out of the box:
+npm install          # Uses public npm registry
+npm run build        # Compiles TypeScript
+npm run test         # Runs unit tests
+npm run test:integration  # Requires Docker services only
+docker-compose -f docker-compose.test.yml up -d  # No auth needed
+```
+
+#### Optional Tokens for Advanced Workflows
+
+The following tokens are **only needed for specific CI/CD or publishing workflows**:
+
+| Token | Purpose | When Needed |
+|-------|---------|-------------|
+| `CODECOV_TOKEN` | Upload coverage reports | CI pipeline for private repos |
+| `NPM_TOKEN` | Publish to npm registry | Publishing packages (not configured) |
+| `GHCR_TOKEN` | Push Docker images | Container registry publishing |
+
+**Note:** The CI pipeline is configured to continue even when these tokens are missing (`fail_ci_if_error: false`), so PRs will still pass all required checks.
+
+#### If You Need Private Registry Access
+
+If your organization uses a private npm registry, configure `.npmrc` locally:
+
+```bash
+# Uncomment and modify in .npmrc:
+# registry=https://your-registry.example.com/
+# //your-registry.example.com/:_authToken=${NPM_TOKEN}
+```
+
+This is **not required** for the open-source ZanaFleet project.
+
 ---
 
 ## Development Workflow
