@@ -63,3 +63,72 @@ Use a strict three-part dot notation with versioning:
   - **Postgres:** Primary store for primitives and event logs (atomicity).
   - **Neo4j:** Graph projections for real-time visibility and relationship mapping.
 - **Observability:** Every state change event must have a corresponding Neo4j projection update to maintain the system's "real-time visibility" principle.
+
+## 6. MCP Verification Workflows
+
+### Purpose
+Before generating code or modifying configurations, AI agents and developers **must** verify third-party library compatibility using MCP (Model Context Protocol) servers. This ensures all code aligns with current API specifications and avoids deprecated patterns.
+
+### Available MCP Tools
+
+| Tool | Purpose | When to Use |
+|------|---------|-------------|
+| `context7` | Query up-to-date library documentation | Before using any external library API |
+| `deepwiki` | Access internal knowledge base and GitHub repository docs | For project-specific patterns and conventions |
+
+### Mandatory Verification Steps
+
+1. **Library Resolution**: Use `resolve-library-id` to obtain the Context7-compatible library ID
+2. **Documentation Query**: Use `query-docs` to retrieve current API specifications
+3. **Cross-Reference**: Compare retrieved docs against versions in `DEPENDENCIES.md`
+
+### Core Technology Verification
+
+The following technologies **require** MCP verification before code generation:
+
+| Technology | Context7 ID Pattern | Verification Focus |
+|------------|---------------------|-------------------|
+| NestJS | `/nestjs/nest` | Decorators, module patterns, CQRS |
+| TypeORM | `/typeorm/typeorm` | Entity definitions, migrations, query builder |
+| Neo4j | `/neo4j/neo4j-javascript-driver` | Driver API, Cypher patterns |
+| Zod | `/colinhacks/zod` | Schema definitions, validation methods |
+
+### Verification Workflow Example
+
+```
+# Step 1: Resolve library ID
+callMcpTool("resolve-library-id", { libraryName: "nestjs" })
+
+# Step 2: Query specific documentation
+callMcpTool("query-docs", { 
+  libraryId: "/nestjs/nest",
+  topic: "CQRS command handlers"
+})
+
+# Step 3: For project-specific context, use deepwiki
+callMcpTool("read_wiki_contents", {
+  repository: "zanafleet/zanafleet",
+  path: "architecture/event-driven"
+})
+```
+
+### Version Reconciliation
+
+When generating code that depends on external libraries:
+1. **Check `DEPENDENCIES.md`** for pinned versions
+2. **Query Context7** for the latest stable API for that version
+3. **Flag discrepancies** if local versions are outdated
+4. **Document breaking changes** in commit messages when upgrading
+
+### DeepWiki Integration
+
+Use `deepwiki` MCP tools for:
+- **`read_wiki_structure`**: Discover available documentation topics
+- **`read_wiki_contents`**: Retrieve specific documentation pages
+- **`ask_question`**: Query the repository's knowledge base directly
+
+### Enforcement
+
+- **Pre-Generation**: All AI-generated code must be preceded by MCP verification
+- **Code Review**: Reviewers may request MCP verification evidence for unfamiliar APIs
+- **CI Integration**: Consider adding version-check scripts that validate against Context7

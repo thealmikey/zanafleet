@@ -62,7 +62,24 @@ npm run format
 npm run lint
 ```
 
-### 3. Write Tests
+### 3. Verify External Dependencies (MCP)
+
+Before writing code that uses external libraries, verify API compatibility:
+
+```bash
+# Using Context7 MCP tool (in AI-assisted environments)
+# 1. Resolve the library ID
+resolve-library-id: "nestjs"
+
+# 2. Query current documentation
+query-docs: { libraryId: "/nestjs/nest", topic: "your-feature" }
+```
+
+**Required for**: NestJS decorators, TypeORM entities, Neo4j queries, Zod schemas.
+
+See [AGENTS.md Section 6](./AGENTS.md#6-mcp-verification-workflows) for detailed verification protocols.
+
+### 4. Write Tests
 
 Add unit and integration tests for your changes.
 
@@ -75,7 +92,7 @@ npm run test:integration
 npm run test:cov
 ```
 
-### 4. Commit Your Changes
+### 5. Commit Your Changes
 
 Pre-commit hooks will automatically run linting and formatting checks:
 
@@ -98,7 +115,7 @@ git add .
 git commit -m "feat: add new feature"
 ```
 
-### 5. Push and Create Pull Request
+### 6. Push and Create Pull Request
 
 ```bash
 git push origin feature/my-feature
@@ -324,6 +341,7 @@ Before submitting a PR, verify:
 - [ ] Documentation updated if needed
 - [ ] No console.log statements left (use logger)
 - [ ] No hardcoded values (use environment variables)
+- [ ] MCP verification performed for new external API usage
 
 ### Pull Request Template
 

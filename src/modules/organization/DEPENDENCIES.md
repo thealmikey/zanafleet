@@ -357,3 +357,23 @@ npm run typeorm migration:revert
 - Update dependencies regularly for security patches
 - Test after updating dependencies
 - Use `npm audit` to check for vulnerabilities
+
+## MCP Verification
+
+When updating dependencies or using new APIs from these packages, verify compatibility using MCP tools:
+
+```bash
+# Verify NestJS CQRS patterns
+resolve-library-id: "@nestjs/cqrs"
+query-docs: { libraryId: "/nestjs/cqrs", topic: "command handlers" }
+
+# Verify TypeORM entity patterns  
+resolve-library-id: "typeorm"
+query-docs: { libraryId: "/typeorm/typeorm", topic: "entity decorators" }
+
+# Verify Neo4j driver usage
+resolve-library-id: "neo4j-driver"
+query-docs: { libraryId: "/neo4j/neo4j-javascript-driver", topic: "session management" }
+```
+
+See [AGENTS.md](../../AGENTS.md) for the complete MCP verification workflow.
