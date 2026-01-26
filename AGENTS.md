@@ -132,3 +132,54 @@ Use `deepwiki` MCP tools for:
 - **Pre-Generation**: All AI-generated code must be preceded by MCP verification
 - **Code Review**: Reviewers may request MCP verification evidence for unfamiliar APIs
 - **CI Integration**: Consider adding version-check scripts that validate against Context7
+
+## 7. Human-in-the-Loop CI Verification
+
+### Purpose
+When AI agents or developers modify CI/CD configuration files, a manual verification step is **required** to confirm the pipeline executes successfully on the hosting platform.
+
+### Trigger Conditions
+This verification is mandatory when changes are made to:
+- `.github/workflows/*.yml` (GitHub Actions workflows)
+- `docker-compose*.yml` (Docker service configurations)
+- `package.json` scripts related to CI (`test:*`, `lint:*`, `build`)
+- Jest or ESLint configuration files
+
+### Verification Workflow
+
+1. **Push Changes**: Commit and push CI-related changes to a feature branch
+2. **Monitor Pipeline**: Navigate to the GitHub Actions tab and observe the workflow run
+3. **Confirm Success**: Verify all jobs complete with ✓ status:
+   - Setup
+   - Lint & Format Check
+   - Unit Tests
+   - Integration Tests
+   - Build & Compile
+4. **Document Failures**: If any job fails, capture the error log and address before merging
+
+### Agent Prompt Template
+
+When an AI agent completes CI-related changes, it must output this reminder:
+
+```
+⚠️ CI VERIFICATION REQUIRED
+
+You have modified CI/CD configuration. Before proceeding:
+1. Push this branch to GitHub
+2. Navigate to: https://github.com/<org>/<repo>/actions
+3. Verify the workflow completes successfully
+4. Confirm all jobs show ✓ status
+
+Do not proceed until CI verification is complete.
+```
+
+### Tokens and Secrets
+
+The following secrets may need configuration in GitHub repository settings:
+| Secret | Purpose | Required For |
+|--------|---------|--------------|
+| `CODECOV_TOKEN` | Coverage upload | Private repository coverage reports |
+| `NPM_TOKEN` | Package registry | Publishing to npm (when needed) |
+| `GHCR_TOKEN` | Container registry | Docker image publishing (when needed) |
+
+**Note**: Until these tokens are configured, related CI steps should use `fail_ci_if_error: false` or `continue-on-error: true` to prevent blocking the pipeline.

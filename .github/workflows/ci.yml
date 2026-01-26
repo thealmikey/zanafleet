@@ -14,7 +14,6 @@ on:
 # Environment variables for the workflow
 env:
   NODE_VERSION: '20'
-  REGISTRY: ghcr.io
 
 jobs:
   # ============================================================================
@@ -103,6 +102,7 @@ jobs:
         run: npm run test:unit -- --coverage --ci
         continue-on-error: false
 
+      # TODO: Configure CODECOV_TOKEN secret for private repo coverage
       - name: Upload unit test coverage to Codecov
         uses: codecov/codecov-action@v3
         if: always()
@@ -110,6 +110,7 @@ jobs:
           file: ./coverage/coverage-final.json
           flags: unittests
           name: unit-test-coverage
+          fail_ci_if_error: false
 
       - name: Report unit test results
         if: always()
@@ -186,6 +187,7 @@ jobs:
           NEO4J_PORT: 7687
         continue-on-error: false
 
+      # TODO: Configure CODECOV_TOKEN secret for private repo coverage
       - name: Upload integration test coverage to Codecov
         uses: codecov/codecov-action@v3
         if: always()
@@ -193,6 +195,7 @@ jobs:
           file: ./coverage/coverage-final.json
           flags: integration
           name: integration-test-coverage
+          fail_ci_if_error: false
 
       - name: Report integration test results
         if: always()
