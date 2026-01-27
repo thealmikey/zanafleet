@@ -46,6 +46,9 @@ export class WorkspaceEntity {
   })
   status!: WorkspaceStatus;
 
+  @Column('uuid', { array: true, default: () => "ARRAY[]::uuid[]" })
+  roleTemplates!: string[];
+
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;
 
@@ -61,6 +64,7 @@ export class WorkspaceEntity {
     name: string;
     type: WorkspaceType;
     status: WorkspaceStatus;
+    roleTemplates: string[];
     createdAt: Date;
     updatedAt: Date;
   } {
@@ -70,6 +74,7 @@ export class WorkspaceEntity {
       name: this.name,
       type: this.type,
       status: this.status,
+      roleTemplates: this.roleTemplates,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
@@ -84,6 +89,7 @@ export class WorkspaceEntity {
     name: string;
     type: WorkspaceType;
     status: WorkspaceStatus;
+    roleTemplates: string[];
     createdAt: Date;
   }): WorkspaceEntity {
     const entity = new WorkspaceEntity();
@@ -92,6 +98,7 @@ export class WorkspaceEntity {
     entity.name = data.name;
     entity.type = data.type;
     entity.status = data.status;
+    entity.roleTemplates = data.roleTemplates;
     entity.createdAt = data.createdAt;
     return entity;
   }

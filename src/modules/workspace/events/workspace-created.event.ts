@@ -35,6 +35,7 @@ export class WorkspaceCreatedEventV1 {
   readonly name: string;
   readonly type: WorkspaceType;
   readonly status: WorkspaceStatus;
+  readonly roleTemplates: string[];
   readonly createdAt: Date;
 
   /**
@@ -50,6 +51,7 @@ export class WorkspaceCreatedEventV1 {
     name: string;
     type: WorkspaceType;
     status: WorkspaceStatus;
+    roleTemplates: string[];
     createdAt: Date;
     occurredAt?: Date;
     correlationId?: string;
@@ -61,6 +63,7 @@ export class WorkspaceCreatedEventV1 {
     this.name = data.name;
     this.type = data.type;
     this.status = data.status;
+    this.roleTemplates = data.roleTemplates;
     this.createdAt = data.createdAt;
     this.occurredAt = data.occurredAt || new Date();
     this.aggregateId = data.workspaceId;
@@ -84,6 +87,7 @@ export class WorkspaceCreatedEventV1 {
     name: string;
     type: WorkspaceType;
     status: WorkspaceStatus;
+    roleTemplates: string[];
     createdAt: string;
     correlationId?: string;
     causationId?: string;
@@ -100,6 +104,7 @@ export class WorkspaceCreatedEventV1 {
       name: this.name,
       type: this.type,
       status: this.status,
+      roleTemplates: this.roleTemplates,
       createdAt: this.createdAt.toISOString(),
       correlationId: this.correlationId,
       causationId: this.causationId,
@@ -117,6 +122,7 @@ export class WorkspaceCreatedEventV1 {
       name: data.name as string,
       type: data.type as WorkspaceType,
       status: data.status as WorkspaceStatus,
+      roleTemplates: (data.roleTemplates as string[]) || [],
       createdAt: new Date(data.createdAt as string),
       occurredAt: new Date(data.occurredAt as string),
       correlationId: data.correlationId as string | undefined,

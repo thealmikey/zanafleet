@@ -25,25 +25,25 @@ import { ActorType } from '../dto/actor.enums';
 @Index(['createdAt'])
 export class ActorEntity {
   @PrimaryColumn('uuid')
-  id: string; // actorId
+  id!: string; // actorId
 
   @Column('enum', { enum: ActorType })
-  type: ActorType;
+  type!: ActorType;
 
   @Column('uuid', { array: true, default: () => 'ARRAY[]::uuid[]' })
-  roles: string[]; // Array of role UUIDs
+  roles!: string[]; // Array of role UUIDs
 
   @Column('uuid')
-  workspaceId: string;
+  workspaceId!: string;
 
   @Column('uuid', { array: true, default: () => 'ARRAY[]::uuid[]' })
-  linkedWallets: string[]; // Array of wallet UUIDs
+  linkedWallets!: string[]; // Array of wallet UUIDs
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ type: 'timestamp with time zone' })
-  updatedAt: Date;
+  updatedAt!: Date;
 
   /**
    * Convert entity to domain object

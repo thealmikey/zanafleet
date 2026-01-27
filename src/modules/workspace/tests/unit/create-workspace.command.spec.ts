@@ -4,11 +4,14 @@ import {
   CreateWorkspaceCommandSchema,
   CreateWorkspaceCommandInput,
 } from '../../commands/create-workspace.command';
+import { WorkspaceType, WorkspaceStatus } from '../../dto/workspace.enums';
 
 describe('CreateWorkspaceCommandSchema', () => {
   const validInput: CreateWorkspaceCommandInput = {
     name: 'Test Workspace',
     orgId: '550e8400-e29b-41d4-a716-446655440000',
+    type: WorkspaceType.SACCO,
+    status: WorkspaceStatus.ACTIVE,
     roleTemplates: ['660e8400-e29b-41d4-a716-446655440001'],
   };
 
@@ -45,7 +48,7 @@ describe('CreateWorkspaceCommandSchema', () => {
     });
 
     it('should default roleTemplates to empty array when omitted', () => {
-      const input = { name: 'Test Workspace', orgId: validInput.orgId };
+      const input = { name: 'Test Workspace', orgId: validInput.orgId, type: WorkspaceType.SACCO };
       const result = CreateWorkspaceCommandSchema.safeParse(input);
 
       expect(result.success).toBe(true);
@@ -197,6 +200,8 @@ describe('CreateWorkspaceCommand', () => {
   const validInput: CreateWorkspaceCommandInput = {
     name: 'Test Workspace',
     orgId: '550e8400-e29b-41d4-a716-446655440000',
+    type: WorkspaceType.SACCO,
+    status: WorkspaceStatus.ACTIVE,
     roleTemplates: ['660e8400-e29b-41d4-a716-446655440001'],
   };
 

@@ -2,9 +2,12 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { ActorEntity } from '../actor/entities/actor.entity';
 import { OrganizationEntity } from '../organization/entities/organization.entity';
 
+import { MembershipEntity } from './entities/membership.entity';
 import { WorkspaceEntity } from './entities/workspace.entity';
+import { AddActorToWorkspaceCommandHandler } from './handlers/add-actor-to-workspace.handler';
 import { CreateWorkspaceCommandHandler } from './handlers/create-workspace.handler';
 import { WorkspaceNeo4jProjection, WorkspaceNeo4jInitializer } from './projections/workspace-neo4j.projection';
 
@@ -16,10 +19,12 @@ import { WorkspaceNeo4jProjection, WorkspaceNeo4jInitializer } from './projectio
  *
  * Features:
  * 1. CreateWorkspaceCommand with Zod validation
- * 2. WorkspaceCreatedEvent-V1 (append-only, deterministic)
- * 3. PostgreSQL persistence via TypeORM
- * 4. Neo4j graph projections with PART_OF relationship to Organization
- * 5. Foreign key validation against Organization
+ * 2. AddActorToWorkspaceCommand with membership management
+ * 3. WorkspaceCreatedEvent-V1 (append-only, deterministic)
+ * 4. ActorAddedToWorkspaceEvent-V1 for membership events
+ * 5. PostgreSQL persistence via TypeORM
+ * 6. Neo4j graph projections with PART_OF relationship to Organization
+ * 7. Foreign key validation against Organization and Actor
  *
  * Dependencies:
  * - @nestjs/cqrs: Command/Event handling
@@ -31,11 +36,12 @@ import { WorkspaceNeo4jProjection, WorkspaceNeo4jInitializer } from './projectio
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([WorkspaceEntity, OrganizationEntity]),
+    TypeOrmModule.forFeature([WorkspaceEntity, MembershipEntity, OrganizationEntity, ActorEntity]),
   ],
   providers: [
     // Command Handlers
     CreateWorkspaceCommandHandler,
+    AddActorToWorkspaceCommandHandler,
 
     // Event Handlers / Projections
     WorkspaceNeo4jProjection,
@@ -44,6 +50,7 @@ import { WorkspaceNeo4jProjection, WorkspaceNeo4jInitializer } from './projectio
   exports: [
     // Export for use in other modules
     CreateWorkspaceCommandHandler,
+    AddActorToWorkspaceCommandHandler,
   ],
 })
 export class WorkspaceModule implements OnModuleInit {

@@ -86,6 +86,7 @@ export class CreateWorkspaceCommandHandler
         name: command.name,
         type: command.type,
         status: command.status,
+        roleTemplates: command.roleTemplates,
         createdAt: now,
       });
 
@@ -103,6 +104,7 @@ export class CreateWorkspaceCommandHandler
         name: command.name,
         type: command.type,
         status: command.status,
+        roleTemplates: command.roleTemplates,
         createdAt: now,
         occurredAt: now,
       });

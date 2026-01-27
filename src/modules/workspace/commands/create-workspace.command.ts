@@ -22,6 +22,10 @@ export const CreateWorkspaceCommandSchema = z.object({
     .nativeEnum(WorkspaceStatus)
     .optional()
     .default(WorkspaceStatus.ACTIVE),
+  roleTemplates: z
+    .array(z.string().uuid('Each role template ID must be a valid UUID'))
+    .optional()
+    .default([]),
 });
 
 export type CreateWorkspaceCommandInput = z.infer<typeof CreateWorkspaceCommandSchema>;
@@ -37,12 +41,14 @@ export class CreateWorkspaceCommand {
   readonly orgId: string;
   readonly type: WorkspaceType;
   readonly status: WorkspaceStatus;
+  readonly roleTemplates: string[];
 
   constructor(input: CreateWorkspaceCommandRawInput) {
     this.name = input.name;
     this.orgId = input.orgId;
     this.type = input.type;
     this.status = input.status ?? WorkspaceStatus.ACTIVE;
+    this.roleTemplates = input.roleTemplates ?? [];
   }
 
   /**

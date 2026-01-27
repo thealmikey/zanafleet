@@ -9,6 +9,7 @@ export class CreateWorkspaceDto {
   orgId: string; // UUID of the parent organization
   type: WorkspaceType;
   status?: WorkspaceStatus;
+  roleTemplates?: string[]; // UUIDs of role templates
 }
 
 /**
