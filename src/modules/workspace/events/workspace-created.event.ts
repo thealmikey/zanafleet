@@ -1,3 +1,5 @@
+import { WorkspaceType, WorkspaceStatus } from '../dto/workspace.enums';
+
 /**
  * WorkspaceCreatedEvent-V1
  *
@@ -31,7 +33,8 @@ export class WorkspaceCreatedEventV1 {
   readonly workspaceId: string; // UUID
   readonly orgId: string; // UUID of the parent organization
   readonly name: string;
-  readonly roleTemplates: readonly string[]; // Array of role template UUIDs
+  readonly type: WorkspaceType;
+  readonly status: WorkspaceStatus;
   readonly createdAt: Date;
 
   /**
@@ -45,7 +48,8 @@ export class WorkspaceCreatedEventV1 {
     workspaceId: string;
     orgId: string;
     name: string;
-    roleTemplates: string[];
+    type: WorkspaceType;
+    status: WorkspaceStatus;
     createdAt: Date;
     occurredAt?: Date;
     correlationId?: string;
@@ -55,7 +59,8 @@ export class WorkspaceCreatedEventV1 {
     this.workspaceId = data.workspaceId;
     this.orgId = data.orgId;
     this.name = data.name;
-    this.roleTemplates = Object.freeze([...data.roleTemplates]); // Immutable copy
+    this.type = data.type;
+    this.status = data.status;
     this.createdAt = data.createdAt;
     this.occurredAt = data.occurredAt || new Date();
     this.aggregateId = data.workspaceId;
@@ -77,7 +82,8 @@ export class WorkspaceCreatedEventV1 {
     workspaceId: string;
     orgId: string;
     name: string;
-    roleTemplates: readonly string[];
+    type: WorkspaceType;
+    status: WorkspaceStatus;
     createdAt: string;
     correlationId?: string;
     causationId?: string;
@@ -92,7 +98,8 @@ export class WorkspaceCreatedEventV1 {
       workspaceId: this.workspaceId,
       orgId: this.orgId,
       name: this.name,
-      roleTemplates: this.roleTemplates,
+      type: this.type,
+      status: this.status,
       createdAt: this.createdAt.toISOString(),
       correlationId: this.correlationId,
       causationId: this.causationId,
@@ -108,7 +115,8 @@ export class WorkspaceCreatedEventV1 {
       workspaceId: data.workspaceId as string,
       orgId: data.orgId as string,
       name: data.name as string,
-      roleTemplates: data.roleTemplates as string[],
+      type: data.type as WorkspaceType,
+      status: data.status as WorkspaceStatus,
       createdAt: new Date(data.createdAt as string),
       occurredAt: new Date(data.occurredAt as string),
       correlationId: data.correlationId as string | undefined,

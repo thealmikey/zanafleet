@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { WorkspaceStatus, WorkspaceType } from '../dto/workspace.enums';
+
 /**
  * Zod validation schema for CreateWorkspaceCommand
  * Ensures type safety and input validation at command level
@@ -13,14 +15,13 @@ export const CreateWorkspaceCommandSchema = z.object({
   orgId: z
     .string()
     .uuid('Organization ID must be a valid UUID'),
-  roleTemplates: z
-    .array(
-      z
-        .string()
-        .uuid('Each role template ID must be a valid UUID'),
-    )
+  type: z.nativeEnum(WorkspaceType, {
+    errorMap: () => ({ message: 'Workspace type is required' }),
+  }),
+  status: z
+    .nativeEnum(WorkspaceStatus)
     .optional()
-    .default([]),
+    .default(WorkspaceStatus.ACTIVE),
 });
 
 export type CreateWorkspaceCommandInput = z.infer<typeof CreateWorkspaceCommandSchema>;
@@ -34,12 +35,14 @@ export type CreateWorkspaceCommandRawInput = z.input<typeof CreateWorkspaceComma
 export class CreateWorkspaceCommand {
   readonly name: string;
   readonly orgId: string;
-  readonly roleTemplates: string[];
+  readonly type: WorkspaceType;
+  readonly status: WorkspaceStatus;
 
   constructor(input: CreateWorkspaceCommandRawInput) {
     this.name = input.name;
     this.orgId = input.orgId;
-    this.roleTemplates = input.roleTemplates ?? [];
+    this.type = input.type;
+    this.status = input.status ?? WorkspaceStatus.ACTIVE;
   }
 
   /**

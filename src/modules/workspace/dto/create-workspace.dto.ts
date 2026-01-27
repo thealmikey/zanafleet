@@ -1,3 +1,5 @@
+import { WorkspaceType, WorkspaceStatus } from './workspace.enums';
+
 /**
  * DTO for creating a workspace
  * Input payload for CreateWorkspaceCommand
@@ -5,7 +7,8 @@
 export class CreateWorkspaceDto {
   name: string;
   orgId: string; // UUID of the parent organization
-  roleTemplates?: string[]; // Array of role template UUIDs
+  type: WorkspaceType;
+  status?: WorkspaceStatus;
 }
 
 /**
@@ -16,7 +19,8 @@ export class WorkspaceDto {
   workspaceId: string; // UUID
   orgId: string; // UUID of the parent organization
   name: string;
-  roleTemplates: string[]; // Array of role template UUIDs
+  type: WorkspaceType;
+  status: WorkspaceStatus;
   createdAt: Date;
   updatedAt: Date;
 }

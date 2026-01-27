@@ -1,11 +1,13 @@
 import {
-  Entity,
-  PrimaryColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   Index,
+  PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+
+import { WorkspaceStatus, WorkspaceType } from '../dto/workspace.enums';
 
 /**
  * Workspace Entity
@@ -19,6 +21,7 @@ import {
  */
 @Entity('workspaces')
 @Index(['orgId'])
+@Index(['type'])
 @Index(['createdAt'])
 export class WorkspaceEntity {
   @PrimaryColumn('uuid')
@@ -30,8 +33,18 @@ export class WorkspaceEntity {
   @Column('varchar', { length: 255 })
   name!: string;
 
-  @Column('uuid', { array: true, default: () => 'ARRAY[]::uuid[]' })
-  roleTemplates!: string[]; // Array of role template UUIDs
+  @Column({
+    type: 'enum',
+    enum: WorkspaceType,
+  })
+  type!: WorkspaceType;
+
+  @Column({
+    type: 'enum',
+    enum: WorkspaceStatus,
+    default: WorkspaceStatus.ACTIVE,
+  })
+  status!: WorkspaceStatus;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;
@@ -46,7 +59,8 @@ export class WorkspaceEntity {
     workspaceId: string;
     orgId: string;
     name: string;
-    roleTemplates: string[];
+    type: WorkspaceType;
+    status: WorkspaceStatus;
     createdAt: Date;
     updatedAt: Date;
   } {
@@ -54,7 +68,8 @@ export class WorkspaceEntity {
       workspaceId: this.id,
       orgId: this.orgId,
       name: this.name,
-      roleTemplates: this.roleTemplates,
+      type: this.type,
+      status: this.status,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
@@ -67,14 +82,16 @@ export class WorkspaceEntity {
     workspaceId: string;
     orgId: string;
     name: string;
-    roleTemplates: string[];
+    type: WorkspaceType;
+    status: WorkspaceStatus;
     createdAt: Date;
   }): WorkspaceEntity {
     const entity = new WorkspaceEntity();
     entity.id = data.workspaceId;
     entity.orgId = data.orgId;
     entity.name = data.name;
-    entity.roleTemplates = data.roleTemplates;
+    entity.type = data.type;
+    entity.status = data.status;
     entity.createdAt = data.createdAt;
     return entity;
   }

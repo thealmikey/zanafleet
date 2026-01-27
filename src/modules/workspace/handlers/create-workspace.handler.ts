@@ -1,13 +1,16 @@
 import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
-import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
-import { Repository } from 'typeorm';
+import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateWorkspaceCommand } from '../commands/create-workspace.command';
-import { WorkspaceCreatedEventV1 } from '../events/workspace-created.event';
-import { WorkspaceEntity } from '../entities/workspace.entity';
-import { OrganizationEntity } from '../../organization/entities/organization.entity';
+
 import { EventBusService, NatsSubjects } from '../../../core/event-bus';
+
+import { OrganizationEntity } from '../../organization/entities/organization.entity';
+
+import { CreateWorkspaceCommand } from '../commands/create-workspace.command';
+import { WorkspaceEntity } from '../entities/workspace.entity';
+import { WorkspaceCreatedEventV1 } from '../events/workspace-created.event';
 
 /**
  * CreateWorkspaceCommandHandler
@@ -81,7 +84,8 @@ export class CreateWorkspaceCommandHandler
         workspaceId,
         orgId: command.orgId,
         name: command.name,
-        roleTemplates: command.roleTemplates,
+        type: command.type,
+        status: command.status,
         createdAt: now,
       });
 
@@ -97,7 +101,8 @@ export class CreateWorkspaceCommandHandler
         workspaceId,
         orgId: command.orgId,
         name: command.name,
-        roleTemplates: command.roleTemplates,
+        type: command.type,
+        status: command.status,
         createdAt: now,
         occurredAt: now,
       });

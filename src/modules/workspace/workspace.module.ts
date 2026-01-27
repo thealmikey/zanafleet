@@ -1,10 +1,12 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { OrganizationEntity } from '../organization/entities/organization.entity';
+
+import { WorkspaceEntity } from './entities/workspace.entity';
 import { CreateWorkspaceCommandHandler } from './handlers/create-workspace.handler';
 import { WorkspaceNeo4jProjection, WorkspaceNeo4jInitializer } from './projections/workspace-neo4j.projection';
-import { WorkspaceEntity } from './entities/workspace.entity';
-import { OrganizationEntity } from '../organization/entities/organization.entity';
 
 /**
  * Workspace Module
