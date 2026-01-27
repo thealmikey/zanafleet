@@ -26,34 +26,34 @@ import { EvidenceType, SubjectType, EvidenceSource } from '../dto/evidence.enums
 @Index(['createdAt'])
 export class EvidenceEntity {
   @PrimaryColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column('enum', { enum: EvidenceType })
-  type: EvidenceType;
+  type!: EvidenceType;
 
   @Column('uuid')
-  actorId: string;
+  actorId!: string;
 
   @Column('uuid')
-  workspaceId: string;
+  workspaceId!: string;
 
   @Column('enum', { enum: SubjectType })
-  subjectType: SubjectType;
+  subjectType!: SubjectType;
 
   @Column('uuid')
-  subjectId: string;
+  subjectId!: string;
 
   @Column('jsonb')
-  payload: Record<string, unknown>;
+  payload!: Record<string, unknown>;
 
   @Column('enum', { enum: EvidenceSource })
-  source: EvidenceSource;
+  source!: EvidenceSource;
 
   @Column('uuid', { unique: true })
-  commandId: string;
+  commandId!: string;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
-  createdAt: Date;
+  createdAt!: Date;
 
   /**
    * Convert entity to domain object
