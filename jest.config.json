@@ -22,12 +22,16 @@
   ],
   "coverageDirectory": "coverage",
   "testEnvironment": "node",
+  "passWithNoTests": true,
   "roots": [
     "<rootDir>/src"
   ],
   "moduleNameMapper": {
     "^src/(.*)$": "<rootDir>/src/$1"
   },
+  "setupFilesAfterEnv": [
+    "<rootDir>/test/jest-setup.ts"
+  ],
   "testTimeout": 30000,
   "verbose": true,
   "coverageThreshold": {
