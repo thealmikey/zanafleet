@@ -8,9 +8,9 @@ import { OrganizationType, OrganizationStatus } from '../dto/organization.enums'
 export const CreateOrganizationCommandSchema = z.object({
   name: z
     .string()
+    .trim()
     .min(1, 'Organization name is required')
-    .max(255, 'Organization name must not exceed 255 characters')
-    .trim(),
+    .max(255, 'Organization name must not exceed 255 characters'),
   type: z.nativeEnum(OrganizationType, {
     errorMap: () => ({
       message: `Organization type must be one of: ${Object.values(OrganizationType).join(', ')}`,
@@ -32,6 +32,7 @@ export const CreateOrganizationCommandSchema = z.object({
 });
 
 export type CreateOrganizationCommandInput = z.infer<typeof CreateOrganizationCommandSchema>;
+export type CreateOrganizationCommandRawInput = z.input<typeof CreateOrganizationCommandSchema>;
 
 /**
  * CreateOrganizationCommand
@@ -44,11 +45,11 @@ export class CreateOrganizationCommand {
   readonly status: OrganizationStatus;
   readonly linkedWallets: string[];
 
-  constructor(input: CreateOrganizationCommandInput) {
+  constructor(input: CreateOrganizationCommandRawInput) {
     this.name = input.name;
     this.type = input.type;
     this.status = input.status;
-    this.linkedWallets = input.linkedWallets || [];
+    this.linkedWallets = input.linkedWallets ?? [];
   }
 
   /**

@@ -24,6 +24,7 @@ export const CreateWorkspaceCommandSchema = z.object({
 });
 
 export type CreateWorkspaceCommandInput = z.infer<typeof CreateWorkspaceCommandSchema>;
+export type CreateWorkspaceCommandRawInput = z.input<typeof CreateWorkspaceCommandSchema>;
 
 /**
  * CreateWorkspaceCommand
@@ -35,10 +36,10 @@ export class CreateWorkspaceCommand {
   readonly orgId: string;
   readonly roleTemplates: string[];
 
-  constructor(input: CreateWorkspaceCommandInput) {
+  constructor(input: CreateWorkspaceCommandRawInput) {
     this.name = input.name;
     this.orgId = input.orgId;
-    this.roleTemplates = input.roleTemplates || [];
+    this.roleTemplates = input.roleTemplates ?? [];
   }
 
   /**
