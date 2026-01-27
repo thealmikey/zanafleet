@@ -5,3 +5,4 @@ export {
   DEFAULT_NEO4J_URI,
   DEFAULT_NEO4J_DATABASE,
 } from './neo4j.constants';
+export * from './queries';
