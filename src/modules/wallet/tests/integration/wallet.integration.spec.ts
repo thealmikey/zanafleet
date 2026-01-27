@@ -21,57 +21,97 @@ type WalletEvent = WalletCreatedEventV1 | WalletCreditedEventV1 | WalletDebitedE
 
 /**
  * Integration Tests: Wallet Commands End-to-End
+ *
+ * By default, integration suites are skipped unless explicitly enabled.
+ * Set RUN_INTEGRATION_TESTS=true when running with Docker services available.
  */
-describe('Wallet Integration Tests', () => {
-  let module: TestingModule;
-  let commandBus: CommandBus;
-  let eventBus: EventBus;
-  let walletRepository: Repository<WalletEntity>;
+const describeIntegration =
+  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+
+describeIntegration('Wallet Integration Tests', () => {
+  let module!: TestingModule;
+  let commandBus!: CommandBus;
+  let eventBus!: EventBus;
+  let walletRepository!: Repository<WalletEntity>;
   let emittedEvents: WalletEvent[] = [];
+  let moduleInitializationFailed = false;
 
   beforeAll(async () => {
-    module = await Test.createTestingModule({
-      imports: [
-        CqrsModule,
-        TypeOrmModule.forFeature([WalletEntity]),
-      ],
-      providers: [
+    try {
+      module = await Test.createTestingModule({
+        imports: [
+          CqrsModule,
+          TypeOrmModule.forRoot({
+            type: 'postgres',
+            host: process.env.TEST_DB_HOST || 'localhost',
+            port: parseInt(process.env.TEST_DB_PORT || '5432', 10),
+            username: process.env.TEST_DB_USER || 'test',
+            password: process.env.TEST_DB_PASSWORD || 'test',
+            database: process.env.TEST_DB_NAME || 'zanafleet_test',
+            entities: [WalletEntity],
+            synchronize: true,
+            dropSchema: true,
+          }),
+          TypeOrmModule.forFeature([WalletEntity]),
+        ],
+        providers: [
+          CreateWalletCommandHandler,
+          CreditWalletCommandHandler,
+          DebitWalletCommandHandler,
+        ],
+      }).compile();
+
+      await module.init();
+
+      commandBus = module.get<CommandBus>(CommandBus);
+      eventBus = module.get<EventBus>(EventBus);
+      walletRepository = module.get<Repository<WalletEntity>>(
+        getRepositoryToken(WalletEntity),
+      );
+
+      eventBus.subscribe((event) => {
+        if (
+          event instanceof WalletCreatedEventV1 ||
+          event instanceof WalletCreditedEventV1 ||
+          event instanceof WalletDebitedEventV1
+        ) {
+          emittedEvents.push(event);
+        }
+      });
+
+      commandBus.register([
         CreateWalletCommandHandler,
         CreditWalletCommandHandler,
         DebitWalletCommandHandler,
-      ],
-    }).compile();
+      ]);
+    } catch (error) {
+      console.warn(
+        'Failed to initialize Wallet integration test module (database may not be available):',
+        error instanceof Error ? error.message : String(error),
+      );
+      moduleInitializationFailed = true;
+    }
+  });
 
-    commandBus = module.get<CommandBus>(CommandBus);
-    eventBus = module.get<EventBus>(EventBus);
-    walletRepository = module.get<Repository<WalletEntity>>(
-      getRepositoryToken(WalletEntity),
-    );
-
-    eventBus.subscribe((event) => {
-      if (
-        event instanceof WalletCreatedEventV1 ||
-        event instanceof WalletCreditedEventV1 ||
-        event instanceof WalletDebitedEventV1
-      ) {
-        emittedEvents.push(event);
-      }
-    });
-
-    commandBus.register([
-      CreateWalletCommandHandler,
-      CreditWalletCommandHandler,
-      DebitWalletCommandHandler,
-    ]);
+  beforeEach((): void => {
+    if (moduleInitializationFailed) {
+      throw new Error(
+        'Wallet integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d) and TEST_DB_* env vars are set.',
+      );
+    }
   });
 
   afterEach(async () => {
-    emittedEvents = [];
-    await walletRepository.delete({});
+    if (!moduleInitializationFailed) {
+      emittedEvents = [];
+      await walletRepository.delete({});
+    }
   });
 
   afterAll(async () => {
-    await module.close();
+    if (!moduleInitializationFailed) {
+      await module.close();
+    }
   });
 
   describe('CreateWalletCommand', () => {

@@ -30,17 +30,21 @@ import {
  * Requires Docker services: Postgres, Neo4j
  * Run: docker-compose -f docker-compose.test.yml up -d
  */
-describe('CreateActorCommand Integration', () => {
-  let module: TestingModule;
-  let commandBus: CommandBus;
-  let eventBus: EventBus;
-  let actorRepository: Repository<ActorEntity>;
-  let workspaceRepository: Repository<WorkspaceEntity>;
-  let mockNeo4jSession: {
+const describeIntegration =
+  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+
+describeIntegration('CreateActorCommand Integration', () => {
+  let module!: TestingModule;
+  let commandBus!: CommandBus;
+  let eventBus!: EventBus;
+  let actorRepository!: Repository<ActorEntity>;
+  let workspaceRepository!: Repository<WorkspaceEntity>;
+  let mockNeo4jSession!: {
     run: jest.Mock;
     close: jest.Mock;
   };
-  let publishedEvents: unknown[];
+  let publishedEvents: unknown[] = [];
+  let moduleInitializationFailed = false;
 
   // Test fixture IDs
   const roleTemplateId1 = uuidv4();
@@ -64,61 +68,85 @@ describe('CreateActorCommand Integration', () => {
   }
 
   beforeAll(async () => {
-    module = await Test.createTestingModule({
-      imports: [
-        CqrsModule,
-        TypeOrmModule.forRoot({
-          type: 'postgres',
-          host: process.env.TEST_DB_HOST || 'localhost',
-          port: parseInt(process.env.TEST_DB_PORT || '5432', 10),
-          username: process.env.TEST_DB_USER || 'test',
-          password: process.env.TEST_DB_PASSWORD || 'test',
-          database: process.env.TEST_DB_NAME || 'zanafleet_test',
-          entities: [ActorEntity, WorkspaceEntity],
-          synchronize: true,
-          dropSchema: true,
-        }),
-        TypeOrmModule.forFeature([ActorEntity, WorkspaceEntity]),
-      ],
-      providers: [
-        CreateActorCommandHandler,
-        ActorNeo4jProjection,
-        ActorNeo4jInitializer,
-        {
-          provide: Neo4jService,
-          useFactory: createMockNeo4jService,
-        },
-      ],
-    }).compile();
+    try {
+      module = await Test.createTestingModule({
+        imports: [
+          CqrsModule,
+          TypeOrmModule.forRoot({
+            type: 'postgres',
+            host: process.env.TEST_DB_HOST || 'localhost',
+            port: parseInt(process.env.TEST_DB_PORT || '5432', 10),
+            username: process.env.TEST_DB_USER || 'test',
+            password: process.env.TEST_DB_PASSWORD || 'test',
+            database: process.env.TEST_DB_NAME || 'zanafleet_test',
+            entities: [ActorEntity, WorkspaceEntity],
+            synchronize: true,
+            dropSchema: true,
+          }),
+          TypeOrmModule.forFeature([ActorEntity, WorkspaceEntity]),
+        ],
+        providers: [
+          CreateActorCommandHandler,
+          ActorNeo4jProjection,
+          ActorNeo4jInitializer,
+          {
+            provide: Neo4jService,
+            useFactory: createMockNeo4jService,
+          },
+        ],
+      }).compile();
 
-    commandBus = module.get<CommandBus>(CommandBus);
-    eventBus = module.get<EventBus>(EventBus);
-    actorRepository = module.get<Repository<ActorEntity>>(
-      getRepositoryToken(ActorEntity),
-    );
-    workspaceRepository = module.get<Repository<WorkspaceEntity>>(
-      getRepositoryToken(WorkspaceEntity),
-    );
+      commandBus = module.get<CommandBus>(CommandBus);
+      eventBus = module.get<EventBus>(EventBus);
+      actorRepository = module.get<Repository<ActorEntity>>(
+        getRepositoryToken(ActorEntity),
+      );
+      workspaceRepository = module.get<Repository<WorkspaceEntity>>(
+        getRepositoryToken(WorkspaceEntity),
+      );
 
-    // Register command handlers with the command bus
-    commandBus.register([CreateActorCommandHandler]);
+      // Register command handlers with the command bus
+      commandBus.register([CreateActorCommandHandler]);
 
-    // Capture published events
-    publishedEvents = [];
-    jest.spyOn(eventBus, 'publish').mockImplementation((event: unknown) => {
-      publishedEvents.push(event);
-    });
+      // Capture published events
+      publishedEvents = [];
+      jest.spyOn(eventBus, 'publish').mockImplementation((event: unknown) => {
+        publishedEvents.push(event);
+      });
+    } catch (error) {
+      console.warn(
+        'Failed to initialize Actor integration test module (database may not be available):',
+        error instanceof Error ? error.message : String(error),
+      );
+      moduleInitializationFailed = true;
+    }
+  });
+
+  beforeEach((): void => {
+    if (moduleInitializationFailed) {
+      throw new Error(
+        'Actor integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d). Neo4j is mocked for this suite.',
+      );
+    }
   });
 
   beforeEach(async () => {
+    if (moduleInitializationFailed) {
+      return;
+    }
+
     // Reset state
     publishedEvents = [];
     mockNeo4jSession.run.mockClear();
     mockNeo4jSession.close.mockClear();
 
     // Clean up database
-    await actorRepository.delete({});
-    await workspaceRepository.delete({});
+    if (actorRepository) {
+      await actorRepository.delete({});
+    }
+    if (workspaceRepository) {
+      await workspaceRepository.delete({});
+    }
 
     // Create test workspace with roleTemplates
     testWorkspaceId = uuidv4();
@@ -132,11 +160,15 @@ describe('CreateActorCommand Integration', () => {
     workspaceEntity.createdAt = new Date();
     workspaceEntity.updatedAt = new Date();
 
-    await workspaceRepository.save(workspaceEntity);
+    if (workspaceRepository) {
+      await workspaceRepository.save(workspaceEntity);
+    }
   });
 
   afterAll(async () => {
-    await module.close();
+    if (!moduleInitializationFailed) {
+      await module.close();
+    }
   });
 
   describe('workspace validation', () => {
@@ -318,6 +350,9 @@ describe('CreateActorCommand Integration', () => {
     let projection: ActorNeo4jProjection;
 
     beforeEach(() => {
+      if (moduleInitializationFailed) {
+        return;
+      }
       projection = module.get<ActorNeo4jProjection>(ActorNeo4jProjection);
     });
 
@@ -413,6 +448,9 @@ describe('CreateActorCommand Integration', () => {
     let initializer: ActorNeo4jInitializer;
 
     beforeEach(() => {
+      if (moduleInitializationFailed) {
+        return;
+      }
       initializer = module.get<ActorNeo4jInitializer>(ActorNeo4jInitializer);
       mockNeo4jSession.run.mockClear();
       mockNeo4jSession.close.mockClear();

@@ -23,51 +23,86 @@ import { InsufficientFundsException } from '../../../wallet/exceptions/insuffici
  * 4. Verify event emission
  * 5. Test error scenarios: insufficient funds, non-existent wallets
  */
-describe('CreateTransactionCommand Integration Tests', () => {
-  let module: TestingModule;
-  let commandBus: CommandBus;
-  let eventBus: EventBus;
-  let transactionRepository: Repository<TransactionEntity>;
-  let walletRepository: Repository<WalletEntity>;
+const describeIntegration =
+  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+
+describeIntegration('CreateTransactionCommand Integration Tests', () => {
+  let module!: TestingModule;
+  let commandBus!: CommandBus;
+  let eventBus!: EventBus;
+  let transactionRepository!: Repository<TransactionEntity>;
+  let walletRepository!: Repository<WalletEntity>;
   let emittedEvents: TransactionCreatedEventV1[] = [];
+  let moduleInitializationFailed = false;
 
   beforeAll(async () => {
-    module = await Test.createTestingModule({
-      imports: [
-        CqrsModule,
-        TypeOrmModule.forFeature([TransactionEntity, WalletEntity]),
-      ],
-      providers: [
-        CreateTransactionCommandHandler,
-      ],
-    }).compile();
+    try {
+      module = await Test.createTestingModule({
+        imports: [
+          CqrsModule,
+          TypeOrmModule.forRoot({
+            type: 'postgres',
+            host: process.env.TEST_DB_HOST || 'localhost',
+            port: parseInt(process.env.TEST_DB_PORT || '5432', 10),
+            username: process.env.TEST_DB_USER || 'test',
+            password: process.env.TEST_DB_PASSWORD || 'test',
+            database: process.env.TEST_DB_NAME || 'zanafleet_test',
+            entities: [TransactionEntity, WalletEntity],
+            synchronize: true,
+            dropSchema: true,
+          }),
+          TypeOrmModule.forFeature([TransactionEntity, WalletEntity]),
+        ],
+        providers: [
+          CreateTransactionCommandHandler,
+        ],
+      }).compile();
 
-    commandBus = module.get<CommandBus>(CommandBus);
-    eventBus = module.get<EventBus>(EventBus);
-    transactionRepository = module.get<Repository<TransactionEntity>>(
-      getRepositoryToken(TransactionEntity),
-    );
-    walletRepository = module.get<Repository<WalletEntity>>(
-      getRepositoryToken(WalletEntity),
-    );
+      commandBus = module.get<CommandBus>(CommandBus);
+      eventBus = module.get<EventBus>(EventBus);
+      transactionRepository = module.get<Repository<TransactionEntity>>(
+        getRepositoryToken(TransactionEntity),
+      );
+      walletRepository = module.get<Repository<WalletEntity>>(
+        getRepositoryToken(WalletEntity),
+      );
 
-    eventBus.subscribe((event) => {
-      if (event instanceof TransactionCreatedEventV1) {
-        emittedEvents.push(event);
-      }
-    });
+      eventBus.subscribe((event) => {
+        if (event instanceof TransactionCreatedEventV1) {
+          emittedEvents.push(event);
+        }
+      });
 
-    commandBus.register([CreateTransactionCommandHandler]);
+      commandBus.register([CreateTransactionCommandHandler]);
+    } catch (error) {
+      console.warn(
+        'Failed to initialize Transaction integration test module (database may not be available):',
+        error instanceof Error ? error.message : String(error),
+      );
+      moduleInitializationFailed = true;
+    }
+  });
+
+  beforeEach((): void => {
+    if (moduleInitializationFailed) {
+      throw new Error(
+        'Transaction integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d) and TEST_DB_* env vars are set.',
+      );
+    }
   });
 
   afterEach(async () => {
-    emittedEvents = [];
-    await transactionRepository.delete({});
-    await walletRepository.delete({});
+    if (!moduleInitializationFailed) {
+      emittedEvents = [];
+      await transactionRepository.delete({});
+      await walletRepository.delete({});
+    }
   });
 
   afterAll(async () => {
-    await module.close();
+    if (!moduleInitializationFailed) {
+      await module.close();
+    }
   });
 
   async function createWallet(
