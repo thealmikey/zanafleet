@@ -24,25 +24,25 @@ import { OrganizationType, OrganizationStatus } from '../dto/organization.enums'
 @Index(['createdAt'])
 export class OrganizationEntity {
   @PrimaryColumn('uuid')
-  id: string; // organizationId
+  id!: string; // organizationId
 
   @Column('varchar', { length: 255 })
-  name: string;
+  name!: string;
 
   @Column('enum', { enum: OrganizationType })
-  type: OrganizationType;
+  type!: OrganizationType;
 
   @Column('enum', { enum: OrganizationStatus })
-  status: OrganizationStatus;
+  status!: OrganizationStatus;
 
   @Column('uuid', { array: true, default: () => 'ARRAY[]::uuid[]' })
-  linkedWallets: string[]; // Array of wallet UUIDs
+  linkedWallets!: string[]; // Array of wallet UUIDs
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ type: 'timestamp with time zone' })
-  updatedAt: Date;
+  updatedAt!: Date;
 
   /**
    * Convert entity to domain object

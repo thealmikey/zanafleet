@@ -35,6 +35,16 @@ describe('CreateRoleCommand Integration Tests', () => {
     module = await Test.createTestingModule({
       imports: [
         CqrsModule,
+        TypeOrmModule.forRoot({
+          type: 'postgres',
+          host: 'localhost',
+          port: 5432,
+          username: 'postgres',
+          password: 'postgres',
+          database: 'zanafleet_test',
+          entities: [RoleEntity],
+          synchronize: true,
+        }),
         TypeOrmModule.forFeature([RoleEntity]),
       ],
       providers: [
@@ -59,11 +69,15 @@ describe('CreateRoleCommand Integration Tests', () => {
 
   afterEach(async () => {
     emittedEvents = [];
-    await roleRepository.delete({});
+    if (roleRepository) {
+      await roleRepository.delete({});
+    }
   });
 
   afterAll(async () => {
-    await module.close();
+    if (module) {
+      await module.close();
+    }
   });
 
   describe('Complete Command Flow', () => {
