@@ -37,7 +37,8 @@ describe('CreateOrganizationCommand', () => {
         status: OrganizationStatus.PILOT,
       };
 
-      const command = new CreateOrganizationCommand(input);
+      const validated = CreateOrganizationCommand.validate(input);
+      const command = new CreateOrganizationCommand(validated);
 
       expect(command.linkedWallets).toEqual([]);
     });

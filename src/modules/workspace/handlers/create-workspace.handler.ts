@@ -116,9 +116,10 @@ export class CreateWorkspaceCommandHandler
 
       return workspaceId;
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
-        `Failed to create workspace: ${error.message}`,
-        error.stack,
+        `Failed to create workspace: ${err.message}`,
+        err.stack,
       );
       throw error;
     }

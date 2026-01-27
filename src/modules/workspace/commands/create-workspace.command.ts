@@ -7,9 +7,9 @@ import { z } from 'zod';
 export const CreateWorkspaceCommandSchema = z.object({
   name: z
     .string()
+    .trim()
     .min(1, 'Workspace name is required')
-    .max(255, 'Workspace name must not exceed 255 characters')
-    .trim(),
+    .max(255, 'Workspace name must not exceed 255 characters'),
   orgId: z
     .string()
     .uuid('Organization ID must be a valid UUID'),

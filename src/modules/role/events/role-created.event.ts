@@ -108,7 +108,7 @@ export class RoleCreatedEventV1 {
     eventId: string;
     roleId: string;
     name: string;
-    permissions: string[];
+    permissions: readonly string[] | string[];
     scope: RoleScope;
     createdAt: string;
     occurredAt: string;
@@ -119,7 +119,7 @@ export class RoleCreatedEventV1 {
       eventId: data.eventId,
       roleId: data.roleId,
       name: data.name,
-      permissions: data.permissions,
+      permissions: [...data.permissions],
       scope: data.scope,
       createdAt: new Date(data.createdAt),
       occurredAt: new Date(data.occurredAt),

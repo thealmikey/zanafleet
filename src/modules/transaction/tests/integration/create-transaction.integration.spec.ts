@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CommandBus, EventBus, CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { DataSource, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { CreateTransactionCommand } from '../../commands/create-transaction.command';
 import { TransactionCreatedEventV1 } from '../../events/transaction-created.event';

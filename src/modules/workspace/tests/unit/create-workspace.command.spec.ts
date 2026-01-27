@@ -211,7 +211,7 @@ describe('CreateWorkspaceCommand', () => {
 
     it('should default roleTemplates to empty array when undefined', () => {
       const input = { name: 'Test', orgId: validInput.orgId, roleTemplates: undefined };
-      const command = new CreateWorkspaceCommand(input as CreateWorkspaceCommandInput);
+      const command = new CreateWorkspaceCommand(input as unknown as CreateWorkspaceCommandInput);
 
       expect(command.roleTemplates).toEqual([]);
     });

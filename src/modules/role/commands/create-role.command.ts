@@ -8,9 +8,9 @@ import { RoleScope } from '../dto/role.enums';
 export const CreateRoleCommandSchema = z.object({
   name: z
     .string()
+    .trim()
     .min(1, 'Role name is required')
-    .max(255, 'Role name must not exceed 255 characters')
-    .trim(),
+    .max(255, 'Role name must not exceed 255 characters'),
   permissions: z
     .array(z.string().min(1, 'Permission cannot be empty'))
     .optional()

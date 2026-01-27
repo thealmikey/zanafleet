@@ -46,7 +46,7 @@ export class OrganizationNeo4jProjection
 
     try {
       // Create/update Organization node with MERGE to ensure idempotency
-      const result = await session.run(
+      await session.run(
         `
         MERGE (org:Organization {id: $organizationId})
         SET 
@@ -73,9 +73,10 @@ export class OrganizationNeo4jProjection
         `Organization node created/updated in Neo4j: ${event.organizationId}`,
       );
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
-        `Failed to project organization to Neo4j: ${error.message}`,
-        error.stack,
+        `Failed to project organization to Neo4j: ${err.message}`,
+        err.stack,
       );
       throw error;
     } finally {
@@ -131,9 +132,10 @@ export class OrganizationNeo4jInitializer {
       );
       this.logger.log('Index on Organization.createdAt created');
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
-        `Failed to initialize Neo4j constraints/indexes: ${error.message}`,
-        error.stack,
+        `Failed to initialize Neo4j constraints/indexes: ${err.message}`,
+        err.stack,
       );
       throw error;
     } finally {

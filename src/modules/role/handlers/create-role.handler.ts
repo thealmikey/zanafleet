@@ -107,9 +107,10 @@ export class CreateRoleCommandHandler
 
       return roleId;
     } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
-        `Failed to create role: ${error.message}`,
-        error.stack,
+        `Failed to create role: ${err.message}`,
+        err.stack,
       );
       throw error;
     }
