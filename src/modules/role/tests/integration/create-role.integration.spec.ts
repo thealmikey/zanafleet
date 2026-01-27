@@ -10,6 +10,9 @@ import { CreateRoleCommandHandler } from '../../handlers/create-role.handler';
 import { RoleEntity } from '../../entities/role.entity';
 import { RoleScope } from '../../dto/role.enums';
 
+const describeIntegration =
+  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+
 /**
  * Integration Tests: CreateRoleCommand End-to-End
  *
@@ -24,58 +27,76 @@ import { RoleScope } from '../../dto/role.enums';
  * - TypeORM with test database (SQLite or PostgreSQL test DB)
  * - NestJS CQRS module
  */
-describe('CreateRoleCommand Integration Tests', () => {
-  let module: TestingModule;
-  let commandBus: CommandBus;
-  let eventBus: EventBus;
-  let roleRepository: Repository<RoleEntity>;
+describeIntegration('CreateRoleCommand Integration Tests', () => {
+  let module!: TestingModule;
+  let commandBus!: CommandBus;
+  let eventBus!: EventBus;
+  let roleRepository!: Repository<RoleEntity>;
   let emittedEvents: RoleCreatedEventV1[] = [];
+  let moduleInitializationFailed = false;
 
   beforeAll(async () => {
-    module = await Test.createTestingModule({
-      imports: [
-        CqrsModule,
-        TypeOrmModule.forRoot({
-          type: 'postgres',
-          host: 'localhost',
-          port: 5432,
-          username: 'postgres',
-          password: 'postgres',
-          database: 'zanafleet_test',
-          entities: [RoleEntity],
-          synchronize: true,
-        }),
-        TypeOrmModule.forFeature([RoleEntity]),
-      ],
-      providers: [
-        CreateRoleCommandHandler,
-      ],
-    }).compile();
+    try {
+      module = await Test.createTestingModule({
+        imports: [
+          CqrsModule,
+          TypeOrmModule.forRoot({
+            type: 'postgres',
+            host: process.env.TEST_DB_HOST || 'localhost',
+            port: parseInt(process.env.TEST_DB_PORT || '5432', 10),
+            username: process.env.TEST_DB_USER || 'test',
+            password: process.env.TEST_DB_PASSWORD || 'test',
+            database: process.env.TEST_DB_NAME || 'zanafleet_test',
+            entities: [RoleEntity],
+            synchronize: true,
+            dropSchema: true,
+          }),
+          TypeOrmModule.forFeature([RoleEntity]),
+        ],
+        providers: [CreateRoleCommandHandler],
+      }).compile();
 
-    commandBus = module.get<CommandBus>(CommandBus);
-    eventBus = module.get<EventBus>(EventBus);
-    roleRepository = module.get<Repository<RoleEntity>>(
-      getRepositoryToken(RoleEntity),
-    );
+      commandBus = module.get<CommandBus>(CommandBus);
+      eventBus = module.get<EventBus>(EventBus);
+      roleRepository = module.get<Repository<RoleEntity>>(
+        getRepositoryToken(RoleEntity),
+      );
 
-    eventBus.subscribe((event) => {
-      if (event instanceof RoleCreatedEventV1) {
-        emittedEvents.push(event);
-      }
-    });
+      eventBus.subscribe((event) => {
+        if (event instanceof RoleCreatedEventV1) {
+          emittedEvents.push(event);
+        }
+      });
 
-    commandBus.register([CreateRoleCommandHandler]);
-  });
-
-  afterEach(async () => {
-    emittedEvents = [];
-    if (roleRepository) {
-      await roleRepository.delete({});
+      commandBus.register([CreateRoleCommandHandler]);
+    } catch (error) {
+      console.warn(
+        'Failed to initialize Role integration test module (database may not be available):',
+        error instanceof Error ? error.message : String(error),
+      );
+      moduleInitializationFailed = true;
     }
   });
 
+  beforeEach((): void => {
+    if (moduleInitializationFailed) {
+      throw new Error(
+        'Role integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d).',
+      );
+    }
+  });
+
+  afterEach(async () => {
+    if (moduleInitializationFailed) {
+      return;
+    }
+
+    emittedEvents = [];
+    await roleRepository.delete({});
+  });
+
   afterAll(async () => {
-    if (module) {
+    if (!moduleInitializationFailed) {
       await module.close();
     }
   });
