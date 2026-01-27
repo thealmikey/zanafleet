@@ -26,31 +26,31 @@ import { TransactionType, TransactionStatus } from '../dto/transaction.enums';
 @Index(['createdAt'])
 export class TransactionEntity {
   @PrimaryColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column('uuid')
-  sourceWalletId: string;
+  sourceWalletId!: string;
 
   @Column('uuid')
-  destinationWalletId: string;
+  destinationWalletId!: string;
 
   @Column('decimal', { precision: 18, scale: 2 })
-  amount: string;
+  amount!: string;
 
   @Column('enum', { enum: TransactionType })
-  type: TransactionType;
+  type!: TransactionType;
 
   @Column('enum', { enum: TransactionStatus })
-  status: TransactionStatus;
+  status!: TransactionStatus;
 
   @Column('uuid', { nullable: true })
-  linkedEventId: string | null;
+  linkedEventId!: string | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ type: 'timestamp with time zone' })
-  updatedAt: Date;
+  updatedAt!: Date;
 
   /**
    * Convert entity to domain object
