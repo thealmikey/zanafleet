@@ -91,6 +91,7 @@ export class TransactionEntity {
     status: TransactionStatus;
     linkedEventId?: string | null;
     createdAt: Date;
+    updatedAt?: Date;
   }): TransactionEntity {
     const entity = new TransactionEntity();
     entity.id = data.transactionId;
@@ -101,6 +102,7 @@ export class TransactionEntity {
     entity.status = data.status;
     entity.linkedEventId = data.linkedEventId ?? null;
     entity.createdAt = data.createdAt;
+    entity.updatedAt = data.updatedAt ?? data.createdAt;
     return entity;
   }
 }
