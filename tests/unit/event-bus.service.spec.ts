@@ -192,6 +192,56 @@ describe('EventBusService', () => {
 
       expect(mockEventLogger.logFailed).toHaveBeenCalledWith(event, error, 3);
     });
+
+    it('should invoke onRetry callback with correct parameters', async () => {
+      const event = createMockEvent();
+      const retryError = new Error('Temporary failure');
+
+      mockRetryService.executeWithRetry.mockImplementationOnce(async (_operation, options) => {
+        options?.onRetry?.(2, retryError, 1500);
+        return { success: false, error: retryError, attempts: 3 };
+      });
+
+      await expect(service.publish('test.subject', event)).rejects.toThrow(retryError);
+
+      expect(mockEventLogger.logRetry).toHaveBeenCalledTimes(1);
+      expect(mockEventLogger.logRetry).toHaveBeenCalledWith(event, 2, 1500);
+      expect(mockEventLogger.logFailed).toHaveBeenCalledWith(event, retryError, 3);
+    });
+
+    it('should log failure and rethrow when retry is disabled', async () => {
+      const event = createMockEvent();
+      const error = new Error('Immediate failure');
+      mockNatsClient.emit.mockReturnValueOnce(throwError(() => error));
+
+      await expect(
+        service.publish('test.subject', event, { retry: false }),
+      ).rejects.toThrow(error);
+
+      expect(mockRetryService.executeWithRetry).not.toHaveBeenCalled();
+      expect(mockEventLogger.logFailed).toHaveBeenCalledTimes(1);
+      expect(mockEventLogger.logFailed).toHaveBeenCalledWith(event, error);
+    });
+
+    it('should throw unknown error when retry result lacks error detail', async () => {
+      expect.assertions(4);
+      const event = createMockEvent();
+      mockRetryService.executeWithRetry.mockResolvedValueOnce({
+        success: false,
+        attempts: 4,
+      });
+
+      let caughtError: Error | undefined;
+      await service.publish('test.subject', event).catch((error) => {
+        caughtError = error as Error;
+      });
+
+      expect(caughtError).toBeDefined();
+      const finalError = caughtError as Error;
+      expect(finalError.message).toBe('Unknown error during publish');
+      expect(mockEventLogger.logFailed).toHaveBeenCalledTimes(1);
+      expect(mockEventLogger.logFailed).toHaveBeenCalledWith(event, finalError, 4);
+    });
   });
 
   describe('publishEvent', () => {
