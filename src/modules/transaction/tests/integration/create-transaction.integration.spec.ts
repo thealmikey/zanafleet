@@ -58,6 +58,8 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
         ],
       }).compile();
 
+      await module.init();
+
       commandBus = module.get<CommandBus>(CommandBus);
       eventBus = module.get<EventBus>(EventBus);
       transactionRepository = module.get<Repository<TransactionEntity>>(
