@@ -95,9 +95,10 @@ export class CreateOrganizationCommandHandler
 
       return organizationId;
     } catch (error) {
+      const err = error as Error;
       this.logger.error(
-        `Failed to create organization: ${error.message}`,
-        error.stack,
+        `Failed to create organization: ${err.message}`,
+        err.stack,
       );
       throw error;
     }

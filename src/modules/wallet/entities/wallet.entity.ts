@@ -25,28 +25,28 @@ import { WalletType, OwnerType } from '../dto/wallet.enums';
 @Index(['ownerId', 'type'])
 export class WalletEntity {
   @PrimaryColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column('uuid')
-  ownerId: string;
+  ownerId!: string;
 
   @Column('enum', { enum: OwnerType })
-  ownerType: OwnerType;
+  ownerType!: OwnerType;
 
   @Column('enum', { enum: WalletType })
-  type: WalletType;
+  type!: WalletType;
 
   @Column('varchar', { length: 3 })
-  currency: string;
+  currency!: string;
 
   @Column('decimal', { precision: 18, scale: 2, default: 0 })
-  balance: string;
+  balance!: string;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ type: 'timestamp with time zone' })
-  updatedAt: Date;
+  updatedAt!: Date;
 
   /**
    * Convert entity to domain object

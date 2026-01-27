@@ -26,22 +26,22 @@ import { RoleScope } from '../dto/role.enums';
 @Index(['createdAt'])
 export class RoleEntity {
   @PrimaryColumn('uuid')
-  id: string;
+  id!: string;
 
   @Column('varchar', { length: 255 })
-  name: string;
+  name!: string;
 
   @Column('varchar', { array: true, default: () => "ARRAY[]::varchar[]" })
-  permissions: string[];
+  permissions!: string[];
 
   @Column('enum', { enum: RoleScope })
-  scope: RoleScope;
+  scope!: RoleScope;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ type: 'timestamp with time zone' })
-  updatedAt: Date;
+  updatedAt!: Date;
 
   /**
    * Convert entity to domain object

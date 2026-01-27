@@ -69,9 +69,10 @@ export class WorkspaceNeo4jProjection
         `Workspace node created/updated in Neo4j with PART_OF relationship: ${event.workspaceId}`,
       );
     } catch (error) {
+      const err = error as Error;
       this.logger.error(
-        `Failed to project workspace to Neo4j: ${error.message}`,
-        error.stack,
+        `Failed to project workspace to Neo4j: ${err.message}`,
+        err.stack,
       );
       throw error;
     } finally {
@@ -120,9 +121,10 @@ export class WorkspaceNeo4jInitializer {
       );
       this.logger.log('Index on Workspace.createdAt created');
     } catch (error) {
+      const err = error as Error;
       this.logger.error(
-        `Failed to initialize Neo4j constraints/indexes: ${error.message}`,
-        error.stack,
+        `Failed to initialize Neo4j constraints/indexes: ${err.message}`,
+        err.stack,
       );
       throw error;
     } finally {

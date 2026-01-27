@@ -47,8 +47,8 @@ describe('EventBus Integration Tests', () => {
         eventId: uuidv4(),
         organizationId: uuidv4(),
         name: 'Test Org',
-        type: OrganizationType.Sacco,
-        status: OrganizationStatus.Active,
+        type: OrganizationType.SACCO,
+        status: OrganizationStatus.ACTIVE,
         linkedWallets: [],
         createdAt: new Date(),
       });
@@ -69,8 +69,8 @@ describe('EventBus Integration Tests', () => {
         eventId: uuidv4(),
         organizationId: uuidv4(),
         name: 'Test Org',
-        type: OrganizationType.Sacco,
-        status: OrganizationStatus.Active,
+        type: OrganizationType.SACCO,
+        status: OrganizationStatus.ACTIVE,
         linkedWallets: [],
         createdAt: new Date(),
       });
@@ -110,8 +110,8 @@ describe('EventBus Integration Tests', () => {
         eventId: uuidv4(),
         organizationId: uuidv4(),
         name: 'Test Org',
-        type: OrganizationType.Sacco,
-        status: OrganizationStatus.Active,
+        type: OrganizationType.SACCO,
+        status: OrganizationStatus.ACTIVE,
         linkedWallets: [],
         createdAt: new Date(),
       });

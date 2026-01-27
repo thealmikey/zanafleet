@@ -22,22 +22,22 @@ import {
 @Index(['createdAt'])
 export class WorkspaceEntity {
   @PrimaryColumn('uuid')
-  id: string; // workspaceId
+  id!: string; // workspaceId
 
   @Column('uuid')
-  orgId: string; // Parent organization UUID
+  orgId!: string; // Parent organization UUID
 
   @Column('varchar', { length: 255 })
-  name: string;
+  name!: string;
 
   @Column('uuid', { array: true, default: () => 'ARRAY[]::uuid[]' })
-  roleTemplates: string[]; // Array of role template UUIDs
+  roleTemplates!: string[]; // Array of role template UUIDs
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn({ type: 'timestamp with time zone' })
-  updatedAt: Date;
+  updatedAt!: Date;
 
   /**
    * Convert entity to domain object

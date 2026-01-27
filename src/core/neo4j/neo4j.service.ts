@@ -42,7 +42,7 @@ export interface Neo4jModuleOptions {
 @Injectable()
 export class Neo4jService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(Neo4jService.name);
-  private driver: Driver;
+  private driver!: Driver;
   private readonly uri: string;
   private readonly user: string | undefined;
   private readonly password: string | undefined;
@@ -50,7 +50,7 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     @Inject(NEO4J_MODULE_OPTIONS)
-    private readonly options: Neo4jModuleOptions,
+    options: Neo4jModuleOptions,
   ) {
     this.uri = options.uri || DEFAULT_NEO4J_URI;
     this.user = options.user;

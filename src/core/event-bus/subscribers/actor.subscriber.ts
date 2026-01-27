@@ -41,7 +41,7 @@ export class ActorSubscriber {
 
     try {
       if (data.eventType === 'ActorOnboardedEvent-V1') {
-        const event = ActorOnboardedEventV1.fromJSON(data as Record<string, unknown>);
+        const event = ActorOnboardedEventV1.fromJSON(data as unknown as Record<string, unknown>);
         await this.projection.handle(event);
         this.eventLogger.logProcessed(event, ActorNeo4jProjection.name);
       }

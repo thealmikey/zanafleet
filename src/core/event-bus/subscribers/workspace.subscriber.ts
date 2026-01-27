@@ -41,7 +41,7 @@ export class WorkspaceSubscriber {
 
     try {
       if (data.eventType === 'WorkspaceCreatedEvent-V1') {
-        const event = WorkspaceCreatedEventV1.fromJSON(data);
+        const event = WorkspaceCreatedEventV1.fromJSON(data as unknown as Record<string, unknown>);
         await this.projection.handle(event);
         this.eventLogger.logProcessed(event, WorkspaceNeo4jProjection.name);
       }
