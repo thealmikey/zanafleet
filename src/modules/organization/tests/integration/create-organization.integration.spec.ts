@@ -9,6 +9,9 @@ import { CreateOrganizationCommandHandler } from '../../handlers/create-organiza
 import { OrganizationEntity } from '../../entities/organization.entity';
 import { OrganizationType, OrganizationStatus } from '../../dto/organization.enums';
 
+const describeIntegration =
+  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+
 /**
  * Integration Tests: CreateOrganizationCommand End-to-End
  * 
@@ -24,53 +27,78 @@ import { OrganizationType, OrganizationStatus } from '../../dto/organization.enu
  * - NestJS CQRS module
  * - Mock NATS/EventBus
  */
-describe('CreateOrganizationCommand Integration Tests', () => {
-  let module: TestingModule;
-  let commandBus: CommandBus;
-  let eventBus: EventBus;
-  let organizationRepository: Repository<OrganizationEntity>;
+describeIntegration('CreateOrganizationCommand Integration Tests', () => {
+  let module!: TestingModule;
+  let commandBus!: CommandBus;
+  let eventBus!: EventBus;
+  let organizationRepository!: Repository<OrganizationEntity>;
   let emittedEvents: OrganizationCreatedEventV1[] = [];
+  let moduleInitializationFailed = false;
 
   beforeAll(async () => {
-    module = await Test.createTestingModule({
-      imports: [
-        CqrsModule,
-        // TypeOrmModule configured for test database
-        // For integration tests, use a test PostgreSQL or SQLite database
-        TypeOrmModule.forFeature([OrganizationEntity]),
-      ],
-      providers: [
-        CreateOrganizationCommandHandler,
-        // Add other event handlers as needed
-      ],
-    }).compile();
+    try {
+      module = await Test.createTestingModule({
+        imports: [
+          CqrsModule,
+          TypeOrmModule.forRoot({
+            type: 'postgres',
+            host: process.env.TEST_DB_HOST || 'localhost',
+            port: parseInt(process.env.TEST_DB_PORT || '5432', 10),
+            username: process.env.TEST_DB_USER || 'test',
+            password: process.env.TEST_DB_PASSWORD || 'test',
+            database: process.env.TEST_DB_NAME || 'zanafleet_test',
+            entities: [OrganizationEntity],
+            synchronize: true,
+            dropSchema: true,
+          }),
+          TypeOrmModule.forFeature([OrganizationEntity]),
+        ],
+        providers: [CreateOrganizationCommandHandler],
+      }).compile();
 
-    commandBus = module.get<CommandBus>(CommandBus);
-    eventBus = module.get<EventBus>(EventBus);
-    organizationRepository = module.get<Repository<OrganizationEntity>>(
-      getRepositoryToken(OrganizationEntity),
-    );
+      commandBus = module.get<CommandBus>(CommandBus);
+      eventBus = module.get<EventBus>(EventBus);
+      organizationRepository = module.get<Repository<OrganizationEntity>>(
+        getRepositoryToken(OrganizationEntity),
+      );
 
-    // Subscribe to events for verification
-    eventBus.subscribe((event) => {
-      if (event instanceof OrganizationCreatedEventV1) {
-        emittedEvents.push(event);
-      }
-    });
+      eventBus.subscribe((event) => {
+        if (event instanceof OrganizationCreatedEventV1) {
+          emittedEvents.push(event);
+        }
+      });
 
-    // Register command handlers
-    commandBus.register([CreateOrganizationCommandHandler]);
+      commandBus.register([CreateOrganizationCommandHandler]);
+    } catch (error) {
+      console.warn(
+        'Failed to initialize Organization integration test module (database may not be available):',
+        error instanceof Error ? error.message : String(error),
+      );
+      moduleInitializationFailed = true;
+    }
+  });
+
+  beforeEach((): void => {
+    if (moduleInitializationFailed) {
+      throw new Error(
+        'Organization integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d).',
+      );
+    }
   });
 
   afterEach(async () => {
-    // Clear emitted events
+    if (moduleInitializationFailed) {
+      return;
+    }
+
     emittedEvents = [];
-    // Clear database
     await organizationRepository.delete({});
   });
 
   afterAll(async () => {
-    await module.close();
+    if (!moduleInitializationFailed) {
+      await module.close();
+    }
   });
 
   describe('Complete Command Flow', () => {

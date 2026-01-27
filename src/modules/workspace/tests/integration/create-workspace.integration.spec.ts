@@ -9,63 +9,90 @@ import { CreateWorkspaceCommand } from '../../commands/create-workspace.command'
 import { CreateWorkspaceCommandHandler } from '../../handlers/create-workspace.handler';
 import { WorkspaceEntity } from '../../entities/workspace.entity';
 import { WorkspaceCreatedEventV1 } from '../../events/workspace-created.event';
+import { WorkspaceType, WorkspaceStatus } from '../../dto/workspace.enums';
 import { OrganizationEntity } from '../../../organization/entities/organization.entity';
 import { OrganizationType, OrganizationStatus } from '../../../organization/dto/organization.enums';
 
-describe('CreateWorkspaceCommand Integration', () => {
-  let module: TestingModule;
-  let commandBus: CommandBus;
-  let eventBus: EventBus;
-  let workspaceRepository: Repository<WorkspaceEntity>;
-  let organizationRepository: Repository<OrganizationEntity>;
-  let dataSource: DataSource;
+const describeIntegration =
+  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
-  let testOrgId: string;
+describeIntegration('CreateWorkspaceCommand Integration', () => {
+  let module!: TestingModule;
+  let commandBus!: CommandBus;
+  let eventBus!: EventBus;
+  let workspaceRepository!: Repository<WorkspaceEntity>;
+  let organizationRepository!: Repository<OrganizationEntity>;
+  let dataSource!: DataSource;
+
+  let testOrgId!: string;
   const publishedEvents: unknown[] = [];
+  let moduleInitializationFailed = false;
 
   beforeAll(async () => {
-    module = await Test.createTestingModule({
-      imports: [
-        CqrsModule,
-        TypeOrmModule.forRoot({
-          type: 'postgres',
-          host: process.env.TEST_DB_HOST || 'localhost',
-          port: parseInt(process.env.TEST_DB_PORT || '5432', 10),
-          username: process.env.TEST_DB_USER || 'test',
-          password: process.env.TEST_DB_PASSWORD || 'test',
-          database: process.env.TEST_DB_NAME || 'zanafleet_test',
-          entities: [WorkspaceEntity, OrganizationEntity],
-          synchronize: true,
-          dropSchema: true,
-        }),
-        TypeOrmModule.forFeature([WorkspaceEntity, OrganizationEntity]),
-      ],
-      providers: [CreateWorkspaceCommandHandler],
-    }).compile();
+    try {
+      module = await Test.createTestingModule({
+        imports: [
+          CqrsModule,
+          TypeOrmModule.forRoot({
+            type: 'postgres',
+            host: process.env.TEST_DB_HOST || 'localhost',
+            port: parseInt(process.env.TEST_DB_PORT || '5432', 10),
+            username: process.env.TEST_DB_USER || 'test',
+            password: process.env.TEST_DB_PASSWORD || 'test',
+            database: process.env.TEST_DB_NAME || 'zanafleet_test',
+            entities: [WorkspaceEntity, OrganizationEntity],
+            synchronize: true,
+            dropSchema: true,
+          }),
+          TypeOrmModule.forFeature([WorkspaceEntity, OrganizationEntity]),
+        ],
+        providers: [CreateWorkspaceCommandHandler],
+      }).compile();
 
-    commandBus = module.get<CommandBus>(CommandBus);
-    eventBus = module.get<EventBus>(EventBus);
-    workspaceRepository = module.get<Repository<WorkspaceEntity>>(
-      getRepositoryToken(WorkspaceEntity),
-    );
-    organizationRepository = module.get<Repository<OrganizationEntity>>(
-      getRepositoryToken(OrganizationEntity),
-    );
-    dataSource = module.get<DataSource>(DataSource);
+      commandBus = module.get<CommandBus>(CommandBus);
+      eventBus = module.get<EventBus>(EventBus);
+      workspaceRepository = module.get<Repository<WorkspaceEntity>>(
+        getRepositoryToken(WorkspaceEntity),
+      );
+      organizationRepository = module.get<Repository<OrganizationEntity>>(
+        getRepositoryToken(OrganizationEntity),
+      );
+      dataSource = module.get<DataSource>(DataSource);
 
-    commandBus.register([CreateWorkspaceCommandHandler]);
+      commandBus.register([CreateWorkspaceCommandHandler]);
 
-    jest.spyOn(eventBus, 'publish').mockImplementation((event) => {
-      publishedEvents.push(event);
-    });
+      jest.spyOn(eventBus, 'publish').mockImplementation((event) => {
+        publishedEvents.push(event);
+      });
+    } catch (error) {
+      console.warn(
+        'Failed to initialize Workspace integration test module (database may not be available):',
+        error instanceof Error ? error.message : String(error),
+      );
+      moduleInitializationFailed = true;
+    }
+  });
+
+  beforeEach((): void => {
+    if (moduleInitializationFailed) {
+      throw new Error(
+        'Workspace integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d).',
+      );
+    }
   });
 
   afterAll(async () => {
-    await dataSource.destroy();
-    await module.close();
+    if (!moduleInitializationFailed) {
+      await dataSource.destroy();
+      await module.close();
+    }
   });
 
   beforeEach(async () => {
+    if (moduleInitializationFailed) {
+      return;
+    }
+
     publishedEvents.length = 0;
 
     testOrgId = uuidv4();
@@ -81,6 +108,10 @@ describe('CreateWorkspaceCommand Integration', () => {
   });
 
   afterEach(async () => {
+    if (moduleInitializationFailed) {
+      return;
+    }
+
     await workspaceRepository.delete({});
     await organizationRepository.delete({});
   });
@@ -91,6 +122,7 @@ describe('CreateWorkspaceCommand Integration', () => {
       const command = new CreateWorkspaceCommand({
         name: 'Test Workspace',
         orgId: nonExistentOrgId,
+        type: WorkspaceType.BUSINESS,
         roleTemplates: [],
       });
 
@@ -105,6 +137,7 @@ describe('CreateWorkspaceCommand Integration', () => {
       const command = new CreateWorkspaceCommand({
         name: 'Test Workspace',
         orgId: nonExistentOrgId,
+        type: WorkspaceType.BUSINESS,
         roleTemplates: [],
       });
 
@@ -122,6 +155,7 @@ describe('CreateWorkspaceCommand Integration', () => {
       const command = new CreateWorkspaceCommand({
         name: 'Test Workspace',
         orgId: nonExistentOrgId,
+        type: WorkspaceType.BUSINESS,
         roleTemplates: [],
       });
 
@@ -141,6 +175,7 @@ describe('CreateWorkspaceCommand Integration', () => {
       const command = new CreateWorkspaceCommand({
         name: 'My Workspace',
         orgId: testOrgId,
+        type: WorkspaceType.BUSINESS,
         roleTemplates: [],
       });
 
@@ -157,6 +192,7 @@ describe('CreateWorkspaceCommand Integration', () => {
       const command = new CreateWorkspaceCommand({
         name: 'Persisted Workspace',
         orgId: testOrgId,
+        type: WorkspaceType.BUSINESS,
         roleTemplates: ['550e8400-e29b-41d4-a716-446655440001'],
       });
 
@@ -170,6 +206,7 @@ describe('CreateWorkspaceCommand Integration', () => {
       expect(entity!.name).toBe('Persisted Workspace');
       expect(entity!.orgId).toBe(testOrgId);
       expect(entity!.roleTemplates).toEqual(['550e8400-e29b-41d4-a716-446655440001']);
+      expect(entity!.status).toBe(WorkspaceStatus.ACTIVE);
       expect(entity!.createdAt).toBeInstanceOf(Date);
       expect(entity!.updatedAt).toBeInstanceOf(Date);
     });
@@ -178,6 +215,7 @@ describe('CreateWorkspaceCommand Integration', () => {
       const command = new CreateWorkspaceCommand({
         name: 'Empty Templates Workspace',
         orgId: testOrgId,
+        type: WorkspaceType.BUSINESS,
         roleTemplates: [],
       });
 
@@ -197,6 +235,7 @@ describe('CreateWorkspaceCommand Integration', () => {
       const command = new CreateWorkspaceCommand({
         name: 'Event Test Workspace',
         orgId: testOrgId,
+        type: WorkspaceType.BUSINESS,
         roleTemplates: [],
       });
 
@@ -211,6 +250,7 @@ describe('CreateWorkspaceCommand Integration', () => {
       const command = new CreateWorkspaceCommand({
         name: 'Payload Test Workspace',
         orgId: testOrgId,
+        type: WorkspaceType.BUSINESS,
         roleTemplates,
       });
 
@@ -236,6 +276,7 @@ describe('CreateWorkspaceCommand Integration', () => {
       const command = new CreateWorkspaceCommand({
         name: 'Immutable Test',
         orgId: testOrgId,
+        type: WorkspaceType.BUSINESS,
         roleTemplates: ['770e8400-e29b-41d4-a716-446655440001'],
       });
 
@@ -252,11 +293,13 @@ describe('CreateWorkspaceCommand Integration', () => {
       const command1 = new CreateWorkspaceCommand({
         name: 'Workspace One',
         orgId: testOrgId,
+        type: WorkspaceType.BUSINESS,
         roleTemplates: [],
       });
       const command2 = new CreateWorkspaceCommand({
         name: 'Workspace Two',
         orgId: testOrgId,
+        type: WorkspaceType.BUSINESS,
         roleTemplates: [],
       });
 
@@ -275,11 +318,13 @@ describe('CreateWorkspaceCommand Integration', () => {
       const command1 = new CreateWorkspaceCommand({
         name: 'Event Workspace One',
         orgId: testOrgId,
+        type: WorkspaceType.BUSINESS,
         roleTemplates: [],
       });
       const command2 = new CreateWorkspaceCommand({
         name: 'Event Workspace Two',
         orgId: testOrgId,
+        type: WorkspaceType.BUSINESS,
         roleTemplates: [],
       });
 

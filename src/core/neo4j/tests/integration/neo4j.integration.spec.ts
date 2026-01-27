@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Neo4jModule, Neo4jService } from '../../index';
 
+const describeIntegration =
+  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+
 /**
  * Neo4j Integration Tests
  *
@@ -12,26 +15,45 @@ import { Neo4jModule, Neo4jService } from '../../index';
  *
  * Run: `npm run test:integration -- --testPathPattern=neo4j.integration.spec`
  */
-describe('Neo4jModule Integration', () => {
-  let module: TestingModule;
-  let neo4jService: Neo4jService;
+describeIntegration('Neo4jModule Integration', () => {
+  let module!: TestingModule;
+  let neo4jService!: Neo4jService;
+  let moduleInitializationFailed = false;
 
   beforeAll(async () => {
-    module = await Test.createTestingModule({
-      imports: [
-        Neo4jModule.forRoot({
-          uri: process.env.NEO4J_URI || 'bolt://localhost:7687',
-          database: process.env.NEO4J_DATABASE || 'neo4j',
-        }),
-      ],
-    }).compile();
+    try {
+      module = await Test.createTestingModule({
+        imports: [
+          Neo4jModule.forRoot({
+            uri: process.env.NEO4J_URI || 'bolt://localhost:7687',
+            database: process.env.NEO4J_DATABASE || 'neo4j',
+          }),
+        ],
+      }).compile();
 
-    await module.init();
-    neo4jService = module.get<Neo4jService>(Neo4jService);
+      await module.init();
+      neo4jService = module.get<Neo4jService>(Neo4jService);
+    } catch (error) {
+      console.warn(
+        'Failed to initialize Neo4j integration test module (Neo4j may not be available):',
+        error instanceof Error ? error.message : String(error),
+      );
+      moduleInitializationFailed = true;
+    }
+  });
+
+  beforeEach((): void => {
+    if (moduleInitializationFailed) {
+      throw new Error(
+        'Neo4j integration test module failed to initialize. Ensure Neo4j is running (docker-compose -f docker-compose.test.yml up -d).',
+      );
+    }
   });
 
   afterAll(async () => {
-    await module.close();
+    if (!moduleInitializationFailed) {
+      await module.close();
+    }
   });
 
   describe('connection', () => {
