@@ -17,5 +17,8 @@ export * from './events/evidence-created.event';
 // Entities
 export * from './entities/evidence.entity';
 
+// Projections
+export * from './projections/evidence-neo4j.projection';
+
 // Module
 export * from './evidence.module';
