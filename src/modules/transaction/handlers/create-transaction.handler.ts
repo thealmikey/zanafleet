@@ -2,14 +2,16 @@ import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common'
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { DataSource, EntityManager } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateTransactionCommand } from '../commands/create-transaction.command';
-import { TransactionCreatedEventV1 } from '../events/transaction-created.event';
-import { TransactionEntity } from '../entities/transaction.entity';
-import { TransactionStatus } from '../dto/transaction.enums';
+
+import { EventBusService, NatsSubjects } from '../../../core/event-bus';
+
 import { WalletEntity } from '../../wallet/entities/wallet.entity';
 import { InsufficientFundsException } from '../../wallet/exceptions/insufficient-funds.exception';
+import { CreateTransactionCommand } from '../commands/create-transaction.command';
+import { TransactionStatus } from '../dto/transaction.enums';
+import { TransactionEntity } from '../entities/transaction.entity';
+import { TransactionCreatedEventV1 } from '../events/transaction-created.event';
 import { TransactionFailedException } from '../exceptions/transaction-failed.exception';
-import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 
 /**
  * CreateTransactionCommandHandler

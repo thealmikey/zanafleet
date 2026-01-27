@@ -1,10 +1,11 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { WalletEntity } from '../wallet/entities/wallet.entity';
+import { TransactionEntity } from './entities/transaction.entity';
 import { CreateTransactionCommandHandler } from './handlers/create-transaction.handler';
 import { TransactionNeo4jProjection, TransactionNeo4jInitializer } from './projections/transaction-neo4j.projection';
-import { TransactionEntity } from './entities/transaction.entity';
-import { WalletEntity } from '../wallet/entities/wallet.entity';
 
 /**
  * Transaction Module

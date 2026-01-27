@@ -1,6 +1,6 @@
 import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { firstValueFrom, timeout, catchError, of } from 'rxjs';
+import { firstValueFrom, timeout, catchError } from 'rxjs';
 import { BaseEvent, SerializedEvent } from './interfaces/base-event.interface';
 import { NATS_CLIENT, buildSubjectFromEventType } from './event-bus.constants';
 import { EventLoggerService } from './services/event-logger.service';
@@ -82,8 +82,9 @@ export class EventBusService implements OnModuleInit {
       });
 
       if (!result.success) {
-        this.eventLogger.logFailed(event, result.error!, result.attempts);
-        throw result.error;
+        const error = result.error ?? new Error('Unknown error during publish');
+        this.eventLogger.logFailed(event, error, result.attempts);
+        throw error;
       }
     } else {
       try {

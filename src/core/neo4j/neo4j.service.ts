@@ -79,8 +79,8 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
       );
     } catch (error) {
       this.logger.error(
-        `Failed to connect to Neo4j at ${this.uri}: ${error.message}`,
-        error.stack,
+        `Failed to connect to Neo4j at ${this.uri}: ${(error as Error).message}`,
+        (error as Error).stack,
       );
       throw error;
     }

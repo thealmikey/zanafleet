@@ -66,6 +66,8 @@ export function withIdempotency<T extends BaseEvent>(
  * }
  * ```
  */
+type AsyncEventHandler = (event: BaseEvent, ...args: unknown[]) => Promise<void>;
+
 export function IdempotentHandler(
   idempotencyServiceKey: string = 'idempotencyService',
   eventLoggerKey?: string,
@@ -75,7 +77,7 @@ export function IdempotentHandler(
     _propertyKey: string | symbol,
     descriptor: PropertyDescriptor,
   ): PropertyDescriptor {
-    const originalMethod = descriptor.value;
+    const originalMethod = descriptor.value as AsyncEventHandler;
 
     descriptor.value = async function (
       this: Record<string, unknown>,
