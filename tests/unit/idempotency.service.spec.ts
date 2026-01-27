@@ -1,15 +1,22 @@
+import { IdempotencyDefaults } from '../../src/core/event-bus/event-bus.constants';
 import { IdempotencyService } from '../../src/core/event-bus/services/idempotency.service';
 
 describe('IdempotencyService', () => {
   let service: IdempotencyService;
+  const baseTime = new Date('2024-01-01T00:00:00.000Z');
 
   beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(baseTime);
     service = new IdempotencyService();
   });
 
   afterEach(() => {
     service.onModuleDestroy();
     service.clear();
+    jest.clearAllTimers();
+    jest.useRealTimers();
+    jest.clearAllMocks();
   });
 
   describe('isProcessed', () => {
@@ -144,6 +151,66 @@ describe('IdempotencyService', () => {
       for (let i = 0; i < eventCount; i++) {
         expect(service.isProcessed(`event-${i}`)).toBe(true);
       }
+    });
+  });
+
+  describe('ttl and cleanup behavior', () => {
+    it('should return false for expired entries when TTL is exceeded', () => {
+      service.markAsProcessed('event-expired');
+
+      jest.advanceTimersByTime(IdempotencyDefaults.TTL_MS + 1);
+
+      expect(service.isProcessed('event-expired')).toBe(false);
+      expect(service.getProcessedCount()).toBe(0);
+    });
+
+    it('cleanup should remove expired entries', () => {
+      const internalService = service as unknown as { cleanup: () => void };
+      service.markAsProcessed('event-cleanup');
+
+      jest.advanceTimersByTime(IdempotencyDefaults.TTL_MS + 1);
+
+      expect(service.getProcessedCount()).toBe(1);
+
+      internalService.cleanup();
+
+      expect(service.getProcessedCount()).toBe(0);
+    });
+
+    it('should stop the cleanup interval when onModuleDestroy is called', () => {
+      const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+
+      service.markAsProcessed('event-keep');
+
+      service.onModuleDestroy();
+
+      jest.advanceTimersByTime(
+        IdempotencyDefaults.TTL_MS + IdempotencyDefaults.CLEANUP_INTERVAL_MS,
+      );
+
+      expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+      expect(service.getProcessedCount()).toBe(1);
+
+      clearIntervalSpy.mockRestore();
+    });
+
+    it('cleanup task runs on interval and removes stale entries automatically', () => {
+      const internalService = service as unknown as { cleanup: () => void };
+      const cleanupSpy = jest.spyOn(internalService, 'cleanup');
+
+      service.markAsProcessed('event-interval');
+
+      expect(service.getProcessedCount()).toBe(1);
+
+      jest.advanceTimersByTime(
+        IdempotencyDefaults.TTL_MS + IdempotencyDefaults.CLEANUP_INTERVAL_MS,
+      );
+
+      expect(cleanupSpy).toHaveBeenCalled();
+      expect(service.getProcessedCount()).toBe(0);
+      expect(service.isProcessed('event-interval')).toBe(false);
+
+      cleanupSpy.mockRestore();
     });
   });
 });
