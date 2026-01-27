@@ -10,6 +10,7 @@ import { WorkspaceEntity } from './entities/workspace.entity';
 import { AddActorToWorkspaceCommandHandler } from './handlers/add-actor-to-workspace.handler';
 import { CreateWorkspaceCommandHandler } from './handlers/create-workspace.handler';
 import { RemoveActorFromWorkspaceCommandHandler } from './handlers/remove-actor-from-workspace.handler';
+import { MembershipNeo4jProjection, MembershipNeo4jInitializer } from './projections/membership-neo4j.projection';
 import { WorkspaceNeo4jProjection, WorkspaceNeo4jInitializer } from './projections/workspace-neo4j.projection';
 
 /**
@@ -48,6 +49,8 @@ import { WorkspaceNeo4jProjection, WorkspaceNeo4jInitializer } from './projectio
     // Event Handlers / Projections
     WorkspaceNeo4jProjection,
     WorkspaceNeo4jInitializer,
+    MembershipNeo4jProjection,
+    MembershipNeo4jInitializer,
   ],
   exports: [
     // Export for use in other modules
@@ -57,14 +60,18 @@ import { WorkspaceNeo4jProjection, WorkspaceNeo4jInitializer } from './projectio
   ],
 })
 export class WorkspaceModule implements OnModuleInit {
-  constructor(private readonly neo4jInitializer: WorkspaceNeo4jInitializer) {}
+  constructor(
+    private readonly workspaceNeo4jInitializer: WorkspaceNeo4jInitializer,
+    private readonly membershipNeo4jInitializer: MembershipNeo4jInitializer,
+  ) {}
 
   /**
    * Initialize module
-   * Sets up Neo4j constraints and indexes
+   * Sets up Neo4j constraints and indexes for Workspace nodes and MEMBER_OF relationships
    */
   async onModuleInit(): Promise<void> {
     // Uncomment when Neo4j is fully configured:
-    // await this.neo4jInitializer.initialize();
+    // await this.workspaceNeo4jInitializer.initialize();
+    // await this.membershipNeo4jInitializer.initialize();
   }
 }
