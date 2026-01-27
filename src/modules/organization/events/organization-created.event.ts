@@ -34,7 +34,7 @@ export class OrganizationCreatedEventV1 {
   readonly name: string;
   readonly type: OrganizationType;
   readonly status: OrganizationStatus;
-  readonly linkedWallets: string[]; // Array of wallet UUIDs
+  readonly linkedWallets: readonly string[]; // Array of wallet UUIDs (immutable)
   readonly createdAt: Date;
 
   /**
@@ -72,7 +72,22 @@ export class OrganizationCreatedEventV1 {
    * Serializes event to JSON-friendly format
    * Used for event store persistence and NATS message serialization
    */
-  toJSON() {
+  toJSON(): {
+    eventId: string;
+    eventType: 'OrganizationCreatedEvent-V1';
+    eventVersion: '1.0.0';
+    occurredAt: string;
+    aggregateId: string;
+    aggregateType: 'Organization';
+    organizationId: string;
+    name: string;
+    type: OrganizationType;
+    status: OrganizationStatus;
+    linkedWallets: readonly string[];
+    createdAt: string;
+    correlationId?: string;
+    causationId?: string;
+  } {
     return {
       eventId: this.eventId,
       eventType: this.eventType,

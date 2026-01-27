@@ -31,7 +31,7 @@ export class WorkspaceCreatedEventV1 {
   readonly workspaceId: string; // UUID
   readonly orgId: string; // UUID of the parent organization
   readonly name: string;
-  readonly roleTemplates: string[]; // Array of role template UUIDs
+  readonly roleTemplates: readonly string[]; // Array of role template UUIDs
   readonly createdAt: Date;
 
   /**
@@ -67,7 +67,21 @@ export class WorkspaceCreatedEventV1 {
    * Serializes event to JSON-friendly format
    * Used for event store persistence and NATS message serialization
    */
-  toJSON(): Record<string, unknown> {
+  toJSON(): {
+    eventId: string;
+    eventType: 'WorkspaceCreatedEvent-V1';
+    eventVersion: '1.0.0';
+    occurredAt: string;
+    aggregateId: string;
+    aggregateType: 'Workspace';
+    workspaceId: string;
+    orgId: string;
+    name: string;
+    roleTemplates: readonly string[];
+    createdAt: string;
+    correlationId?: string;
+    causationId?: string;
+  } {
     return {
       eventId: this.eventId,
       eventType: this.eventType,

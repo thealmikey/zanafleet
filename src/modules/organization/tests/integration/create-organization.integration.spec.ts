@@ -278,7 +278,7 @@ describe('CreateOrganizationCommand Integration Tests', () => {
 
       // Assert - linkedWallets should be frozen
       expect(() => {
-        event.linkedWallets.push('550e8400-e29b-41d4-a716-446655440001');
+        (event.linkedWallets as string[]).push('550e8400-e29b-41d4-a716-446655440001');
       }).toThrow();
     });
 
