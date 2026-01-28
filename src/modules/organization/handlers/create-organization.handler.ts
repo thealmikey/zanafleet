@@ -87,20 +87,28 @@ export class CreateOrganizationCommandHandler
       );
 
       if (this.eventBusService) {
-        await this.eventBusService.publish(
-          NatsSubjects.Organization.CREATED_V1,
-          event,
-        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+        try {
+          await this.eventBusService.publish(
+            NatsSubjects.Organization.CREATED_V1,
+            event,
+          );
+        } catch (publishError: unknown) {
+          const err =
+            publishError instanceof Error
+              ? publishError
+              : new Error(String(publishError));
+          this.logger.warn(`NATS publish failed: ${err.message}`);
+        }
       }
 
       return organizationId;
-    } catch (error) {
-      const err = error as Error;
+    } catch (error: unknown) {
+      const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
         `Failed to create organization: ${err.message}`,
         err.stack,
       );
-      throw error;
+      throw err;
     }
   }
 }

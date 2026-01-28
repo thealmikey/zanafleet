@@ -1,5 +1,22 @@
 import { OrganizationType, OrganizationStatus } from '../dto/organization.enums';
 
+export interface OrganizationCreatedEventV1JSON {
+  eventId: string;
+  eventType: 'OrganizationCreatedEvent-V1';
+  eventVersion: '1.0.0';
+  occurredAt: string;
+  aggregateId: string;
+  aggregateType: 'Organization';
+  organizationId: string;
+  name: string;
+  type: OrganizationType;
+  status: OrganizationStatus;
+  linkedWallets: readonly string[];
+  createdAt: string;
+  correlationId?: string;
+  causationId?: string;
+}
+
 /**
  * OrganizationCreatedEvent-V1
  * 
@@ -72,22 +89,7 @@ export class OrganizationCreatedEventV1 {
    * Serializes event to JSON-friendly format
    * Used for event store persistence and NATS message serialization
    */
-  toJSON(): {
-    eventId: string;
-    eventType: 'OrganizationCreatedEvent-V1';
-    eventVersion: '1.0.0';
-    occurredAt: string;
-    aggregateId: string;
-    aggregateType: 'Organization';
-    organizationId: string;
-    name: string;
-    type: OrganizationType;
-    status: OrganizationStatus;
-    linkedWallets: readonly string[];
-    createdAt: string;
-    correlationId?: string;
-    causationId?: string;
-  } {
+  toJSON(): OrganizationCreatedEventV1JSON {
     return {
       eventId: this.eventId,
       eventType: this.eventType,
@@ -109,14 +111,16 @@ export class OrganizationCreatedEventV1 {
   /**
    * Deserializes event from persisted format
    */
-  static fromJSON(data: any): OrganizationCreatedEventV1 {
+  static fromJSON(
+    data: OrganizationCreatedEventV1JSON,
+  ): OrganizationCreatedEventV1 {
     return new OrganizationCreatedEventV1({
       eventId: data.eventId,
       organizationId: data.organizationId,
       name: data.name,
       type: data.type,
       status: data.status,
-      linkedWallets: data.linkedWallets,
+      linkedWallets: [...data.linkedWallets],
       createdAt: new Date(data.createdAt),
       occurredAt: new Date(data.occurredAt),
       correlationId: data.correlationId,
