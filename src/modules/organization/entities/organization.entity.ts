@@ -1,12 +1,13 @@
 import {
-  Entity,
-  PrimaryColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
+  Entity,
   Index,
+  PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
-import { OrganizationType, OrganizationStatus } from '../dto/organization.enums';
+
+import { OrganizationStatus, OrganizationType } from '../dto/organization.enums';
 
 /**
  * Organization Entity
@@ -35,7 +36,7 @@ export class OrganizationEntity {
   @Column('enum', { enum: OrganizationStatus })
   status!: OrganizationStatus;
 
-  @Column('uuid', { array: true, default: () => 'ARRAY[]::uuid[]' })
+  @Column('varchar', { array: true, default: () => 'ARRAY[]::varchar[]' })
   linkedWallets!: string[]; // Array of wallet UUIDs
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

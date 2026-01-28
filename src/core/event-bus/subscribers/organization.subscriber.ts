@@ -1,14 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { MessagePattern, Payload, Ctx, NatsContext } from '@nestjs/microservices';
-import { OrganizationNeo4jProjection } from '../../../modules/organization/projections/organization-neo4j.projection';
+import {
+  Ctx,
+  MessagePattern,
+  NatsContext,
+  Payload,
+} from '@nestjs/microservices';
+
 import {
   OrganizationCreatedEventV1,
   OrganizationCreatedEventV1JSON,
 } from '../../../modules/organization/events/organization-created.event';
-import { IdempotencyService } from '../services/idempotency.service';
-import { EventLoggerService } from '../services/event-logger.service';
+import { OrganizationNeo4jProjection } from '../../../modules/organization/projections/organization-neo4j.projection';
+
 import { NatsSubjects } from '../event-bus.constants';
 import { SerializedEvent } from '../interfaces/base-event.interface';
+import { EventLoggerService } from '../services/event-logger.service';
+import { IdempotencyService } from '../services/idempotency.service';
 
 /**
  * OrganizationSubscriber
@@ -32,15 +39,15 @@ export class OrganizationSubscriber {
     @Ctx() context: NatsContext,
   ): Promise<void> {
     const subject = context.getSubject();
-    this.logger.debug(`Received event on subject: ${subject}`);
+    this.logger.debug(`Received event on subject: ${String(subject)}`);
 
     if (this.idempotencyService.isProcessed(data.eventId)) {
-      this.eventLogger.logSkipped(data as unknown as OrganizationCreatedEventV1, 'duplicate');
+      this.eventLogger.logSkipped(data, 'duplicate');
       return;
     }
 
     this.idempotencyService.markAsProcessed(data.eventId);
-    this.eventLogger.logReceive(data as unknown as OrganizationCreatedEventV1, subject);
+    this.eventLogger.logReceive(data, subject);
 
     try {
       if (data.eventType === 'OrganizationCreatedEvent-V1') {
@@ -52,7 +59,7 @@ export class OrganizationSubscriber {
       }
     } catch (error) {
       this.idempotencyService.remove(data.eventId);
-      this.eventLogger.logFailed(data as unknown as OrganizationCreatedEventV1, error as Error);
+      this.eventLogger.logFailed(data, error as Error);
       throw error;
     }
   }

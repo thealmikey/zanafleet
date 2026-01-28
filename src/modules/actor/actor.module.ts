@@ -4,8 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { WorkspaceEntity } from '../workspace/entities/workspace.entity';
 
-import { ActorEntity } from './entities/actor.entity';
 import { ActorController } from './controllers/actor.controller';
+import { ActorEntity } from './entities/actor.entity';
 import { CreateActorCommandHandler } from './handlers/create-actor.handler';
 import { UpdateActorCommandHandler } from './handlers/update-actor.handler';
 import {

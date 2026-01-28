@@ -63,6 +63,12 @@ export const NatsSubjects = {
     REQUIREMENT_SATISFIED_V1: 'formation.events.requirement-satisfied-v1',
     ALL: 'formation.events.*',
   },
+  SignUp: {
+    INITIATED_V1: 'signup.events.initiated-v1',
+    STEP_COMPLETED_V1: 'signup.events.step-completed-v1',
+    FINALIZED_V1: 'signup.events.finalized-v1',
+    ALL: 'signup.events.*',
+  },
 } as const;
 
 /**

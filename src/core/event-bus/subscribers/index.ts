@@ -4,9 +4,10 @@
  * NATS message handlers for domain events across all modules.
  */
 
-export { OrganizationSubscriber } from './organization.subscriber';
-export { WorkspaceSubscriber } from './workspace.subscriber';
 export { ActorSubscriber } from './actor.subscriber';
+export { OrganizationSubscriber } from './organization.subscriber';
 export { RoleSubscriber } from './role.subscriber';
-export { WalletSubscriber } from './wallet.subscriber';
+export { SignUpSubscriber } from './signup.subscriber';
 export { TransactionSubscriber } from './transaction.subscriber';
+export { WalletSubscriber } from './wallet.subscriber';
+export { WorkspaceSubscriber } from './workspace.subscriber';

@@ -116,11 +116,11 @@ export class CreateOrganizationCommandHandler
             event,
           );
         } catch (publishError: unknown) {
-          const err =
+          const errorMessage =
             publishError instanceof Error
-              ? publishError
-              : new Error(String(publishError));
-          this.logger.warn(`NATS publish failed: ${err.message}`);
+              ? publishError.message
+              : String(publishError);
+          this.logger.warn(`NATS publish failed: ${errorMessage}`);
         }
       }
 
@@ -160,12 +160,12 @@ export class CreateOrganizationCommandHandler
           }
         } catch (orchestrationError: unknown) {
           // Log warning but don't fail - organization was already created successfully
-          const err =
+          const errorMessage =
             orchestrationError instanceof Error
-              ? orchestrationError
-              : new Error(String(orchestrationError));
+              ? orchestrationError.message
+              : String(orchestrationError);
           this.logger.warn(
-            `Workspace orchestration failed for organization ${organizationId}: ${err.message}`,
+            `Workspace orchestration failed for organization ${organizationId}: ${errorMessage}`,
           );
         }
       }
@@ -174,7 +174,7 @@ export class CreateOrganizationCommandHandler
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
-        `Failed to create organization: ${err.message}`,
+        `Failed to create organization: ${String(err.message)}`,
         err.stack,
       );
       throw err;

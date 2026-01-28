@@ -5,13 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ActorEntity } from '../actor/entities/actor.entity';
 import { OrganizationEntity } from '../organization/entities/organization.entity';
 
+import { WorkspaceController } from './controllers/workspace.controller';
 import { MembershipEntity } from './entities/membership.entity';
 import { WorkspaceEntity } from './entities/workspace.entity';
-import { WorkspaceController } from './controllers/workspace.controller';
 import { AddActorToWorkspaceCommandHandler } from './handlers/add-actor-to-workspace.handler';
 import { CreateWorkspaceCommandHandler } from './handlers/create-workspace.handler';
-import { UpdateWorkspaceCommandHandler } from './handlers/update-workspace.handler';
 import { RemoveActorFromWorkspaceCommandHandler } from './handlers/remove-actor-from-workspace.handler';
+import { UpdateWorkspaceCommandHandler } from './handlers/update-workspace.handler';
 import { MembershipNeo4jProjection, MembershipNeo4jInitializer } from './projections/membership-neo4j.projection';
 import { WorkspaceNeo4jProjection, WorkspaceNeo4jInitializer } from './projections/workspace-neo4j.projection';
 
