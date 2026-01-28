@@ -11,18 +11,22 @@ export * from './dto/signup.enums';
 // DTOs
 export * from './dto/initiate-signup.dto';
 export * from './dto/update-signup-step.dto';
+export * from './dto/finalize-signup.dto';
 
 // Commands
 export * from './commands/initiate-signup.command';
 export * from './commands/update-signup-step.command';
+export * from './commands/finalize-signup.command';
 
 // Handlers
 export * from './handlers/initiate-signup.handler';
 export * from './handlers/update-signup-step.handler';
+export * from './handlers/finalize-signup.handler';
 
 // Events
 export * from './events/signup-initiated.event';
 export * from './events/signup-step-completed.event';
+export * from './events/signup-finalized.event';
 
 // Entities
 export * from './entities/signup-session.entity';
