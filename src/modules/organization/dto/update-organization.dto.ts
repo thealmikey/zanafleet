@@ -5,7 +5,6 @@ import { OrganizationStatus, OrganizationType } from './organization.enums';
  * Mirrors UpdateOrganizationCommand input structure
  */
 export class UpdateOrganizationDto {
-  organizationId: string;
   name?: string;
   type?: OrganizationType;
   status?: OrganizationStatus;

@@ -2,6 +2,7 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ActorEntity } from '../actor/entities/actor.entity';
+import { OrganizationController } from './controllers/organization.controller';
 import { CreateOrganizationCommandHandler } from './handlers/create-organization.handler';
 import { DeleteOrganizationCommandHandler } from './handlers/delete-organization.handler';
 import { UpdateOrganizationCommandHandler } from './handlers/update-organization.handler';
@@ -36,6 +37,7 @@ import { OrganizationEntity } from './entities/organization.entity';
     // Uncomment when Neo4j module is configured:
     // Neo4jModule.forRoot({...}),
   ],
+  controllers: [OrganizationController],
   providers: [
     // Command Handlers
     CreateOrganizationCommandHandler,

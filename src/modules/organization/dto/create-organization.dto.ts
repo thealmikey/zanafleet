@@ -5,9 +5,9 @@ import { OrganizationType, OrganizationStatus } from './organization.enums';
  * Input payload for CreateOrganizationCommand
  */
 export class CreateOrganizationDto {
-  name: string;
-  type: OrganizationType;
-  status: OrganizationStatus;
+  name!: string;
+  type!: OrganizationType;
+  status!: OrganizationStatus;
   linkedWallets?: string[]; // Array of wallet UUIDs
 
   /**
@@ -24,11 +24,11 @@ export class CreateOrganizationDto {
  * Output DTO for queries and responses
  */
 export class OrganizationDto {
-  organizationId: string; // UUID
-  name: string;
-  type: OrganizationType;
-  status: OrganizationStatus;
-  linkedWallets: string[]; // Array of wallet UUIDs
-  createdAt: Date;
-  updatedAt: Date;
+  organizationId!: string; // UUID
+  name!: string;
+  type!: OrganizationType;
+  status!: OrganizationStatus;
+  linkedWallets!: string[]; // Array of wallet UUIDs
+  createdAt!: Date;
+  updatedAt!: Date;
 }
