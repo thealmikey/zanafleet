@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { SignUpController } from './controllers/signup.controller';
 import { SignUpSessionEntity } from './entities/signup-session.entity';
 import { FinalizeSignUpCommandHandler } from './handlers/finalize-signup.handler';
 import { InitiateSignUpCommandHandler } from './handlers/initiate-signup.handler';
@@ -14,7 +15,7 @@ import { UpdateSignUpStepCommandHandler } from './handlers/update-signup-step.ha
  */
 @Module({
   imports: [CqrsModule, TypeOrmModule.forFeature([SignUpSessionEntity])],
-  controllers: [],
+  controllers: [SignUpController],
   providers: [
     InitiateSignUpCommandHandler,
     UpdateSignUpStepCommandHandler,

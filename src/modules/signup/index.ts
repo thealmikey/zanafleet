@@ -12,6 +12,10 @@ export * from './dto/signup.enums';
 export * from './dto/initiate-signup.dto';
 export * from './dto/update-signup-step.dto';
 export * from './dto/finalize-signup.dto';
+export * from './dto/signup-session.dto';
+
+// Controllers
+export * from './controllers/signup.controller';
 
 // Commands
 export * from './commands/initiate-signup.command';
