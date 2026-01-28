@@ -53,6 +53,7 @@ export const NatsSubjects = {
   },
   Capability: {
     CREATED_V1: 'capability.events.created-v1',
+    GRANTED_TO_PERSONA_V1: 'capability.events.granted-to-persona-v1',
     ALL: 'capability.events.*',
   },
 } as const;
