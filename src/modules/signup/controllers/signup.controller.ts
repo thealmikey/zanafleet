@@ -22,6 +22,7 @@ import { InitiateSignUpDto } from '../dto/initiate-signup.dto';
 import { SignUpSessionDto } from '../dto/signup-session.dto';
 import { SignUpSessionStatus } from '../dto/signup.enums';
 import { UpdateSignUpStepDto } from '../dto/update-signup-step.dto';
+import { UpdateSignUpStepResult } from '../handlers/signup-result.interfaces';
 import { GetSignUpSessionQuery } from '../queries/get-signup-session.query';
 
 @Controller('signup')
@@ -60,7 +61,7 @@ export class SignUpController {
   async updateStep(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() body: UpdateSignUpStepDto,
-  ): Promise<{ sessionId: string; status: string; completedSteps: string[] }> {
+  ): Promise<UpdateSignUpStepResult> {
     try {
       const input = UpdateSignUpStepCommand.validate({
         ...body,
@@ -69,14 +70,10 @@ export class SignUpController {
       const command = new UpdateSignUpStepCommand(input);
       const result = await this.commandBus.execute<
         UpdateSignUpStepCommand,
-        { sessionId: string; status: string; completedSteps: string[] }
+        UpdateSignUpStepResult
       >(command);
 
-      return {
-        sessionId: result.sessionId,
-        status: result.status,
-        completedSteps: result.completedSteps,
-      };
+      return result;
     } catch (error: unknown) {
       if (error instanceof ZodError) {
         throw this.createValidationException(error);
