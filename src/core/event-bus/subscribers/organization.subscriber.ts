@@ -11,7 +11,6 @@ import {
   OrganizationCreatedEventV1JSON,
 } from '../../../modules/organization/events/organization-created.event';
 import { OrganizationNeo4jProjection } from '../../../modules/organization/projections/organization-neo4j.projection';
-
 import { NatsSubjects } from '../event-bus.constants';
 import { SerializedEvent } from '../interfaces/base-event.interface';
 import { EventLoggerService } from '../services/event-logger.service';
@@ -52,14 +51,15 @@ export class OrganizationSubscriber {
     try {
       if (data.eventType === 'OrganizationCreatedEvent-V1') {
         const event = OrganizationCreatedEventV1.fromJSON(
-          data as unknown as OrganizationCreatedEventV1JSON,
+          data as OrganizationCreatedEventV1JSON,
         );
         await this.projection.handle(event);
         this.eventLogger.logProcessed(event, OrganizationNeo4jProjection.name);
       }
-    } catch (error) {
+    } catch (error: unknown) {
       this.idempotencyService.remove(data.eventId);
-      this.eventLogger.logFailed(data, error as Error);
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.eventLogger.logFailed(data, err);
       throw error;
     }
   }

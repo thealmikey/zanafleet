@@ -1,5 +1,8 @@
 /**
  * SignUp Module Exports
+ *
+ * Public API for the SignUp module
+ * Other modules should import from this barrel file
  */
 
 // DTOs

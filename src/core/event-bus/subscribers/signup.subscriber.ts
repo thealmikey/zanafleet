@@ -25,9 +25,7 @@ export class SignUpSubscriber {
   ): void {
     const subject = context.getSubject();
     this.logger.log(
-      `Received SignUp event: ${String(data.eventType)} on subject: ${String(
-        subject,
-      )}`,
+      `Received SignUp event: ${data.eventType} on subject: ${subject}`,
     );
   }
 }

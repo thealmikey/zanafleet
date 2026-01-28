@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 
 import { ActorType } from '../../actor/dto/actor.enums';
-
 import { SignUpSessionStatus } from '../dto/signup.enums';
 
 /**
@@ -17,6 +16,7 @@ import { SignUpSessionStatus } from '../dto/signup.enums';
  */
 @Entity('signup_sessions')
 @Index(['status'])
+@Index(['actorType'])
 @Index(['expiresAt'])
 export class SignUpSessionEntity {
   @PrimaryColumn('uuid')
@@ -84,6 +84,7 @@ export class SignUpSessionEntity {
     idempotencyKey?: string | null;
     completedSteps: string[];
     expiresAt: Date;
+    createdAt: Date;
   }): SignUpSessionEntity {
     const entity = new SignUpSessionEntity();
     entity.id = data.sessionId;
@@ -95,6 +96,7 @@ export class SignUpSessionEntity {
     entity.idempotencyKey = data.idempotencyKey;
     entity.completedSteps = data.completedSteps;
     entity.expiresAt = data.expiresAt;
+    entity.createdAt = data.createdAt;
     return entity;
   }
 }
