@@ -22,6 +22,7 @@ export const NatsSubjects = {
   Organization: {
     CREATED_V1: 'organization.events.created-v1',
     UPDATED_V1: 'organization.events.updated-v1',
+    DELETED_V1: 'organization.events.deleted-v1',
     ALL: 'organization.events.*',
   },
   Workspace: {
