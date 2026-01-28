@@ -1,6 +1,7 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ActorEntity } from '../actor/entities/actor.entity';
 import { CreateOrganizationCommandHandler } from './handlers/create-organization.handler';
 import { OrganizationNeo4jProjection, OrganizationNeo4jInitializer } from './projections/organization-neo4j.projection';
 import { OrganizationEntity } from './entities/organization.entity';
@@ -28,7 +29,7 @@ import { OrganizationEntity } from './entities/organization.entity';
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([OrganizationEntity]),
+    TypeOrmModule.forFeature([OrganizationEntity, ActorEntity]),
     // Neo4j module should be imported at root level
     // Uncomment when Neo4j module is configured:
     // Neo4jModule.forRoot({...}),

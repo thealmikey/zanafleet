@@ -1,6 +1,9 @@
-import { EventBus } from '@nestjs/cqrs';
+import { CommandBus, EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 
+import { AddActorToWorkspaceCommand } from '../../../workspace/commands/add-actor-to-workspace.command';
+import { CreateWorkspaceCommand } from '../../../workspace/commands/create-workspace.command';
+import { MembershipRole, WorkspaceStatus, WorkspaceType } from '../../../workspace/dto/workspace.enums';
 import { CreateOrganizationCommand } from '../../commands/create-organization.command';
 import { OrganizationStatus, OrganizationType } from '../../dto/organization.enums';
 import { OrganizationEntity } from '../../entities/organization.entity';
@@ -11,6 +14,7 @@ describe('CreateOrganizationCommandHandler', () => {
   let handler: CreateOrganizationCommandHandler;
   let organizationRepository: jest.Mocked<Repository<OrganizationEntity>>;
   let eventBus: jest.Mocked<EventBus>;
+  let commandBus: jest.Mocked<CommandBus>;
 
   beforeEach(() => {
     organizationRepository = {
@@ -21,9 +25,14 @@ describe('CreateOrganizationCommandHandler', () => {
       publish: jest.fn(),
     } as unknown as jest.Mocked<EventBus>;
 
+    commandBus = {
+      execute: jest.fn(),
+    } as unknown as jest.Mocked<CommandBus>;
+
     handler = new CreateOrganizationCommandHandler(
       organizationRepository,
       eventBus,
+      commandBus,
     );
   });
 
@@ -42,6 +51,7 @@ describe('CreateOrganizationCommandHandler', () => {
 
       const fromDomainSpy = jest.spyOn(OrganizationEntity, 'fromDomain');
       organizationRepository.save.mockResolvedValue({} as OrganizationEntity);
+      commandBus.execute.mockResolvedValue('workspace-id-123');
 
       const organizationId = await handler.execute(command);
 
@@ -84,6 +94,149 @@ describe('CreateOrganizationCommandHandler', () => {
       expect(emittedEvent.eventId).toEqual(expect.any(String));
       expect(emittedEvent.occurredAt).toBeInstanceOf(Date);
       expect(emittedEvent.createdAt).toBeInstanceOf(Date);
+    });
+  });
+
+  describe('workspace orchestration', () => {
+    it('should create workspace with WorkspaceType.SACCO for SACCO organization', async () => {
+      const command = new CreateOrganizationCommand({
+        name: 'Test SACCO',
+        type: OrganizationType.SACCO,
+        status: OrganizationStatus.ACTIVE,
+      });
+
+      organizationRepository.save.mockResolvedValue({} as OrganizationEntity);
+      commandBus.execute.mockResolvedValue('workspace-id-123');
+
+      await handler.execute(command);
+
+      expect(commandBus.execute).toHaveBeenCalledTimes(1);
+      const createWorkspaceCall =
+        commandBus.execute.mock.calls[0][0] as CreateWorkspaceCommand;
+      expect(createWorkspaceCall).toBeInstanceOf(CreateWorkspaceCommand);
+      expect(createWorkspaceCall).toMatchObject({
+        name: 'Test SACCO Workspace',
+        type: WorkspaceType.SACCO,
+        status: WorkspaceStatus.ACTIVE,
+        roleTemplates: [],
+      });
+    });
+
+    it('should create workspace with WorkspaceType.BUSINESS for BUSINESS organization', async () => {
+      const command = new CreateOrganizationCommand({
+        name: 'Test Business',
+        type: OrganizationType.BUSINESS,
+        status: OrganizationStatus.ACTIVE,
+      });
+
+      organizationRepository.save.mockResolvedValue({} as OrganizationEntity);
+      commandBus.execute.mockResolvedValue('workspace-id-123');
+
+      await handler.execute(command);
+
+      expect(commandBus.execute).toHaveBeenCalledTimes(1);
+      const createWorkspaceCall =
+        commandBus.execute.mock.calls[0][0] as CreateWorkspaceCommand;
+      expect(createWorkspaceCall).toBeInstanceOf(CreateWorkspaceCommand);
+      expect(createWorkspaceCall).toMatchObject({
+        name: 'Test Business Workspace',
+        type: WorkspaceType.BUSINESS,
+        status: WorkspaceStatus.ACTIVE,
+        roleTemplates: [],
+      });
+    });
+
+    it('should NOT create workspace for PLATFORM organization', async () => {
+      const command = new CreateOrganizationCommand({
+        name: 'Test Platform',
+        type: OrganizationType.PLATFORM,
+        status: OrganizationStatus.ACTIVE,
+      });
+
+      organizationRepository.save.mockResolvedValue({} as OrganizationEntity);
+
+      await handler.execute(command);
+
+      expect(commandBus.execute).not.toHaveBeenCalled();
+    });
+
+    it('should NOT create workspace for INTERNAL organization', async () => {
+      const command = new CreateOrganizationCommand({
+        name: 'Test Internal',
+        type: OrganizationType.INTERNAL,
+        status: OrganizationStatus.ACTIVE,
+      });
+
+      organizationRepository.save.mockResolvedValue({} as OrganizationEntity);
+
+      await handler.execute(command);
+
+      expect(commandBus.execute).not.toHaveBeenCalled();
+    });
+
+    it('should add actor as ADMIN when createdByActorId is provided', async () => {
+      const actorId = '550e8400-e29b-41d4-a716-446655440000';
+      const workspaceId = 'workspace-id-123';
+
+      const command = new CreateOrganizationCommand({
+        name: 'Test SACCO',
+        type: OrganizationType.SACCO,
+        status: OrganizationStatus.ACTIVE,
+        createdByActorId: actorId,
+      });
+
+      organizationRepository.save.mockResolvedValue({} as OrganizationEntity);
+      commandBus.execute
+        .mockResolvedValueOnce(workspaceId)
+        .mockResolvedValueOnce(undefined);
+
+      await handler.execute(command);
+
+      expect(commandBus.execute).toHaveBeenCalledTimes(2);
+      const addActorCall =
+        commandBus.execute.mock.calls[1][0] as AddActorToWorkspaceCommand;
+      expect(addActorCall).toBeInstanceOf(AddActorToWorkspaceCommand);
+      expect(addActorCall).toMatchObject({
+        actorId,
+        workspaceId,
+        role: MembershipRole.ADMIN,
+      });
+    });
+
+    it('should skip actor assignment when createdByActorId is not provided', async () => {
+      const command = new CreateOrganizationCommand({
+        name: 'Test SACCO',
+        type: OrganizationType.SACCO,
+        status: OrganizationStatus.ACTIVE,
+      });
+
+      organizationRepository.save.mockResolvedValue({} as OrganizationEntity);
+      commandBus.execute.mockResolvedValue('workspace-id-123');
+
+      await handler.execute(command);
+
+      expect(commandBus.execute).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not fail organization creation if workspace orchestration fails', async () => {
+      const command = new CreateOrganizationCommand({
+        name: 'Test SACCO',
+        type: OrganizationType.SACCO,
+        status: OrganizationStatus.ACTIVE,
+      });
+
+      organizationRepository.save.mockResolvedValue({} as OrganizationEntity);
+      commandBus.execute.mockRejectedValueOnce(
+        new Error('Workspace creation failed'),
+      );
+
+      const organizationId = await handler.execute(command);
+
+      expect(typeof organizationId).toBe('string');
+      expect(organizationId).toHaveLength(36);
+      expect(commandBus.execute).toHaveBeenCalledTimes(1);
+      expect(organizationRepository.save).toHaveBeenCalled();
+      expect(eventBus.publish).toHaveBeenCalled();
     });
   });
 });

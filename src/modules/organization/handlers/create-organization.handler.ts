@@ -1,12 +1,17 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
-import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
-import { Repository } from 'typeorm';
+import { CommandBus, CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateOrganizationCommand } from '../commands/create-organization.command';
-import { OrganizationCreatedEventV1 } from '../events/organization-created.event';
-import { OrganizationEntity } from '../entities/organization.entity';
+
 import { EventBusService, NatsSubjects } from '../../../core/event-bus';
+import { AddActorToWorkspaceCommand } from '../../workspace/commands/add-actor-to-workspace.command';
+import { CreateWorkspaceCommand } from '../../workspace/commands/create-workspace.command';
+import { MembershipRole, WorkspaceStatus, WorkspaceType } from '../../workspace/dto/workspace.enums';
+import { CreateOrganizationCommand } from '../commands/create-organization.command';
+import { OrganizationEntity } from '../entities/organization.entity';
+import { OrganizationType } from '../dto/organization.enums';
+import { OrganizationCreatedEventV1 } from '../events/organization-created.event';
 
 /**
  * CreateOrganizationCommandHandler
@@ -33,8 +38,26 @@ export class CreateOrganizationCommandHandler
     @InjectRepository(OrganizationEntity)
     private readonly organizationRepository: Repository<OrganizationEntity>,
     private readonly eventBus: EventBus,
+    private readonly commandBus: CommandBus,
     @Optional() private readonly eventBusService?: EventBusService,
   ) {}
+
+  /**
+   * Maps OrganizationType to WorkspaceType for default workspace creation
+   * Returns null for organization types that don't get a default workspace
+   */
+  private mapOrgTypeToWorkspaceType(orgType: OrganizationType): WorkspaceType | null {
+    switch (orgType) {
+      case OrganizationType.SACCO:
+        return WorkspaceType.SACCO;
+      case OrganizationType.BUSINESS:
+        return WorkspaceType.BUSINESS;
+      case OrganizationType.PLATFORM:
+      case OrganizationType.INTERNAL:
+      default:
+        return null;
+    }
+  }
 
   /**
    * Execute command: Create organization
@@ -98,6 +121,52 @@ export class CreateOrganizationCommandHandler
               ? publishError
               : new Error(String(publishError));
           this.logger.warn(`NATS publish failed: ${err.message}`);
+        }
+      }
+
+      // Step 4: Orchestrate default workspace and membership creation
+      const workspaceType = this.mapOrgTypeToWorkspaceType(command.type);
+      if (workspaceType !== null) {
+        try {
+          // Create default workspace for this organization
+          const createWorkspaceCommand = new CreateWorkspaceCommand({
+            name: `${command.name} Workspace`,
+            orgId: organizationId,
+            type: workspaceType,
+            status: WorkspaceStatus.ACTIVE,
+            roleTemplates: [],
+          });
+
+          const workspaceId =
+            await this.commandBus.execute<CreateWorkspaceCommand, string>(
+              createWorkspaceCommand,
+            );
+          this.logger.log(
+            `Default workspace created: ${workspaceId} for organization: ${organizationId}`,
+          );
+
+          // If createdByActorId is provided, add the actor as ADMIN
+          if (command.createdByActorId) {
+            const addActorCommand = new AddActorToWorkspaceCommand({
+              actorId: command.createdByActorId,
+              workspaceId,
+              role: MembershipRole.ADMIN,
+            });
+
+            await this.commandBus.execute(addActorCommand);
+            this.logger.log(
+              `Actor ${command.createdByActorId} added as ADMIN to workspace: ${workspaceId}`,
+            );
+          }
+        } catch (orchestrationError: unknown) {
+          // Log warning but don't fail - organization was already created successfully
+          const err =
+            orchestrationError instanceof Error
+              ? orchestrationError
+              : new Error(String(orchestrationError));
+          this.logger.warn(
+            `Workspace orchestration failed for organization ${organizationId}: ${err.message}`,
+          );
         }
       }
 
