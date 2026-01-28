@@ -12,6 +12,9 @@ export * from './dto/workspace.enums';
 export * from './dto/create-workspace.dto';
 export * from './dto/update-workspace.dto';
 
+// Controllers
+export * from './controllers/workspace.controller';
+
 // Commands
 export * from './commands/create-workspace.command';
 export * from './commands/update-workspace.command';

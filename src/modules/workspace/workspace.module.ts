@@ -7,6 +7,7 @@ import { OrganizationEntity } from '../organization/entities/organization.entity
 
 import { MembershipEntity } from './entities/membership.entity';
 import { WorkspaceEntity } from './entities/workspace.entity';
+import { WorkspaceController } from './controllers/workspace.controller';
 import { AddActorToWorkspaceCommandHandler } from './handlers/add-actor-to-workspace.handler';
 import { CreateWorkspaceCommandHandler } from './handlers/create-workspace.handler';
 import { UpdateWorkspaceCommandHandler } from './handlers/update-workspace.handler';
@@ -41,6 +42,7 @@ import { WorkspaceNeo4jProjection, WorkspaceNeo4jInitializer } from './projectio
     CqrsModule,
     TypeOrmModule.forFeature([WorkspaceEntity, MembershipEntity, OrganizationEntity, ActorEntity]),
   ],
+  controllers: [WorkspaceController],
   providers: [
     // Command Handlers
     CreateWorkspaceCommandHandler,
