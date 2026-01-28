@@ -54,6 +54,19 @@ export class EventBusService implements OnModuleInit {
     event: BaseEvent,
     options: Omit<PublishOptions, 'subject'> = {},
   ): Promise<void> {
+    if (!this.isConnected) {
+      try {
+        await this.natsClient.connect();
+        this.isConnected = true;
+        this.logger.log('Reconnected to NATS');
+      } catch (error) {
+        const connectionError =
+          error instanceof Error ? error : new Error('NATS client is not connected');
+        this.eventLogger.logFailed(event, connectionError);
+        throw connectionError;
+      }
+    }
+
     const serialized = this.serializeEvent(event);
     const shouldRetry = options.retry ?? true;
     const timeoutMs = options.timeoutMs ?? 5000;

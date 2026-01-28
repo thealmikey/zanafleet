@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ClientProxy } from '@nestjs/microservices';
-import { of, throwError, firstValueFrom } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { EventBusService } from '../../src/core/event-bus/event-bus.service';
 import { EventLoggerService } from '../../src/core/event-bus/services/event-logger.service';
 import { RetryService } from '../../src/core/event-bus/services/retry.service';
-import { NATS_CLIENT } from '../../src/core/event-bus/event-bus.constants';
-import { BaseEvent } from '../../src/core/event-bus/interfaces/base-event.interface';
+import * as EventBusConstants from '../../src/core/event-bus/event-bus.constants';
+import { BaseEvent, SerializedEvent } from '../../src/core/event-bus/interfaces/base-event.interface';
 
 describe('EventBusService', () => {
   let service: EventBusService;
@@ -57,13 +57,14 @@ describe('EventBusService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         EventBusService,
-        { provide: NATS_CLIENT, useValue: mockNatsClient },
+        { provide: EventBusConstants.NATS_CLIENT, useValue: mockNatsClient },
         { provide: EventLoggerService, useValue: mockEventLogger },
         { provide: RetryService, useValue: mockRetryService },
       ],
     }).compile();
 
     service = module.get<EventBusService>(EventBusService);
+    (service as unknown as { isConnected: boolean }).isConnected = true;
   });
 
   describe('onModuleInit', () => {
@@ -117,6 +118,38 @@ describe('EventBusService', () => {
       });
     });
 
+    it('should handle missing optional correlation and causation identifiers', () => {
+      const { correlationId: _correlationId, causationId: _causationId, ...baseEvent } =
+        createMockEvent();
+      const event = {
+        ...baseEvent,
+        status: 'pending',
+      } as BaseEvent & { status: string };
+
+      const serialized = service.serializeEvent(event);
+
+      expect(serialized.correlationId).toBeUndefined();
+      expect(serialized.causationId).toBeUndefined();
+      expect(serialized.payload).toEqual({ status: 'pending' });
+    });
+
+    it('should serialize event with only base fields to an empty payload', () => {
+      const event: BaseEvent = {
+        eventId: 'evt-base',
+        eventType: 'WorkspaceCreatedEvent-V1',
+        eventVersion: '1.0.0',
+        occurredAt: new Date('2024-02-01T00:00:00Z'),
+        aggregateId: 'workspace-123',
+        aggregateType: 'Workspace',
+      };
+
+      const serialized = service.serializeEvent(event);
+
+      expect(serialized.payload).toEqual({});
+      expect(serialized.correlationId).toBeUndefined();
+      expect(serialized.causationId).toBeUndefined();
+    });
+
     it('should handle string occurredAt', () => {
       const event = {
         ...createMockEvent(),
@@ -150,6 +183,29 @@ describe('EventBusService', () => {
       expect(deserialized.occurredAt).toEqual(new Date('2024-01-01T00:00:00.000Z'));
       expect(deserialized.organizationName).toBe('Test Org');
     });
+
+    it('should deserialize event with empty payload to base fields only', () => {
+      const serialized: SerializedEvent = {
+        eventId: 'evt-empty',
+        eventType: 'WorkspaceCreatedEvent-V1',
+        eventVersion: '1.0.0',
+        occurredAt: '2024-02-01T00:00:00.000Z',
+        aggregateId: 'workspace-123',
+        aggregateType: 'Workspace',
+        payload: {},
+      };
+
+      const deserialized = service.deserializeEvent(serialized);
+
+      expect(deserialized).toEqual({
+        eventId: 'evt-empty',
+        eventType: 'WorkspaceCreatedEvent-V1',
+        eventVersion: '1.0.0',
+        occurredAt: new Date('2024-02-01T00:00:00.000Z'),
+        aggregateId: 'workspace-123',
+        aggregateType: 'Workspace',
+      });
+    });
   });
 
   describe('publish', () => {
@@ -160,6 +216,35 @@ describe('EventBusService', () => {
 
       expect(mockEventLogger.logPublish).toHaveBeenCalledWith(event, 'test.subject');
       expect(mockRetryService.executeWithRetry).toHaveBeenCalled();
+    });
+
+    it('should throw an error when NATS client reconnection fails', async () => {
+      const event = createMockEvent();
+      mockNatsClient.connect.mockRejectedValueOnce(new Error('Connection failed'));
+      (service as unknown as { isConnected: boolean }).isConnected = false;
+
+      await expect(service.publish('test.subject', event)).rejects.toThrow('Connection failed');
+
+      expect(mockNatsClient.connect).toHaveBeenCalledTimes(1);
+      expect(mockRetryService.executeWithRetry).not.toHaveBeenCalled();
+      expect(mockEventLogger.logPublish).not.toHaveBeenCalled();
+      expect(mockEventLogger.logFailed).toHaveBeenCalledTimes(1);
+      const [, error] = mockEventLogger.logFailed.mock.calls[0] as [BaseEvent, Error];
+      expect(error).toBeInstanceOf(Error);
+      expect(error.message).toBe('Connection failed');
+    });
+
+    it('should attempt to reconnect when not connected and succeed', async () => {
+      const event = createMockEvent();
+      (service as unknown as { isConnected: boolean }).isConnected = false;
+
+      await service.publish('test.subject', event);
+
+      expect(mockNatsClient.connect).toHaveBeenCalledTimes(1);
+      expect((service as unknown as { isConnected: boolean }).isConnected).toBe(true);
+      expect(mockEventLogger.logPublish).toHaveBeenCalledWith(event, 'test.subject');
+      expect(mockRetryService.executeWithRetry).toHaveBeenCalledTimes(1);
+      expect(mockEventLogger.logFailed).not.toHaveBeenCalled();
     });
 
     it('should use retry service by default', async () => {
@@ -209,6 +294,23 @@ describe('EventBusService', () => {
       expect(mockEventLogger.logFailed).toHaveBeenCalledWith(event, retryError, 3);
     });
 
+    it('should log retries for multiple retry attempts', async () => {
+      const event = createMockEvent();
+      const retryError = new Error('Intermittent failure');
+
+      mockRetryService.executeWithRetry.mockImplementationOnce(async (_operation, options) => {
+        options?.onRetry?.(1, retryError, 500);
+        options?.onRetry?.(2, retryError, 1000);
+        return { success: false, error: retryError, attempts: 3 };
+      });
+
+      await expect(service.publish('test.subject', event)).rejects.toThrow(retryError);
+
+      expect(mockEventLogger.logRetry).toHaveBeenNthCalledWith(1, event, 1, 500);
+      expect(mockEventLogger.logRetry).toHaveBeenNthCalledWith(2, event, 2, 1000);
+      expect(mockEventLogger.logFailed).toHaveBeenCalledWith(event, retryError, 3);
+    });
+
     it('should log failure and rethrow when retry is disabled', async () => {
       const event = createMockEvent();
       const error = new Error('Immediate failure');
@@ -245,12 +347,61 @@ describe('EventBusService', () => {
   });
 
   describe('publishEvent', () => {
-    it('should derive subject from event type', async () => {
-      const event = createMockEvent({ eventType: 'OrganizationCreatedEvent-V1' });
+    it('should derive subjects from multiple event types using buildSubjectFromEventType', async () => {
+      const buildSubjectSpy = jest.spyOn(
+        EventBusConstants,
+        'buildSubjectFromEventType',
+      );
+      const events: BaseEvent[] = [
+        createMockEvent({
+          eventId: 'evt-workspace',
+          eventType: 'WorkspaceCreatedEvent-V1',
+          aggregateId: 'workspace-1',
+          aggregateType: 'Workspace',
+        }),
+        createMockEvent({
+          eventId: 'evt-organization',
+          eventType: 'OrganizationUpdatedEvent-V2',
+          aggregateId: 'organization-2',
+          aggregateType: 'Organization',
+        }),
+        createMockEvent({
+          eventId: 'evt-actor',
+          eventType: 'ActorOnboardedEvent-V1',
+          aggregateId: 'actor-3',
+          aggregateType: 'Actor',
+        }),
+      ];
 
-      await service.publishEvent(event);
+      try {
+        for (const event of events) {
+          await service.publishEvent(event);
+        }
 
-      expect(mockRetryService.executeWithRetry).toHaveBeenCalled();
+        expect(buildSubjectSpy).toHaveBeenCalledTimes(events.length);
+        expect(buildSubjectSpy).toHaveBeenNthCalledWith(1, 'WorkspaceCreatedEvent-V1');
+        expect(buildSubjectSpy).toHaveBeenNthCalledWith(2, 'OrganizationUpdatedEvent-V2');
+        expect(buildSubjectSpy).toHaveBeenNthCalledWith(3, 'ActorOnboardedEvent-V1');
+
+        expect(mockEventLogger.logPublish).toHaveBeenNthCalledWith(
+          1,
+          events[0],
+          'workspace.events.created-v1',
+        );
+        expect(mockEventLogger.logPublish).toHaveBeenNthCalledWith(
+          2,
+          events[1],
+          'organization.events.updated-v2',
+        );
+        expect(mockEventLogger.logPublish).toHaveBeenNthCalledWith(
+          3,
+          events[2],
+          'actor.events.onboarded-v1',
+        );
+        expect(mockRetryService.executeWithRetry).toHaveBeenCalledTimes(events.length);
+      } finally {
+        buildSubjectSpy.mockRestore();
+      }
     });
 
     it('should use custom subject when provided', async () => {
