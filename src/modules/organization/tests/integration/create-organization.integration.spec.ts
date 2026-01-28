@@ -1,13 +1,25 @@
+import { CommandBus, CqrsModule, EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CommandBus, EventBus, CqrsModule } from '@nestjs/cqrs';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
+
+import { ActorType } from '../../../actor/dto/actor.enums';
+import { ActorEntity } from '../../../actor/entities/actor.entity';
+import { AddActorToWorkspaceCommandHandler } from '../../../workspace/handlers/add-actor-to-workspace.handler';
+import { CreateWorkspaceCommandHandler } from '../../../workspace/handlers/create-workspace.handler';
+import { MembershipEntity } from '../../../workspace/entities/membership.entity';
+import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
+import {
+  MembershipRole,
+  WorkspaceStatus,
+  WorkspaceType,
+} from '../../../workspace/dto/workspace.enums';
 import { CreateOrganizationCommand } from '../../commands/create-organization.command';
+import { OrganizationStatus, OrganizationType } from '../../dto/organization.enums';
+import { OrganizationEntity } from '../../entities/organization.entity';
 import { OrganizationCreatedEventV1 } from '../../events/organization-created.event';
 import { CreateOrganizationCommandHandler } from '../../handlers/create-organization.handler';
-import { OrganizationEntity } from '../../entities/organization.entity';
-import { OrganizationType, OrganizationStatus } from '../../dto/organization.enums';
 
 const describeIntegration =
   process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
@@ -27,11 +39,35 @@ const describeIntegration =
  * - NestJS CQRS module
  * - Mock NATS/EventBus
  */
+/**
+ * Helper function to create a test actor in the database
+ * Used for testing admin-by-default flow
+ */
+async function createTestActor(
+  repo: Repository<ActorEntity>,
+  workspaceId: string,
+): Promise<string> {
+  const actorId = uuidv4();
+  const actor = ActorEntity.fromDomain({
+    actorId,
+    type: ActorType.SaccoAdmin,
+    roles: [],
+    workspaceId,
+    linkedWallets: [],
+    createdAt: new Date(),
+  });
+  await repo.save(actor);
+  return actorId;
+}
+
 describeIntegration('CreateOrganizationCommand Integration Tests', () => {
   let module!: TestingModule;
   let commandBus!: CommandBus;
   let eventBus!: EventBus;
   let organizationRepository!: Repository<OrganizationEntity>;
+  let workspaceRepository!: Repository<WorkspaceEntity>;
+  let membershipRepository!: Repository<MembershipEntity>;
+  let actorRepository!: Repository<ActorEntity>;
   let emittedEvents: OrganizationCreatedEventV1[] = [];
   let moduleInitializationFailed = false;
 
@@ -47,19 +83,42 @@ describeIntegration('CreateOrganizationCommand Integration Tests', () => {
             username: process.env.TEST_DB_USER || 'test',
             password: process.env.TEST_DB_PASSWORD || 'test',
             database: process.env.TEST_DB_NAME || 'zanafleet_test',
-            entities: [OrganizationEntity],
+            entities: [
+              OrganizationEntity,
+              WorkspaceEntity,
+              MembershipEntity,
+              ActorEntity,
+            ],
             synchronize: true,
             dropSchema: true,
           }),
-          TypeOrmModule.forFeature([OrganizationEntity]),
+          TypeOrmModule.forFeature([
+            OrganizationEntity,
+            WorkspaceEntity,
+            MembershipEntity,
+            ActorEntity,
+          ]),
         ],
-        providers: [CreateOrganizationCommandHandler],
+        providers: [
+          CreateOrganizationCommandHandler,
+          CreateWorkspaceCommandHandler,
+          AddActorToWorkspaceCommandHandler,
+        ],
       }).compile();
 
       commandBus = module.get<CommandBus>(CommandBus);
       eventBus = module.get<EventBus>(EventBus);
       organizationRepository = module.get<Repository<OrganizationEntity>>(
         getRepositoryToken(OrganizationEntity),
+      );
+      workspaceRepository = module.get<Repository<WorkspaceEntity>>(
+        getRepositoryToken(WorkspaceEntity),
+      );
+      membershipRepository = module.get<Repository<MembershipEntity>>(
+        getRepositoryToken(MembershipEntity),
+      );
+      actorRepository = module.get<Repository<ActorEntity>>(
+        getRepositoryToken(ActorEntity),
       );
 
       eventBus.subscribe((event) => {
@@ -68,7 +127,11 @@ describeIntegration('CreateOrganizationCommand Integration Tests', () => {
         }
       });
 
-      commandBus.register([CreateOrganizationCommandHandler]);
+      commandBus.register([
+        CreateOrganizationCommandHandler,
+        CreateWorkspaceCommandHandler,
+        AddActorToWorkspaceCommandHandler,
+      ]);
     } catch (error) {
       console.warn(
         'Failed to initialize Organization integration test module (database may not be available):',
@@ -92,6 +155,9 @@ describeIntegration('CreateOrganizationCommand Integration Tests', () => {
     }
 
     emittedEvents = [];
+    await membershipRepository.delete({});
+    await workspaceRepository.delete({});
+    await actorRepository.delete({});
     await organizationRepository.delete({});
   });
 
@@ -332,6 +398,229 @@ describeIntegration('CreateOrganizationCommand Integration Tests', () => {
       expect(deserialized.status).toBe(originalEvent.status);
       expect(deserialized.linkedWallets).toEqual(originalEvent.linkedWallets);
       expect(deserialized.eventType).toBe('OrganizationCreatedEvent-V1');
+    });
+  });
+
+  describe('Admin-by-Default Organization Creation Flow', () => {
+    it('should create SACCO organization with default workspace and ADMIN membership when createdByActorId is provided', async () => {
+      const placeholderWorkspaceId = uuidv4();
+      const placeholderWorkspace = WorkspaceEntity.fromDomain({
+        workspaceId: placeholderWorkspaceId,
+        orgId: uuidv4(),
+        name: 'Placeholder Workspace',
+        type: WorkspaceType.SACCO,
+        status: WorkspaceStatus.ACTIVE,
+        roleTemplates: [],
+        createdAt: new Date(),
+      });
+
+      const tempOrgId = uuidv4();
+      const tempOrg = OrganizationEntity.fromDomain({
+        organizationId: tempOrgId,
+        name: 'Temp Org',
+        type: OrganizationType.SACCO,
+        status: OrganizationStatus.ACTIVE,
+        linkedWallets: [],
+        createdAt: new Date(),
+      });
+      await organizationRepository.save(tempOrg);
+      placeholderWorkspace.orgId = tempOrgId;
+      await workspaceRepository.save(placeholderWorkspace);
+
+      const actorId = await createTestActor(actorRepository, placeholderWorkspaceId);
+
+      const command = new CreateOrganizationCommand({
+        name: 'Test SACCO Organization',
+        type: OrganizationType.SACCO,
+        status: OrganizationStatus.ACTIVE,
+        linkedWallets: [],
+        createdByActorId: actorId,
+      });
+
+      const organizationId = await commandBus.execute(command);
+
+      const savedOrg = await organizationRepository.findOne({
+        where: { id: organizationId },
+      });
+      expect(savedOrg).toBeDefined();
+      expect(savedOrg?.type).toBe(OrganizationType.SACCO);
+      expect(savedOrg?.name).toBe('Test SACCO Organization');
+
+      const savedWorkspace = await workspaceRepository.findOne({
+        where: { orgId: organizationId },
+      });
+      expect(savedWorkspace).toBeDefined();
+      expect(savedWorkspace?.type).toBe(WorkspaceType.SACCO);
+      expect(savedWorkspace?.name).toBe('Test SACCO Organization Workspace');
+
+      const savedMembership = await membershipRepository.findOne({
+        where: { actorId, workspaceId: savedWorkspace?.id },
+      });
+      expect(savedMembership).toBeDefined();
+      expect(savedMembership?.role).toBe(MembershipRole.ADMIN);
+    });
+
+    it('should create BUSINESS organization with default workspace and ADMIN membership when createdByActorId is provided', async () => {
+      const tempOrgId = uuidv4();
+      const tempOrg = OrganizationEntity.fromDomain({
+        organizationId: tempOrgId,
+        name: 'Temp Org',
+        type: OrganizationType.BUSINESS,
+        status: OrganizationStatus.ACTIVE,
+        linkedWallets: [],
+        createdAt: new Date(),
+      });
+      await organizationRepository.save(tempOrg);
+
+      const placeholderWorkspaceId = uuidv4();
+      const placeholderWorkspace = WorkspaceEntity.fromDomain({
+        workspaceId: placeholderWorkspaceId,
+        orgId: tempOrgId,
+        name: 'Placeholder Workspace',
+        type: WorkspaceType.BUSINESS,
+        status: WorkspaceStatus.ACTIVE,
+        roleTemplates: [],
+        createdAt: new Date(),
+      });
+      await workspaceRepository.save(placeholderWorkspace);
+
+      const actorId = await createTestActor(actorRepository, placeholderWorkspaceId);
+
+      const command = new CreateOrganizationCommand({
+        name: 'Test Business Organization',
+        type: OrganizationType.BUSINESS,
+        status: OrganizationStatus.ACTIVE,
+        linkedWallets: [],
+        createdByActorId: actorId,
+      });
+
+      const organizationId = await commandBus.execute(command);
+
+      const savedOrg = await organizationRepository.findOne({
+        where: { id: organizationId },
+      });
+      expect(savedOrg).toBeDefined();
+      expect(savedOrg?.type).toBe(OrganizationType.BUSINESS);
+
+      const savedWorkspace = await workspaceRepository.findOne({
+        where: { orgId: organizationId },
+      });
+      expect(savedWorkspace).toBeDefined();
+      expect(savedWorkspace?.type).toBe(WorkspaceType.BUSINESS);
+
+      const savedMembership = await membershipRepository.findOne({
+        where: { actorId, workspaceId: savedWorkspace?.id },
+      });
+      expect(savedMembership).toBeDefined();
+      expect(savedMembership?.role).toBe(MembershipRole.ADMIN);
+    });
+
+    it('should create PLATFORM organization without workspace or membership even when createdByActorId is provided', async () => {
+      const tempOrgId = uuidv4();
+      const tempOrg = OrganizationEntity.fromDomain({
+        organizationId: tempOrgId,
+        name: 'Temp Org',
+        type: OrganizationType.SACCO,
+        status: OrganizationStatus.ACTIVE,
+        linkedWallets: [],
+        createdAt: new Date(),
+      });
+      await organizationRepository.save(tempOrg);
+
+      const placeholderWorkspaceId = uuidv4();
+      const placeholderWorkspace = WorkspaceEntity.fromDomain({
+        workspaceId: placeholderWorkspaceId,
+        orgId: tempOrgId,
+        name: 'Placeholder Workspace',
+        type: WorkspaceType.SACCO,
+        status: WorkspaceStatus.ACTIVE,
+        roleTemplates: [],
+        createdAt: new Date(),
+      });
+      await workspaceRepository.save(placeholderWorkspace);
+
+      const actorId = await createTestActor(actorRepository, placeholderWorkspaceId);
+
+      const command = new CreateOrganizationCommand({
+        name: 'Test Platform Organization',
+        type: OrganizationType.PLATFORM,
+        status: OrganizationStatus.ACTIVE,
+        linkedWallets: [],
+        createdByActorId: actorId,
+      });
+
+      const organizationId = await commandBus.execute(command);
+
+      const savedOrg = await organizationRepository.findOne({
+        where: { id: organizationId },
+      });
+      expect(savedOrg).toBeDefined();
+      expect(savedOrg?.type).toBe(OrganizationType.PLATFORM);
+
+      const workspaces = await workspaceRepository.find({
+        where: { orgId: organizationId },
+      });
+      expect(workspaces.length).toBe(0);
+
+      const memberships = await membershipRepository.find({
+        where: { actorId },
+      });
+      const relevantMemberships = memberships.filter(
+        (membership) => membership.workspaceId !== placeholderWorkspaceId,
+      );
+      expect(relevantMemberships.length).toBe(0);
+    });
+
+    it('should create SACCO organization with default workspace but NO membership when createdByActorId is not provided', async () => {
+      const command = new CreateOrganizationCommand({
+        name: 'Test SACCO No Actor',
+        type: OrganizationType.SACCO,
+        status: OrganizationStatus.ACTIVE,
+        linkedWallets: [],
+      });
+
+      const organizationId = await commandBus.execute(command);
+
+      const savedOrg = await organizationRepository.findOne({
+        where: { id: organizationId },
+      });
+      expect(savedOrg).toBeDefined();
+      expect(savedOrg?.type).toBe(OrganizationType.SACCO);
+
+      const savedWorkspace = await workspaceRepository.findOne({
+        where: { orgId: organizationId },
+      });
+      expect(savedWorkspace).toBeDefined();
+      expect(savedWorkspace?.type).toBe(WorkspaceType.SACCO);
+
+      const memberships = await membershipRepository.find({
+        where: { workspaceId: savedWorkspace?.id },
+      });
+      expect(memberships.length).toBe(0);
+    });
+
+    it('should maintain backward compatibility with minimal fields (name, type, status)', async () => {
+      const command = new CreateOrganizationCommand({
+        name: 'Minimal Org',
+        type: OrganizationType.INTERNAL,
+        status: OrganizationStatus.ACTIVE,
+      });
+
+      const organizationId = await commandBus.execute(command);
+
+      const savedOrg = await organizationRepository.findOne({
+        where: { id: organizationId },
+      });
+      expect(savedOrg).toBeDefined();
+      expect(savedOrg?.name).toBe('Minimal Org');
+      expect(savedOrg?.type).toBe(OrganizationType.INTERNAL);
+      expect(savedOrg?.status).toBe(OrganizationStatus.ACTIVE);
+      expect(savedOrg?.linkedWallets).toEqual([]);
+
+      const workspaces = await workspaceRepository.find({
+        where: { orgId: organizationId },
+      });
+      expect(workspaces.length).toBe(0);
     });
   });
 });
