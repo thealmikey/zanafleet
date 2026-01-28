@@ -13,16 +13,17 @@ import {
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ZodError } from 'zod';
 
-import { ActorType } from '../../actor/dto/actor.enums';
 import { FinalizeSignUpCommand } from '../commands/finalize-signup.command';
 import { InitiateSignUpCommand } from '../commands/initiate-signup.command';
 import { UpdateSignUpStepCommand } from '../commands/update-signup-step.command';
 import { FinalizeSignUpDto } from '../dto/finalize-signup.dto';
 import { InitiateSignUpDto } from '../dto/initiate-signup.dto';
 import { SignUpSessionDto } from '../dto/signup-session.dto';
-import { SignUpSessionStatus } from '../dto/signup.enums';
 import { UpdateSignUpStepDto } from '../dto/update-signup-step.dto';
-import { UpdateSignUpStepResult } from '../handlers/signup-result.interfaces';
+import {
+  SignUpSessionResult,
+  UpdateSignUpStepResult,
+} from '../handlers/signup-result.interfaces';
 import { GetSignUpSessionQuery } from '../queries/get-signup-session.query';
 
 @Controller('signup')
@@ -112,18 +113,7 @@ export class SignUpController {
     return this.mapResultToDto(result);
   }
 
-  private mapResultToDto(result: {
-    sessionId: string;
-    status: SignUpSessionStatus;
-    actorType: ActorType;
-    workspaceId?: string | null;
-    roles: string[];
-    linkedWallets: string[];
-    completedSteps: string[];
-    expiresAt: Date;
-    createdAt: Date;
-    updatedAt: Date;
-  }): SignUpSessionDto {
+  private mapResultToDto(result: SignUpSessionResult): SignUpSessionDto {
     const dto = new SignUpSessionDto();
     dto.sessionId = result.sessionId;
     dto.status = result.status;
