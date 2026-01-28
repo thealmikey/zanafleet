@@ -10,14 +10,17 @@ export * from './dto/workspace.enums';
 
 // DTOs
 export * from './dto/create-workspace.dto';
+export * from './dto/update-workspace.dto';
 
 // Commands
 export * from './commands/create-workspace.command';
+export * from './commands/update-workspace.command';
 export * from './commands/add-actor-to-workspace.command';
 export * from './commands/remove-actor-from-workspace.command';
 
 // Events
 export * from './events/workspace-created.event';
+export * from './events/workspace-updated.event';
 export * from './events/actor-added-to-workspace.event';
 export * from './events/actor-removed-from-workspace.event';
 
