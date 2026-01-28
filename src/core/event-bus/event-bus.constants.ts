@@ -56,6 +56,12 @@ export const NatsSubjects = {
     GRANTED_TO_PERSONA_V1: 'capability.events.granted-to-persona-v1',
     ALL: 'capability.events.*',
   },
+  Formation: {
+    STATUS_CHANGED_V1: 'formation.events.status-changed-v1',
+    REQUIREMENT_CREATED_V1: 'formation.events.requirement-created-v1',
+    REQUIREMENT_SATISFIED_V1: 'formation.events.requirement-satisfied-v1',
+    ALL: 'formation.events.*',
+  },
 } as const;
 
 /**
