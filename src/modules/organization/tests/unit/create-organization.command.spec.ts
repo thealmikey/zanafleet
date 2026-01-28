@@ -263,4 +263,56 @@ describe('CreateOrganizationCommand', () => {
       expect(() => CreateOrganizationCommand.validate(input)).not.toThrow();
     });
   });
+
+  describe('createdByActorId Validation', () => {
+    it('should accept valid UUID for createdByActorId', () => {
+      const input = {
+        name: 'Test Organization',
+        type: OrganizationType.SACCO,
+        status: OrganizationStatus.ACTIVE,
+        createdByActorId: '550e8400-e29b-41d4-a716-446655440000',
+      };
+
+      const command = new CreateOrganizationCommand(input);
+
+      expect(command.createdByActorId).toBe('550e8400-e29b-41d4-a716-446655440000');
+    });
+
+    it('should reject invalid UUID format for createdByActorId', () => {
+      const input = {
+        name: 'Test Organization',
+        type: 'SACCO',
+        status: 'active',
+        createdByActorId: 'not-a-valid-uuid',
+      };
+
+      expect(() => CreateOrganizationCommandSchema.parse(input)).toThrow(
+        z.ZodError,
+      );
+    });
+
+    it('should work without createdByActorId (backward compatible)', () => {
+      const input = {
+        name: 'Test Organization',
+        type: OrganizationType.SACCO,
+        status: OrganizationStatus.ACTIVE,
+      };
+
+      const command = new CreateOrganizationCommand(input);
+
+      expect(command.createdByActorId).toBeUndefined();
+      expect(command.name).toBe('Test Organization');
+    });
+
+    it('should accept undefined createdByActorId explicitly', () => {
+      const input = {
+        name: 'Test Organization',
+        type: 'SACCO',
+        status: 'active',
+        createdByActorId: undefined,
+      };
+
+      expect(() => CreateOrganizationCommandSchema.parse(input)).not.toThrow();
+    });
+  });
 });

@@ -29,6 +29,10 @@ export const CreateOrganizationCommandSchema = z.object({
     )
     .optional()
     .default([]),
+  createdByActorId: z
+    .string()
+    .uuid('createdByActorId must be a valid UUID')
+    .optional(),
 });
 
 export type CreateOrganizationCommandInput = z.infer<typeof CreateOrganizationCommandSchema>;
@@ -44,12 +48,14 @@ export class CreateOrganizationCommand {
   readonly type: OrganizationType;
   readonly status: OrganizationStatus;
   readonly linkedWallets: string[];
+  readonly createdByActorId?: string;
 
   constructor(input: CreateOrganizationCommandRawInput) {
     this.name = input.name;
     this.type = input.type;
     this.status = input.status;
     this.linkedWallets = input.linkedWallets ?? [];
+    this.createdByActorId = input.createdByActorId;
   }
 
   /**

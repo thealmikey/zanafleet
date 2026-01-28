@@ -9,6 +9,14 @@ export class CreateOrganizationDto {
   type: OrganizationType;
   status: OrganizationStatus;
   linkedWallets?: string[]; // Array of wallet UUIDs
+
+  /**
+   * Optional actor ID of the user creating the organization.
+   * When provided, triggers admin-by-default behavior:
+   * - For SACCO/BUSINESS types, automatically creates a default workspace
+   * - Assigns the creating actor as ADMIN of the new workspace
+   */
+  createdByActorId?: string;
 }
 
 /**
