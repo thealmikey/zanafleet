@@ -11,6 +11,10 @@ export * from './dto/actor.enums';
 // DTOs
 export * from './dto/create-actor.dto';
 export * from './dto/update-actor.dto';
+export * from './dto/actor.dto';
+
+// Controllers
+export * from './controllers/actor.controller';
 
 // Commands
 export * from './commands/create-actor.command';

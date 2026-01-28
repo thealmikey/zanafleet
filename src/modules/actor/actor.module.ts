@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkspaceEntity } from '../workspace/entities/workspace.entity';
 
 import { ActorEntity } from './entities/actor.entity';
+import { ActorController } from './controllers/actor.controller';
 import { CreateActorCommandHandler } from './handlers/create-actor.handler';
 import { UpdateActorCommandHandler } from './handlers/update-actor.handler';
 import {
@@ -38,6 +39,7 @@ import {
     TypeOrmModule.forFeature([ActorEntity]),
     TypeOrmModule.forFeature([WorkspaceEntity]),
   ],
+  controllers: [ActorController],
   providers: [
     // Command Handlers
     CreateActorCommandHandler,
