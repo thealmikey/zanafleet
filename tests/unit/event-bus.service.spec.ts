@@ -411,5 +411,20 @@ describe('EventBusService', () => {
 
       expect(mockEventLogger.logPublish).toHaveBeenCalledWith(event, 'custom.subject');
     });
+
+    it('should fall back to unknown subject when event type does not match pattern', async () => {
+      const event = createMockEvent({
+        eventId: 'evt-unknown',
+        eventType: 'InvalidEventType',
+      });
+
+      await service.publishEvent(event);
+
+      expect(mockEventLogger.logPublish).toHaveBeenCalledWith(
+        event,
+        'unknown.events.invalideventtype',
+      );
+      expect(mockRetryService.executeWithRetry).toHaveBeenCalledTimes(1);
+    });
   });
 });

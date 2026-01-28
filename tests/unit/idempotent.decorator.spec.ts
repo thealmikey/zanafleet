@@ -334,6 +334,32 @@ describe('IdempotentHandler decorator', () => {
     expect(eventLogger.logSkipped).not.toHaveBeenCalled();
   });
 
+  it('handles missing event logger when key is provided', async () => {
+    const idempotencyService = createIdempotencyServiceMock();
+    idempotencyService.isProcessed.mockReturnValue(false);
+    const original = jest.fn().mockResolvedValue(undefined);
+
+    class MissingLoggerHandler {
+      public idempotencyService = idempotencyService as unknown as IdempotencyService;
+      public eventLogger?: EventLoggerService;
+
+      constructor(private readonly originalHandler: jest.Mock) {}
+
+      @IdempotentHandler('idempotencyService', 'eventLogger')
+      async handle(event: BaseEvent): Promise<void> {
+        await this.originalHandler(event);
+      }
+    }
+
+    const handlerInstance = new MissingLoggerHandler(original);
+
+    await handlerInstance.handle(event);
+
+    expect(idempotencyService.markAsProcessed).toHaveBeenCalledWith(event.eventId);
+    expect(original).toHaveBeenCalledWith(event);
+    expect(idempotencyService.remove).not.toHaveBeenCalled();
+  });
+
   it('forwards additional arguments to the original handler', async () => {
     const idempotencyService = createIdempotencyServiceMock();
     idempotencyService.isProcessed.mockReturnValue(false);
