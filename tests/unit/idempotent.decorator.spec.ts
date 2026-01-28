@@ -122,6 +122,58 @@ describe('withIdempotency', () => {
     expect(idempotencyService.markAsProcessed).toHaveBeenCalledWith(event.eventId);
     expect(idempotencyService.remove).toHaveBeenCalledWith(event.eventId);
   });
+
+  it('handles duplicate events without event logger', async () => {
+    idempotencyService.isProcessed.mockReturnValue(true);
+    const handler = jest.fn();
+
+    const wrapped = withIdempotency(
+      handler,
+      idempotencyService as unknown as IdempotencyService,
+    );
+
+    await wrapped(event);
+
+    expect(handler).not.toHaveBeenCalled();
+    expect(idempotencyService.markAsProcessed).not.toHaveBeenCalled();
+    expect(idempotencyService.remove).not.toHaveBeenCalled();
+    expect(eventLogger.logSkipped).not.toHaveBeenCalled();
+  });
+
+  it('processes new events without event logger', async () => {
+    idempotencyService.isProcessed.mockReturnValue(false);
+    const handler = jest.fn().mockResolvedValue(undefined);
+
+    const wrapped = withIdempotency(
+      handler,
+      idempotencyService as unknown as IdempotencyService,
+    );
+
+    await wrapped(event);
+
+    expect(idempotencyService.markAsProcessed).toHaveBeenCalledWith(event.eventId);
+    expect(handler).toHaveBeenCalledWith(event);
+    expect(idempotencyService.remove).not.toHaveBeenCalled();
+    expect(eventLogger.logSkipped).not.toHaveBeenCalled();
+  });
+
+  it('skips logging when event logger argument is undefined', async () => {
+    idempotencyService.isProcessed.mockReturnValue(true);
+    const handler = jest.fn();
+
+    const wrapped = withIdempotency(
+      handler,
+      idempotencyService as unknown as IdempotencyService,
+      undefined,
+    );
+
+    await wrapped(event);
+
+    expect(handler).not.toHaveBeenCalled();
+    expect(idempotencyService.markAsProcessed).not.toHaveBeenCalled();
+    expect(idempotencyService.remove).not.toHaveBeenCalled();
+    expect(eventLogger.logSkipped).not.toHaveBeenCalled();
+  });
 });
 
 describe('IdempotentHandler decorator', () => {
@@ -224,5 +276,84 @@ describe('IdempotentHandler decorator', () => {
 
     expect(idempotencyService.markAsProcessed).toHaveBeenCalledWith(event.eventId);
     expect(idempotencyService.remove).toHaveBeenCalledWith(event.eventId);
+  });
+
+  it('uses custom idempotency service key to resolve service', async () => {
+    const idempotencyService = createIdempotencyServiceMock();
+    const eventLogger = createEventLoggerMock();
+    idempotencyService.isProcessed.mockReturnValue(false);
+    const original = jest.fn().mockResolvedValue(undefined);
+
+    class CustomKeyHandler {
+      public customIdempotency = idempotencyService as unknown as IdempotencyService;
+      public customLogger = eventLogger as unknown as EventLoggerService;
+
+      constructor(private readonly originalHandler: jest.Mock) {}
+
+      @IdempotentHandler('customIdempotency', 'customLogger')
+      async handle(event: BaseEvent): Promise<void> {
+        await this.originalHandler(event);
+      }
+    }
+
+    const handlerInstance = new CustomKeyHandler(original);
+
+    await handlerInstance.handle(event);
+
+    expect(idempotencyService.markAsProcessed).toHaveBeenCalledWith(event.eventId);
+    expect(original).toHaveBeenCalledWith(event);
+    expect(idempotencyService.remove).not.toHaveBeenCalled();
+    expect(eventLogger.logSkipped).not.toHaveBeenCalled();
+  });
+
+  it('handles duplicate events without event logger key', async () => {
+    const idempotencyService = createIdempotencyServiceMock();
+    const eventLogger = createEventLoggerMock();
+    idempotencyService.isProcessed.mockReturnValue(true);
+    const original = jest.fn();
+
+    class NoLoggerKeyHandler {
+      public idempotencyService = idempotencyService as unknown as IdempotencyService;
+      public eventLogger = eventLogger as unknown as EventLoggerService;
+
+      constructor(private readonly originalHandler: jest.Mock) {}
+
+      @IdempotentHandler('idempotencyService')
+      async handle(event: BaseEvent): Promise<void> {
+        await this.originalHandler(event);
+      }
+    }
+
+    const handlerInstance = new NoLoggerKeyHandler(original);
+
+    await handlerInstance.handle(event);
+
+    expect(original).not.toHaveBeenCalled();
+    expect(idempotencyService.markAsProcessed).not.toHaveBeenCalled();
+    expect(idempotencyService.remove).not.toHaveBeenCalled();
+    expect(eventLogger.logSkipped).not.toHaveBeenCalled();
+  });
+
+  it('forwards additional arguments to the original handler', async () => {
+    const idempotencyService = createIdempotencyServiceMock();
+    idempotencyService.isProcessed.mockReturnValue(false);
+    const original = jest.fn().mockResolvedValue(undefined);
+
+    class AdditionalArgsHandler {
+      public idempotencyService = idempotencyService as unknown as IdempotencyService;
+
+      @IdempotentHandler('idempotencyService')
+      async handle(event: BaseEvent, arg1: string, arg2: number): Promise<void> {
+        await original(event, arg1, arg2);
+      }
+    }
+
+    const handlerInstance = new AdditionalArgsHandler();
+
+    await handlerInstance.handle(event, 'argument-one', 42);
+
+    expect(idempotencyService.markAsProcessed).toHaveBeenCalledWith(event.eventId);
+    expect(original).toHaveBeenCalledWith(event, 'argument-one', 42);
+    expect(idempotencyService.remove).not.toHaveBeenCalled();
   });
 });
