@@ -51,6 +51,10 @@ export const NatsSubjects = {
     UPDATED_V1: 'role.events.updated-v1',
     ALL: 'role.events.*',
   },
+  Capability: {
+    CREATED_V1: 'capability.events.created-v1',
+    ALL: 'capability.events.*',
+  },
 } as const;
 
 /**

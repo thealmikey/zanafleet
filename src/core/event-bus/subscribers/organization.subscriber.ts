@@ -1,7 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MessagePattern, Payload, Ctx, NatsContext } from '@nestjs/microservices';
 import { OrganizationNeo4jProjection } from '../../../modules/organization/projections/organization-neo4j.projection';
-import { OrganizationCreatedEventV1 } from '../../../modules/organization/events/organization-created.event';
+import {
+  OrganizationCreatedEventV1,
+  OrganizationCreatedEventV1JSON,
+} from '../../../modules/organization/events/organization-created.event';
 import { IdempotencyService } from '../services/idempotency.service';
 import { EventLoggerService } from '../services/event-logger.service';
 import { NatsSubjects } from '../event-bus.constants';
@@ -41,7 +44,9 @@ export class OrganizationSubscriber {
 
     try {
       if (data.eventType === 'OrganizationCreatedEvent-V1') {
-        const event = OrganizationCreatedEventV1.fromJSON(data);
+        const event = OrganizationCreatedEventV1.fromJSON(
+          data as unknown as OrganizationCreatedEventV1JSON,
+        );
         await this.projection.handle(event);
         this.eventLogger.logProcessed(event, OrganizationNeo4jProjection.name);
       }
