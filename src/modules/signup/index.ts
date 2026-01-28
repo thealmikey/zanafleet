@@ -5,8 +5,20 @@
  * Other modules should import from this barrel file
  */
 
-// DTOs
+// Enums
 export * from './dto/signup.enums';
+
+// DTOs
+export * from './dto/initiate-signup.dto';
+
+// Commands
+export * from './commands/initiate-signup.command';
+
+// Handlers
+export * from './handlers/initiate-signup.handler';
+
+// Events
+export * from './events/signup-initiated.event';
 
 // Entities
 export * from './entities/signup-session.entity';

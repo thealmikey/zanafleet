@@ -12,7 +12,7 @@ import {
 } from '../../../modules/organization/events/organization-created.event';
 import { OrganizationNeo4jProjection } from '../../../modules/organization/projections/organization-neo4j.projection';
 import { NatsSubjects } from '../event-bus.constants';
-import { SerializedEvent } from '../interfaces/base-event.interface';
+import { BaseEvent, SerializedEvent } from '../interfaces/base-event.interface';
 import { EventLoggerService } from '../services/event-logger.service';
 import { IdempotencyService } from '../services/idempotency.service';
 
@@ -41,17 +41,17 @@ export class OrganizationSubscriber {
     this.logger.debug(`Received event on subject: ${String(subject)}`);
 
     if (this.idempotencyService.isProcessed(data.eventId)) {
-      this.eventLogger.logSkipped(data, 'duplicate');
+      this.eventLogger.logSkipped(data as unknown as BaseEvent, 'duplicate');
       return;
     }
 
     this.idempotencyService.markAsProcessed(data.eventId);
-    this.eventLogger.logReceive(data, subject);
+    this.eventLogger.logReceive(data as unknown as BaseEvent, subject);
 
     try {
       if (data.eventType === 'OrganizationCreatedEvent-V1') {
         const event = OrganizationCreatedEventV1.fromJSON(
-          data as OrganizationCreatedEventV1JSON,
+          data as unknown as OrganizationCreatedEventV1JSON,
         );
         await this.projection.handle(event);
         this.eventLogger.logProcessed(event, OrganizationNeo4jProjection.name);
@@ -59,7 +59,7 @@ export class OrganizationSubscriber {
     } catch (error: unknown) {
       this.idempotencyService.remove(data.eventId);
       const err = error instanceof Error ? error : new Error(String(error));
-      this.eventLogger.logFailed(data, err);
+      this.eventLogger.logFailed(data as unknown as BaseEvent, err);
       throw error;
     }
   }
