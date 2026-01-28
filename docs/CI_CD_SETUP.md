@@ -271,7 +271,7 @@ Jest is configured in `package.json` with:
 
 - **Preset**: `ts-jest` (TypeScript support)
 - **Test files**: `**/*.spec.ts`
-- **Coverage thresholds**: 70% target
+- **Coverage thresholds**: 60% target
 - **Test timeout**: 30 seconds
 
 ### Test Coverage
@@ -369,7 +369,7 @@ npm run test -- src/modules/organization/tests/unit/create-organization.handler.
 
 3. **Write tests alongside code** (unit + integration)
 
-4. **Aim for >70% coverage** on new modules
+4. **Aim for >60% coverage** on new modules
 
 5. **Document complex logic** with comments
 

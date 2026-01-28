@@ -286,7 +286,7 @@ try {
 
 ### Coverage Thresholds
 
-- **Minimum**: 70% coverage on new code
+- **Minimum**: 60% coverage on new code
 - **Target**: 80% coverage for core modules
 - **Critical paths**: 90% coverage (auth, payments, etc.)
 
