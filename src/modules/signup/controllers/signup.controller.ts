@@ -109,7 +109,10 @@ export class SignUpController {
     @Param('id', new ParseUUIDPipe()) id: string,
   ): Promise<SignUpSessionDto> {
     const query = new GetSignUpSessionQuery({ sessionId: id });
-    const result = await this.queryBus.execute(query);
+    const result = await this.queryBus.execute<
+      GetSignUpSessionQuery,
+      SignUpSessionResult
+    >(query);
     return this.mapResultToDto(result);
   }
 
