@@ -53,6 +53,12 @@ describe('RetryService', () => {
 
       expect(sequence).toEqual([]);
     });
+
+    it('should return single delay value when maxRetries is 1', () => {
+      const sequence = service.getDelaySequence(1, 250, 4);
+
+      expect(sequence).toEqual([250]);
+    });
   });
 
   describe('executeWithRetry', () => {
@@ -75,6 +81,42 @@ describe('RetryService', () => {
       expect(result.result).toBe('success');
       expect(result.attempts).toBe(1);
       expect(operation).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not delay or invoke onRetry on immediate success', async () => {
+      const operation = jest.fn().mockResolvedValue('instant-success');
+      const onRetry = jest.fn();
+      const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+
+      try {
+        const result = await service.executeWithRetry(operation, { onRetry });
+
+        expect(result.success).toBe(true);
+        expect(result.result).toBe('instant-success');
+        expect(result.attempts).toBe(1);
+        expect(onRetry).not.toHaveBeenCalled();
+        expect(setTimeoutSpy).not.toHaveBeenCalled();
+      } finally {
+        setTimeoutSpy.mockRestore();
+      }
+    });
+
+    it('should attempt once when maxRetries is 0', async () => {
+      const error = new Error('No retry');
+      const operation = jest.fn().mockRejectedValue(error);
+      const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+
+      try {
+        const result = await service.executeWithRetry(operation, { maxRetries: 0 });
+
+        expect(result.success).toBe(false);
+        expect(result.error).toBe(error);
+        expect(result.attempts).toBe(1);
+        expect(operation).toHaveBeenCalledTimes(1);
+        expect(setTimeoutSpy).not.toHaveBeenCalled();
+      } finally {
+        setTimeoutSpy.mockRestore();
+      }
     });
 
     it('should retry on failure and succeed', async () => {
@@ -158,6 +200,72 @@ describe('RetryService', () => {
       expect(operation).toHaveBeenCalledTimes(4);
 
       await resultPromise;
+    });
+
+    it('should apply constant delay when multiplier is 1', async () => {
+      const error = new Error('Retry');
+      const operation = jest
+        .fn()
+        .mockRejectedValueOnce(error)
+        .mockRejectedValueOnce(error)
+        .mockResolvedValue('success');
+      const onRetry = jest.fn();
+      const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+
+      try {
+        const resultPromise = service.executeWithRetry(operation, {
+          maxRetries: 3,
+          baseDelayMs: 100,
+          multiplier: 1,
+          onRetry,
+        });
+
+        await jest.runAllTimersAsync();
+        const result = await resultPromise;
+
+        expect(result.success).toBe(true);
+        expect(result.attempts).toBe(3);
+        expect(onRetry).toHaveBeenNthCalledWith(1, 1, error, 100);
+        expect(onRetry).toHaveBeenNthCalledWith(2, 2, error, 100);
+        expect(setTimeoutSpy).toHaveBeenCalledTimes(2);
+        expect(setTimeoutSpy).toHaveBeenNthCalledWith(1, expect.any(Function), 100);
+        expect(setTimeoutSpy).toHaveBeenNthCalledWith(2, expect.any(Function), 100);
+      } finally {
+        setTimeoutSpy.mockRestore();
+      }
+    });
+
+    it('should schedule zero delay after first retry when multiplier is 0', async () => {
+      const error = new Error('Retry');
+      const operation = jest
+        .fn()
+        .mockRejectedValueOnce(error)
+        .mockRejectedValueOnce(error)
+        .mockResolvedValue('done');
+      const onRetry = jest.fn();
+      const setTimeoutSpy = jest.spyOn(global, 'setTimeout');
+
+      try {
+        const resultPromise = service.executeWithRetry(operation, {
+          maxRetries: 3,
+          baseDelayMs: 50,
+          multiplier: 0,
+          onRetry,
+        });
+
+        await jest.runAllTimersAsync();
+        const result = await resultPromise;
+
+        expect(result.success).toBe(true);
+        expect(result.attempts).toBe(3);
+        expect(onRetry).toHaveBeenNthCalledWith(1, 1, error, 50);
+        expect(onRetry).toHaveBeenNthCalledWith(2, 2, error, 0);
+        expect(setTimeoutSpy).toHaveBeenCalledTimes(2);
+        expect(setTimeoutSpy).toHaveBeenNthCalledWith(1, expect.any(Function), 50);
+        expect(setTimeoutSpy).toHaveBeenNthCalledWith(2, expect.any(Function), 0);
+      } finally {
+        setTimeoutSpy.mockRestore();
+      }
     });
   });
 
