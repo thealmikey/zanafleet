@@ -22,10 +22,17 @@ export * from './commands/initiate-signup.command';
 export * from './commands/update-signup-step.command';
 export * from './commands/finalize-signup.command';
 
+// Queries
+export * from './queries/get-signup-session.query';
+
 // Handlers
 export * from './handlers/initiate-signup.handler';
 export * from './handlers/update-signup-step.handler';
 export * from './handlers/finalize-signup.handler';
+export * from './handlers/get-signup-session.handler';
+
+// Result Interfaces
+export * from './handlers/signup-result.interfaces';
 
 // Events
 export * from './events/signup-initiated.event';

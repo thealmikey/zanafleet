@@ -1,36 +1,34 @@
 import {
-  Controller,
-  Post,
-  Patch,
-  Get,
-  Body,
-  Param,
-  HttpStatus,
-  HttpCode,
-  NotFoundException,
   BadRequestException,
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
   ParseUUIDPipe,
+  Patch,
+  Post,
 } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ZodError } from 'zod';
 
+import { ActorType } from '../../actor/dto/actor.enums';
 import { FinalizeSignUpCommand } from '../commands/finalize-signup.command';
 import { InitiateSignUpCommand } from '../commands/initiate-signup.command';
 import { UpdateSignUpStepCommand } from '../commands/update-signup-step.command';
 import { FinalizeSignUpDto } from '../dto/finalize-signup.dto';
 import { InitiateSignUpDto } from '../dto/initiate-signup.dto';
 import { SignUpSessionDto } from '../dto/signup-session.dto';
+import { SignUpSessionStatus } from '../dto/signup.enums';
 import { UpdateSignUpStepDto } from '../dto/update-signup-step.dto';
-import { SignUpSessionEntity } from '../entities/signup-session.entity';
+import { GetSignUpSessionQuery } from '../queries/get-signup-session.query';
 
 @Controller('signup')
 export class SignUpController {
   constructor(
     private readonly commandBus: CommandBus,
-    @InjectRepository(SignUpSessionEntity)
-    private readonly signupRepository: Repository<SignUpSessionEntity>,
+    private readonly queryBus: QueryBus,
   ) {}
 
   @Post()
@@ -41,18 +39,14 @@ export class SignUpController {
     try {
       const input = InitiateSignUpCommand.validate(body);
       const command = new InitiateSignUpCommand(input);
-      const sessionId = await this.commandBus.execute<
+      const result = await this.commandBus.execute<
         InitiateSignUpCommand,
-        string
+        { sessionId: string; expiresAt: Date }
       >(command);
 
-      const session = await this.signupRepository.findOne({
-        where: { id: sessionId },
-      });
-
       return {
-        sessionId,
-        expiresAt: session?.expiresAt.toISOString() ?? '',
+        sessionId: result.sessionId,
+        expiresAt: result.expiresAt.toISOString(),
       };
     } catch (error: unknown) {
       if (error instanceof ZodError) {
@@ -73,20 +67,15 @@ export class SignUpController {
         sessionId: id,
       });
       const command = new UpdateSignUpStepCommand(input);
-      await this.commandBus.execute(command);
-
-      const session = await this.signupRepository.findOne({
-        where: { id },
-      });
-
-      if (!session) {
-        throw new NotFoundException(`SignUp session ${id} not found`);
-      }
+      const result = await this.commandBus.execute<
+        UpdateSignUpStepCommand,
+        { sessionId: string; status: string; completedSteps: string[] }
+      >(command);
 
       return {
-        sessionId: session.id,
-        status: session.status,
-        completedSteps: session.completedSteps,
+        sessionId: result.sessionId,
+        status: result.status,
+        completedSteps: result.completedSteps,
       };
     } catch (error: unknown) {
       if (error instanceof ZodError) {
@@ -121,30 +110,34 @@ export class SignUpController {
   async findOne(
     @Param('id', new ParseUUIDPipe()) id: string,
   ): Promise<SignUpSessionDto> {
-    const session = await this.signupRepository.findOne({
-      where: { id },
-    });
-
-    if (!session) {
-      throw new NotFoundException(`SignUp session ${id} not found`);
-    }
-
-    return this.mapToDto(session);
+    const query = new GetSignUpSessionQuery({ sessionId: id });
+    const result = await this.queryBus.execute(query);
+    return this.mapResultToDto(result);
   }
 
-  private mapToDto(entity: SignUpSessionEntity): SignUpSessionDto {
-    const domain = entity.toDomain();
+  private mapResultToDto(result: {
+    sessionId: string;
+    status: SignUpSessionStatus;
+    actorType: ActorType;
+    workspaceId?: string | null;
+    roles: string[];
+    linkedWallets: string[];
+    completedSteps: string[];
+    expiresAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
+  }): SignUpSessionDto {
     const dto = new SignUpSessionDto();
-    dto.sessionId = domain.sessionId;
-    dto.status = domain.status;
-    dto.actorType = domain.actorType;
-    dto.workspaceId = domain.workspaceId;
-    dto.roles = domain.roles;
-    dto.linkedWallets = domain.linkedWallets;
-    dto.completedSteps = domain.completedSteps;
-    dto.expiresAt = domain.expiresAt;
-    dto.createdAt = domain.createdAt;
-    dto.updatedAt = domain.updatedAt;
+    dto.sessionId = result.sessionId;
+    dto.status = result.status;
+    dto.actorType = result.actorType;
+    dto.workspaceId = result.workspaceId;
+    dto.roles = result.roles;
+    dto.linkedWallets = result.linkedWallets;
+    dto.completedSteps = result.completedSteps;
+    dto.expiresAt = result.expiresAt;
+    dto.createdAt = result.createdAt;
+    dto.updatedAt = result.updatedAt;
     return dto;
   }
 

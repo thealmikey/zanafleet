@@ -89,10 +89,13 @@ describe('UpdateSignUpStepCommandHandler', () => {
       idempotencyKey: 'key-1',
     });
 
-    await handler.execute(command);
+    const result = await handler.execute(command);
 
     // Verify persistence
     expect(repository.save).toHaveBeenCalled();
+    expect(result.sessionId).toBe(sessionId);
+    expect(result.status).toBe(SignUpSessionStatus.PARTIAL);
+    expect(result.completedSteps).toContain('work-info');
     const saved = (repository.save as jest.Mock).mock.calls[0][0];
     expect(saved.workspaceId).toBe(workspaceId);
     expect(saved.roles).toEqual(['Rider']);
@@ -173,9 +176,12 @@ describe('UpdateSignUpStepCommandHandler', () => {
       idempotencyKey: 'key-1',
     });
 
-    await handler.execute(command);
+    const result = await handler.execute(command);
 
     expect(repository.save).not.toHaveBeenCalled();
+    expect(result.sessionId).toBe(sessionId);
+    expect(result.status).toBe(SignUpSessionStatus.PARTIAL);
+    expect(result.completedSteps).toEqual(['init', 'step1']);
     expect(eventBus.publish).not.toHaveBeenCalled();
     expect(eventBusService.publish).not.toHaveBeenCalled();
   });
@@ -204,9 +210,10 @@ describe('UpdateSignUpStepCommandHandler', () => {
       idempotencyKey: 'key-1',
     });
 
-    await handler.execute(command);
+    const result = await handler.execute(command);
 
     expect(repository.save).toHaveBeenCalled();
+    expect(result.completedSteps).toContain('step1');
     expect(eventBus.publish).toHaveBeenCalled();
   });
 });

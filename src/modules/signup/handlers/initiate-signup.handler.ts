@@ -9,6 +9,7 @@ import { InitiateSignUpCommand } from '../commands/initiate-signup.command';
 import { SignUpSessionStatus } from '../dto/signup.enums';
 import { SignUpSessionEntity } from '../entities/signup-session.entity';
 import { SignUpInitiatedEventV1 } from '../events/signup-initiated.event';
+import { InitiateSignUpResult } from './signup-result.interfaces';
 
 /**
  * InitiateSignUpCommandHandler
@@ -37,9 +38,11 @@ export class InitiateSignUpCommandHandler
    * Executes the sign-up initiation process
    *
    * @param command InitiateSignUpCommand
-   * @returns sessionId of the newly created sign-up session
+   * @returns result containing sessionId and expiration of the newly created sign-up session
    */
-  async execute(command: InitiateSignUpCommand): Promise<string> {
+  async execute(
+    command: InitiateSignUpCommand,
+  ): Promise<InitiateSignUpResult> {
     const sessionId = uuidv4();
     const eventId = uuidv4();
     const now = new Date();
@@ -104,7 +107,7 @@ export class InitiateSignUpCommandHandler
         }
       }
 
-      return sessionId;
+      return { sessionId, expiresAt };
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(

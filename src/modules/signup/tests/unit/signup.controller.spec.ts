@@ -5,26 +5,23 @@ jest.mock('@nestjs/swagger', () => ({
 }), { virtual: true });
 
 import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { CommandBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { ActorType } from '../../../actor/dto/actor.enums';
 import { SignUpController } from '../../controllers/signup.controller';
 import { SignUpSessionStatus } from '../../dto/signup.enums';
-import { SignUpSessionEntity } from '../../entities/signup-session.entity';
 
 describe('SignUpController', () => {
   let controller: SignUpController;
-  let commandBus: CommandBus;
 
   const mockCommandBus = {
     execute: jest.fn(),
   };
 
-  const mockRepository = {
-    findOne: jest.fn(),
+  const mockQueryBus = {
+    execute: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -36,14 +33,13 @@ describe('SignUpController', () => {
           useValue: mockCommandBus,
         },
         {
-          provide: getRepositoryToken(SignUpSessionEntity),
-          useValue: mockRepository,
+          provide: QueryBus,
+          useValue: mockQueryBus,
         },
       ],
     }).compile();
 
     controller = module.get<SignUpController>(SignUpController);
-    commandBus = module.get<CommandBus>(CommandBus);
   });
 
   afterEach(() => {
@@ -56,8 +52,7 @@ describe('SignUpController', () => {
       const expiresAt = new Date();
       const body = { actorType: ActorType.Rider };
 
-      mockCommandBus.execute.mockResolvedValue(sessionId);
-      mockRepository.findOne.mockResolvedValue({ id: sessionId, expiresAt });
+      mockCommandBus.execute.mockResolvedValue({ sessionId, expiresAt });
 
       const result = await controller.initiate(body);
 
@@ -65,7 +60,7 @@ describe('SignUpController', () => {
         sessionId,
         expiresAt: expiresAt.toISOString(),
       });
-      expect(commandBus.execute).toHaveBeenCalled();
+      expect(mockCommandBus.execute).toHaveBeenCalled();
     });
 
     it('should throw BadRequestException on validation failure', async () => {
@@ -81,14 +76,12 @@ describe('SignUpController', () => {
     it('should update signup step and return progress', async () => {
       const sessionId = uuidv4();
       const body = { stepName: 'identity', roles: ['Rider'] };
-      const session = {
-        id: sessionId,
+
+      mockCommandBus.execute.mockResolvedValue({
+        sessionId,
         status: SignUpSessionStatus.PARTIAL,
         completedSteps: ['identity'],
-      };
-
-      mockCommandBus.execute.mockResolvedValue(undefined);
-      mockRepository.findOne.mockResolvedValue(session);
+      });
 
       const result = await controller.updateStep(sessionId, body);
 
@@ -97,16 +90,6 @@ describe('SignUpController', () => {
         status: SignUpSessionStatus.PARTIAL,
         completedSteps: ['identity'],
       });
-    });
-
-    it('should throw NotFoundException if session not found after update', async () => {
-      const sessionId = uuidv4();
-      mockCommandBus.execute.mockResolvedValue(undefined);
-      mockRepository.findOne.mockResolvedValue(null);
-
-      await expect(
-        controller.updateStep(sessionId, { stepName: 'test' }),
-      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -128,42 +111,35 @@ describe('SignUpController', () => {
     it('should return session DTO if found', async () => {
       const sessionId = uuidv4();
       const now = new Date();
-      const entity = {
-        id: sessionId,
+      const workspaceId = uuidv4();
+
+      const queryResult = {
+        sessionId,
         status: SignUpSessionStatus.PARTIAL,
         actorType: ActorType.Rider,
-        workspaceId: uuidv4(),
+        workspaceId,
         roles: ['Rider'],
         linkedWallets: [],
         completedSteps: ['init'],
         expiresAt: now,
         createdAt: now,
         updatedAt: now,
-        toDomain: () => ({
-          sessionId,
-          status: SignUpSessionStatus.PARTIAL,
-          actorType: ActorType.Rider,
-          workspaceId: entity.workspaceId,
-          roles: entity.roles,
-          linkedWallets: entity.linkedWallets,
-          completedSteps: entity.completedSteps,
-          expiresAt: entity.expiresAt,
-          createdAt: entity.createdAt,
-          updatedAt: entity.updatedAt,
-        }),
       };
 
-      mockRepository.findOne.mockResolvedValue(entity);
+      mockQueryBus.execute.mockResolvedValue(queryResult);
 
       const result = await controller.findOne(sessionId);
 
       expect(result.sessionId).toBe(sessionId);
       expect(result.status).toBe(SignUpSessionStatus.PARTIAL);
+      expect(mockQueryBus.execute).toHaveBeenCalled();
     });
 
     it('should throw NotFoundException if session not found', async () => {
       const sessionId = uuidv4();
-      mockRepository.findOne.mockResolvedValue(null);
+      mockQueryBus.execute.mockRejectedValue(
+        new NotFoundException(`SignUp session ${sessionId} not found`),
+      );
 
       await expect(controller.findOne(sessionId)).rejects.toThrow(
         NotFoundException,

@@ -67,11 +67,12 @@ describe('InitiateSignUpCommandHandler', () => {
       idempotencyKey: 'test-idempotency-key',
     });
 
-    const sessionId = await handler.execute(command);
+    const result = await handler.execute(command);
 
-    // Verify session ID returned
-    expect(sessionId).toBeDefined();
-    expect(typeof sessionId).toBe('string');
+    // Verify result returned
+    expect(result.sessionId).toBeDefined();
+    expect(typeof result.sessionId).toBe('string');
+    expect(result.expiresAt).toBeInstanceOf(Date);
 
     // Verify persistence
     expect(repository.save).toHaveBeenCalled();
@@ -88,7 +89,7 @@ describe('InitiateSignUpCommandHandler', () => {
     // Verify event payload
     const event = (eventBus.publish as jest.Mock).mock.calls[0][0];
     expect(event.eventType).toBe('SignUpInitiatedEvent-V1');
-    expect(event.sessionId).toBe(sessionId);
+    expect(event.sessionId).toBe(result.sessionId);
     expect(event.actorType).toBe(ActorType.Rider);
   });
 
@@ -117,9 +118,9 @@ describe('InitiateSignUpCommandHandler', () => {
       .spyOn(eventBusService, 'publish')
       .mockRejectedValueOnce(new Error('NATS timed out'));
 
-    const sessionId = await handler.execute(command);
+    const result = await handler.execute(command);
 
-    expect(sessionId).toBeDefined();
+    expect(result.sessionId).toBeDefined();
     expect(repository.save).toHaveBeenCalled();
     expect(eventBus.publish).toHaveBeenCalled();
     expect(eventBusService.publish).toHaveBeenCalled(); // Still tried to call it

@@ -15,6 +15,7 @@ import { UpdateSignUpStepCommand } from '../commands/update-signup-step.command'
 import { SignUpSessionStatus } from '../dto/signup.enums';
 import { SignUpSessionEntity } from '../entities/signup-session.entity';
 import { SignUpStepCompletedEventV1 } from '../events/signup-step-completed.event';
+import { UpdateSignUpStepResult } from './signup-result.interfaces';
 
 /**
  * UpdateSignUpStepCommandHandler
@@ -47,7 +48,9 @@ export class UpdateSignUpStepCommandHandler
    *
    * @param command UpdateSignUpStepCommand
    */
-  async execute(command: UpdateSignUpStepCommand): Promise<void> {
+  async execute(
+    command: UpdateSignUpStepCommand,
+  ): Promise<UpdateSignUpStepResult> {
     const {
       sessionId,
       stepName,
@@ -97,7 +100,11 @@ export class UpdateSignUpStepCommandHandler
       this.logger.log(
         `Duplicate request detected via idempotency key: ${idempotencyKey}. No changes needed.`,
       );
-      return;
+      return {
+        sessionId: session.id,
+        status: session.status,
+        completedSteps: session.completedSteps,
+      };
     }
 
     // Step 4: Apply changes and track for event
@@ -175,6 +182,12 @@ export class UpdateSignUpStepCommandHandler
         );
       }
     }
+
+    return {
+      sessionId: session.id,
+      status: session.status,
+      completedSteps: session.completedSteps,
+    };
   }
 
   /**
