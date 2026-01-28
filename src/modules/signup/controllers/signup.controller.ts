@@ -108,12 +108,20 @@ export class SignUpController {
   async findOne(
     @Param('id', new ParseUUIDPipe()) id: string,
   ): Promise<SignUpSessionDto> {
-    const query = new GetSignUpSessionQuery({ sessionId: id });
-    const result = await this.queryBus.execute<
-      GetSignUpSessionQuery,
-      SignUpSessionResult
-    >(query);
-    return this.mapResultToDto(result);
+    try {
+      const input = GetSignUpSessionQuery.validate({ sessionId: id });
+      const query = new GetSignUpSessionQuery(input);
+      const result = await this.queryBus.execute<
+        GetSignUpSessionQuery,
+        SignUpSessionResult
+      >(query);
+      return this.mapResultToDto(result);
+    } catch (error: unknown) {
+      if (error instanceof ZodError) {
+        throw this.createValidationException(error);
+      }
+      throw error;
+    }
   }
 
   private mapResultToDto(result: SignUpSessionResult): SignUpSessionDto {
