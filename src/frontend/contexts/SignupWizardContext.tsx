@@ -26,6 +26,7 @@ export const WIZARD_STEPS = [
   'workspace',
   'roles',
   'wallets',
+  'review',
 ] as const;
 
 export type WizardStepName = (typeof WIZARD_STEPS)[number];
