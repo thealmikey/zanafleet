@@ -10,6 +10,13 @@ export {
 } from './signup.types';
 
 export type {
+  User,
+  AuthState,
+  LoginRequest,
+  LoginResponse,
+} from './auth.types';
+
+export type {
   WizardFormData,
   SignupWizardState,
   SignupWizardActions,
