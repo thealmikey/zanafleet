@@ -1,4 +1,3 @@
-// @ts-ignore
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { ActorType } from '../../actor/dto/actor.enums';
