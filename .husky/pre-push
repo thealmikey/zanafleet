@@ -1,0 +1,14 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🚀 Running full formatting & lint check before push..."
+
+npm run format
+npm run lint:check
+
+if [ $? -ne 0 ]; then
+  echo "❌ Push blocked — fix formatting/lint issues"
+  exit 1
+fi
+
+echo "✅ Push allowed — repo clean"
