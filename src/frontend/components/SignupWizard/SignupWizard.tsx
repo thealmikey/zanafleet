@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   Box,
   Button,
@@ -13,7 +13,8 @@ import {
 
 import { useSignupWizard } from '../../hooks/useSignupWizard';
 import { WIZARD_STEPS, WizardStepName } from '../../contexts/SignupWizardContext';
-import { AccountTypeStep, WorkspaceStep, RolesStep, WalletsStep } from './steps';
+import { FinalizeSignupResponse } from '../../types';
+import { AccountTypeStep, WorkspaceStep, RolesStep, WalletsStep, ReviewStep } from './steps';
 
 const STEP_LABELS: Record<WizardStepName, string> = {
   'account-type': 'Account Type',
@@ -30,6 +31,7 @@ export interface SignupWizardProps {
 export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElement {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const [isFinalized, setIsFinalized] = useState(false);
 
   const {
     currentStep,
@@ -38,7 +40,6 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
     error,
     nextStep,
     prevStep,
-    finalize,
   } = useSignupWizard();
 
   const canProceed = useMemo((): boolean => {
@@ -58,10 +59,6 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
     }
   }, [currentStep, formData]);
 
-  const canFinalize = useMemo((): boolean => {
-    return formData.actorType !== null && formData.workspaceId !== null;
-  }, [formData.actorType, formData.workspaceId]);
-
   const isLastStep = currentStep === WIZARD_STEPS.length - 1;
   const isFirstStep = currentStep === 0;
 
@@ -73,14 +70,13 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
     prevStep();
   }, [prevStep]);
 
-  const handleFinalize = useCallback(async (): Promise<void> => {
-    try {
-      const result = await finalize();
+  const handleReviewComplete = useCallback(
+    (result: FinalizeSignupResponse): void => {
+      setIsFinalized(true);
       onComplete?.(result);
-    } catch {
-      // Error is already set in context
-    }
-  }, [finalize, onComplete]);
+    },
+    [onComplete],
+  );
 
   const renderStepContent = (): React.ReactNode => {
     const stepName = WIZARD_STEPS[currentStep];
@@ -95,55 +91,7 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
       case 'wallets':
         return <WalletsStep />;
       case 'review':
-        return (
-          <Box sx={{ py: 2 }}>
-            <Typography variant="h6" gutterBottom>
-              Review &amp; Confirm
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Review your selections before finalizing your account
-            </Typography>
-            <Box
-              sx={{
-                p: 3,
-                bgcolor: 'background.default',
-                borderRadius: 1,
-                border: 1,
-                borderColor: 'divider',
-              }}
-            >
-              <Typography variant="body1" sx={{ mb: 2 }}>
-                <strong>Account Type:</strong> {formData.actorType ?? 'Not selected'}
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 2 }}>
-                <strong>Workspace ID:</strong> {formData.workspaceId ?? 'Not selected'}
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 2 }}>
-                <strong>Roles:</strong>{' '}
-                {formData.roles.length > 0 ? formData.roles.join(', ') : 'None assigned'}
-              </Typography>
-              <Typography variant="body1">
-                <strong>Linked Wallets:</strong>{' '}
-                {formData.linkedWallets.length > 0
-                  ? `${formData.linkedWallets.length} wallet(s)`
-                  : 'None linked'}
-              </Typography>
-              {formData.linkedWallets.length > 0 && (
-                <Box sx={{ mt: 1, pl: 2 }}>
-                  {formData.linkedWallets.map((wallet) => (
-                    <Typography
-                      key={wallet}
-                      variant="caption"
-                      sx={{ display: 'block', fontFamily: 'monospace' }}
-                    >
-                      {wallet}
-                    </Typography>
-                  ))}
-                </Box>
-              )}
-            </Box>
-          </Box>
-        );
+        return <ReviewStep onComplete={handleReviewComplete} />;
       default:
         return null;
     }
@@ -180,38 +128,28 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
 
       <Box sx={{ minHeight: 200 }}>{renderStepContent()}</Box>
 
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: { xs: 'column-reverse', sm: 'row' },
-          justifyContent: 'space-between',
-          gap: 2,
-          mt: 4,
-          pt: 2,
-          borderTop: 1,
-          borderColor: 'divider',
-        }}
-      >
-        <Button
-          variant="outlined"
-          onClick={handleBack}
-          disabled={isFirstStep || isLoading}
-          fullWidth={isMobile}
+      {!isLastStep && (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: { xs: 'column-reverse', sm: 'row' },
+            justifyContent: 'space-between',
+            gap: 2,
+            mt: 4,
+            pt: 2,
+            borderTop: 1,
+            borderColor: 'divider',
+          }}
         >
-          Back
-        </Button>
-
-        {isLastStep ? (
           <Button
-            variant="contained"
-            color="primary"
-            onClick={handleFinalize}
-            disabled={!canFinalize || isLoading}
+            variant="outlined"
+            onClick={handleBack}
+            disabled={isFirstStep || isLoading}
             fullWidth={isMobile}
           >
-            {isLoading ? 'Finalizing...' : 'Finalize'}
+            Back
           </Button>
-        ) : (
+
           <Button
             variant="contained"
             onClick={handleNext}
@@ -220,8 +158,30 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
           >
             Next
           </Button>
-        )}
-      </Box>
+        </Box>
+      )}
+
+      {isLastStep && !isFinalized && (
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-start',
+            mt: 4,
+            pt: 2,
+            borderTop: 1,
+            borderColor: 'divider',
+          }}
+        >
+          <Button
+            variant="outlined"
+            onClick={handleBack}
+            disabled={isLoading}
+            fullWidth={isMobile}
+          >
+            Back
+          </Button>
+        </Box>
+      )}
     </Paper>
   );
 }
