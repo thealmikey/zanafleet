@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { RoleScope } from '../dto/role.enums';
 
 /**

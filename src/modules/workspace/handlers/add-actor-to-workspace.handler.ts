@@ -13,7 +13,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { EventBusService } from '../../../core/event-bus';
 import { ActorEntity } from '../../actor/entities/actor.entity';
-
 import { AddActorToWorkspaceCommand } from '../commands/add-actor-to-workspace.command';
 import { WorkspaceStatus } from '../dto/workspace.enums';
 import { MembershipEntity } from '../entities/membership.entity';

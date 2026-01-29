@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 
 import { SignUpSessionEntity } from '../entities/signup-session.entity';
 import { GetSignUpSessionQuery } from '../queries/get-signup-session.query';
+
 import { SignUpSessionResult } from './signup-result.interfaces';
 
 /**

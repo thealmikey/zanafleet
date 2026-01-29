@@ -11,7 +11,6 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { EventBusService } from '../../../core/event-bus';
-
 import {
   UpdateCommitmentStatusCommand,
   isValidStatusTransition,

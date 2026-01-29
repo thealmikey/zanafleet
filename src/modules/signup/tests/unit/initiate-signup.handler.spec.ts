@@ -1,14 +1,14 @@
+import { EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 
 import { EventBusService } from '../../../../core/event-bus';
 import { ActorType } from '../../../actor/dto/actor.enums';
 import { InitiateSignUpCommand } from '../../commands/initiate-signup.command';
-import { InitiateSignUpCommandHandler } from '../../handlers/initiate-signup.handler';
-import { SignUpSessionEntity } from '../../entities/signup-session.entity';
 import { SignUpSessionStatus } from '../../dto/signup.enums';
+import { SignUpSessionEntity } from '../../entities/signup-session.entity';
+import { InitiateSignUpCommandHandler } from '../../handlers/initiate-signup.handler';
 
 describe('InitiateSignUpCommandHandler', () => {
   let handler: InitiateSignUpCommandHandler;

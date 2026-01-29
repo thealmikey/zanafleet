@@ -1,9 +1,10 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { RoleEntity } from './entities/role.entity';
 import { CreateRoleCommandHandler } from './handlers/create-role.handler';
 import { RoleNeo4jProjection, RoleNeo4jInitializer } from './projections/role-neo4j.projection';
-import { RoleEntity } from './entities/role.entity';
 
 /**
  * Role Module

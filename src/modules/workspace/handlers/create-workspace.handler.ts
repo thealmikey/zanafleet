@@ -5,9 +5,7 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { EventBusService, NatsSubjects } from '../../../core/event-bus';
-
 import { OrganizationEntity } from '../../organization/entities/organization.entity';
-
 import { CreateWorkspaceCommand } from '../commands/create-workspace.command';
 import { WorkspaceEntity } from '../entities/workspace.entity';
 import { WorkspaceCreatedEventV1 } from '../events/workspace-created.event';

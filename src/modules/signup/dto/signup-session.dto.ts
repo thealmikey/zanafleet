@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { ActorType } from '../../actor/dto/actor.enums';
+
 import { SignUpSessionStatus } from './signup.enums';
 
 /**

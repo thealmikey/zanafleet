@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ActorEntity } from '../actor/entities/actor.entity';
+
 import { AuthController } from './controllers/auth.controller';
 import { LoginCommandHandler } from './handlers/login.handler';
 

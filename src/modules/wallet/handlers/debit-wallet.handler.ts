@@ -1,13 +1,14 @@
 import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { DebitWalletCommand } from '../commands/debit-wallet.command';
-import { WalletDebitedEventV1 } from '../events/wallet-debited.event';
-import { WalletEntity } from '../entities/wallet.entity';
-import { InsufficientFundsException } from '../exceptions/insufficient-funds.exception';
+
 import { EventBusService, NatsSubjects } from '../../../core/event-bus';
+import { DebitWalletCommand } from '../commands/debit-wallet.command';
+import { WalletEntity } from '../entities/wallet.entity';
+import { WalletDebitedEventV1 } from '../events/wallet-debited.event';
+import { InsufficientFundsException } from '../exceptions/insufficient-funds.exception';
 
 /**
  * DebitWalletCommandHandler

@@ -6,8 +6,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 import { DeleteOrganizationCommand } from '../commands/delete-organization.command';
-import { OrganizationEntity } from '../entities/organization.entity';
 import { OrganizationStatus } from '../dto/organization.enums';
+import { OrganizationEntity } from '../entities/organization.entity';
 import { OrganizationDeletedEventV1 } from '../events/organization-deleted.event';
 
 @CommandHandler(DeleteOrganizationCommand)

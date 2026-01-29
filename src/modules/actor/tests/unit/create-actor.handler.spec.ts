@@ -3,9 +3,9 @@ import { EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 
 import { ActorEntity } from '../../../actor/entities/actor.entity';
-import { ActorType } from '../../dto/actor.enums';
-import { CreateActorCommand } from '../../commands/create-actor.command';
 import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
+import { CreateActorCommand } from '../../commands/create-actor.command';
+import { ActorType } from '../../dto/actor.enums';
 import { ActorOnboardedEventV1 } from '../../events/actor-onboarded.event';
 import { CreateActorCommandHandler } from '../../handlers/create-actor.handler';
 

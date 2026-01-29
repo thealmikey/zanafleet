@@ -1,6 +1,7 @@
+import { z } from 'zod';
+
 import { CreateRoleCommand, CreateRoleCommandSchema } from '../../commands/create-role.command';
 import { RoleScope } from '../../dto/role.enums';
-import { z } from 'zod';
 
 /**
  * Unit Tests: CreateRoleCommand Zod Validation

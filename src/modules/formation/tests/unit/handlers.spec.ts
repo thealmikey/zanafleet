@@ -11,8 +11,8 @@ import { RequirementEntity } from '../../entities/requirement.entity';
 import { FormationStatusChangedEventV1 } from '../../events/formation-status-changed.event';
 import { RequirementCreatedEventV1 } from '../../events/requirement-created.event';
 import { RequirementSatisfiedEventV1 } from '../../events/requirement-satisfied.event';
-import { EvaluateFormationCommandHandler } from '../../handlers/evaluate-formation.handler';
 import { CreateRequirementCommandHandler } from '../../handlers/create-requirement.handler';
+import { EvaluateFormationCommandHandler } from '../../handlers/evaluate-formation.handler';
 import { SatisfyRequirementCommandHandler } from '../../handlers/satisfy-requirement.handler';
 import { FormationService } from '../../services/formation.service';
 

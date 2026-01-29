@@ -1,17 +1,17 @@
+import { NotFoundException } from '@nestjs/common';
+import { CommandBus, CqrsModule, EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
-import { CommandBus, CqrsModule, EventBus } from '@nestjs/cqrs';
 import { Repository, DataSource } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
+import { OrganizationType, OrganizationStatus } from '../../../organization/dto/organization.enums';
+import { OrganizationEntity } from '../../../organization/entities/organization.entity';
 import { CreateWorkspaceCommand } from '../../commands/create-workspace.command';
-import { CreateWorkspaceCommandHandler } from '../../handlers/create-workspace.handler';
+import { WorkspaceType, WorkspaceStatus } from '../../dto/workspace.enums';
 import { WorkspaceEntity } from '../../entities/workspace.entity';
 import { WorkspaceCreatedEventV1 } from '../../events/workspace-created.event';
-import { WorkspaceType, WorkspaceStatus } from '../../dto/workspace.enums';
-import { OrganizationEntity } from '../../../organization/entities/organization.entity';
-import { OrganizationType, OrganizationStatus } from '../../../organization/dto/organization.enums';
+import { CreateWorkspaceCommandHandler } from '../../handlers/create-workspace.handler';
 
 const describeIntegration =
   process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;

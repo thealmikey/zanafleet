@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { EventBusModule } from './core/event-bus';
 import { Neo4jModule } from './core/neo4j';
 import { OrganizationModule } from './modules/organization/organization.module';

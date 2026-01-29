@@ -4,8 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { validate as isUuid } from 'uuid';
 
-import { ActorEntity } from '../../actor/entities/actor.entity';
 import { ActorType } from '../../actor/dto/actor.enums';
+import { ActorEntity } from '../../actor/entities/actor.entity';
 import { LoginCommand } from '../commands/login.command';
 
 export interface LoginResult {

@@ -3,6 +3,7 @@ import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+
 import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 import { UpdateWorkspaceCommand } from '../commands/update-workspace.command';
 import { WorkspaceEntity } from '../entities/workspace.entity';

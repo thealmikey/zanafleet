@@ -139,7 +139,7 @@ describe('AssignPersonaToActorCommandHandler', () => {
 
     expect(actorPersonaRepository.save).toHaveBeenCalledTimes(1);
     const savedEntity =
-      actorPersonaRepository.save.mock.calls[0][0] as ActorPersonaEntity;
+      actorPersonaRepository.save.mock.calls[0][0] ;
     expect(savedEntity).toBeInstanceOf(ActorPersonaEntity);
     expect(savedEntity.actorId).toBe(ACTOR_ID);
     expect(savedEntity.workspaceId).toBe(WORKSPACE_ID);

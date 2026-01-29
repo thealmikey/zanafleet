@@ -1,4 +1,5 @@
 import { Injectable, Logger, OnModuleDestroy } from '@nestjs/common';
+
 import { IdempotencyDefaults } from '../event-bus.constants';
 
 /**

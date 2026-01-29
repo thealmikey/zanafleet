@@ -113,7 +113,7 @@ describe('GrantCapabilityToPersonaCommandHandler', () => {
     expect(personaCapabilityRepository.save).toHaveBeenCalledTimes(1);
 
     const savedEntity =
-      personaCapabilityRepository.save.mock.calls[0][0] as PersonaCapabilityEntity;
+      personaCapabilityRepository.save.mock.calls[0][0] ;
 
     expect(savedEntity).toBeInstanceOf(PersonaCapabilityEntity);
     expect(savedEntity.personaId).toBe(PERSONA_ID);

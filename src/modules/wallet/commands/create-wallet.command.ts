@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { WalletType, OwnerType } from '../dto/wallet.enums';
 
 /**

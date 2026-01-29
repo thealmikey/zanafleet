@@ -4,7 +4,6 @@ import { DataSource, EntityManager } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { EventBusService, NatsSubjects } from '../../../core/event-bus';
-
 import { WalletEntity } from '../../wallet/entities/wallet.entity';
 import { InsufficientFundsException } from '../../wallet/exceptions/insufficient-funds.exception';
 import { CreateTransactionCommand } from '../commands/create-transaction.command';

@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
+
 import { WalletType, OwnerType } from '../dto/wallet.enums';
 
 /**

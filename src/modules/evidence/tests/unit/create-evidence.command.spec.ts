@@ -1,11 +1,11 @@
 import { ZodError } from 'zod';
 
-import { EvidenceType, SubjectType, EvidenceSource } from '../../dto/evidence.enums';
 import {
   CreateEvidenceCommand,
   CreateEvidenceCommandSchema,
   CreateEvidenceCommandInput,
 } from '../../commands/create-evidence.command';
+import { EvidenceType, SubjectType, EvidenceSource } from '../../dto/evidence.enums';
 
 describe('CreateEvidenceCommandSchema', () => {
   const validInput: CreateEvidenceCommandInput = {

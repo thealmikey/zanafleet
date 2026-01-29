@@ -1,12 +1,13 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateWalletCommand } from '../commands/create-wallet.command';
-import { WalletCreatedEventV1 } from '../events/wallet-created.event';
-import { WalletEntity } from '../entities/wallet.entity';
+
 import { EventBusService, NatsSubjects } from '../../../core/event-bus';
+import { CreateWalletCommand } from '../commands/create-wallet.command';
+import { WalletEntity } from '../entities/wallet.entity';
+import { WalletCreatedEventV1 } from '../events/wallet-created.event';
 
 /**
  * CreateWalletCommandHandler

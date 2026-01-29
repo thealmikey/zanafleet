@@ -1,7 +1,7 @@
 import { Logger } from '@nestjs/common';
 
-import { PersonaAssignmentNeo4jProjection } from '../../projections/persona-assignment-neo4j.projection';
 import { PersonaAssignedToActorEventV1 } from '../../events/persona-assigned-to-actor.event';
+import { PersonaAssignmentNeo4jProjection } from '../../projections/persona-assignment-neo4j.projection';
 
 type Neo4jSessionMock = {
   run: jest.Mock<Promise<unknown>, [string, Record<string, unknown>?]>;

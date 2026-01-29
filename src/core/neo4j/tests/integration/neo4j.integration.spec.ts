@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { Neo4jModule, Neo4jService } from '../../index';
 
 const describeIntegration =

@@ -1,22 +1,22 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { NotFoundException } from '@nestjs/common';
 import { CqrsModule, EventBus } from '@nestjs/cqrs';
+import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { NotFoundException } from '@nestjs/common';
 
+import { EventBusService } from '../../../../core/event-bus';
+import { OrganizationType, OrganizationStatus } from '../../../organization/dto/organization.enums';
+import { OrganizationEntity } from '../../../organization/entities/organization.entity';
 import { WorkspaceController } from '../../controllers/workspace.controller';
-import { WorkspaceEntity } from '../../entities/workspace.entity';
-import { WorkspaceType, WorkspaceStatus } from '../../dto/workspace.enums';
 import { CreateWorkspaceDto } from '../../dto/create-workspace.dto';
 import { UpdateWorkspaceDto } from '../../dto/update-workspace.dto';
+import { WorkspaceType, WorkspaceStatus } from '../../dto/workspace.enums';
+import { WorkspaceEntity } from '../../entities/workspace.entity';
 import { WorkspaceCreatedEventV1 } from '../../events/workspace-created.event';
 import { WorkspaceUpdatedEventV1 } from '../../events/workspace-updated.event';
 import { CreateWorkspaceCommandHandler } from '../../handlers/create-workspace.handler';
 import { UpdateWorkspaceCommandHandler } from '../../handlers/update-workspace.handler';
-import { OrganizationEntity } from '../../../organization/entities/organization.entity';
-import { OrganizationType, OrganizationStatus } from '../../../organization/dto/organization.enums';
-import { EventBusService } from '../../../../core/event-bus';
 
 /**
  * Integration test for Workspace CRUD operations via WorkspaceController.

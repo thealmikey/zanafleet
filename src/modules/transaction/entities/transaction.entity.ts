@@ -6,6 +6,7 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
+
 import { TransactionType, TransactionStatus } from '../dto/transaction.enums';
 
 /**

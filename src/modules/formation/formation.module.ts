@@ -4,8 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { FormationStatusEntity } from './entities/formation-status.entity';
 import { RequirementEntity } from './entities/requirement.entity';
-import { EvaluateFormationCommandHandler } from './handlers/evaluate-formation.handler';
 import { CreateRequirementCommandHandler } from './handlers/create-requirement.handler';
+import { EvaluateFormationCommandHandler } from './handlers/evaluate-formation.handler';
 import { SatisfyRequirementCommandHandler } from './handlers/satisfy-requirement.handler';
 import { FormationService } from './services/formation.service';
 

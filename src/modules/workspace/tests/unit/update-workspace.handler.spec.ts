@@ -1,16 +1,16 @@
+import { NotFoundException } from '@nestjs/common';
+import { EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { NotFoundException } from '@nestjs/common';
 
-import { UpdateWorkspaceCommandHandler } from '../../handlers/update-workspace.handler';
-import { UpdateWorkspaceCommand } from '../../commands/update-workspace.command';
-import { WorkspaceEntity } from '../../entities/workspace.entity';
 import { EventBusService } from '../../../../core/event-bus';
-import { WorkspaceUpdatedEventV1 } from '../../events/workspace-updated.event';
+import { UpdateWorkspaceCommand } from '../../commands/update-workspace.command';
 import { WorkspaceStatus, WorkspaceType } from '../../dto/workspace.enums';
+import { WorkspaceEntity } from '../../entities/workspace.entity';
+import { WorkspaceUpdatedEventV1 } from '../../events/workspace-updated.event';
+import { UpdateWorkspaceCommandHandler } from '../../handlers/update-workspace.handler';
 
 describe('UpdateWorkspaceCommandHandler', () => {
   let handler: UpdateWorkspaceCommandHandler;

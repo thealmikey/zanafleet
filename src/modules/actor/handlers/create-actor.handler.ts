@@ -4,12 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
+import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 import { WorkspaceEntity } from '../../workspace/entities/workspace.entity';
-
 import { CreateActorCommand } from '../commands/create-actor.command';
 import { ActorEntity } from '../entities/actor.entity';
 import { ActorOnboardedEventV1 } from '../events/actor-onboarded.event';
-import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 
 /**
  * CreateActorCommandHandler

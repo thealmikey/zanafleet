@@ -1,21 +1,21 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { CommandBus, EventBus, CqrsModule } from '@nestjs/cqrs';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
+import { CommandBus, EventBus, CqrsModule } from '@nestjs/cqrs';
+import { Test, TestingModule } from '@nestjs/testing';
+import { TypeOrmModule , getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 import { CreateWalletCommand } from '../../commands/create-wallet.command';
 import { CreditWalletCommand } from '../../commands/credit-wallet.command';
 import { DebitWalletCommand } from '../../commands/debit-wallet.command';
+import { WalletType, OwnerType } from '../../dto/wallet.enums';
+import { WalletEntity } from '../../entities/wallet.entity';
 import { WalletCreatedEventV1 } from '../../events/wallet-created.event';
 import { WalletCreditedEventV1 } from '../../events/wallet-credited.event';
 import { WalletDebitedEventV1 } from '../../events/wallet-debited.event';
+import { InsufficientFundsException } from '../../exceptions/insufficient-funds.exception';
 import { CreateWalletCommandHandler } from '../../handlers/create-wallet.handler';
 import { CreditWalletCommandHandler } from '../../handlers/credit-wallet.handler';
 import { DebitWalletCommandHandler } from '../../handlers/debit-wallet.handler';
-import { WalletEntity } from '../../entities/wallet.entity';
-import { WalletType, OwnerType } from '../../dto/wallet.enums';
-import { InsufficientFundsException } from '../../exceptions/insufficient-funds.exception';
 
 type WalletEvent = WalletCreatedEventV1 | WalletCreditedEventV1 | WalletDebitedEventV1;
 

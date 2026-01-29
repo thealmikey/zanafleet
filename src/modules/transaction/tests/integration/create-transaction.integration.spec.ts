@@ -1,17 +1,17 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { CommandBus, EventBus, CqrsModule } from '@nestjs/cqrs';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
+import { CommandBus, EventBus, CqrsModule } from '@nestjs/cqrs';
+import { Test, TestingModule } from '@nestjs/testing';
+import { TypeOrmModule , getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { WalletType, OwnerType } from '../../../wallet/dto/wallet.enums';
+import { WalletEntity } from '../../../wallet/entities/wallet.entity';
+import { InsufficientFundsException } from '../../../wallet/exceptions/insufficient-funds.exception';
 import { CreateTransactionCommand } from '../../commands/create-transaction.command';
+import { TransactionType, TransactionStatus } from '../../dto/transaction.enums';
+import { TransactionEntity } from '../../entities/transaction.entity';
 import { TransactionCreatedEventV1 } from '../../events/transaction-created.event';
 import { CreateTransactionCommandHandler } from '../../handlers/create-transaction.handler';
-import { TransactionEntity } from '../../entities/transaction.entity';
-import { TransactionType, TransactionStatus } from '../../dto/transaction.enums';
-import { WalletEntity } from '../../../wallet/entities/wallet.entity';
-import { WalletType, OwnerType } from '../../../wallet/dto/wallet.enums';
-import { InsufficientFundsException } from '../../../wallet/exceptions/insufficient-funds.exception';
 
 /**
  * Integration Tests: CreateTransactionCommand End-to-End

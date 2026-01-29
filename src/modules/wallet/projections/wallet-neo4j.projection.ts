@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+
 import { Neo4jService } from '../../../core/neo4j';
-import { WalletCreatedEventV1 } from '../events/wallet-created.event';
 import { OwnerType } from '../dto/wallet.enums';
+import { WalletCreatedEventV1 } from '../events/wallet-created.event';
 
 /**
  * WalletNeo4jProjection

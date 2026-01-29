@@ -1,7 +1,8 @@
 import { SetMetadata } from '@nestjs/common';
-import { IdempotencyService } from '../services/idempotency.service';
+
 import { BaseEvent } from '../interfaces/base-event.interface';
 import { EventLoggerService } from '../services/event-logger.service';
+import { IdempotencyService } from '../services/idempotency.service';
 
 /**
  * Metadata key for idempotent decorator
@@ -69,7 +70,7 @@ export function withIdempotency<T extends BaseEvent>(
 type AsyncEventHandler = (event: BaseEvent, ...args: unknown[]) => Promise<void>;
 
 export function IdempotentHandler(
-  idempotencyServiceKey: string = 'idempotencyService',
+  idempotencyServiceKey = 'idempotencyService',
   eventLoggerKey?: string,
 ): MethodDecorator {
   return function (

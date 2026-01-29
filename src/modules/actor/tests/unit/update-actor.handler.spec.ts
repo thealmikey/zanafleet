@@ -1,16 +1,16 @@
+import { NotFoundException } from '@nestjs/common';
+import { EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { NotFoundException } from '@nestjs/common';
 
-import { UpdateActorCommandHandler } from '../../handlers/update-actor.handler';
-import { UpdateActorCommand } from '../../commands/update-actor.command';
-import { ActorEntity } from '../../entities/actor.entity';
 import { EventBusService } from '../../../../core/event-bus';
-import { ActorUpdatedEventV1 } from '../../events/actor-updated.event';
+import { UpdateActorCommand } from '../../commands/update-actor.command';
 import { ActorType } from '../../dto/actor.enums';
+import { ActorEntity } from '../../entities/actor.entity';
+import { ActorUpdatedEventV1 } from '../../events/actor-updated.event';
+import { UpdateActorCommandHandler } from '../../handlers/update-actor.handler';
 
 describe('UpdateActorCommandHandler', () => {
   let handler: UpdateActorCommandHandler;

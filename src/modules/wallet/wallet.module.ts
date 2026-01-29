@@ -1,11 +1,12 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { WalletEntity } from './entities/wallet.entity';
 import { CreateWalletCommandHandler } from './handlers/create-wallet.handler';
 import { CreditWalletCommandHandler } from './handlers/credit-wallet.handler';
 import { DebitWalletCommandHandler } from './handlers/debit-wallet.handler';
 import { WalletNeo4jProjection, WalletNeo4jInitializer } from './projections/wallet-neo4j.projection';
-import { WalletEntity } from './entities/wallet.entity';
 
 /**
  * Wallet Module

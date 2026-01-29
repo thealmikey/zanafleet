@@ -1,14 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { CommandBus, EventBus, CqrsModule } from '@nestjs/cqrs';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { ConflictException } from '@nestjs/common';
+import { CommandBus, EventBus, CqrsModule } from '@nestjs/cqrs';
+import { Test, TestingModule } from '@nestjs/testing';
+import { TypeOrmModule , getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
 import { CreateRoleCommand } from '../../commands/create-role.command';
+import { RoleScope } from '../../dto/role.enums';
+import { RoleEntity } from '../../entities/role.entity';
 import { RoleCreatedEventV1 } from '../../events/role-created.event';
 import { CreateRoleCommandHandler } from '../../handlers/create-role.handler';
-import { RoleEntity } from '../../entities/role.entity';
-import { RoleScope } from '../../dto/role.enums';
 
 const describeIntegration =
   process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;

@@ -1,11 +1,11 @@
 import { ZodError } from 'zod';
 
-import { CommitmentStatus, CommitmentType } from '../../dto/commitment.enums';
 import {
   CreateCommitmentCommand,
   CreateCommitmentCommandSchema,
   CreateCommitmentCommandInput,
 } from '../../commands/create-commitment.command';
+import { CommitmentStatus, CommitmentType } from '../../dto/commitment.enums';
 
 describe('CreateCommitmentCommandSchema', () => {
   const validInput: CreateCommitmentCommandInput = {

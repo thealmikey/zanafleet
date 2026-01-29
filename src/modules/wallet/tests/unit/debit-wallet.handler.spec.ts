@@ -5,8 +5,8 @@ import { Repository } from 'typeorm';
 import { DebitWalletCommand } from '../../commands/debit-wallet.command';
 import { WalletEntity } from '../../entities/wallet.entity';
 import { WalletDebitedEventV1 } from '../../events/wallet-debited.event';
-import { DebitWalletCommandHandler } from '../../handlers/debit-wallet.handler';
 import { InsufficientFundsException } from '../../exceptions/insufficient-funds.exception';
+import { DebitWalletCommandHandler } from '../../handlers/debit-wallet.handler';
 
 describe('DebitWalletCommandHandler', () => {
   let handler: DebitWalletCommandHandler;

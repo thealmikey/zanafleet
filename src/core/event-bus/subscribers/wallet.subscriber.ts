@@ -1,13 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MessagePattern, Payload, Ctx, NatsContext } from '@nestjs/microservices';
-import { WalletNeo4jProjection } from '../../../modules/wallet/projections/wallet-neo4j.projection';
+
 import { WalletCreatedEventV1 } from '../../../modules/wallet/events/wallet-created.event';
 import { WalletCreditedEventV1 } from '../../../modules/wallet/events/wallet-credited.event';
 import { WalletDebitedEventV1 } from '../../../modules/wallet/events/wallet-debited.event';
-import { IdempotencyService } from '../services/idempotency.service';
-import { EventLoggerService } from '../services/event-logger.service';
+import { WalletNeo4jProjection } from '../../../modules/wallet/projections/wallet-neo4j.projection';
 import { NatsSubjects } from '../event-bus.constants';
 import { SerializedEvent, BaseEvent } from '../interfaces/base-event.interface';
+import { EventLoggerService } from '../services/event-logger.service';
+import { IdempotencyService } from '../services/idempotency.service';
 
 /**
  * WalletSubscriber
@@ -46,11 +47,11 @@ export class WalletSubscriber {
         case 'WalletCreatedEvent-V1': {
           const eventData = {
             eventId: data.eventId,
-            walletId: (data.payload as Record<string, unknown>).walletId as string,
-            ownerId: (data.payload as Record<string, unknown>).ownerId as string,
-            ownerType: (data.payload as Record<string, unknown>).ownerType as string,
-            type: (data.payload as Record<string, unknown>).type as string,
-            currency: (data.payload as Record<string, unknown>).currency as string,
+            walletId: (data.payload ).walletId as string,
+            ownerId: (data.payload ).ownerId as string,
+            ownerType: (data.payload ).ownerType as string,
+            type: (data.payload ).type as string,
+            currency: (data.payload ).currency as string,
             createdAt: data.payload.createdAt as string,
             occurredAt: data.occurredAt,
             correlationId: data.correlationId,
@@ -64,10 +65,10 @@ export class WalletSubscriber {
         case 'WalletCreditedEvent-V1': {
           const eventData = {
             eventId: data.eventId,
-            walletId: (data.payload as Record<string, unknown>).walletId as string,
-            amount: (data.payload as Record<string, unknown>).amount as number,
-            newBalance: (data.payload as Record<string, unknown>).newBalance as number,
-            reference: (data.payload as Record<string, unknown>).reference as string | undefined,
+            walletId: (data.payload ).walletId as string,
+            amount: (data.payload ).amount as number,
+            newBalance: (data.payload ).newBalance as number,
+            reference: (data.payload ).reference as string | undefined,
             occurredAt: data.occurredAt,
             correlationId: data.correlationId,
             causationId: data.causationId,
@@ -80,10 +81,10 @@ export class WalletSubscriber {
         case 'WalletDebitedEvent-V1': {
           const eventData = {
             eventId: data.eventId,
-            walletId: (data.payload as Record<string, unknown>).walletId as string,
-            amount: (data.payload as Record<string, unknown>).amount as number,
-            newBalance: (data.payload as Record<string, unknown>).newBalance as number,
-            reference: (data.payload as Record<string, unknown>).reference as string | undefined,
+            walletId: (data.payload ).walletId as string,
+            amount: (data.payload ).amount as number,
+            newBalance: (data.payload ).newBalance as number,
+            reference: (data.payload ).reference as string | undefined,
             occurredAt: data.occurredAt,
             correlationId: data.correlationId,
             causationId: data.causationId,

@@ -1,7 +1,8 @@
 import { Logger } from '@nestjs/common';
-import { ActorNeo4jProjection, ActorNeo4jInitializer } from '../../projections/actor-neo4j.projection';
+
 import { Neo4jService } from '../../../../core/neo4j';
 import { ActorOnboardedEventV1 } from '../../events/actor-onboarded.event';
+import { ActorNeo4jProjection, ActorNeo4jInitializer } from '../../projections/actor-neo4j.projection';
 
 type MockSession = {
   run: jest.Mock<Promise<unknown>, [string, Record<string, unknown>?]>;

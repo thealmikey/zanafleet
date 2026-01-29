@@ -1,14 +1,15 @@
 import { Logger } from '@nestjs/common';
-import {
-  OrganizationNeo4jProjection,
-  OrganizationNeo4jInitializer,
-} from '../../projections/organization-neo4j.projection';
+
 import { Neo4jService } from '../../../../core/neo4j';
-import { OrganizationCreatedEventV1 } from '../../events/organization-created.event';
 import {
   OrganizationType,
   OrganizationStatus,
 } from '../../dto/organization.enums';
+import { OrganizationCreatedEventV1 } from '../../events/organization-created.event';
+import {
+  OrganizationNeo4jProjection,
+  OrganizationNeo4jInitializer,
+} from '../../projections/organization-neo4j.projection';
 
 type MockSession = {
   run: jest.Mock<Promise<unknown>, [string, Record<string, unknown>?]>;

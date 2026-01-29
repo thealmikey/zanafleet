@@ -1,6 +1,7 @@
+import { z } from 'zod';
+
 import { CreateTransactionCommand, CreateTransactionCommandSchema } from '../../commands/create-transaction.command';
 import { TransactionType } from '../../dto/transaction.enums';
-import { z } from 'zod';
 
 /**
  * Unit Tests: CreateTransactionCommand Zod Validation

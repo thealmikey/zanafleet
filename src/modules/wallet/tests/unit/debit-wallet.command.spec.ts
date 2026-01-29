@@ -1,5 +1,6 @@
-import { DebitWalletCommand, DebitWalletCommandSchema } from '../../commands/debit-wallet.command';
 import { z } from 'zod';
+
+import { DebitWalletCommand, DebitWalletCommandSchema } from '../../commands/debit-wallet.command';
 
 /**
  * Unit Tests: DebitWalletCommand Zod Validation

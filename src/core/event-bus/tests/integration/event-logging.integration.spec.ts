@@ -1,9 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EventLoggerService } from '../../services/event-logger.service';
-import { OrganizationCreatedEventV1 } from '../../../../modules/organization/events/organization-created.event';
-import { OrganizationType, OrganizationStatus } from '../../../../modules/organization/dto/organization.enums';
-import { NatsSubjects } from '../../event-bus.constants';
 import { v4 as uuidv4 } from 'uuid';
+
+import { OrganizationType, OrganizationStatus } from '../../../../modules/organization/dto/organization.enums';
+import { OrganizationCreatedEventV1 } from '../../../../modules/organization/events/organization-created.event';
+import { NatsSubjects } from '../../event-bus.constants';
+import { EventLoggerService } from '../../services/event-logger.service';
+
 
 describe('Event Logging Integration Tests', () => {
   let eventLogger: EventLoggerService;

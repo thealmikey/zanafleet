@@ -15,6 +15,7 @@ import { UpdateSignUpStepCommand } from '../commands/update-signup-step.command'
 import { SignUpSessionStatus } from '../dto/signup.enums';
 import { SignUpSessionEntity } from '../entities/signup-session.entity';
 import { SignUpStepCompletedEventV1 } from '../events/signup-step-completed.event';
+
 import { UpdateSignUpStepResult } from './signup-result.interfaces';
 
 /**

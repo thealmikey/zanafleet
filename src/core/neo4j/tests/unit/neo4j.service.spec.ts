@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { Neo4jService, Neo4jModuleOptions } from '../../neo4j.service';
+
 import {
   NEO4J_MODULE_OPTIONS,
   DEFAULT_NEO4J_URI,
   DEFAULT_NEO4J_DATABASE,
 } from '../../neo4j.constants';
+import { Neo4jService, Neo4jModuleOptions } from '../../neo4j.service';
 
 const mockSession = {
   run: jest.fn(),

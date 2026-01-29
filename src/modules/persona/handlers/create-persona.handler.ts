@@ -3,6 +3,7 @@ import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+
 import { EventBusService } from '../../../core/event-bus';
 import { CreatePersonaCommand } from '../commands/create-persona.command';
 import { PersonaEntity } from '../entities/persona.entity';

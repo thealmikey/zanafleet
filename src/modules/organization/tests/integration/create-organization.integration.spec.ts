@@ -6,15 +6,15 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { ActorType } from '../../../actor/dto/actor.enums';
 import { ActorEntity } from '../../../actor/entities/actor.entity';
-import { AddActorToWorkspaceCommandHandler } from '../../../workspace/handlers/add-actor-to-workspace.handler';
-import { CreateWorkspaceCommandHandler } from '../../../workspace/handlers/create-workspace.handler';
-import { MembershipEntity } from '../../../workspace/entities/membership.entity';
-import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
 import {
   MembershipRole,
   WorkspaceStatus,
   WorkspaceType,
 } from '../../../workspace/dto/workspace.enums';
+import { MembershipEntity } from '../../../workspace/entities/membership.entity';
+import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
+import { AddActorToWorkspaceCommandHandler } from '../../../workspace/handlers/add-actor-to-workspace.handler';
+import { CreateWorkspaceCommandHandler } from '../../../workspace/handlers/create-workspace.handler';
 import { CreateOrganizationCommand } from '../../commands/create-organization.command';
 import { OrganizationStatus, OrganizationType } from '../../dto/organization.enums';
 import { OrganizationEntity } from '../../entities/organization.entity';

@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 
-import { server } from './mocks/server';
 import { resetMockSessions } from './mocks/handlers';
+import { server } from './mocks/server';
 
 // Polyfill crypto.randomUUID for Node.js test environment
 if (typeof crypto === 'undefined' || !crypto.randomUUID) {

@@ -1,6 +1,7 @@
+import { z } from 'zod';
+
 import { CreateWalletCommand, CreateWalletCommandSchema } from '../../commands/create-wallet.command';
 import { WalletType, OwnerType } from '../../dto/wallet.enums';
-import { z } from 'zod';
 
 /**
  * Unit Tests: CreateWalletCommand Zod Validation

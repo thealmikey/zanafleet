@@ -1,11 +1,11 @@
 import { ZodError } from 'zod';
 
-import { MembershipRole } from '../../dto/workspace.enums';
 import {
   AddActorToWorkspaceCommand,
   AddActorToWorkspaceCommandSchema,
   AddActorToWorkspaceCommandInput,
 } from '../../commands/add-actor-to-workspace.command';
+import { MembershipRole } from '../../dto/workspace.enums';
 
 describe('AddActorToWorkspaceCommandSchema', () => {
   const validInput: AddActorToWorkspaceCommandInput = {

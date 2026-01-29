@@ -1,8 +1,8 @@
 import { EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 
-import { EvidenceType, SubjectType, EvidenceSource } from '../../dto/evidence.enums';
 import { CreateEvidenceCommand } from '../../commands/create-evidence.command';
+import { EvidenceType, SubjectType, EvidenceSource } from '../../dto/evidence.enums';
 import { EvidenceEntity } from '../../entities/evidence.entity';
 import { EvidenceCreatedEventV1 } from '../../events/evidence-created.event';
 import { CreateEvidenceCommandHandler } from '../../handlers/create-evidence.handler';

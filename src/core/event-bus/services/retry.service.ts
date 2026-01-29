@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+
 import { RetryDefaults } from '../event-bus.constants';
 
 /**

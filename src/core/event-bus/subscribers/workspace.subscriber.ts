@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MessagePattern, Payload, Ctx, NatsContext } from '@nestjs/microservices';
-import { WorkspaceNeo4jProjection } from '../../../modules/workspace/projections/workspace-neo4j.projection';
+
 import { WorkspaceCreatedEventV1 } from '../../../modules/workspace/events/workspace-created.event';
-import { IdempotencyService } from '../services/idempotency.service';
-import { EventLoggerService } from '../services/event-logger.service';
+import { WorkspaceNeo4jProjection } from '../../../modules/workspace/projections/workspace-neo4j.projection';
 import { NatsSubjects } from '../event-bus.constants';
 import { SerializedEvent } from '../interfaces/base-event.interface';
+import { EventLoggerService } from '../services/event-logger.service';
+import { IdempotencyService } from '../services/idempotency.service';
 
 /**
  * WorkspaceSubscriber

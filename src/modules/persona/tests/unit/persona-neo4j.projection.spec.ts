@@ -1,10 +1,10 @@
 import { Logger } from '@nestjs/common';
 
+import { PersonaCreatedEventV1 } from '../../events/persona-created.event';
 import {
   PersonaNeo4jInitializer,
   PersonaNeo4jProjection,
 } from '../../projections/persona-neo4j.projection';
-import { PersonaCreatedEventV1 } from '../../events/persona-created.event';
 
 type Neo4jSessionMock = {
   run: jest.Mock<Promise<unknown>, [string, Record<string, unknown>?]>;

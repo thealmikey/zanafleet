@@ -1,8 +1,9 @@
 import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom, timeout, catchError } from 'rxjs';
-import { BaseEvent, SerializedEvent } from './interfaces/base-event.interface';
+
 import { NATS_CLIENT, buildSubjectFromEventType } from './event-bus.constants';
+import { BaseEvent, SerializedEvent } from './interfaces/base-event.interface';
 import { EventLoggerService } from './services/event-logger.service';
 import { RetryService } from './services/retry.service';
 

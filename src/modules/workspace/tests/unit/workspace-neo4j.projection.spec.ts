@@ -1,14 +1,15 @@
 import { Logger } from '@nestjs/common';
-import {
-  WorkspaceNeo4jProjection,
-  WorkspaceNeo4jInitializer,
-} from '../../projections/workspace-neo4j.projection';
+
 import { Neo4jService } from '../../../../core/neo4j';
-import { WorkspaceCreatedEventV1 } from '../../events/workspace-created.event';
 import {
   WorkspaceType,
   WorkspaceStatus,
 } from '../../dto/workspace.enums';
+import { WorkspaceCreatedEventV1 } from '../../events/workspace-created.event';
+import {
+  WorkspaceNeo4jProjection,
+  WorkspaceNeo4jInitializer,
+} from '../../projections/workspace-neo4j.projection';
 
 type MockSession = {
   run: jest.Mock<Promise<unknown>, [string, Record<string, unknown>?]>;

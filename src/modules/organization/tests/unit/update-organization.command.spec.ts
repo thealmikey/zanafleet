@@ -1,9 +1,10 @@
 import { ZodError } from 'zod';
-import { OrganizationStatus, OrganizationType } from '../../dto/organization.enums';
+
 import {
   UpdateOrganizationCommand,
   UpdateOrganizationCommandSchema,
 } from '../../commands/update-organization.command';
+import { OrganizationStatus, OrganizationType } from '../../dto/organization.enums';
 
 describe('UpdateOrganizationCommand', () => {
   const organizationId = '4b6f9f0e-5d76-4b36-9f4c-2b2e5b4b8f84';

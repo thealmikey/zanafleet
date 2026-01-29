@@ -4,31 +4,30 @@ import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { FormationState, RequirementType } from '../../dto/formation.enums';
-import { FormationStatusEntity } from '../../entities/formation-status.entity';
-import { RequirementEntity } from '../../entities/requirement.entity';
-import { FormationService } from '../../services/formation.service';
-import { EvaluateFormationCommand } from '../../commands/evaluate-formation.command';
-import { CreateRequirementCommand } from '../../commands/create-requirement.command';
-import { SatisfyRequirementCommand } from '../../commands/satisfy-requirement.command';
-import { EvaluateFormationCommandHandler } from '../../handlers/evaluate-formation.handler';
-import { CreateRequirementCommandHandler } from '../../handlers/create-requirement.handler';
-import { SatisfyRequirementCommandHandler } from '../../handlers/satisfy-requirement.handler';
-
-import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
-import {
-  WorkspaceStatus,
-  WorkspaceType,
-} from '../../../workspace/dto/workspace.enums';
-import { OrganizationEntity } from '../../../organization/entities/organization.entity';
+import { ActorType } from '../../../actor/dto/actor.enums';
+import { ActorEntity } from '../../../actor/entities/actor.entity';
 import {
   OrganizationStatus,
   OrganizationType,
 } from '../../../organization/dto/organization.enums';
-import { ActorEntity } from '../../../actor/entities/actor.entity';
-import { ActorType } from '../../../actor/dto/actor.enums';
-import { PersonaEntity } from '../../../persona/entities/persona.entity';
+import { OrganizationEntity } from '../../../organization/entities/organization.entity';
 import { ActorPersonaEntity } from '../../../persona/entities/actor-persona.entity';
+import { PersonaEntity } from '../../../persona/entities/persona.entity';
+import {
+  WorkspaceStatus,
+  WorkspaceType,
+} from '../../../workspace/dto/workspace.enums';
+import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
+import { CreateRequirementCommand } from '../../commands/create-requirement.command';
+import { EvaluateFormationCommand } from '../../commands/evaluate-formation.command';
+import { FormationState, RequirementType } from '../../dto/formation.enums';
+import { FormationStatusEntity } from '../../entities/formation-status.entity';
+import { RequirementEntity } from '../../entities/requirement.entity';
+import { FormationService } from '../../services/formation.service';
+import { SatisfyRequirementCommand } from '../../commands/satisfy-requirement.command';
+import { EvaluateFormationCommandHandler } from '../../handlers/evaluate-formation.handler';
+import { CreateRequirementCommandHandler } from '../../handlers/create-requirement.handler';
+import { SatisfyRequirementCommandHandler } from '../../handlers/satisfy-requirement.handler';
 
 const describeIntegration =
   process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;

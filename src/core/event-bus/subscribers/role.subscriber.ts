@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MessagePattern, Payload, Ctx, NatsContext } from '@nestjs/microservices';
-import { RoleNeo4jProjection } from '../../../modules/role/projections/role-neo4j.projection';
+
 import { RoleCreatedEventV1 } from '../../../modules/role/events/role-created.event';
-import { IdempotencyService } from '../services/idempotency.service';
-import { EventLoggerService } from '../services/event-logger.service';
+import { RoleNeo4jProjection } from '../../../modules/role/projections/role-neo4j.projection';
 import { NatsSubjects } from '../event-bus.constants';
 import { SerializedEvent } from '../interfaces/base-event.interface';
+import { EventLoggerService } from '../services/event-logger.service';
+import { IdempotencyService } from '../services/idempotency.service';
 
 /**
  * RoleSubscriber
@@ -43,10 +44,10 @@ export class RoleSubscriber {
       if (data.eventType === 'RoleCreatedEvent-V1') {
         const eventData = {
           eventId: data.eventId,
-          roleId: (data.payload as Record<string, unknown>).roleId as string,
-          name: (data.payload as Record<string, unknown>).name as string,
-          permissions: (data.payload as Record<string, unknown>).permissions as string[],
-          scope: (data.payload as Record<string, unknown>).scope as string,
+          roleId: (data.payload ).roleId as string,
+          name: (data.payload ).name as string,
+          permissions: (data.payload ).permissions as string[],
+          scope: (data.payload ).scope as string,
           createdAt: data.payload.createdAt as string,
           occurredAt: data.occurredAt,
           correlationId: data.correlationId,

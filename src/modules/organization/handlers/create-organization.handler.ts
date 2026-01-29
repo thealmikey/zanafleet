@@ -9,8 +9,8 @@ import { AddActorToWorkspaceCommand } from '../../workspace/commands/add-actor-t
 import { CreateWorkspaceCommand } from '../../workspace/commands/create-workspace.command';
 import { MembershipRole, WorkspaceStatus, WorkspaceType } from '../../workspace/dto/workspace.enums';
 import { CreateOrganizationCommand } from '../commands/create-organization.command';
-import { OrganizationEntity } from '../entities/organization.entity';
 import { OrganizationType } from '../dto/organization.enums';
+import { OrganizationEntity } from '../entities/organization.entity';
 import { OrganizationCreatedEventV1 } from '../events/organization-created.event';
 
 /**

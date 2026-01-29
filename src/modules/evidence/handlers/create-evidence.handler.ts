@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { EventBusService } from '../../../core/event-bus';
-
 import { CreateEvidenceCommand } from '../commands/create-evidence.command';
 import { EvidenceEntity } from '../entities/evidence.entity';
 import { EvidenceCreatedEventV1 } from '../events/evidence-created.event';

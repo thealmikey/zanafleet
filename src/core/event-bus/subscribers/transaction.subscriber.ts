@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MessagePattern, Payload, Ctx, NatsContext } from '@nestjs/microservices';
-import { TransactionNeo4jProjection } from '../../../modules/transaction/projections/transaction-neo4j.projection';
+
 import { TransactionCreatedEventV1 } from '../../../modules/transaction/events/transaction-created.event';
-import { IdempotencyService } from '../services/idempotency.service';
-import { EventLoggerService } from '../services/event-logger.service';
+import { TransactionNeo4jProjection } from '../../../modules/transaction/projections/transaction-neo4j.projection';
 import { NatsSubjects } from '../event-bus.constants';
 import { SerializedEvent } from '../interfaces/base-event.interface';
+import { EventLoggerService } from '../services/event-logger.service';
+import { IdempotencyService } from '../services/idempotency.service';
 
 /**
  * TransactionSubscriber
@@ -43,13 +44,13 @@ export class TransactionSubscriber {
       if (data.eventType === 'TransactionCreatedEvent-V1') {
         const eventData = {
           eventId: data.eventId,
-          transactionId: (data.payload as Record<string, unknown>).transactionId as string,
-          sourceWalletId: (data.payload as Record<string, unknown>).sourceWalletId as string,
-          destinationWalletId: (data.payload as Record<string, unknown>).destinationWalletId as string,
-          amount: (data.payload as Record<string, unknown>).amount as number,
-          type: (data.payload as Record<string, unknown>).type as string,
-          status: (data.payload as Record<string, unknown>).status as string,
-          linkedEventId: (data.payload as Record<string, unknown>).linkedEventId as string | null | undefined,
+          transactionId: (data.payload ).transactionId as string,
+          sourceWalletId: (data.payload ).sourceWalletId as string,
+          destinationWalletId: (data.payload ).destinationWalletId as string,
+          amount: (data.payload ).amount as number,
+          type: (data.payload ).type as string,
+          status: (data.payload ).status as string,
+          linkedEventId: (data.payload ).linkedEventId as string | null | undefined,
           occurredAt: data.occurredAt,
           correlationId: data.correlationId,
           causationId: data.causationId,

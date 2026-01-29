@@ -7,6 +7,7 @@ import {
   Index,
   Unique,
 } from 'typeorm';
+
 import { RoleScope } from '../dto/role.enums';
 
 /**

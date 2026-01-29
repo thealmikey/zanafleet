@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ZodError } from 'zod';
+
 import { UpdateActorCommand } from '../../commands/update-actor.command';
 
 describe('UpdateActorCommand', () => {

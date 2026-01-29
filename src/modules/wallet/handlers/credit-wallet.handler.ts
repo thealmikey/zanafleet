@@ -1,12 +1,13 @@
 import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { CreditWalletCommand } from '../commands/credit-wallet.command';
-import { WalletCreditedEventV1 } from '../events/wallet-credited.event';
-import { WalletEntity } from '../entities/wallet.entity';
+
 import { EventBusService, NatsSubjects } from '../../../core/event-bus';
+import { CreditWalletCommand } from '../commands/credit-wallet.command';
+import { WalletEntity } from '../entities/wallet.entity';
+import { WalletCreditedEventV1 } from '../events/wallet-credited.event';
 
 /**
  * CreditWalletCommandHandler

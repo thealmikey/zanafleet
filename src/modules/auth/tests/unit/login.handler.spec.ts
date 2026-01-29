@@ -3,8 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ActorEntity } from '../../../actor/entities/actor.entity';
 import { ActorType } from '../../../actor/dto/actor.enums';
+import { ActorEntity } from '../../../actor/entities/actor.entity';
 import { LoginCommand } from '../../commands/login.command';
 import { LoginCommandHandler } from '../../handlers/login.handler';
 

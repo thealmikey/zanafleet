@@ -1,16 +1,16 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { ZodError } from 'zod';
 
-import { ActorController } from '../../controllers/actor.controller';
-import { ActorEntity } from '../../entities/actor.entity';
-import { ActorType } from '../../dto/actor.enums';
 import { CreateActorCommand } from '../../commands/create-actor.command';
 import { UpdateActorCommand } from '../../commands/update-actor.command';
+import { ActorController } from '../../controllers/actor.controller';
+import { ActorType } from '../../dto/actor.enums';
+import { ActorEntity } from '../../entities/actor.entity';
 
 describe('ActorController', () => {
   let controller: ActorController;

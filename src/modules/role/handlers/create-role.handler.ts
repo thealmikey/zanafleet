@@ -1,12 +1,13 @@
 import { Injectable, Logger, ConflictException, Optional } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { CreateRoleCommand } from '../commands/create-role.command';
-import { RoleCreatedEventV1 } from '../events/role-created.event';
-import { RoleEntity } from '../entities/role.entity';
+
 import { EventBusService, NatsSubjects } from '../../../core/event-bus';
+import { CreateRoleCommand } from '../commands/create-role.command';
+import { RoleEntity } from '../entities/role.entity';
+import { RoleCreatedEventV1 } from '../events/role-created.event';
 
 /**
  * CreateRoleCommandHandler

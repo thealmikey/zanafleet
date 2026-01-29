@@ -1,24 +1,24 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { NotFoundException } from '@nestjs/common';
 import { CqrsModule, EventBus } from '@nestjs/cqrs';
+import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { NotFoundException } from '@nestjs/common';
 
+import { EventBusService } from '../../../../core/event-bus';
+import { OrganizationType, OrganizationStatus } from '../../../organization/dto/organization.enums';
+import { OrganizationEntity } from '../../../organization/entities/organization.entity';
+import { WorkspaceType, WorkspaceStatus } from '../../../workspace/dto/workspace.enums';
+import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
 import { ActorController } from '../../controllers/actor.controller';
-import { ActorEntity } from '../../entities/actor.entity';
 import { ActorType } from '../../dto/actor.enums';
 import { CreateActorDto } from '../../dto/create-actor.dto';
 import { UpdateActorDto } from '../../dto/update-actor.dto';
+import { ActorEntity } from '../../entities/actor.entity';
 import { ActorOnboardedEventV1 } from '../../events/actor-onboarded.event';
 import { ActorUpdatedEventV1 } from '../../events/actor-updated.event';
 import { CreateActorCommandHandler } from '../../handlers/create-actor.handler';
 import { UpdateActorCommandHandler } from '../../handlers/update-actor.handler';
-import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
-import { OrganizationEntity } from '../../../organization/entities/organization.entity';
-import { OrganizationType, OrganizationStatus } from '../../../organization/dto/organization.enums';
-import { WorkspaceType, WorkspaceStatus } from '../../../workspace/dto/workspace.enums';
-import { EventBusService } from '../../../../core/event-bus';
 
 /**
  * Integration test for Actor CRUD operations via ActorController.

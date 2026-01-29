@@ -1,9 +1,9 @@
 import { Repository } from 'typeorm';
 
 import { FormationState, RequirementType } from '../../dto/formation.enums';
-import { FormationService } from '../../services/formation.service';
 import type { FormationStatusEntity } from '../../entities/formation-status.entity';
 import type { RequirementEntity } from '../../entities/requirement.entity';
+import { FormationService } from '../../services/formation.service';
 
 type MockRepository<T> = {
   find: jest.Mock<Promise<T[]>, [unknown?]>;

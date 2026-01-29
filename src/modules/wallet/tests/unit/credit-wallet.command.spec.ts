@@ -1,5 +1,6 @@
-import { CreditWalletCommand, CreditWalletCommandSchema } from '../../commands/credit-wallet.command';
 import { z } from 'zod';
+
+import { CreditWalletCommand, CreditWalletCommandSchema } from '../../commands/credit-wallet.command';
 
 /**
  * Unit Tests: CreditWalletCommand Zod Validation

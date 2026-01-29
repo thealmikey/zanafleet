@@ -1,11 +1,12 @@
 import { Logger } from '@nestjs/common';
+
+import { Neo4jService } from '../../../../core/neo4j';
+import { OwnerType, WalletType } from '../../dto/wallet.enums';
+import { WalletCreatedEventV1 } from '../../events/wallet-created.event';
 import {
   WalletNeo4jProjection,
   WalletNeo4jInitializer,
 } from '../../projections/wallet-neo4j.projection';
-import { Neo4jService } from '../../../../core/neo4j';
-import { WalletCreatedEventV1 } from '../../events/wallet-created.event';
-import { OwnerType, WalletType } from '../../dto/wallet.enums';
 
 type MockSession = {
   run: jest.Mock<Promise<unknown>, [string, Record<string, unknown>?]>;

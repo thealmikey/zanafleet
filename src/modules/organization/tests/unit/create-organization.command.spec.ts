@@ -1,6 +1,7 @@
+import { z } from 'zod';
+
 import { CreateOrganizationCommand, CreateOrganizationCommandSchema } from '../../commands/create-organization.command';
 import { OrganizationType, OrganizationStatus } from '../../dto/organization.enums';
-import { z } from 'zod';
 
 /**
  * Unit Tests: CreateOrganizationCommand Validation

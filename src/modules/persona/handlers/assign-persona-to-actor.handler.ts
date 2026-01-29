@@ -9,9 +9,10 @@ import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+
+import { EventBusService } from '../../../core/event-bus';
 import { ActorEntity } from '../../actor/entities/actor.entity';
 import { WorkspaceEntity } from '../../workspace/entities/workspace.entity';
-import { EventBusService } from '../../../core/event-bus';
 import { AssignPersonaToActorCommand } from '../commands/assign-persona-to-actor.command';
 import { ActorPersonaEntity } from '../entities/actor-persona.entity';
 import { PersonaEntity } from '../entities/persona.entity';

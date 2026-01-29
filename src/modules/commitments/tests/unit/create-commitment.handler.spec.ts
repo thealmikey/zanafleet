@@ -3,8 +3,8 @@ import { EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 
 import { ActorEntity } from '../../../actor/entities/actor.entity';
-import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
 import { WorkspaceStatus, WorkspaceType } from '../../../workspace/dto/workspace.enums';
+import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
 import { CreateCommitmentCommand } from '../../commands/create-commitment.command';
 import { CommitmentStatus, CommitmentType } from '../../dto/commitment.enums';
 import { CommitmentEntity } from '../../entities/commitment.entity';

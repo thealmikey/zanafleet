@@ -66,7 +66,7 @@ describe('CreateCapabilityCommandHandler', () => {
     expect(capabilityId).toBe('capability-uuid');
     expect(repository.save).toHaveBeenCalledTimes(1);
 
-    const savedEntity = repository.save.mock.calls[0][0] as CapabilityEntity;
+    const savedEntity = repository.save.mock.calls[0][0] ;
     expect(savedEntity).toBeInstanceOf(CapabilityEntity);
     expect(savedEntity).toMatchObject({
       id: 'capability-uuid',

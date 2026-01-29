@@ -1,11 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MessagePattern, Payload, Ctx, NatsContext } from '@nestjs/microservices';
-import { ActorNeo4jProjection } from '../../../modules/actor/projections/actor-neo4j.projection';
+
 import { ActorOnboardedEventV1 } from '../../../modules/actor/events/actor-onboarded.event';
-import { IdempotencyService } from '../services/idempotency.service';
-import { EventLoggerService } from '../services/event-logger.service';
+import { ActorNeo4jProjection } from '../../../modules/actor/projections/actor-neo4j.projection';
 import { NatsSubjects } from '../event-bus.constants';
 import { SerializedEvent } from '../interfaces/base-event.interface';
+import { EventLoggerService } from '../services/event-logger.service';
+import { IdempotencyService } from '../services/idempotency.service';
 
 /**
  * ActorSubscriber

@@ -1,4 +1,5 @@
 import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
+
 import { WorkspaceStatus } from './workspace.enums';
 
 /**

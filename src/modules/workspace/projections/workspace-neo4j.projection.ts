@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+
 import { Neo4jService } from '../../../core/neo4j';
 import { WorkspaceCreatedEventV1 } from '../events/workspace-created.event';
 

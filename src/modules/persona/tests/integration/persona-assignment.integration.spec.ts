@@ -4,27 +4,27 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { Neo4jService } from '../../../../core/neo4j';
 
-import { ActorEntity } from '../../../actor/entities/actor.entity';
+import { Neo4jService } from '../../../../core/neo4j';
 import { ActorType } from '../../../actor/dto/actor.enums';
-import { OrganizationEntity } from '../../../organization/entities/organization.entity';
+import { ActorEntity } from '../../../actor/entities/actor.entity';
 import {
   OrganizationStatus,
   OrganizationType,
 } from '../../../organization/dto/organization.enums';
-import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
+import { OrganizationEntity } from '../../../organization/entities/organization.entity';
 import {
   WorkspaceStatus,
   WorkspaceType,
 } from '../../../workspace/dto/workspace.enums';
-import { CreatePersonaCommand } from '../../commands/create-persona.command';
+import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
 import { AssignPersonaToActorCommand } from '../../commands/assign-persona-to-actor.command';
-import { CreatePersonaCommandHandler } from '../../handlers/create-persona.handler';
-import { AssignPersonaToActorCommandHandler } from '../../handlers/assign-persona-to-actor.handler';
-import { PersonaEntity } from '../../entities/persona.entity';
+import { CreatePersonaCommand } from '../../commands/create-persona.command';
 import { ActorPersonaEntity } from '../../entities/actor-persona.entity';
+import { PersonaEntity } from '../../entities/persona.entity';
 import { PersonaAssignedToActorEventV1 } from '../../events/persona-assigned-to-actor.event';
+import { AssignPersonaToActorCommandHandler } from '../../handlers/assign-persona-to-actor.handler';
+import { CreatePersonaCommandHandler } from '../../handlers/create-persona.handler';
 
 /**
  * Integration tests for Persona assignment flow.

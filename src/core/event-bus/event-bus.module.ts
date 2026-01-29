@@ -1,10 +1,11 @@
 import { Module, DynamicModule } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+
 import { NATS_CLIENT, DEFAULT_NATS_URL } from './event-bus.constants';
 import { EventBusService } from './event-bus.service';
+import { EventLoggerService } from './services/event-logger.service';
 import { IdempotencyService } from './services/idempotency.service';
 import { RetryService } from './services/retry.service';
-import { EventLoggerService } from './services/event-logger.service';
 
 /**
  * Configuration options for the Event Bus module

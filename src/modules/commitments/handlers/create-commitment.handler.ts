@@ -7,7 +7,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { EventBusService } from '../../../core/event-bus';
 import { ActorEntity } from '../../actor/entities/actor.entity';
 import { WorkspaceEntity } from '../../workspace/entities/workspace.entity';
-
 import { CreateCommitmentCommand } from '../commands/create-commitment.command';
 import { CommitmentEntity } from '../entities/commitment.entity';
 import { CommitmentCreatedEventV1 } from '../events/commitment-created.event';

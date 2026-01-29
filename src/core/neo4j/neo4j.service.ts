@@ -6,6 +6,7 @@ import {
   OnModuleDestroy,
 } from '@nestjs/common';
 import neo4j, { Driver, Session, SessionConfig, auth } from 'neo4j-driver';
+
 import {
   NEO4J_MODULE_OPTIONS,
   DEFAULT_NEO4J_URI,

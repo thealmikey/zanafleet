@@ -1,14 +1,15 @@
 import { Logger } from '@nestjs/common';
-import {
-  TransactionNeo4jProjection,
-  TransactionNeo4jInitializer,
-} from '../../projections/transaction-neo4j.projection';
+
 import { Neo4jService } from '../../../../core/neo4j';
-import { TransactionCreatedEventV1 } from '../../events/transaction-created.event';
 import {
   TransactionType,
   TransactionStatus,
 } from '../../dto/transaction.enums';
+import { TransactionCreatedEventV1 } from '../../events/transaction-created.event';
+import {
+  TransactionNeo4jProjection,
+  TransactionNeo4jInitializer,
+} from '../../projections/transaction-neo4j.projection';
 
 type MockSession = {
   run: jest.Mock<Promise<unknown>, [string, Record<string, unknown>?]>;

@@ -9,6 +9,7 @@ import { InitiateSignUpCommand } from '../commands/initiate-signup.command';
 import { SignUpSessionStatus } from '../dto/signup.enums';
 import { SignUpSessionEntity } from '../entities/signup-session.entity';
 import { SignUpInitiatedEventV1 } from '../events/signup-initiated.event';
+
 import { InitiateSignUpResult } from './signup-result.interfaces';
 
 /**

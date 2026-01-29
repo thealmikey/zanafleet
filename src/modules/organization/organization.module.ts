@@ -1,13 +1,15 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { ActorEntity } from '../actor/entities/actor.entity';
+
 import { OrganizationController } from './controllers/organization.controller';
+import { OrganizationEntity } from './entities/organization.entity';
 import { CreateOrganizationCommandHandler } from './handlers/create-organization.handler';
 import { DeleteOrganizationCommandHandler } from './handlers/delete-organization.handler';
 import { UpdateOrganizationCommandHandler } from './handlers/update-organization.handler';
 import { OrganizationNeo4jProjection, OrganizationNeo4jInitializer } from './projections/organization-neo4j.projection';
-import { OrganizationEntity } from './entities/organization.entity';
 
 /**
  * Organization Module

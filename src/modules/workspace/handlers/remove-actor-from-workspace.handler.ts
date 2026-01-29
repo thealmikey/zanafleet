@@ -10,7 +10,6 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { EventBusService } from '../../../core/event-bus';
-
 import { RemoveActorFromWorkspaceCommand } from '../commands/remove-actor-from-workspace.command';
 import { MembershipEntity } from '../entities/membership.entity';
 import { ActorRemovedFromWorkspaceEventV1 } from '../events/actor-removed-from-workspace.event';
