@@ -8,3 +8,13 @@ export {
   type SignupSession,
   type FinalizeSignupResponse,
 } from './signup.types';
+
+export type {
+  WizardFormData,
+  SignupWizardState,
+  SignupWizardActions,
+  SignupWizardContextValue,
+  WizardStepName,
+} from '../contexts/SignupWizardContext';
+
+export { WIZARD_STEPS } from '../contexts/SignupWizardContext';
