@@ -20,14 +20,14 @@ import {
 import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
 import { CreateRequirementCommand } from '../../commands/create-requirement.command';
 import { EvaluateFormationCommand } from '../../commands/evaluate-formation.command';
+import { SatisfyRequirementCommand } from '../../commands/satisfy-requirement.command';
 import { FormationState, RequirementType } from '../../dto/formation.enums';
 import { FormationStatusEntity } from '../../entities/formation-status.entity';
 import { RequirementEntity } from '../../entities/requirement.entity';
-import { FormationService } from '../../services/formation.service';
-import { SatisfyRequirementCommand } from '../../commands/satisfy-requirement.command';
-import { EvaluateFormationCommandHandler } from '../../handlers/evaluate-formation.handler';
 import { CreateRequirementCommandHandler } from '../../handlers/create-requirement.handler';
+import { EvaluateFormationCommandHandler } from '../../handlers/evaluate-formation.handler';
 import { SatisfyRequirementCommandHandler } from '../../handlers/satisfy-requirement.handler';
+import { FormationService } from '../../services/formation.service';
 
 const describeIntegration =
   process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
