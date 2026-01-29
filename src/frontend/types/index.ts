@@ -17,6 +17,11 @@ export type {
 } from './auth.types';
 
 export type {
+  AuthActions,
+  AuthContextValue,
+} from '../contexts/AuthContext';
+
+export type {
   WizardFormData,
   SignupWizardState,
   SignupWizardActions,

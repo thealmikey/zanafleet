@@ -1,4 +1,5 @@
 import { User, LoginRequest, LoginResponse } from '../types';
+
 import { ApiError } from './signupApi';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
@@ -35,12 +36,16 @@ export async function login(credentials: LoginRequest): Promise<LoginResponse> {
  * Logout the current user
  * POST /api/auth/logout
  */
-export async function logout(): Promise<void> {
+export async function logout(token?: string): Promise<void> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   const response = await fetch(`${API_BASE_URL}/auth/logout`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
   });
   if (!response.ok) {
     let body: unknown;
@@ -57,12 +62,16 @@ export async function logout(): Promise<void> {
  * Get the current authenticated user
  * GET /api/auth/me
  */
-export async function getCurrentUser(): Promise<User> {
+export async function getCurrentUser(token?: string): Promise<User> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
   const response = await fetch(`${API_BASE_URL}/auth/me`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers,
   });
   return handleResponse<User>(response);
 }
