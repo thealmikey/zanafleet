@@ -1,4 +1,7 @@
 {
+  "ignorePatterns": [
+    "src/frontend/**"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2020,
@@ -25,7 +28,7 @@
   },
   "rules": {
     "@typescript-eslint/interface-name-prefix": "off",
-    "@typescript-eslint/explicit-function-return-type": "warn",
+    "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/no-unused-vars": [
@@ -37,6 +40,26 @@
     ],
     "@typescript-eslint/no-floating-promises": "error",
     "@typescript-eslint/no-misused-promises": "error",
+    "@typescript-eslint/prefer-as-const": "off",
+    "@typescript-eslint/no-non-null-assertion": "warn",
+    "@typescript-eslint/ban-ts-comment": [
+      "warn",
+      {
+        "ts-ignore": "allow-with-description",
+        "ts-expect-error": "allow-with-description",
+        "minimumDescriptionLength": 3
+      }
+    ],
+    "@typescript-eslint/require-await": "off",
+    "@typescript-eslint/restrict-template-expressions": [
+      "error",
+      {
+        "allowNumber": true,
+        "allowBoolean": true,
+        "allowAny": false,
+        "allowNullish": false
+      }
+    ],
     "import/no-unresolved": "error",
     "import/order": [
       "error",
@@ -73,5 +96,51 @@
       }
     ],
     "no-debugger": "error"
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/handlers/*.handler.ts"
+      ],
+      "rules": {
+        "@typescript-eslint/restrict-template-expressions": [
+          "error",
+          {
+            "allowNumber": true,
+            "allowBoolean": true,
+            "allowAny": true,
+            "allowNullish": false
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "**/*.spec.ts",
+        "**/*.test.ts",
+        "**/tests/**/*.ts"
+      ],
+      "rules": {
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-return": "off",
+        "@typescript-eslint/unbound-method": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/require-await": "off",
+        "@typescript-eslint/no-empty-function": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/no-unused-vars": [
+          "warn",
+          {
+            "argsIgnorePattern": "^_",
+            "varsIgnorePattern": "^_"
+          }
+        ]
+      }
+    }
+  ]
 }

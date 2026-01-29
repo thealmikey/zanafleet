@@ -103,7 +103,10 @@ export class CreateWorkspaceCommandHandler implements ICommandHandler<CreateWork
       if (this.eventBusService) {
         await this.eventBusService
           .publish(NatsSubjects.Workspace.CREATED_V1, event)
-          .catch((err) => this.logger.warn(`NATS publish failed: ${err.message}`));
+          .catch((err: unknown) => {
+            const message = err instanceof Error ? err.message : String(err);
+            this.logger.warn(`NATS publish failed: ${message}`);
+          });
       }
 
       return workspaceId;

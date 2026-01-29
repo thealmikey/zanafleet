@@ -87,7 +87,7 @@ export class EventBusService implements OnModuleInit {
 
     if (shouldRetry) {
       const result = await this.retryService.executeWithRetry(publishOperation, {
-        onRetry: (attempt, error, delayMs) => {
+        onRetry: (attempt: number, error: Error, delayMs: number): void => {
           this.eventLogger.logRetry(event, attempt, delayMs);
           this.logger.warn(`Retry ${attempt} for event ${event.eventId}: ${error.message}`);
         },
