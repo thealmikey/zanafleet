@@ -13,6 +13,7 @@ import {
 
 import { useSignupWizard } from '../../hooks/useSignupWizard';
 import { WIZARD_STEPS, WizardStepName } from '../../contexts/SignupWizardContext';
+import { AccountTypeStep, WorkspaceStep, RolesStep, WalletsStep } from './steps';
 
 const STEP_LABELS: Record<WizardStepName, string> = {
   'account-type': 'Account Type',
@@ -39,6 +40,23 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
     prevStep,
     finalize,
   } = useSignupWizard();
+
+  const canProceed = useMemo((): boolean => {
+    const stepName = WIZARD_STEPS[currentStep];
+    switch (stepName) {
+      case 'account-type':
+        return formData.actorType !== null;
+      case 'workspace':
+        return formData.workspaceId !== null && formData.workspaceId.trim() !== '';
+      case 'roles':
+      case 'wallets':
+        return true;
+      case 'review':
+        return formData.actorType !== null && formData.workspaceId !== null;
+      default:
+        return false;
+    }
+  }, [currentStep, formData]);
 
   const canFinalize = useMemo((): boolean => {
     return formData.actorType !== null && formData.workspaceId !== null;
@@ -69,61 +87,60 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
 
     switch (stepName) {
       case 'account-type':
-        return (
-          <Box sx={{ py: 4, textAlign: 'center' }}>
-            <Typography variant="h6">Select Account Type</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Choose the type of account you want to create
-            </Typography>
-          </Box>
-        );
+        return <AccountTypeStep />;
       case 'workspace':
-        return (
-          <Box sx={{ py: 4, textAlign: 'center' }}>
-            <Typography variant="h6">Select Workspace</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Choose or create a workspace for your account
-            </Typography>
-          </Box>
-        );
+        return <WorkspaceStep />;
       case 'roles':
-        return (
-          <Box sx={{ py: 4, textAlign: 'center' }}>
-            <Typography variant="h6">Assign Roles</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Select the roles for your account (optional)
-            </Typography>
-          </Box>
-        );
+        return <RolesStep />;
       case 'wallets':
-        return (
-          <Box sx={{ py: 4, textAlign: 'center' }}>
-            <Typography variant="h6">Link Wallets</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Connect your wallets (optional)
-            </Typography>
-          </Box>
-        );
+        return <WalletsStep />;
       case 'review':
         return (
-          <Box sx={{ py: 4, textAlign: 'center' }}>
-            <Typography variant="h6">Review &amp; Confirm</Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Review your selections before finalizing
+          <Box sx={{ py: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Review &amp; Confirm
             </Typography>
-            <Box sx={{ mt: 3, textAlign: 'left', maxWidth: 400, mx: 'auto' }}>
-              <Typography variant="body2">
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Review your selections before finalizing your account
+            </Typography>
+            <Box
+              sx={{
+                p: 3,
+                bgcolor: 'background.default',
+                borderRadius: 1,
+                border: 1,
+                borderColor: 'divider',
+              }}
+            >
+              <Typography variant="body1" sx={{ mb: 2 }}>
                 <strong>Account Type:</strong> {formData.actorType ?? 'Not selected'}
               </Typography>
-              <Typography variant="body2">
-                <strong>Workspace:</strong> {formData.workspaceId ?? 'Not selected'}
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                <strong>Workspace ID:</strong> {formData.workspaceId ?? 'Not selected'}
               </Typography>
-              <Typography variant="body2">
-                <strong>Roles:</strong> {formData.roles.length > 0 ? formData.roles.join(', ') : 'None'}
+              <Typography variant="body1" sx={{ mb: 2 }}>
+                <strong>Roles:</strong>{' '}
+                {formData.roles.length > 0 ? formData.roles.join(', ') : 'None assigned'}
               </Typography>
-              <Typography variant="body2">
-                <strong>Wallets:</strong> {formData.linkedWallets.length > 0 ? formData.linkedWallets.join(', ') : 'None'}
+              <Typography variant="body1">
+                <strong>Linked Wallets:</strong>{' '}
+                {formData.linkedWallets.length > 0
+                  ? `${formData.linkedWallets.length} wallet(s)`
+                  : 'None linked'}
               </Typography>
+              {formData.linkedWallets.length > 0 && (
+                <Box sx={{ mt: 1, pl: 2 }}>
+                  {formData.linkedWallets.map((wallet) => (
+                    <Typography
+                      key={wallet}
+                      variant="caption"
+                      sx={{ display: 'block', fontFamily: 'monospace' }}
+                    >
+                      {wallet}
+                    </Typography>
+                  ))}
+                </Box>
+              )}
             </Box>
           </Box>
         );
@@ -198,7 +215,7 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
           <Button
             variant="contained"
             onClick={handleNext}
-            disabled={isLoading}
+            disabled={!canProceed || isLoading}
             fullWidth={isMobile}
           >
             Next
