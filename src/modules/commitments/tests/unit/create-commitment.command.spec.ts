@@ -142,7 +142,9 @@ describe('CreateCommitmentCommandSchema', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe('Commitment type must be a valid CommitmentType');
+        expect(result.error.issues[0].message).toBe(
+          'Commitment type must be a valid CommitmentType'
+        );
       }
     });
   });

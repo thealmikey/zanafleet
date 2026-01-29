@@ -6,30 +6,28 @@ import { OrganizationCreatedEventV1 } from '../events/organization-created.event
 
 /**
  * OrganizationNeo4jProjection
- * 
+ *
  * Neo4j projection handler that automatically updates the graph database
  * when OrganizationCreatedEvent-V1 is emitted.
- * 
+ *
  * Architecture:
  * - Listens for OrganizationCreatedEvent-V1 events
  * - Creates/updates Organization node in Neo4j
  * - Maintains graph consistency
  * - Supports future relationship additions (phase 2+)
- * 
+ *
  * Node Structure:
  * Node: Organization {id, name, type, status, createdAt, updatedAt}
  * Labels: [:Organization]
  * Constraints: UNIQUE (id)
- * 
+ *
  * Indexes:
  * - Index on type (for filtering by org type)
  * - Index on status (for filtering by status)
  */
 @EventsHandler(OrganizationCreatedEventV1)
 @Injectable()
-export class OrganizationNeo4jProjection
-  implements IEventHandler<OrganizationCreatedEventV1>
-{
+export class OrganizationNeo4jProjection implements IEventHandler<OrganizationCreatedEventV1> {
   private readonly logger = new Logger(OrganizationNeo4jProjection.name);
 
   constructor(private readonly neo4j: Neo4jService) {}
@@ -40,7 +38,7 @@ export class OrganizationNeo4jProjection
    */
   async handle(event: OrganizationCreatedEventV1): Promise<void> {
     this.logger.log(
-      `Handling OrganizationCreatedEvent-V1 for organization: ${event.organizationId}`,
+      `Handling OrganizationCreatedEvent-V1 for organization: ${event.organizationId}`
     );
 
     const session = this.neo4j.getSession();
@@ -67,18 +65,13 @@ export class OrganizationNeo4jProjection
           createdAt: event.createdAt.toISOString(),
           updatedAt: new Date().toISOString(),
           linkedWallets: event.linkedWallets,
-        },
+        }
       );
 
-      this.logger.debug(
-        `Organization node created/updated in Neo4j: ${event.organizationId}`,
-      );
+      this.logger.debug(`Organization node created/updated in Neo4j: ${event.organizationId}`);
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to project organization to Neo4j: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to project organization to Neo4j: ${err.message}`, err.stack);
       throw error;
     } finally {
       await session.close();
@@ -108,35 +101,35 @@ export class OrganizationNeo4jInitializer {
       // Create UNIQUE constraint on Organization.id
       await session.run(
         `CREATE CONSTRAINT organization_id_unique IF NOT EXISTS 
-         FOR (org:Organization) REQUIRE org.id IS UNIQUE`,
+         FOR (org:Organization) REQUIRE org.id IS UNIQUE`
       );
       this.logger.log('UNIQUE constraint on Organization.id created');
 
       // Create index on type for filtering
       await session.run(
         `CREATE INDEX organization_type_index IF NOT EXISTS 
-         FOR (org:Organization) ON (org.type)`,
+         FOR (org:Organization) ON (org.type)`
       );
       this.logger.log('Index on Organization.type created');
 
       // Create index on status for filtering
       await session.run(
         `CREATE INDEX organization_status_index IF NOT EXISTS 
-         FOR (org:Organization) ON (org.status)`,
+         FOR (org:Organization) ON (org.status)`
       );
       this.logger.log('Index on Organization.status created');
 
       // Create index on createdAt for time-based queries
       await session.run(
         `CREATE INDEX organization_createdAt_index IF NOT EXISTS 
-         FOR (org:Organization) ON (org.createdAt)`,
+         FOR (org:Organization) ON (org.createdAt)`
       );
       this.logger.log('Index on Organization.createdAt created');
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
         `Failed to initialize Neo4j constraints/indexes: ${err.message}`,
-        err.stack,
+        err.stack
       );
       throw error;
     } finally {

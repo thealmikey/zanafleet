@@ -10,10 +10,7 @@ import { SatisfyRequirementCommandHandler } from './handlers/satisfy-requirement
 import { FormationService } from './services/formation.service';
 
 @Module({
-  imports: [
-    CqrsModule,
-    TypeOrmModule.forFeature([FormationStatusEntity, RequirementEntity]),
-  ],
+  imports: [CqrsModule, TypeOrmModule.forFeature([FormationStatusEntity, RequirementEntity])],
   providers: [
     FormationService,
     EvaluateFormationCommandHandler,

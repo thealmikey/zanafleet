@@ -37,11 +37,7 @@ describe('DeleteOrganizationCommandHandler', () => {
       publish: eventBusServicePublishMock,
     } as unknown as EventBusService;
 
-    handler = new DeleteOrganizationCommandHandler(
-      repository,
-      eventBus,
-      eventBusService,
-    );
+    handler = new DeleteOrganizationCommandHandler(repository, eventBus, eventBusService);
   });
 
   it('soft deletes organization and emits events', async () => {
@@ -58,7 +54,7 @@ describe('DeleteOrganizationCommandHandler', () => {
 
     const deletedAt = new Date('2023-02-01T12:00:00.000Z');
     saveMock.mockImplementation(async (entity: OrganizationEntity) =>
-      Object.assign(entity, { updatedAt: deletedAt }),
+      Object.assign(entity, { updatedAt: deletedAt })
     );
 
     const command = new DeleteOrganizationCommand({
@@ -86,7 +82,7 @@ describe('DeleteOrganizationCommandHandler', () => {
     expect(eventBusServicePublishMock).toHaveBeenCalledTimes(1);
     expect(eventBusServicePublishMock).toHaveBeenCalledWith(
       NatsSubjects.Organization.DELETED_V1,
-      publishedEvent,
+      publishedEvent
     );
   });
 
@@ -97,9 +93,7 @@ describe('DeleteOrganizationCommandHandler', () => {
       organizationId: '9d1d6178-ac5a-4e85-93d3-8c8fcaf7d48f',
     });
 
-    await expect(handler.execute(command)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(handler.execute(command)).rejects.toBeInstanceOf(NotFoundException);
     expect(saveMock).not.toHaveBeenCalled();
     expect(publishMock).not.toHaveBeenCalled();
     expect(eventBusServicePublishMock).not.toHaveBeenCalled();
@@ -120,7 +114,7 @@ describe('DeleteOrganizationCommandHandler', () => {
 
     const deletedAt = new Date('2023-03-05T08:30:00.000Z');
     saveMock.mockImplementation(async (entity: OrganizationEntity) =>
-      Object.assign(entity, { updatedAt: deletedAt }),
+      Object.assign(entity, { updatedAt: deletedAt })
     );
 
     const command = new DeleteOrganizationCommand({

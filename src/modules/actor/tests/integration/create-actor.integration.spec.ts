@@ -30,8 +30,7 @@ import {
  * Requires Docker services: Postgres, Neo4j
  * Run: docker-compose -f docker-compose.test.yml up -d
  */
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 describeIntegration('CreateActorCommand Integration', () => {
   let module!: TestingModule;
@@ -98,11 +97,9 @@ describeIntegration('CreateActorCommand Integration', () => {
 
       commandBus = module.get<CommandBus>(CommandBus);
       eventBus = module.get<EventBus>(EventBus);
-      actorRepository = module.get<Repository<ActorEntity>>(
-        getRepositoryToken(ActorEntity),
-      );
+      actorRepository = module.get<Repository<ActorEntity>>(getRepositoryToken(ActorEntity));
       workspaceRepository = module.get<Repository<WorkspaceEntity>>(
-        getRepositoryToken(WorkspaceEntity),
+        getRepositoryToken(WorkspaceEntity)
       );
 
       // Register command handlers with the command bus
@@ -116,7 +113,7 @@ describeIntegration('CreateActorCommand Integration', () => {
     } catch (error) {
       console.warn(
         'Failed to initialize Actor integration test module (database may not be available):',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? error.message : String(error)
       );
       moduleInitializationFailed = true;
     }
@@ -125,7 +122,7 @@ describeIntegration('CreateActorCommand Integration', () => {
   beforeEach((): void => {
     if (moduleInitializationFailed) {
       throw new Error(
-        'Actor integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d). Neo4j is mocked for this suite.',
+        'Actor integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d). Neo4j is mocked for this suite.'
       );
     }
   });
@@ -181,11 +178,9 @@ describeIntegration('CreateActorCommand Integration', () => {
         linkedWallets: [],
       });
 
+      await expect(commandBus.execute(command)).rejects.toThrow(NotFoundException);
       await expect(commandBus.execute(command)).rejects.toThrow(
-        NotFoundException,
-      );
-      await expect(commandBus.execute(command)).rejects.toThrow(
-        `Workspace with ID ${nonExistentWorkspaceId} does not exist`,
+        `Workspace with ID ${nonExistentWorkspaceId} does not exist`
       );
 
       // Verify no actor was persisted
@@ -206,11 +201,9 @@ describeIntegration('CreateActorCommand Integration', () => {
         linkedWallets: [],
       });
 
+      await expect(commandBus.execute(command)).rejects.toThrow(BadRequestException);
       await expect(commandBus.execute(command)).rejects.toThrow(
-        BadRequestException,
-      );
-      await expect(commandBus.execute(command)).rejects.toThrow(
-        `The following roles are not valid for workspace ${testWorkspaceId}: ${invalidRoleId}`,
+        `The following roles are not valid for workspace ${testWorkspaceId}: ${invalidRoleId}`
       );
 
       // Verify no actor was persisted
@@ -229,9 +222,7 @@ describeIntegration('CreateActorCommand Integration', () => {
         linkedWallets: [],
       });
 
-      await expect(commandBus.execute(command)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(commandBus.execute(command)).rejects.toThrow(BadRequestException);
 
       // Verify no actor was persisted
       const actors = await actorRepository.find();
@@ -322,8 +313,7 @@ describeIntegration('CreateActorCommand Integration', () => {
       const actorId = await commandBus.execute(command);
 
       // Validate UUID format
-      const uuidRegex =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       expect(actorId).toMatch(uuidRegex);
     });
 
@@ -410,19 +400,14 @@ describeIntegration('CreateActorCommand Integration', () => {
 
       await projection.handle(event);
 
-      const params = mockNeo4jSession.run.mock.calls[0][1] as Record<
-        string,
-        unknown
-      >;
+      const params = mockNeo4jSession.run.mock.calls[0][1] as Record<string, unknown>;
 
       expect(params.createdAt).toBe(createdAt.toISOString());
       expect(params.updatedAt).toBeDefined();
     });
 
     it('should handle projection errors gracefully', async () => {
-      mockNeo4jSession.run.mockRejectedValueOnce(
-        new Error('Neo4j connection failed'),
-      );
+      mockNeo4jSession.run.mockRejectedValueOnce(new Error('Neo4j connection failed'));
 
       const event = new ActorOnboardedEventV1({
         eventId: uuidv4(),
@@ -435,9 +420,7 @@ describeIntegration('CreateActorCommand Integration', () => {
         occurredAt: new Date(),
       });
 
-      await expect(projection.handle(event)).rejects.toThrow(
-        'Neo4j connection failed',
-      );
+      await expect(projection.handle(event)).rejects.toThrow('Neo4j connection failed');
 
       // Verify session was still closed
       expect(mockNeo4jSession.close).toHaveBeenCalledTimes(1);
@@ -460,9 +443,7 @@ describeIntegration('CreateActorCommand Integration', () => {
       await initializer.initialize();
 
       const calls = mockNeo4jSession.run.mock.calls;
-      const constraintCall = calls.find((call) =>
-        (call[0] as string).includes('actor_id_unique'),
-      );
+      const constraintCall = calls.find((call) => (call[0] as string).includes('actor_id_unique'));
 
       expect(constraintCall).toBeDefined();
       expect(constraintCall?.[0]).toContain('CREATE CONSTRAINT');
@@ -473,9 +454,7 @@ describeIntegration('CreateActorCommand Integration', () => {
       await initializer.initialize();
 
       const calls = mockNeo4jSession.run.mock.calls;
-      const indexCall = calls.find((call) =>
-        (call[0] as string).includes('actor_type_index'),
-      );
+      const indexCall = calls.find((call) => (call[0] as string).includes('actor_type_index'));
 
       expect(indexCall).toBeDefined();
       expect(indexCall?.[0]).toContain('CREATE INDEX');
@@ -487,7 +466,7 @@ describeIntegration('CreateActorCommand Integration', () => {
 
       const calls = mockNeo4jSession.run.mock.calls;
       const indexCall = calls.find((call) =>
-        (call[0] as string).includes('actor_workspaceId_index'),
+        (call[0] as string).includes('actor_workspaceId_index')
       );
 
       expect(indexCall).toBeDefined();
@@ -547,9 +526,7 @@ describeIntegration('CreateActorCommand Integration', () => {
       expect(deserializedEvent.type).toBe(originalEvent.type);
       expect([...deserializedEvent.roles]).toEqual([...originalEvent.roles]);
       expect(deserializedEvent.workspaceId).toBe(originalEvent.workspaceId);
-      expect([...deserializedEvent.linkedWallets]).toEqual([
-        ...originalEvent.linkedWallets,
-      ]);
+      expect([...deserializedEvent.linkedWallets]).toEqual([...originalEvent.linkedWallets]);
       expect(deserializedEvent.correlationId).toBe(originalEvent.correlationId);
       expect(deserializedEvent.causationId).toBe(originalEvent.causationId);
     });

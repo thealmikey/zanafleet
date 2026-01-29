@@ -37,7 +37,7 @@ describe('CreatePersonaCommandHandler', () => {
         personaId: string;
         name: string;
         createdAt: Date;
-      },
+      }
     ]
   >;
 
@@ -55,7 +55,7 @@ describe('CreatePersonaCommandHandler', () => {
     handler = new CreatePersonaCommandHandler(
       repository as unknown as Repository<PersonaEntity>,
       eventBus as unknown as EventBus,
-      eventBusService as unknown as EventBusService,
+      eventBusService as unknown as EventBusService
     );
 
     fromDomainSpy = jest.spyOn(PersonaEntity, 'fromDomain');
@@ -96,8 +96,7 @@ describe('CreatePersonaCommandHandler', () => {
     expect(savedEntity.createdAt.toISOString()).toBe(now.toISOString());
 
     expect(eventBus.publish).toHaveBeenCalledTimes(1);
-    const publishedEvent =
-      eventBus.publish.mock.calls[0][0] as PersonaCreatedEventV1;
+    const publishedEvent = eventBus.publish.mock.calls[0][0] as PersonaCreatedEventV1;
     expect(publishedEvent).toBeInstanceOf(PersonaCreatedEventV1);
     expect(publishedEvent.personaId).toBe('persona-uuid');
     expect(publishedEvent.name).toBe('Support Agent');
@@ -106,7 +105,7 @@ describe('CreatePersonaCommandHandler', () => {
 
     expect(eventBusService.publish).toHaveBeenCalledWith(
       'persona.created.v1',
-      expect.any(PersonaCreatedEventV1),
+      expect.any(PersonaCreatedEventV1)
     );
   });
 
@@ -135,7 +134,7 @@ describe('CreatePersonaCommandHandler', () => {
 
     handler = new CreatePersonaCommandHandler(
       repository as unknown as Repository<PersonaEntity>,
-      eventBus as unknown as EventBus,
+      eventBus as unknown as EventBus
     );
 
     uuidMock.mockReturnValueOnce('persona-uuid');

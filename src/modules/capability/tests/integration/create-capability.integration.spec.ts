@@ -14,8 +14,7 @@ import {
   CapabilityNeo4jProjection,
 } from '../../projections/capability-neo4j.projection';
 
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 describeIntegration('CreateCapabilityCommand Integration', () => {
   let module!: TestingModule;
@@ -74,14 +73,10 @@ describeIntegration('CreateCapabilityCommand Integration', () => {
       commandBus = module.get<CommandBus>(CommandBus);
       eventBus = module.get<EventBus>(EventBus);
       capabilityRepository = module.get<Repository<CapabilityEntity>>(
-        getRepositoryToken(CapabilityEntity),
+        getRepositoryToken(CapabilityEntity)
       );
-      projection = module.get<CapabilityNeo4jProjection>(
-        CapabilityNeo4jProjection,
-      );
-      initializer = module.get<CapabilityNeo4jInitializer>(
-        CapabilityNeo4jInitializer,
-      );
+      projection = module.get<CapabilityNeo4jProjection>(CapabilityNeo4jProjection);
+      initializer = module.get<CapabilityNeo4jInitializer>(CapabilityNeo4jInitializer);
 
       commandBus.register([CreateCapabilityCommandHandler]);
 
@@ -92,7 +87,7 @@ describeIntegration('CreateCapabilityCommand Integration', () => {
     } catch (error) {
       console.warn(
         'Failed to initialize Capability integration test module (database may not be available):',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? error.message : String(error)
       );
       moduleInitializationFailed = true;
     }
@@ -101,7 +96,7 @@ describeIntegration('CreateCapabilityCommand Integration', () => {
   beforeEach((): void => {
     if (moduleInitializationFailed) {
       throw new Error(
-        'Capability integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d). Neo4j is mocked for this suite.',
+        'Capability integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d). Neo4j is mocked for this suite.'
       );
     }
   });
@@ -150,7 +145,7 @@ describeIntegration('CreateCapabilityCommand Integration', () => {
       const capabilityId = await commandBus.execute(command);
 
       expect(capabilityId).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
       );
     });
   });
@@ -212,12 +207,8 @@ describeIntegration('CreateCapabilityCommand Integration', () => {
       expect(deserialized.eventId).toBe(originalEvent.eventId);
       expect(deserialized.capabilityId).toBe(originalEvent.capabilityId);
       expect(deserialized.name).toBe(originalEvent.name);
-      expect(deserialized.createdAt.toISOString()).toBe(
-        originalEvent.createdAt.toISOString(),
-      );
-      expect(deserialized.occurredAt.toISOString()).toBe(
-        originalEvent.occurredAt.toISOString(),
-      );
+      expect(deserialized.createdAt.toISOString()).toBe(originalEvent.createdAt.toISOString());
+      expect(deserialized.occurredAt.toISOString()).toBe(originalEvent.occurredAt.toISOString());
       expect(deserialized.correlationId).toBe(originalEvent.correlationId);
       expect(deserialized.causationId).toBe(originalEvent.causationId);
     });
@@ -249,7 +240,7 @@ describeIntegration('CreateCapabilityCommand Integration', () => {
       expect(mockNeo4jSession.run).toHaveBeenCalledTimes(1);
       const [query, params] = mockNeo4jSession.run.mock.calls[0] as [
         string,
-        Record<string, unknown>,
+        Record<string, unknown>
       ];
 
       expect(query).toContain('MERGE (capability:Capability {id: $capabilityId})');
@@ -266,9 +257,7 @@ describeIntegration('CreateCapabilityCommand Integration', () => {
     });
 
     it('should close the session when projection fails', async () => {
-      mockNeo4jSession.run.mockRejectedValueOnce(
-        new Error('Neo4j projection failure'),
-      );
+      mockNeo4jSession.run.mockRejectedValueOnce(new Error('Neo4j projection failure'));
 
       const event = new CapabilityCreatedEventV1({
         eventId: uuidv4(),
@@ -278,9 +267,7 @@ describeIntegration('CreateCapabilityCommand Integration', () => {
         occurredAt: new Date(),
       });
 
-      await expect(projection.handle(event)).rejects.toThrow(
-        'Neo4j projection failure',
-      );
+      await expect(projection.handle(event)).rejects.toThrow('Neo4j projection failure');
       expect(mockNeo4jSession.close).toHaveBeenCalledTimes(1);
     });
   });
@@ -298,7 +285,7 @@ describeIntegration('CreateCapabilityCommand Integration', () => {
       await initializer.initialize();
 
       const constraintCall = mockNeo4jSession.run.mock.calls.find((call) =>
-        (call[0] as string).includes('capability_id_unique'),
+        (call[0] as string).includes('capability_id_unique')
       );
 
       expect(constraintCall).toBeDefined();
@@ -311,7 +298,7 @@ describeIntegration('CreateCapabilityCommand Integration', () => {
       await initializer.initialize();
 
       const indexCall = mockNeo4jSession.run.mock.calls.find((call) =>
-        (call[0] as string).includes('capability_name_index'),
+        (call[0] as string).includes('capability_name_index')
       );
 
       expect(indexCall).toBeDefined();

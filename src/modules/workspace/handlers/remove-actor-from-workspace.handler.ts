@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  NotFoundException,
-  Optional,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -39,7 +34,7 @@ export class RemoveActorFromWorkspaceCommandHandler
     @InjectRepository(MembershipEntity)
     private readonly membershipRepository: Repository<MembershipEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -54,7 +49,7 @@ export class RemoveActorFromWorkspaceCommandHandler
     const eventId = uuidv4();
 
     this.logger.log(
-      `Executing RemoveActorFromWorkspaceCommand: actor=${command.actorId}, workspace=${command.workspaceId}`,
+      `Executing RemoveActorFromWorkspaceCommand: actor=${command.actorId}, workspace=${command.workspaceId}`
     );
 
     try {
@@ -68,21 +63,21 @@ export class RemoveActorFromWorkspaceCommandHandler
 
       if (!membership) {
         this.logger.warn(
-          `Membership not found: actor=${command.actorId}, workspace=${command.workspaceId}`,
+          `Membership not found: actor=${command.actorId}, workspace=${command.workspaceId}`
         );
         throw new NotFoundException(
-          `Actor '${command.actorId}' is not a member of workspace '${command.workspaceId}'`,
+          `Actor '${command.actorId}' is not a member of workspace '${command.workspaceId}'`
         );
       }
 
       this.logger.debug(
-        `Membership validated: actor=${command.actorId}, workspace=${command.workspaceId}`,
+        `Membership validated: actor=${command.actorId}, workspace=${command.workspaceId}`
       );
 
       // Step 2: Delete membership from PostgreSQL
       await this.membershipRepository.remove(membership);
       this.logger.debug(
-        `Membership deleted: actor=${command.actorId}, workspace=${command.workspaceId}`,
+        `Membership deleted: actor=${command.actorId}, workspace=${command.workspaceId}`
       );
 
       // Step 3: Create and emit event
@@ -100,16 +95,11 @@ export class RemoveActorFromWorkspaceCommandHandler
       if (this.eventBusService) {
         await this.eventBusService
           .publish('workspace.events.member-removed-v1', event)
-          .catch((err: Error) =>
-            this.logger.warn(`NATS publish failed: ${err.message}`),
-          );
+          .catch((err: Error) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to remove actor from workspace: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to remove actor from workspace: ${err.message}`, err.stack);
       throw error;
     }
   }

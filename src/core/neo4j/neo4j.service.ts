@@ -1,17 +1,7 @@
-import {
-  Injectable,
-  Logger,
-  Inject,
-  OnModuleInit,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { Injectable, Logger, Inject, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import neo4j, { Driver, Session, SessionConfig, auth } from 'neo4j-driver';
 
-import {
-  NEO4J_MODULE_OPTIONS,
-  DEFAULT_NEO4J_URI,
-  DEFAULT_NEO4J_DATABASE,
-} from './neo4j.constants';
+import { NEO4J_MODULE_OPTIONS, DEFAULT_NEO4J_URI, DEFAULT_NEO4J_DATABASE } from './neo4j.constants';
 
 /**
  * Configuration options for Neo4j connection
@@ -51,7 +41,7 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     @Inject(NEO4J_MODULE_OPTIONS)
-    options: Neo4jModuleOptions,
+    options: Neo4jModuleOptions
   ) {
     this.uri = options.uri || DEFAULT_NEO4J_URI;
     this.user = options.user;
@@ -67,21 +57,17 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
 
     try {
       const authToken =
-        this.user && this.password
-          ? auth.basic(this.user, this.password)
-          : undefined;
+        this.user && this.password ? auth.basic(this.user, this.password) : undefined;
 
       this.driver = neo4j.driver(this.uri, authToken);
 
       await this.driver.verifyConnectivity({ database: this.database });
 
-      this.logger.log(
-        `Successfully connected to Neo4j database: ${this.database}`,
-      );
+      this.logger.log(`Successfully connected to Neo4j database: ${this.database}`);
     } catch (error) {
       this.logger.error(
         `Failed to connect to Neo4j at ${this.uri}: ${(error as Error).message}`,
-        (error as Error).stack,
+        (error as Error).stack
       );
       throw error;
     }

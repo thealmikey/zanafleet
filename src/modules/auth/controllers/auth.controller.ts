@@ -1,11 +1,4 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  HttpCode,
-  HttpStatus,
-  Post,
-} from '@nestjs/common';
+import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ZodError } from 'zod';
 
@@ -23,7 +16,7 @@ export class AuthController {
     try {
       const input = LoginCommand.validate(body);
       const command = new LoginCommand(input);
-      
+
       return await this.commandBus.execute<LoginCommand, LoginResult>(command);
     } catch (error: unknown) {
       if (error instanceof ZodError) {

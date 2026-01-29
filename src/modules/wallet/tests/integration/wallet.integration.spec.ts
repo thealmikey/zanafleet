@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandBus, EventBus, CqrsModule } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TypeOrmModule , getRepositoryToken } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { CreateWalletCommand } from '../../commands/create-wallet.command';
@@ -25,8 +25,7 @@ type WalletEvent = WalletCreatedEventV1 | WalletCreditedEventV1 | WalletDebitedE
  * By default, integration suites are skipped unless explicitly enabled.
  * Set RUN_INTEGRATION_TESTS=true when running with Docker services available.
  */
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 describeIntegration('Wallet Integration Tests', () => {
   let module!: TestingModule;
@@ -65,9 +64,7 @@ describeIntegration('Wallet Integration Tests', () => {
 
       commandBus = module.get<CommandBus>(CommandBus);
       eventBus = module.get<EventBus>(EventBus);
-      walletRepository = module.get<Repository<WalletEntity>>(
-        getRepositoryToken(WalletEntity),
-      );
+      walletRepository = module.get<Repository<WalletEntity>>(getRepositoryToken(WalletEntity));
 
       eventBus.subscribe((event) => {
         if (
@@ -87,7 +84,7 @@ describeIntegration('Wallet Integration Tests', () => {
     } catch (error) {
       console.warn(
         'Failed to initialize Wallet integration test module (database may not be available):',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? error.message : String(error)
       );
       moduleInitializationFailed = true;
     }
@@ -96,7 +93,7 @@ describeIntegration('Wallet Integration Tests', () => {
   beforeEach((): void => {
     if (moduleInitializationFailed) {
       throw new Error(
-        'Wallet integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d) and TEST_DB_* env vars are set.',
+        'Wallet integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d) and TEST_DB_* env vars are set.'
       );
     }
   });
@@ -196,23 +193,23 @@ describeIntegration('Wallet Integration Tests', () => {
     it('should credit wallet and update balance', async () => {
       const command = new CreditWalletCommand({
         walletId,
-        amount: 100.50,
+        amount: 100.5,
         reference: 'DEPOSIT-001',
       });
 
       const newBalance = await commandBus.execute(command);
 
-      expect(newBalance).toBe(100.50);
+      expect(newBalance).toBe(100.5);
 
       const savedWallet = await walletRepository.findOne({ where: { id: walletId } });
-      expect(parseFloat(savedWallet?.balance || '0')).toBe(100.50);
+      expect(parseFloat(savedWallet?.balance || '0')).toBe(100.5);
 
       expect(emittedEvents.length).toBe(1);
       const event = emittedEvents[0] as WalletCreditedEventV1;
       expect(event.eventType).toBe('WalletCreditedEvent-V1');
       expect(event.walletId).toBe(walletId);
-      expect(event.amount).toBe(100.50);
-      expect(event.newBalance).toBe(100.50);
+      expect(event.amount).toBe(100.5);
+      expect(event.newBalance).toBe(100.5);
       expect(event.reference).toBe('DEPOSIT-001');
     });
 
@@ -220,7 +217,7 @@ describeIntegration('Wallet Integration Tests', () => {
       await commandBus.execute(new CreditWalletCommand({ walletId, amount: 50 }));
       await commandBus.execute(new CreditWalletCommand({ walletId, amount: 30 }));
       const finalBalance = await commandBus.execute(
-        new CreditWalletCommand({ walletId, amount: 20 }),
+        new CreditWalletCommand({ walletId, amount: 20 })
       );
 
       expect(finalBalance).toBe(100);
@@ -258,29 +255,29 @@ describeIntegration('Wallet Integration Tests', () => {
     it('should debit wallet and update balance', async () => {
       const command = new DebitWalletCommand({
         walletId,
-        amount: 75.50,
+        amount: 75.5,
         reference: 'WITHDRAWAL-001',
       });
 
       const newBalance = await commandBus.execute(command);
 
-      expect(newBalance).toBe(124.50);
+      expect(newBalance).toBe(124.5);
 
       const savedWallet = await walletRepository.findOne({ where: { id: walletId } });
-      expect(parseFloat(savedWallet?.balance || '0')).toBe(124.50);
+      expect(parseFloat(savedWallet?.balance || '0')).toBe(124.5);
 
       expect(emittedEvents.length).toBe(1);
       const event = emittedEvents[0] as WalletDebitedEventV1;
       expect(event.eventType).toBe('WalletDebitedEvent-V1');
       expect(event.walletId).toBe(walletId);
-      expect(event.amount).toBe(75.50);
-      expect(event.newBalance).toBe(124.50);
+      expect(event.amount).toBe(75.5);
+      expect(event.newBalance).toBe(124.5);
       expect(event.reference).toBe('WITHDRAWAL-001');
     });
 
     it('should allow debit of exact balance', async () => {
       const newBalance = await commandBus.execute(
-        new DebitWalletCommand({ walletId, amount: 200 }),
+        new DebitWalletCommand({ walletId, amount: 200 })
       );
 
       expect(newBalance).toBe(0);
@@ -317,7 +314,7 @@ describeIntegration('Wallet Integration Tests', () => {
       await commandBus.execute(new DebitWalletCommand({ walletId, amount: 50 }));
       await commandBus.execute(new DebitWalletCommand({ walletId, amount: 30 }));
       const finalBalance = await commandBus.execute(
-        new DebitWalletCommand({ walletId, amount: 20 }),
+        new DebitWalletCommand({ walletId, amount: 20 })
       );
 
       expect(finalBalance).toBe(100);
@@ -340,7 +337,7 @@ describeIntegration('Wallet Integration Tests', () => {
       await commandBus.execute(new DebitWalletCommand({ walletId, amount: 250 }));
       await commandBus.execute(new CreditWalletCommand({ walletId, amount: 500 }));
       const finalBalance = await commandBus.execute(
-        new DebitWalletCommand({ walletId, amount: 300 }),
+        new DebitWalletCommand({ walletId, amount: 300 })
       );
 
       expect(finalBalance).toBe(950);
@@ -365,7 +362,7 @@ describeIntegration('Wallet Integration Tests', () => {
       await commandBus.execute(new DebitWalletCommand({ walletId, amount: 60 }));
 
       await expect(
-        commandBus.execute(new DebitWalletCommand({ walletId, amount: 50 })),
+        commandBus.execute(new DebitWalletCommand({ walletId, amount: 50 }))
       ).rejects.toThrow(InsufficientFundsException);
 
       const savedWallet = await walletRepository.findOne({ where: { id: walletId } });
@@ -405,7 +402,7 @@ describeIntegration('Wallet Integration Tests', () => {
       emittedEvents = [];
 
       await commandBus.execute(
-        new CreditWalletCommand({ walletId, amount: 100, reference: 'TEST' }),
+        new CreditWalletCommand({ walletId, amount: 100, reference: 'TEST' })
       );
       const originalEvent = emittedEvents[0] as WalletCreditedEventV1;
       const serialized = originalEvent.toJSON();
@@ -429,7 +426,7 @@ describeIntegration('Wallet Integration Tests', () => {
       emittedEvents = [];
 
       await commandBus.execute(
-        new DebitWalletCommand({ walletId, amount: 150, reference: 'WITHDRAW' }),
+        new DebitWalletCommand({ walletId, amount: 150, reference: 'WITHDRAW' })
       );
       const originalEvent = emittedEvents[0] as WalletDebitedEventV1;
       const serialized = originalEvent.toJSON();

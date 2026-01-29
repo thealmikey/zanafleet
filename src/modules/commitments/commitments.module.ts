@@ -36,10 +36,7 @@ import {
  * - uuid: ID generation
  */
 @Module({
-  imports: [
-    CqrsModule,
-    TypeOrmModule.forFeature([CommitmentEntity, ActorEntity, WorkspaceEntity]),
-  ],
+  imports: [CqrsModule, TypeOrmModule.forFeature([CommitmentEntity, ActorEntity, WorkspaceEntity])],
   providers: [
     // Command Handlers
     CreateCommitmentCommandHandler,
@@ -49,15 +46,10 @@ import {
     CommitmentNeo4jProjection,
     CommitmentNeo4jInitializer,
   ],
-  exports: [
-    CreateCommitmentCommandHandler,
-    UpdateCommitmentStatusCommandHandler,
-  ],
+  exports: [CreateCommitmentCommandHandler, UpdateCommitmentStatusCommandHandler],
 })
 export class CommitmentsModule implements OnModuleInit {
-  constructor(
-    private readonly commitmentNeo4jInitializer: CommitmentNeo4jInitializer,
-  ) {}
+  constructor(private readonly commitmentNeo4jInitializer: CommitmentNeo4jInitializer) {}
 
   /**
    * Initialize module

@@ -35,10 +35,7 @@ describe('RemoveActorFromWorkspaceCommandHandler', () => {
       publish: jest.fn(),
     } as unknown as jest.Mocked<EventBus>;
 
-    handler = new RemoveActorFromWorkspaceCommandHandler(
-      membershipRepository,
-      eventBus,
-    );
+    handler = new RemoveActorFromWorkspaceCommandHandler(membershipRepository, eventBus);
   });
 
   afterEach(() => {
@@ -67,7 +64,7 @@ describe('RemoveActorFromWorkspaceCommandHandler', () => {
 
       await expect(handler.execute(validCommand)).rejects.toThrow(NotFoundException);
       await expect(handler.execute(validCommand)).rejects.toThrow(
-        `Actor '${validCommand.actorId}' is not a member of workspace '${validCommand.workspaceId}'`,
+        `Actor '${validCommand.actorId}' is not a member of workspace '${validCommand.workspaceId}'`
       );
 
       expect(membershipRepository.remove).not.toHaveBeenCalled();

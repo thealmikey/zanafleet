@@ -7,29 +7,24 @@ import { v4 as uuidv4 } from 'uuid';
 import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 import { UpdateActorCommand } from '../commands/update-actor.command';
 import { ActorEntity } from '../entities/actor.entity';
-import {
-  ActorUpdatedEventV1,
-  ActorUpdatedEventV1Changes,
-} from '../events/actor-updated.event';
+import { ActorUpdatedEventV1, ActorUpdatedEventV1Changes } from '../events/actor-updated.event';
 
 /**
  * UpdateActorCommandHandler
- * 
+ *
  * Handles UpdateActorCommand by updating the ActorEntity in PostgreSQL
  * and emitting ActorUpdatedEventV1 to both internal and external event buses.
  */
 @CommandHandler(UpdateActorCommand)
 @Injectable()
-export class UpdateActorCommandHandler
-  implements ICommandHandler<UpdateActorCommand>
-{
+export class UpdateActorCommandHandler implements ICommandHandler<UpdateActorCommand> {
   private readonly logger = new Logger(UpdateActorCommandHandler.name);
 
   constructor(
     @InjectRepository(ActorEntity)
     private readonly actorRepository: Repository<ActorEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -89,16 +84,10 @@ export class UpdateActorCommandHandler
     // Step 6: Publish to NATS external event bus (for other modules)
     if (this.eventBusService) {
       try {
-        await this.eventBusService.publish(
-          NatsSubjects.Actor.UPDATED_V1,
-          event,
-        );
+        await this.eventBusService.publish(NatsSubjects.Actor.UPDATED_V1, event);
         this.logger.log(`ActorUpdatedEvent-V1 published to NATS: ${NatsSubjects.Actor.UPDATED_V1}`);
       } catch (publishError: unknown) {
-        const err =
-          publishError instanceof Error
-            ? publishError
-            : new Error(String(publishError));
+        const err = publishError instanceof Error ? publishError : new Error(String(publishError));
         this.logger.warn(`NATS publish failed for actor ${actorId}: ${err.message}`);
       }
     }

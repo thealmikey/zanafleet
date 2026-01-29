@@ -27,10 +27,7 @@ import { RoleNeo4jProjection, RoleNeo4jInitializer } from './projections/role-ne
  * - uuid: ID generation
  */
 @Module({
-  imports: [
-    CqrsModule,
-    TypeOrmModule.forFeature([RoleEntity]),
-  ],
+  imports: [CqrsModule, TypeOrmModule.forFeature([RoleEntity])],
   providers: [
     // Command Handlers
     CreateRoleCommandHandler,
@@ -39,9 +36,7 @@ import { RoleNeo4jProjection, RoleNeo4jInitializer } from './projections/role-ne
     RoleNeo4jProjection,
     RoleNeo4jInitializer,
   ],
-  exports: [
-    CreateRoleCommandHandler,
-  ],
+  exports: [CreateRoleCommandHandler],
 })
 export class RoleModule implements OnModuleInit {
   constructor(private readonly neo4jInitializer: RoleNeo4jInitializer) {}

@@ -21,12 +21,12 @@ export class DeleteOrganizationCommandHandler
     @InjectRepository(OrganizationEntity)
     private readonly organizationRepository: Repository<OrganizationEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: DeleteOrganizationCommand): Promise<void> {
     this.logger.log(
-      `Executing DeleteOrganizationCommand for organization: ${command.organizationId}`,
+      `Executing DeleteOrganizationCommand for organization: ${command.organizationId}`
     );
 
     const organization = await this.organizationRepository.findOne({
@@ -34,19 +34,13 @@ export class DeleteOrganizationCommandHandler
     });
 
     if (!organization) {
-      throw new NotFoundException(
-        `Organization ${command.organizationId} not found`,
-      );
+      throw new NotFoundException(`Organization ${command.organizationId} not found`);
     }
 
     organization.status = OrganizationStatus.DELETED;
 
-    const updatedOrganization = await this.organizationRepository.save(
-      organization,
-    );
-    this.logger.debug(
-      `Organization soft-deleted in PostgreSQL: ${command.organizationId}`,
-    );
+    const updatedOrganization = await this.organizationRepository.save(organization);
+    this.logger.debug(`Organization soft-deleted in PostgreSQL: ${command.organizationId}`);
 
     const deletedAt = updatedOrganization.updatedAt ?? new Date();
 
@@ -60,20 +54,14 @@ export class DeleteOrganizationCommandHandler
 
     this.eventBus.publish(event);
     this.logger.log(
-      `OrganizationDeletedEvent-V1 emitted to event bus for: ${command.organizationId}`,
+      `OrganizationDeletedEvent-V1 emitted to event bus for: ${command.organizationId}`
     );
 
     if (this.eventBusService) {
       try {
-        await this.eventBusService.publish(
-          NatsSubjects.Organization.DELETED_V1,
-          event,
-        );
+        await this.eventBusService.publish(NatsSubjects.Organization.DELETED_V1, event);
       } catch (publishError: unknown) {
-        const err =
-          publishError instanceof Error
-            ? publishError
-            : new Error(String(publishError));
+        const err = publishError instanceof Error ? publishError : new Error(String(publishError));
         this.logger.warn(`NATS publish failed: ${err.message}`);
       }
     }

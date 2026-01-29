@@ -26,7 +26,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
 
   constructor(
     @InjectRepository(ActorEntity)
-    private readonly actorRepository: Repository<ActorEntity>,
+    private readonly actorRepository: Repository<ActorEntity>
   ) {}
 
   /**

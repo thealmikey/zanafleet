@@ -17,11 +17,7 @@ import {
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([
-      CapabilityEntity,
-      PersonaCapabilityEntity,
-      PersonaEntity,
-    ]),
+    TypeOrmModule.forFeature([CapabilityEntity, PersonaCapabilityEntity, PersonaEntity]),
   ],
   providers: [
     CreateCapabilityCommandHandler,
@@ -30,16 +26,10 @@ import {
     CapabilityGrantNeo4jProjection,
     CapabilityNeo4jInitializer,
   ],
-  exports: [
-    TypeOrmModule,
-    CreateCapabilityCommandHandler,
-    GrantCapabilityToPersonaCommandHandler,
-  ],
+  exports: [TypeOrmModule, CreateCapabilityCommandHandler, GrantCapabilityToPersonaCommandHandler],
 })
 export class CapabilityModule implements OnModuleInit {
-  constructor(
-    private readonly capabilityNeo4jInitializer: CapabilityNeo4jInitializer,
-  ) {}
+  constructor(private readonly capabilityNeo4jInitializer: CapabilityNeo4jInitializer) {}
 
   async onModuleInit(): Promise<void> {
     await this.capabilityNeo4jInitializer.initialize();

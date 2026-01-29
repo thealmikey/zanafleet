@@ -29,9 +29,7 @@ import { EvidenceCreatedEventV1 } from '../events/evidence-created.event';
  */
 @EventsHandler(EvidenceCreatedEventV1)
 @Injectable()
-export class EvidenceNeo4jProjection
-  implements IEventHandler<EvidenceCreatedEventV1>
-{
+export class EvidenceNeo4jProjection implements IEventHandler<EvidenceCreatedEventV1> {
   private readonly logger = new Logger(EvidenceNeo4jProjection.name);
 
   constructor(private readonly neo4j: Neo4jService) {}
@@ -41,9 +39,7 @@ export class EvidenceNeo4jProjection
    * Creates Evidence node and establishes RECORDED and ABOUT relationships
    */
   async handle(event: EvidenceCreatedEventV1): Promise<void> {
-    this.logger.log(
-      `Handling EvidenceCreatedEvent-V1 for evidence: ${event.evidenceId}`,
-    );
+    this.logger.log(`Handling EvidenceCreatedEvent-V1 for evidence: ${event.evidenceId}`);
 
     const session = this.neo4j.getWriteSession();
 
@@ -74,18 +70,15 @@ export class EvidenceNeo4jProjection
           actorId: event.actorId,
           workspaceId: event.workspaceId,
           createdAt: event.createdAt.toISOString(),
-        },
+        }
       );
 
       this.logger.debug(
-        `Evidence node created/updated in Neo4j with RECORDED and ABOUT relationships: ${event.evidenceId}`,
+        `Evidence node created/updated in Neo4j with RECORDED and ABOUT relationships: ${event.evidenceId}`
       );
     } catch (error) {
       const err = error as Error;
-      this.logger.error(
-        `Failed to project evidence to Neo4j: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to project evidence to Neo4j: ${err.message}`, err.stack);
       throw error;
     } finally {
       await session.close();
@@ -115,35 +108,35 @@ export class EvidenceNeo4jInitializer {
       // Create UNIQUE constraint on Evidence.id
       await session.run(
         `CREATE CONSTRAINT evidence_id_unique IF NOT EXISTS 
-         FOR (e:Evidence) REQUIRE e.id IS UNIQUE`,
+         FOR (e:Evidence) REQUIRE e.id IS UNIQUE`
       );
       this.logger.log('UNIQUE constraint on Evidence.id created');
 
       // Create index on type for type-based queries
       await session.run(
         `CREATE INDEX evidence_type_index IF NOT EXISTS 
-         FOR (e:Evidence) ON (e.type)`,
+         FOR (e:Evidence) ON (e.type)`
       );
       this.logger.log('Index on Evidence.type created');
 
       // Create index on createdAt for time-range queries
       await session.run(
         `CREATE INDEX evidence_createdAt_index IF NOT EXISTS 
-         FOR (e:Evidence) ON (e.createdAt)`,
+         FOR (e:Evidence) ON (e.createdAt)`
       );
       this.logger.log('Index on Evidence.createdAt created');
 
       // Create composite index on (type, createdAt) for filtered time queries
       await session.run(
         `CREATE INDEX evidence_type_createdAt_index IF NOT EXISTS 
-         FOR (e:Evidence) ON (e.type, e.createdAt)`,
+         FOR (e:Evidence) ON (e.type, e.createdAt)`
       );
       this.logger.log('Composite index on Evidence.(type, createdAt) created');
     } catch (error) {
       const err = error as Error;
       this.logger.error(
         `Failed to initialize Neo4j constraints/indexes: ${err.message}`,
-        err.stack,
+        err.stack
       );
       throw error;
     } finally {

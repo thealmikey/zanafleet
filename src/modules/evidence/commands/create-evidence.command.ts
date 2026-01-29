@@ -10,29 +10,19 @@ export const CreateEvidenceCommandSchema = z.object({
   type: z.nativeEnum(EvidenceType, {
     errorMap: () => ({ message: 'Evidence type must be a valid EvidenceType' }),
   }),
-  actorId: z
-    .string()
-    .uuid('Actor ID must be a valid UUID'),
-  workspaceId: z
-    .string()
-    .uuid('Workspace ID must be a valid UUID'),
+  actorId: z.string().uuid('Actor ID must be a valid UUID'),
+  workspaceId: z.string().uuid('Workspace ID must be a valid UUID'),
   subjectType: z.nativeEnum(SubjectType, {
     errorMap: () => ({ message: 'Subject type must be a valid SubjectType' }),
   }),
-  subjectId: z
-    .string()
-    .uuid('Subject ID must be a valid UUID'),
-  payload: z
-    .record(z.unknown())
-    .refine((val) => val !== null && typeof val === 'object', {
-      message: 'Payload must be a valid object',
-    }),
+  subjectId: z.string().uuid('Subject ID must be a valid UUID'),
+  payload: z.record(z.unknown()).refine((val) => val !== null && typeof val === 'object', {
+    message: 'Payload must be a valid object',
+  }),
   source: z.nativeEnum(EvidenceSource, {
     errorMap: () => ({ message: 'Source must be a valid EvidenceSource' }),
   }),
-  commandId: z
-    .string()
-    .uuid('Command ID must be a valid UUID'),
+  commandId: z.string().uuid('Command ID must be a valid UUID'),
 });
 
 export type CreateEvidenceCommandInput = z.infer<typeof CreateEvidenceCommandSchema>;

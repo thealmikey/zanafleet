@@ -51,7 +51,7 @@ export class AddActorToWorkspaceCommandHandler
     @InjectRepository(ActorEntity)
     private readonly actorRepository: Repository<ActorEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -68,7 +68,7 @@ export class AddActorToWorkspaceCommandHandler
     const eventId = uuidv4();
 
     this.logger.log(
-      `Executing AddActorToWorkspaceCommand: actor=${command.actorId}, workspace=${command.workspaceId}, role=${command.role}`,
+      `Executing AddActorToWorkspaceCommand: actor=${command.actorId}, workspace=${command.workspaceId}, role=${command.role}`
     );
 
     try {
@@ -79,16 +79,14 @@ export class AddActorToWorkspaceCommandHandler
 
       if (!workspace) {
         this.logger.warn(`Workspace not found: ${command.workspaceId}`);
-        throw new NotFoundException(
-          `Workspace with ID '${command.workspaceId}' does not exist`,
-        );
+        throw new NotFoundException(`Workspace with ID '${command.workspaceId}' does not exist`);
       }
 
       // Step 2: Check workspace is ACTIVE
       if (workspace.status === WorkspaceStatus.SUSPENDED) {
         this.logger.warn(`Workspace is suspended: ${command.workspaceId}`);
         throw new BadRequestException(
-          `Cannot add actor to suspended workspace '${command.workspaceId}'`,
+          `Cannot add actor to suspended workspace '${command.workspaceId}'`
         );
       }
 
@@ -101,9 +99,7 @@ export class AddActorToWorkspaceCommandHandler
 
       if (!actor) {
         this.logger.warn(`Actor not found: ${command.actorId}`);
-        throw new NotFoundException(
-          `Actor with ID '${command.actorId}' does not exist`,
-        );
+        throw new NotFoundException(`Actor with ID '${command.actorId}' does not exist`);
       }
 
       this.logger.debug(`Actor validated: ${command.actorId}`);
@@ -118,10 +114,10 @@ export class AddActorToWorkspaceCommandHandler
 
       if (existingMembership) {
         this.logger.warn(
-          `Actor ${command.actorId} is already a member of workspace ${command.workspaceId}`,
+          `Actor ${command.actorId} is already a member of workspace ${command.workspaceId}`
         );
         throw new ConflictException(
-          `Actor '${command.actorId}' is already a member of workspace '${command.workspaceId}'`,
+          `Actor '${command.actorId}' is already a member of workspace '${command.workspaceId}'`
         );
       }
 
@@ -136,7 +132,7 @@ export class AddActorToWorkspaceCommandHandler
       // Step 6: Persist to PostgreSQL
       await this.membershipRepository.save(membership);
       this.logger.debug(
-        `Membership persisted: actor=${command.actorId}, workspace=${command.workspaceId}`,
+        `Membership persisted: actor=${command.actorId}, workspace=${command.workspaceId}`
       );
 
       // Step 7: Create and emit event
@@ -155,16 +151,11 @@ export class AddActorToWorkspaceCommandHandler
       if (this.eventBusService) {
         await this.eventBusService
           .publish('workspace.events.member-added-v1', event)
-          .catch((err: Error) =>
-            this.logger.warn(`NATS publish failed: ${err.message}`),
-          );
+          .catch((err: Error) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to add actor to workspace: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to add actor to workspace: ${err.message}`, err.stack);
       throw error;
     }
   }

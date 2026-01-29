@@ -46,10 +46,7 @@ describe('CreateEvidenceCommandHandler', () => {
       publish: jest.fn(),
     } as unknown as jest.Mocked<EventBus>;
 
-    handler = new CreateEvidenceCommandHandler(
-      evidenceRepository,
-      eventBus,
-    );
+    handler = new CreateEvidenceCommandHandler(evidenceRepository, eventBus);
   });
 
   afterEach(() => {

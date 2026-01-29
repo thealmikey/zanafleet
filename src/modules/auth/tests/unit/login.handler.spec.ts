@@ -33,7 +33,7 @@ describe('LoginCommandHandler', () => {
     }).compile();
 
     handler = module.get<LoginCommandHandler>(LoginCommandHandler);
-    
+
     mockRepository.createQueryBuilder.mockReturnValue(mockQueryBuilder);
   });
 
@@ -99,10 +99,9 @@ describe('LoginCommandHandler', () => {
       type: ActorType.Rider,
     });
     expect(mockRepository.findOne).not.toHaveBeenCalled(); // because '0x123...' is not a UUID
-    expect(mockQueryBuilder.where).toHaveBeenCalledWith(
-      ':identifier = ANY(actor.linkedWallets)',
-      { identifier: walletAddress },
-    );
+    expect(mockQueryBuilder.where).toHaveBeenCalledWith(':identifier = ANY(actor.linkedWallets)', {
+      identifier: walletAddress,
+    });
   });
 
   it('should successfully login by wallet address even if it is a UUID but not found as actor ID', async () => {

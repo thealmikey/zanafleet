@@ -8,10 +8,7 @@ import { ActorController } from './controllers/actor.controller';
 import { ActorEntity } from './entities/actor.entity';
 import { CreateActorCommandHandler } from './handlers/create-actor.handler';
 import { UpdateActorCommandHandler } from './handlers/update-actor.handler';
-import {
-  ActorNeo4jProjection,
-  ActorNeo4jInitializer,
-} from './projections/actor-neo4j.projection';
+import { ActorNeo4jProjection, ActorNeo4jInitializer } from './projections/actor-neo4j.projection';
 
 /**
  * Actor Module

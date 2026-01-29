@@ -7,7 +7,11 @@ import { v4 as uuidv4 } from 'uuid';
 import { EventBusService, NatsSubjects } from '../../../core/event-bus';
 import { AddActorToWorkspaceCommand } from '../../workspace/commands/add-actor-to-workspace.command';
 import { CreateWorkspaceCommand } from '../../workspace/commands/create-workspace.command';
-import { MembershipRole, WorkspaceStatus, WorkspaceType } from '../../workspace/dto/workspace.enums';
+import {
+  MembershipRole,
+  WorkspaceStatus,
+  WorkspaceType,
+} from '../../workspace/dto/workspace.enums';
 import { CreateOrganizationCommand } from '../commands/create-organization.command';
 import { OrganizationType } from '../dto/organization.enums';
 import { OrganizationEntity } from '../entities/organization.entity';
@@ -15,12 +19,12 @@ import { OrganizationCreatedEventV1 } from '../events/organization-created.event
 
 /**
  * CreateOrganizationCommandHandler
- * 
+ *
  * Handles the CreateOrganizationCommand by:
  * 1. Validating input (already done in command)
  * 2. Persisting to PostgreSQL
  * 3. Emitting OrganizationCreatedEvent-V1 to NATS event bus
- * 
+ *
  * Best Practices:
  * - Uses dependency injection for repository and event bus
  * - Atomic operations (persist then emit)
@@ -39,7 +43,7 @@ export class CreateOrganizationCommandHandler
     private readonly organizationRepository: Repository<OrganizationEntity>,
     private readonly eventBus: EventBus,
     private readonly commandBus: CommandBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -61,7 +65,7 @@ export class CreateOrganizationCommandHandler
 
   /**
    * Execute command: Create organization
-   * 
+   *
    * @param command CreateOrganizationCommand
    * @returns organizationId of created organization
    * @throws Error if persistence fails
@@ -71,9 +75,7 @@ export class CreateOrganizationCommandHandler
     const now = new Date();
     const eventId = uuidv4();
 
-    this.logger.log(
-      `Executing CreateOrganizationCommand for organization: ${organizationId}`,
-    );
+    this.logger.log(`Executing CreateOrganizationCommand for organization: ${organizationId}`);
 
     try {
       // Step 1: Create organization entity
@@ -88,9 +90,7 @@ export class CreateOrganizationCommandHandler
 
       // Step 2: Persist to PostgreSQL
       await this.organizationRepository.save(entity);
-      this.logger.debug(
-        `Organization persisted to PostgreSQL: ${organizationId}`,
-      );
+      this.logger.debug(`Organization persisted to PostgreSQL: ${organizationId}`);
 
       // Step 3: Create and emit event
       const event = new OrganizationCreatedEventV1({
@@ -105,21 +105,14 @@ export class CreateOrganizationCommandHandler
       });
 
       this.eventBus.publish(event);
-      this.logger.log(
-        `OrganizationCreatedEvent-V1 emitted to event bus: ${eventId}`,
-      );
+      this.logger.log(`OrganizationCreatedEvent-V1 emitted to event bus: ${eventId}`);
 
       if (this.eventBusService) {
         try {
-          await this.eventBusService.publish(
-            NatsSubjects.Organization.CREATED_V1,
-            event,
-          );
+          await this.eventBusService.publish(NatsSubjects.Organization.CREATED_V1, event);
         } catch (publishError: unknown) {
           const errorMessage =
-            publishError instanceof Error
-              ? publishError.message
-              : String(publishError);
+            publishError instanceof Error ? publishError.message : String(publishError);
           this.logger.warn(`NATS publish failed: ${errorMessage}`);
         }
       }
@@ -137,12 +130,11 @@ export class CreateOrganizationCommandHandler
             roleTemplates: [],
           });
 
-          const workspaceId =
-            await this.commandBus.execute<CreateWorkspaceCommand, string>(
-              createWorkspaceCommand,
-            );
+          const workspaceId = await this.commandBus.execute<CreateWorkspaceCommand, string>(
+            createWorkspaceCommand
+          );
           this.logger.log(
-            `Default workspace created: ${workspaceId} for organization: ${organizationId}`,
+            `Default workspace created: ${workspaceId} for organization: ${organizationId}`
           );
 
           // If createdByActorId is provided, add the actor as ADMIN
@@ -155,7 +147,7 @@ export class CreateOrganizationCommandHandler
 
             await this.commandBus.execute(addActorCommand);
             this.logger.log(
-              `Actor ${command.createdByActorId} added as ADMIN to workspace: ${workspaceId}`,
+              `Actor ${command.createdByActorId} added as ADMIN to workspace: ${workspaceId}`
             );
           }
         } catch (orchestrationError: unknown) {
@@ -165,7 +157,7 @@ export class CreateOrganizationCommandHandler
               ? orchestrationError.message
               : String(orchestrationError);
           this.logger.warn(
-            `Workspace orchestration failed for organization ${organizationId}: ${errorMessage}`,
+            `Workspace orchestration failed for organization ${organizationId}: ${errorMessage}`
           );
         }
       }
@@ -173,10 +165,7 @@ export class CreateOrganizationCommandHandler
       return organizationId;
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to create organization: ${String(err.message)}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to create organization: ${String(err.message)}`, err.stack);
       throw err;
     }
   }

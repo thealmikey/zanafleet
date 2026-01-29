@@ -25,8 +25,7 @@ import { UpdateActorCommandHandler } from '../../handlers/update-actor.handler';
  * Verifies persistence in PostgreSQL and event emission.
  */
 
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 describeIntegration('ActorController (Integration)', () => {
   let module: TestingModule;
@@ -69,8 +68,12 @@ describeIntegration('ActorController (Integration)', () => {
 
     controller = module.get<ActorController>(ActorController);
     actorRepository = module.get<Repository<ActorEntity>>(getRepositoryToken(ActorEntity));
-    workspaceRepository = module.get<Repository<WorkspaceEntity>>(getRepositoryToken(WorkspaceEntity));
-    organizationRepository = module.get<Repository<OrganizationEntity>>(getRepositoryToken(OrganizationEntity));
+    workspaceRepository = module.get<Repository<WorkspaceEntity>>(
+      getRepositoryToken(WorkspaceEntity)
+    );
+    organizationRepository = module.get<Repository<OrganizationEntity>>(
+      getRepositoryToken(OrganizationEntity)
+    );
     eventBus = module.get<EventBus>(EventBus);
     dataSource = module.get<DataSource>(DataSource);
   });
@@ -150,7 +153,7 @@ describeIntegration('ActorController (Integration)', () => {
       expect(persistedAfterCreate?.workspaceId).toBe(workspaceId);
       expect(persistedAfterCreate?.roles).toEqual(roles);
       expect(persistedAfterCreate?.linkedWallets).toEqual(linkedWallets);
-      
+
       // Verify event emission for creation (internal CQRS bus)
       expect(eventSpy).toHaveBeenCalledWith(expect.any(ActorOnboardedEventV1));
 
@@ -190,7 +193,9 @@ describeIntegration('ActorController (Integration)', () => {
 
     it('should throw NotFoundException when updating a non-existent actor', async () => {
       const nonExistentId = uuidv4();
-      await expect(controller.update(nonExistentId, { roles: [uuidv4()] })).rejects.toThrow(NotFoundException);
+      await expect(controller.update(nonExistentId, { roles: [uuidv4()] })).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 });

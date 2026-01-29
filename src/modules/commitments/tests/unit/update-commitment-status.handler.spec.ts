@@ -37,10 +37,7 @@ describe('UpdateCommitmentStatusCommandHandler', () => {
       publish: jest.fn(),
     } as unknown as jest.Mocked<EventBus>;
 
-    handler = new UpdateCommitmentStatusCommandHandler(
-      commitmentRepository,
-      eventBus,
-    );
+    handler = new UpdateCommitmentStatusCommandHandler(commitmentRepository, eventBus);
   });
 
   afterEach(() => {
@@ -128,7 +125,7 @@ describe('UpdateCommitmentStatusCommandHandler', () => {
 
       await expect(handler.execute(command)).rejects.toThrow(BadRequestException);
       await expect(handler.execute(command)).rejects.toThrow(
-        "Invalid status transition from 'FULFILLED' to 'BREACHED'",
+        "Invalid status transition from 'FULFILLED' to 'BREACHED'"
       );
 
       expect(commitmentRepository.save).not.toHaveBeenCalled();
@@ -146,7 +143,7 @@ describe('UpdateCommitmentStatusCommandHandler', () => {
 
       await expect(handler.execute(command)).rejects.toThrow(BadRequestException);
       await expect(handler.execute(command)).rejects.toThrow(
-        "Invalid status transition from 'BREACHED' to 'PENDING'",
+        "Invalid status transition from 'BREACHED' to 'PENDING'"
       );
 
       expect(commitmentRepository.save).not.toHaveBeenCalled();
@@ -164,7 +161,7 @@ describe('UpdateCommitmentStatusCommandHandler', () => {
 
       await expect(handler.execute(command)).rejects.toThrow(BadRequestException);
       await expect(handler.execute(command)).rejects.toThrow(
-        "Invalid status transition from 'CANCELLED' to 'FULFILLED'",
+        "Invalid status transition from 'CANCELLED' to 'FULFILLED'"
       );
 
       expect(commitmentRepository.save).not.toHaveBeenCalled();
@@ -181,7 +178,7 @@ describe('UpdateCommitmentStatusCommandHandler', () => {
 
       await expect(handler.execute(command)).rejects.toThrow(NotFoundException);
       await expect(handler.execute(command)).rejects.toThrow(
-        "Commitment with ID '123e4567-e89b-12d3-a456-426614174000' does not exist",
+        "Commitment with ID '123e4567-e89b-12d3-a456-426614174000' does not exist"
       );
 
       expect(commitmentRepository.save).not.toHaveBeenCalled();

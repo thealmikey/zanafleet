@@ -22,23 +22,21 @@ import { InsufficientFundsException } from '../exceptions/insufficient-funds.exc
  */
 @CommandHandler(DebitWalletCommand)
 @Injectable()
-export class DebitWalletCommandHandler
-  implements ICommandHandler<DebitWalletCommand>
-{
+export class DebitWalletCommandHandler implements ICommandHandler<DebitWalletCommand> {
   private readonly logger = new Logger(DebitWalletCommandHandler.name);
 
   constructor(
     @InjectRepository(WalletEntity)
     private readonly walletRepository: Repository<WalletEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: DebitWalletCommand): Promise<number> {
     const eventId = uuidv4();
 
     this.logger.log(
-      `Executing DebitWalletCommand for wallet: ${command.walletId}, amount: ${command.amount}`,
+      `Executing DebitWalletCommand for wallet: ${command.walletId}, amount: ${command.amount}`
     );
 
     const wallet = await this.walletRepository.findOne({
@@ -53,13 +51,9 @@ export class DebitWalletCommandHandler
 
     if (currentBalance < command.amount) {
       this.logger.warn(
-        `Insufficient funds in wallet ${command.walletId}. Balance: ${currentBalance}, Requested: ${command.amount}`,
+        `Insufficient funds in wallet ${command.walletId}. Balance: ${currentBalance}, Requested: ${command.amount}`
       );
-      throw new InsufficientFundsException(
-        command.walletId,
-        currentBalance,
-        command.amount,
-      );
+      throw new InsufficientFundsException(command.walletId, currentBalance, command.amount);
     }
 
     const newBalance = currentBalance - command.amount;
@@ -67,9 +61,7 @@ export class DebitWalletCommandHandler
     try {
       wallet.balance = newBalance.toFixed(2);
       await this.walletRepository.save(wallet);
-      this.logger.debug(
-        `Wallet ${command.walletId} debited. New balance: ${newBalance}`,
-      );
+      this.logger.debug(`Wallet ${command.walletId} debited. New balance: ${newBalance}`);
 
       const event = new WalletDebitedEventV1({
         eventId,
@@ -84,17 +76,16 @@ export class DebitWalletCommandHandler
       this.logger.log(`WalletDebitedEvent-V1 emitted to event bus: ${eventId}`);
 
       if (this.eventBusService) {
-        await this.eventBusService.publish(
-          NatsSubjects.Wallet.DEBITED_V1,
-          event,
-        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+        await this.eventBusService
+          .publish(NatsSubjects.Wallet.DEBITED_V1, event)
+          .catch((err) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
 
       return newBalance;
     } catch (error) {
       this.logger.error(
         `Failed to debit wallet: ${(error as Error).message}`,
-        (error as Error).stack,
+        (error as Error).stack
       );
       throw error;
     }

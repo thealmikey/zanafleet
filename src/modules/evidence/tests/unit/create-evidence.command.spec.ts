@@ -146,11 +146,7 @@ describe('CreateEvidenceCommandSchema', () => {
 
   describe('subjectType validation', () => {
     it('should accept all valid SubjectType values', () => {
-      const types = [
-        SubjectType.RIDER,
-        SubjectType.BUSINESS,
-        SubjectType.SACCO,
-      ];
+      const types = [SubjectType.RIDER, SubjectType.BUSINESS, SubjectType.SACCO];
 
       types.forEach((subjectType) => {
         const input = { ...validInput, subjectType };
@@ -231,11 +227,7 @@ describe('CreateEvidenceCommandSchema', () => {
 
   describe('source validation', () => {
     it('should accept all valid EvidenceSource values', () => {
-      const sources = [
-        EvidenceSource.API,
-        EvidenceSource.SMS,
-        EvidenceSource.OPS_APP,
-      ];
+      const sources = [EvidenceSource.API, EvidenceSource.SMS, EvidenceSource.OPS_APP];
 
       sources.forEach((source) => {
         const input = { ...validInput, source };

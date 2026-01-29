@@ -57,7 +57,7 @@ describe('CreateTransactionCommandHandler', () => {
 
     const transactionFn = jest.fn(
       async (runInTransaction: (manager: EntityManager) => Promise<unknown>) =>
-        runInTransaction(entityManager),
+        runInTransaction(entityManager)
     );
 
     dataSource = {
@@ -80,11 +80,7 @@ describe('CreateTransactionCommandHandler', () => {
       return entity as WalletEntity;
     });
 
-    handler = new CreateTransactionCommandHandler(
-      dataSource,
-      eventBus,
-      undefined,
-    );
+    handler = new CreateTransactionCommandHandler(dataSource, eventBus, undefined);
   });
 
   afterEach(() => {
@@ -118,12 +114,8 @@ describe('CreateTransactionCommandHandler', () => {
 
     expect(walletRepository.save).toHaveBeenCalledTimes(2);
     expect(savedWallets).toHaveLength(2);
-    const debitedWallet = savedWallets.find(
-      (wallet) => wallet.id === command.sourceWalletId,
-    );
-    const creditedWallet = savedWallets.find(
-      (wallet) => wallet.id === command.destinationWalletId,
-    );
+    const debitedWallet = savedWallets.find((wallet) => wallet.id === command.sourceWalletId);
+    const creditedWallet = savedWallets.find((wallet) => wallet.id === command.destinationWalletId);
 
     expect(debitedWallet).toBeDefined();
     expect(creditedWallet).toBeDefined();
@@ -131,19 +123,16 @@ describe('CreateTransactionCommandHandler', () => {
     expect((creditedWallet as WalletEntity).balance).toBe('120.00');
 
     expect(eventBus.publish).toHaveBeenCalledTimes(1);
-    const emittedEvent =
-      eventBus.publish.mock.calls[0][0] as TransactionCreatedEventV1;
+    const emittedEvent = eventBus.publish.mock.calls[0][0] as TransactionCreatedEventV1;
 
     expect(emittedEvent).toBeInstanceOf(TransactionCreatedEventV1);
     expect(emittedEvent.sourceWalletId).toBe(command.sourceWalletId);
-    expect(emittedEvent.destinationWalletId).toBe(
-      command.destinationWalletId,
-    );
+    expect(emittedEvent.destinationWalletId).toBe(command.destinationWalletId);
     expect(emittedEvent.amount).toBe(command.amount);
     expect(emittedEvent.status).toBe(TransactionStatus.Completed);
     expect(emittedEvent.transactionId).toBe(transactionId);
     expect(transactionId).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
     );
   });
 
@@ -169,9 +158,7 @@ describe('CreateTransactionCommandHandler', () => {
       balance: '100.00',
     } as WalletEntity;
 
-    walletRepository.findOne
-      .mockResolvedValueOnce(sourceWallet)
-      .mockResolvedValueOnce(null);
+    walletRepository.findOne.mockResolvedValueOnce(sourceWallet).mockResolvedValueOnce(null);
 
     await expect(handler.execute(command)).rejects.toThrow(NotFoundException);
 
@@ -199,9 +186,7 @@ describe('CreateTransactionCommandHandler', () => {
       .mockResolvedValueOnce(sourceWallet)
       .mockResolvedValueOnce(destinationWallet);
 
-    await expect(handler.execute(command)).rejects.toThrow(
-      InsufficientFundsException,
-    );
+    await expect(handler.execute(command)).rejects.toThrow(InsufficientFundsException);
 
     expect(dataSource.transaction).toHaveBeenCalledTimes(1);
     expect(walletRepository.findOne).toHaveBeenCalledTimes(2);

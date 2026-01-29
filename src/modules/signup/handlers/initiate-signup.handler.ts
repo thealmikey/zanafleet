@@ -23,16 +23,14 @@ import { InitiateSignUpResult } from './signup-result.interfaces';
  */
 @CommandHandler(InitiateSignUpCommand)
 @Injectable()
-export class InitiateSignUpCommandHandler
-  implements ICommandHandler<InitiateSignUpCommand>
-{
+export class InitiateSignUpCommandHandler implements ICommandHandler<InitiateSignUpCommand> {
   private readonly logger = new Logger(InitiateSignUpCommandHandler.name);
 
   constructor(
     @InjectRepository(SignUpSessionEntity)
     private readonly signupSessionRepository: Repository<SignUpSessionEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -41,9 +39,7 @@ export class InitiateSignUpCommandHandler
    * @param command InitiateSignUpCommand
    * @returns result containing sessionId and expiration of the newly created sign-up session
    */
-  async execute(
-    command: InitiateSignUpCommand,
-  ): Promise<InitiateSignUpResult> {
+  async execute(command: InitiateSignUpCommand): Promise<InitiateSignUpResult> {
     const sessionId = uuidv4();
     const eventId = uuidv4();
     const now = new Date();
@@ -51,7 +47,7 @@ export class InitiateSignUpCommandHandler
     const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
     this.logger.log(
-      `Executing InitiateSignUpCommand for actorType: ${command.actorType} (Session: ${sessionId})`,
+      `Executing InitiateSignUpCommand for actorType: ${command.actorType} (Session: ${sessionId})`
     );
 
     try {
@@ -83,38 +79,24 @@ export class InitiateSignUpCommandHandler
 
       // Step 4: Publish to internal EventBus (Synchronous handlers)
       this.eventBus.publish(event);
-      this.logger.log(
-        `SignUpInitiatedEvent-V1 published to internal bus: ${eventId}`,
-      );
+      this.logger.log(`SignUpInitiatedEvent-V1 published to internal bus: ${eventId}`);
 
       // Step 5: Publish to external NATS EventBus (Asynchronous integration)
       if (this.eventBusService) {
         try {
-          await this.eventBusService.publish(
-            NatsSubjects.SignUp.INITIATED_V1,
-            event,
-          );
-          this.logger.debug(
-            `SignUpInitiatedEvent-V1 published to NATS: ${eventId}`,
-          );
+          await this.eventBusService.publish(NatsSubjects.SignUp.INITIATED_V1, event);
+          this.logger.debug(`SignUpInitiatedEvent-V1 published to NATS: ${eventId}`);
         } catch (publishError: unknown) {
           const errorMessage =
-            publishError instanceof Error
-              ? publishError.message
-              : String(publishError);
-          this.logger.warn(
-            `NATS publish failed for SignUpInitiatedEvent-V1: ${errorMessage}`,
-          );
+            publishError instanceof Error ? publishError.message : String(publishError);
+          this.logger.warn(`NATS publish failed for SignUpInitiatedEvent-V1: ${errorMessage}`);
         }
       }
 
       return { sessionId, expiresAt };
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to initiate sign-up process: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to initiate sign-up process: ${err.message}`, err.stack);
       throw err;
     }
   }

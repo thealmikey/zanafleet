@@ -1,10 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  Logger,
-  NotFoundException,
-  Optional,
-} from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -39,16 +33,16 @@ export class AssignPersonaToActorCommandHandler
     @InjectRepository(ActorPersonaEntity)
     private readonly actorPersonaRepository: Repository<ActorPersonaEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(
-    command: AssignPersonaToActorCommand,
+    command: AssignPersonaToActorCommand
   ): Promise<{ actorId: string; workspaceId: string; personaId: string }> {
     const { actorId, workspaceId, personaId } = command;
 
     this.logger.log(
-      `Executing AssignPersonaToActorCommand for actor: ${actorId}, workspace: ${workspaceId}, persona: ${personaId}`,
+      `Executing AssignPersonaToActorCommand for actor: ${actorId}, workspace: ${workspaceId}, persona: ${personaId}`
     );
 
     try {
@@ -58,9 +52,7 @@ export class AssignPersonaToActorCommandHandler
 
       if (!actor) {
         this.logger.warn(`Actor not found: ${actorId}`);
-        throw new NotFoundException(
-          `Actor with ID '${actorId}' does not exist`,
-        );
+        throw new NotFoundException(`Actor with ID '${actorId}' does not exist`);
       }
 
       const workspace = await this.workspaceRepository.findOne({
@@ -69,9 +61,7 @@ export class AssignPersonaToActorCommandHandler
 
       if (!workspace) {
         this.logger.warn(`Workspace not found: ${workspaceId}`);
-        throw new NotFoundException(
-          `Workspace with ID '${workspaceId}' does not exist`,
-        );
+        throw new NotFoundException(`Workspace with ID '${workspaceId}' does not exist`);
       }
 
       const persona = await this.personaRepository.findOne({
@@ -80,9 +70,7 @@ export class AssignPersonaToActorCommandHandler
 
       if (!persona) {
         this.logger.warn(`Persona not found: ${personaId}`);
-        throw new NotFoundException(
-          `Persona with ID '${personaId}' does not exist`,
-        );
+        throw new NotFoundException(`Persona with ID '${personaId}' does not exist`);
       }
 
       const existingAssignment = await this.actorPersonaRepository.findOne({
@@ -91,10 +79,10 @@ export class AssignPersonaToActorCommandHandler
 
       if (existingAssignment) {
         this.logger.warn(
-          `Duplicate persona assignment detected for actor: ${actorId}, workspace: ${workspaceId}, persona: ${personaId}`,
+          `Duplicate persona assignment detected for actor: ${actorId}, workspace: ${workspaceId}, persona: ${personaId}`
         );
         throw new ConflictException(
-          'Persona is already assigned to this actor within the specified workspace',
+          'Persona is already assigned to this actor within the specified workspace'
         );
       }
 
@@ -108,7 +96,7 @@ export class AssignPersonaToActorCommandHandler
 
       await this.actorPersonaRepository.save(entity);
       this.logger.debug(
-        `ActorPersona persisted: actor=${actorId}, workspace=${workspaceId}, persona=${personaId}`,
+        `ActorPersona persisted: actor=${actorId}, workspace=${workspaceId}, persona=${personaId}`
       );
 
       const eventId = uuidv4();
@@ -122,21 +110,14 @@ export class AssignPersonaToActorCommandHandler
       });
 
       this.eventBus.publish(event);
-      this.logger.log(
-        `PersonaAssignedToActorEvent-V1 emitted to event bus: ${eventId}`,
-      );
+      this.logger.log(`PersonaAssignedToActorEvent-V1 emitted to event bus: ${eventId}`);
 
       if (this.eventBusService) {
         try {
-          await this.eventBusService.publish(
-            'persona.assigned-to-actor.v1',
-            event,
-          );
+          await this.eventBusService.publish('persona.assigned-to-actor.v1', event);
         } catch (publishError) {
           const err =
-            publishError instanceof Error
-              ? publishError
-              : new Error(String(publishError));
+            publishError instanceof Error ? publishError : new Error(String(publishError));
           this.logger.warn(`NATS publish failed: ${err.message}`);
         }
       }
@@ -148,10 +129,7 @@ export class AssignPersonaToActorCommandHandler
       }
 
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to assign persona to actor: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to assign persona to actor: ${err.message}`, err.stack);
       throw error;
     }
   }

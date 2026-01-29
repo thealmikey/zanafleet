@@ -26,25 +26,19 @@ export class GrantCapabilityToPersonaCommandHandler
     @InjectRepository(PersonaCapabilityEntity)
     private readonly personaCapabilityRepository: Repository<PersonaCapabilityEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: GrantCapabilityToPersonaCommand): Promise<void> {
-    this.logger.log(
-      `Granting capability ${command.capabilityId} to persona ${command.personaId}`,
-    );
+    this.logger.log(`Granting capability ${command.capabilityId} to persona ${command.personaId}`);
 
     const capability = await this.capabilityRepository.findOne({
       where: { id: command.capabilityId },
     });
 
     if (!capability) {
-      this.logger.warn(
-        `Capability not found for granting to persona: ${command.capabilityId}`,
-      );
-      throw new NotFoundException(
-        `Capability not found: ${command.capabilityId}`,
-      );
+      this.logger.warn(`Capability not found for granting to persona: ${command.capabilityId}`);
+      throw new NotFoundException(`Capability not found: ${command.capabilityId}`);
     }
 
     const persona = await this.personaRepository.findOne({
@@ -52,9 +46,7 @@ export class GrantCapabilityToPersonaCommandHandler
     });
 
     if (!persona) {
-      this.logger.warn(
-        `Persona not found for capability grant: ${command.personaId}`,
-      );
+      this.logger.warn(`Persona not found for capability grant: ${command.personaId}`);
       throw new NotFoundException(`Persona not found: ${command.personaId}`);
     }
 
@@ -79,35 +71,27 @@ export class GrantCapabilityToPersonaCommandHandler
       await this.personaCapabilityRepository.save(personaCapability);
 
       this.logger.debug(
-        `Capability ${command.capabilityId} granted to persona ${command.personaId} in PostgreSQL`,
+        `Capability ${command.capabilityId} granted to persona ${command.personaId} in PostgreSQL`
       );
 
       this.eventBus.publish(event);
 
       this.logger.log(
-        `CapabilityGrantedToPersonaEvent-V1 emitted to internal event bus: ${eventId}`,
+        `CapabilityGrantedToPersonaEvent-V1 emitted to internal event bus: ${eventId}`
       );
 
       if (this.eventBusService) {
         try {
-          await this.eventBusService.publish(
-            NatsSubjects.Capability.GRANTED_TO_PERSONA_V1,
-            event,
-          );
+          await this.eventBusService.publish(NatsSubjects.Capability.GRANTED_TO_PERSONA_V1, event);
         } catch (publishError: unknown) {
           const err =
-            publishError instanceof Error
-              ? publishError
-              : new Error(String(publishError));
+            publishError instanceof Error ? publishError : new Error(String(publishError));
           this.logger.warn(`NATS publish failed: ${err.message}`);
         }
       }
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to grant capability to persona: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to grant capability to persona: ${err.message}`, err.stack);
       throw err;
     }
   }

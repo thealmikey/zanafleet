@@ -152,9 +152,7 @@ describe('CreateRoleCommand Unit Tests', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          expect(result.error.issues[0].message).toBe(
-            'Role name must not exceed 255 characters',
-          );
+          expect(result.error.issues[0].message).toBe('Role name must not exceed 255 characters');
         }
       });
 

@@ -1,11 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 
 import { WorkspaceStatus, WorkspaceType } from '../dto/workspace.enums';
 
@@ -46,7 +39,7 @@ export class WorkspaceEntity {
   })
   status!: WorkspaceStatus;
 
-  @Column('uuid', { array: true, default: () => "ARRAY[]::uuid[]" })
+  @Column('uuid', { array: true, default: () => 'ARRAY[]::uuid[]' })
   roleTemplates!: string[];
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

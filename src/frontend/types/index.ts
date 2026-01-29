@@ -9,17 +9,9 @@ export {
   type FinalizeSignupResponse,
 } from './signup.types';
 
-export type {
-  User,
-  AuthState,
-  LoginRequest,
-  LoginResponse,
-} from './auth.types';
+export type { User, AuthState, LoginRequest, LoginResponse } from './auth.types';
 
-export type {
-  AuthActions,
-  AuthContextValue,
-} from '../contexts/AuthContext';
+export type { AuthActions, AuthContextValue } from '../contexts/AuthContext';
 
 export type {
   WizardFormData,

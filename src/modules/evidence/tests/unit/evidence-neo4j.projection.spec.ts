@@ -151,11 +151,7 @@ describe('EvidenceNeo4jProjection', () => {
     });
 
     it('should accept all SubjectType values', async () => {
-      const subjectTypes = [
-        SubjectType.RIDER,
-        SubjectType.BUSINESS,
-        SubjectType.SACCO,
-      ];
+      const subjectTypes = [SubjectType.RIDER, SubjectType.BUSINESS, SubjectType.SACCO];
 
       for (const subjectType of subjectTypes) {
         jest.clearAllMocks();
@@ -181,11 +177,7 @@ describe('EvidenceNeo4jProjection', () => {
     });
 
     it('should accept all EvidenceSource values', async () => {
-      const sources = [
-        EvidenceSource.API,
-        EvidenceSource.SMS,
-        EvidenceSource.OPS_APP,
-      ];
+      const sources = [EvidenceSource.API, EvidenceSource.SMS, EvidenceSource.OPS_APP];
 
       for (const source of sources) {
         jest.clearAllMocks();
@@ -243,7 +235,9 @@ describe('EvidenceNeo4jInitializer', () => {
 
       const cypherCalls = mockSession.run.mock.calls.map(([cypher]: [string]) => cypher);
       expect(cypherCalls.some((c: string) => c.includes('evidence_id_unique'))).toBe(true);
-      expect(cypherCalls.some((c: string) => c.includes('FOR (e:Evidence) REQUIRE e.id IS UNIQUE'))).toBe(true);
+      expect(
+        cypherCalls.some((c: string) => c.includes('FOR (e:Evidence) REQUIRE e.id IS UNIQUE'))
+      ).toBe(true);
     });
 
     it('should create index on Evidence.type for type-based queries', async () => {
@@ -251,7 +245,9 @@ describe('EvidenceNeo4jInitializer', () => {
 
       const cypherCalls = mockSession.run.mock.calls.map(([cypher]: [string]) => cypher);
       expect(cypherCalls.some((c: string) => c.includes('evidence_type_index'))).toBe(true);
-      expect(cypherCalls.some((c: string) => c.includes('FOR (e:Evidence) ON (e.type)'))).toBe(true);
+      expect(cypherCalls.some((c: string) => c.includes('FOR (e:Evidence) ON (e.type)'))).toBe(
+        true
+      );
     });
 
     it('should create index on Evidence.createdAt for time-range queries', async () => {
@@ -259,15 +255,21 @@ describe('EvidenceNeo4jInitializer', () => {
 
       const cypherCalls = mockSession.run.mock.calls.map(([cypher]: [string]) => cypher);
       expect(cypherCalls.some((c: string) => c.includes('evidence_createdAt_index'))).toBe(true);
-      expect(cypherCalls.some((c: string) => c.includes('FOR (e:Evidence) ON (e.createdAt)'))).toBe(true);
+      expect(cypherCalls.some((c: string) => c.includes('FOR (e:Evidence) ON (e.createdAt)'))).toBe(
+        true
+      );
     });
 
     it('should create composite index on (type, createdAt) for filtered time queries', async () => {
       await initializer.initialize();
 
       const cypherCalls = mockSession.run.mock.calls.map(([cypher]: [string]) => cypher);
-      expect(cypherCalls.some((c: string) => c.includes('evidence_type_createdAt_index'))).toBe(true);
-      expect(cypherCalls.some((c: string) => c.includes('FOR (e:Evidence) ON (e.type, e.createdAt)'))).toBe(true);
+      expect(cypherCalls.some((c: string) => c.includes('evidence_type_createdAt_index'))).toBe(
+        true
+      );
+      expect(
+        cypherCalls.some((c: string) => c.includes('FOR (e:Evidence) ON (e.type, e.createdAt)'))
+      ).toBe(true);
     });
 
     it('should use IF NOT EXISTS for idempotent initialization', async () => {

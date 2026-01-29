@@ -50,11 +50,9 @@ describe('UpdateSignUpStepCommandHandler', () => {
       ],
     }).compile();
 
-    handler = module.get<UpdateSignUpStepCommandHandler>(
-      UpdateSignUpStepCommandHandler,
-    );
+    handler = module.get<UpdateSignUpStepCommandHandler>(UpdateSignUpStepCommandHandler);
     repository = module.get<Repository<SignUpSessionEntity>>(
-      getRepositoryToken(SignUpSessionEntity),
+      getRepositoryToken(SignUpSessionEntity)
     );
     eventBus = module.get<EventBus>(EventBus);
     eventBusService = module.get<EventBusService>(EventBusService);

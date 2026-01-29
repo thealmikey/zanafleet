@@ -1,7 +1,7 @@
 import { ConflictException } from '@nestjs/common';
 import { CommandBus, EventBus, CqrsModule } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TypeOrmModule , getRepositoryToken } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { CreateRoleCommand } from '../../commands/create-role.command';
@@ -10,8 +10,7 @@ import { RoleEntity } from '../../entities/role.entity';
 import { RoleCreatedEventV1 } from '../../events/role-created.event';
 import { CreateRoleCommandHandler } from '../../handlers/create-role.handler';
 
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 /**
  * Integration Tests: CreateRoleCommand End-to-End
@@ -58,9 +57,7 @@ describeIntegration('CreateRoleCommand Integration Tests', () => {
 
       commandBus = module.get<CommandBus>(CommandBus);
       eventBus = module.get<EventBus>(EventBus);
-      roleRepository = module.get<Repository<RoleEntity>>(
-        getRepositoryToken(RoleEntity),
-      );
+      roleRepository = module.get<Repository<RoleEntity>>(getRepositoryToken(RoleEntity));
 
       eventBus.subscribe((event) => {
         if (event instanceof RoleCreatedEventV1) {
@@ -72,7 +69,7 @@ describeIntegration('CreateRoleCommand Integration Tests', () => {
     } catch (error) {
       console.warn(
         'Failed to initialize Role integration test module (database may not be available):',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? error.message : String(error)
       );
       moduleInitializationFailed = true;
     }
@@ -81,7 +78,7 @@ describeIntegration('CreateRoleCommand Integration Tests', () => {
   beforeEach((): void => {
     if (moduleInitializationFailed) {
       throw new Error(
-        'Role integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d).',
+        'Role integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d).'
       );
     }
   });
@@ -196,7 +193,7 @@ describeIntegration('CreateRoleCommand Integration Tests', () => {
 
       await expect(commandBus.execute(command2)).rejects.toThrow(ConflictException);
       await expect(commandBus.execute(command2)).rejects.toThrow(
-        'Role with name "Duplicate Role" and scope "Organization" already exists',
+        'Role with name "Duplicate Role" and scope "Organization" already exists'
       );
 
       expect(emittedEvents.length).toBe(0);

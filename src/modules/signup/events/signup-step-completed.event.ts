@@ -78,9 +78,7 @@ export class SignUpStepCompletedEventV1 implements BaseEvent {
   /**
    * Hydrates event from serialized form
    */
-  static fromJSON(
-    data: SignUpStepCompletedEventV1JSON,
-  ): SignUpStepCompletedEventV1 {
+  static fromJSON(data: SignUpStepCompletedEventV1JSON): SignUpStepCompletedEventV1 {
     return new SignUpStepCompletedEventV1({
       eventId: data.eventId,
       sessionId: data.sessionId,

@@ -60,18 +60,8 @@ export class EventBusModule {
           },
         ]),
       ],
-      providers: [
-        EventBusService,
-        IdempotencyService,
-        RetryService,
-        EventLoggerService,
-      ],
-      exports: [
-        EventBusService,
-        IdempotencyService,
-        RetryService,
-        EventLoggerService,
-      ],
+      providers: [EventBusService, IdempotencyService, RetryService, EventLoggerService],
+      exports: [EventBusService, IdempotencyService, RetryService, EventLoggerService],
     };
   }
 

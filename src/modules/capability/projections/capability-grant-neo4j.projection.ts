@@ -15,7 +15,7 @@ export class CapabilityGrantNeo4jProjection
 
   async handle(event: CapabilityGrantedToPersonaEventV1): Promise<void> {
     this.logger.log(
-      `Handling CapabilityGrantedToPersonaEvent-V1 for persona: ${event.personaId}, capability: ${event.capabilityId}`,
+      `Handling CapabilityGrantedToPersonaEvent-V1 for persona: ${event.personaId}, capability: ${event.capabilityId}`
     );
 
     const session = this.neo4j.getSession();
@@ -36,18 +36,15 @@ export class CapabilityGrantNeo4jProjection
           capabilityId: event.capabilityId,
           grantedAt: event.grantedAt.toISOString(),
           occurredAt: event.occurredAt.toISOString(),
-        },
+        }
       );
 
       this.logger.debug(
-        `Projected capability grant to Neo4j: persona=${event.personaId}, capability=${event.capabilityId}`,
+        `Projected capability grant to Neo4j: persona=${event.personaId}, capability=${event.capabilityId}`
       );
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to project capability grant to Neo4j: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to project capability grant to Neo4j: ${err.message}`, err.stack);
       throw error;
     } finally {
       await session.close();

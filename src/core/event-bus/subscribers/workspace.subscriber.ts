@@ -21,13 +21,13 @@ export class WorkspaceSubscriber {
   constructor(
     private readonly projection: WorkspaceNeo4jProjection,
     private readonly idempotencyService: IdempotencyService,
-    private readonly eventLogger: EventLoggerService,
+    private readonly eventLogger: EventLoggerService
   ) {}
 
   @MessagePattern(NatsSubjects.Workspace.ALL)
   async handleWorkspaceEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     const subject = context.getSubject();
     this.logger.debug(`Received event on subject: ${subject}`);

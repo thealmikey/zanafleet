@@ -1,8 +1,12 @@
 // Mock @nestjs/swagger to avoid import errors in test environment
-jest.mock('@nestjs/swagger', () => ({
-  ApiProperty: () => () => {},
-  ApiPropertyOptional: () => () => {},
-}), { virtual: true });
+jest.mock(
+  '@nestjs/swagger',
+  () => ({
+    ApiProperty: () => () => {},
+    ApiPropertyOptional: () => () => {},
+  }),
+  { virtual: true }
+);
 
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -66,9 +70,7 @@ describe('SignUpController', () => {
     it('should throw BadRequestException on validation failure', async () => {
       const body = { actorType: 'INVALID' };
 
-      await expect(controller.initiate(body as any)).rejects.toThrow(
-        BadRequestException,
-      );
+      await expect(controller.initiate(body as any)).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -138,12 +140,10 @@ describe('SignUpController', () => {
     it('should throw NotFoundException if session not found', async () => {
       const sessionId = uuidv4();
       mockQueryBus.execute.mockRejectedValue(
-        new NotFoundException(`SignUp session ${sessionId} not found`),
+        new NotFoundException(`SignUp session ${sessionId} not found`)
       );
 
-      await expect(controller.findOne(sessionId)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(controller.findOne(sessionId)).rejects.toThrow(NotFoundException);
     });
   });
 });

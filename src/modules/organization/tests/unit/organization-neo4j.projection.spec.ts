@@ -1,10 +1,7 @@
 import { Logger } from '@nestjs/common';
 
 import { Neo4jService } from '../../../../core/neo4j';
-import {
-  OrganizationType,
-  OrganizationStatus,
-} from '../../dto/organization.enums';
+import { OrganizationType, OrganizationStatus } from '../../dto/organization.enums';
 import { OrganizationCreatedEventV1 } from '../../events/organization-created.event';
 import {
   OrganizationNeo4jProjection,
@@ -63,10 +60,7 @@ describe('OrganizationNeo4jProjection', () => {
     expect(getSession).toHaveBeenCalledTimes(1);
     expect(mockSession.run).toHaveBeenCalledTimes(1);
 
-    const [query, params] = mockSession.run.mock.calls[0] as [
-      string,
-      Record<string, unknown>,
-    ];
+    const [query, params] = mockSession.run.mock.calls[0] as [string, Record<string, unknown>];
 
     expect(query).toContain('MERGE (org:Organization {id: $organizationId})');
     expect(query).toContain('org.linkedWallets = $linkedWallets');
@@ -96,7 +90,7 @@ describe('OrganizationNeo4jProjection', () => {
     expect(mockSession.run).toHaveBeenCalledTimes(1);
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       `Failed to project organization to Neo4j: ${error.message}`,
-      error.stack,
+      error.stack
     );
     expect(mockSession.close).toHaveBeenCalledTimes(1);
   });
@@ -133,19 +127,19 @@ describe('OrganizationNeo4jInitializer', () => {
 
     expect(mockSession.run).toHaveBeenNthCalledWith(
       1,
-      expect.stringContaining('CREATE CONSTRAINT organization_id_unique IF NOT EXISTS'),
+      expect.stringContaining('CREATE CONSTRAINT organization_id_unique IF NOT EXISTS')
     );
     expect(mockSession.run).toHaveBeenNthCalledWith(
       2,
-      expect.stringContaining('CREATE INDEX organization_type_index IF NOT EXISTS'),
+      expect.stringContaining('CREATE INDEX organization_type_index IF NOT EXISTS')
     );
     expect(mockSession.run).toHaveBeenNthCalledWith(
       3,
-      expect.stringContaining('CREATE INDEX organization_status_index IF NOT EXISTS'),
+      expect.stringContaining('CREATE INDEX organization_status_index IF NOT EXISTS')
     );
     expect(mockSession.run).toHaveBeenNthCalledWith(
       4,
-      expect.stringContaining('CREATE INDEX organization_createdAt_index IF NOT EXISTS'),
+      expect.stringContaining('CREATE INDEX organization_createdAt_index IF NOT EXISTS')
     );
 
     expect(loggerLogSpy).toHaveBeenCalledWith('UNIQUE constraint on Organization.id created');
@@ -165,7 +159,7 @@ describe('OrganizationNeo4jInitializer', () => {
     expect(mockSession.run).toHaveBeenCalledTimes(1);
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       `Failed to initialize Neo4j constraints/indexes: ${error.message}`,
-      error.stack,
+      error.stack
     );
     expect(mockSession.close).toHaveBeenCalledTimes(1);
   });

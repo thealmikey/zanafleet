@@ -5,12 +5,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import {
-  CommandHandler,
-  ICommandHandler,
-  EventBus,
-  CommandBus,
-} from '@nestjs/cqrs';
+import { CommandHandler, ICommandHandler, EventBus, CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -35,9 +30,7 @@ import { SignUpFinalizedEventV1 } from '../events/signup-finalized.event';
  */
 @CommandHandler(FinalizeSignUpCommand)
 @Injectable()
-export class FinalizeSignUpCommandHandler
-  implements ICommandHandler<FinalizeSignUpCommand>
-{
+export class FinalizeSignUpCommandHandler implements ICommandHandler<FinalizeSignUpCommand> {
   private readonly logger = new Logger(FinalizeSignUpCommandHandler.name);
 
   constructor(
@@ -45,7 +38,7 @@ export class FinalizeSignUpCommandHandler
     private readonly signupSessionRepository: Repository<SignUpSessionEntity>,
     private readonly eventBus: EventBus,
     private readonly commandBus: CommandBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -54,9 +47,7 @@ export class FinalizeSignUpCommandHandler
    * @param command FinalizeSignUpCommand
    * @returns Object containing the newly created actorId and its workspaceId
    */
-  async execute(
-    command: FinalizeSignUpCommand,
-  ): Promise<{ actorId: string; workspaceId: string }> {
+  async execute(command: FinalizeSignUpCommand): Promise<{ actorId: string; workspaceId: string }> {
     const { sessionId } = command;
 
     this.logger.log(`Executing FinalizeSignUpCommand for session: ${sessionId}`);
@@ -76,15 +67,13 @@ export class FinalizeSignUpCommandHandler
     }
 
     if (session.status === SignUpSessionStatus.COMPLETED) {
-      throw new BadRequestException(
-        `SignUp session ${sessionId} is already completed`,
-      );
+      throw new BadRequestException(`SignUp session ${sessionId} is already completed`);
     }
 
     // Step 3: Validate mandatory fields
     if (!session.workspaceId) {
       throw new BadRequestException(
-        `SignUp session ${sessionId} is missing mandatory field: workspaceId. Please complete required steps before finalizing.`,
+        `SignUp session ${sessionId} is missing mandatory field: workspaceId. Please complete required steps before finalizing.`
       );
     }
 
@@ -99,17 +88,13 @@ export class FinalizeSignUpCommandHandler
 
     let actorId: string;
     try {
-      actorId = await this.commandBus.execute<CreateActorCommand, string>(
-        createActorCommand,
-      );
-      this.logger.log(
-        `Actor created successfully: ${actorId} for session: ${sessionId}`,
-      );
+      actorId = await this.commandBus.execute<CreateActorCommand, string>(createActorCommand);
+      this.logger.log(`Actor created successfully: ${actorId} for session: ${sessionId}`);
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
         `Failed to create actor during sign-up finalization: ${err.message}`,
-        err.stack,
+        err.stack
       );
       throw err;
     }
@@ -130,25 +115,16 @@ export class FinalizeSignUpCommandHandler
     });
 
     this.eventBus.publish(event);
-    this.logger.log(
-      `SignUpFinalizedEvent-V1 published for session: ${sessionId}`,
-    );
+    this.logger.log(`SignUpFinalizedEvent-V1 published for session: ${sessionId}`);
 
     // Step 7: Publish to external NATS EventBus
     if (this.eventBusService) {
       try {
-        await this.eventBusService.publish(
-          NatsSubjects.SignUp.FINALIZED_V1,
-          event,
-        );
+        await this.eventBusService.publish(NatsSubjects.SignUp.FINALIZED_V1, event);
       } catch (publishError: unknown) {
         const errorMessage =
-          publishError instanceof Error
-            ? publishError.message
-            : String(publishError);
-        this.logger.warn(
-          `NATS publish failed for SignUpFinalizedEvent-V1: ${errorMessage}`,
-        );
+          publishError instanceof Error ? publishError.message : String(publishError);
+        this.logger.warn(`NATS publish failed for SignUpFinalizedEvent-V1: ${errorMessage}`);
       }
     }
 

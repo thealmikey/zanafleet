@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 
@@ -63,7 +59,7 @@ describe('AddActorToWorkspaceCommandHandler', () => {
       membershipRepository,
       workspaceRepository,
       actorRepository,
-      eventBus,
+      eventBus
     );
   });
 
@@ -101,7 +97,7 @@ describe('AddActorToWorkspaceCommandHandler', () => {
 
       await expect(handler.execute(validCommand)).rejects.toThrow(NotFoundException);
       await expect(handler.execute(validCommand)).rejects.toThrow(
-        `Workspace with ID '${validCommand.workspaceId}' does not exist`,
+        `Workspace with ID '${validCommand.workspaceId}' does not exist`
       );
 
       expect(actorRepository.findOne).not.toHaveBeenCalled();
@@ -118,7 +114,7 @@ describe('AddActorToWorkspaceCommandHandler', () => {
 
       await expect(handler.execute(validCommand)).rejects.toThrow(BadRequestException);
       await expect(handler.execute(validCommand)).rejects.toThrow(
-        `Cannot add actor to suspended workspace '${validCommand.workspaceId}'`,
+        `Cannot add actor to suspended workspace '${validCommand.workspaceId}'`
       );
 
       expect(actorRepository.findOne).not.toHaveBeenCalled();
@@ -132,7 +128,7 @@ describe('AddActorToWorkspaceCommandHandler', () => {
 
       await expect(handler.execute(validCommand)).rejects.toThrow(NotFoundException);
       await expect(handler.execute(validCommand)).rejects.toThrow(
-        `Actor with ID '${validCommand.actorId}' does not exist`,
+        `Actor with ID '${validCommand.actorId}' does not exist`
       );
 
       expect(membershipRepository.findOne).not.toHaveBeenCalled();
@@ -154,7 +150,7 @@ describe('AddActorToWorkspaceCommandHandler', () => {
 
       await expect(handler.execute(validCommand)).rejects.toThrow(ConflictException);
       await expect(handler.execute(validCommand)).rejects.toThrow(
-        `Actor '${validCommand.actorId}' is already a member of workspace '${validCommand.workspaceId}'`,
+        `Actor '${validCommand.actorId}' is already a member of workspace '${validCommand.workspaceId}'`
       );
 
       expect(membershipRepository.save).not.toHaveBeenCalled();
@@ -171,7 +167,7 @@ describe('AddActorToWorkspaceCommandHandler', () => {
 
       expect(eventBus.publish).toHaveBeenCalledTimes(1);
       const emittedEvent = eventBus.publish.mock.calls[0][0] as ActorAddedToWorkspaceEventV1;
-      
+
       expect(emittedEvent).toBeInstanceOf(ActorAddedToWorkspaceEventV1);
       expect(emittedEvent.actorId).toBe(validCommand.actorId);
       expect(emittedEvent.workspaceId).toBe(validCommand.workspaceId);
@@ -193,7 +189,7 @@ describe('AddActorToWorkspaceCommandHandler', () => {
 
       expect(membershipRepository.save).toHaveBeenCalledTimes(1);
       const savedMembership = membershipRepository.save.mock.calls[0][0] as MembershipEntity;
-      
+
       expect(savedMembership.actorId).toBe(validCommand.actorId);
       expect(savedMembership.workspaceId).toBe(validCommand.workspaceId);
       expect(savedMembership.role).toBe(validCommand.role);

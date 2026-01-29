@@ -18,10 +18,7 @@ export const CreateWalletCommandSchema = z.object({
       message: `Wallet type must be one of: ${Object.values(WalletType).join(', ')}`,
     }),
   }),
-  currency: z
-    .string()
-    .length(3, 'Currency must be exactly 3 characters')
-    .toUpperCase(),
+  currency: z.string().length(3, 'Currency must be exactly 3 characters').toUpperCase(),
 });
 
 export type CreateWalletCommandInput = z.infer<typeof CreateWalletCommandSchema>;

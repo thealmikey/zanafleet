@@ -42,9 +42,7 @@ describe('Neo4jService', () => {
   let service: Neo4jService;
   let module: TestingModule;
 
-  const createTestingModule = async (
-    options: Neo4jModuleOptions = {},
-  ): Promise<void> => {
+  const createTestingModule = async (options: Neo4jModuleOptions = {}): Promise<void> => {
     module = await Test.createTestingModule({
       providers: [
         {
@@ -94,7 +92,7 @@ describe('Neo4jService', () => {
       expect(auth.basic).toHaveBeenCalledWith('testuser', 'testpass');
       expect(neo4j.driver).toHaveBeenCalledWith(
         'bolt://test:7687',
-        expect.objectContaining({ scheme: 'basic' }),
+        expect.objectContaining({ scheme: 'basic' })
       );
     });
 

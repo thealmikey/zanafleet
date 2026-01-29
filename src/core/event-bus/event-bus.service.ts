@@ -30,7 +30,7 @@ export class EventBusService implements OnModuleInit {
   constructor(
     @Inject(NATS_CLIENT) private readonly natsClient: ClientProxy,
     private readonly eventLogger: EventLoggerService,
-    private readonly retryService: RetryService,
+    private readonly retryService: RetryService
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -53,7 +53,7 @@ export class EventBusService implements OnModuleInit {
   async publish(
     subject: string,
     event: BaseEvent,
-    options: Omit<PublishOptions, 'subject'> = {},
+    options: Omit<PublishOptions, 'subject'> = {}
   ): Promise<void> {
     if (!this.isConnected) {
       try {
@@ -80,8 +80,8 @@ export class EventBusService implements OnModuleInit {
           timeout(timeoutMs),
           catchError((error) => {
             throw error;
-          }),
-        ),
+          })
+        )
       );
     };
 
@@ -89,9 +89,7 @@ export class EventBusService implements OnModuleInit {
       const result = await this.retryService.executeWithRetry(publishOperation, {
         onRetry: (attempt, error, delayMs) => {
           this.eventLogger.logRetry(event, attempt, delayMs);
-          this.logger.warn(
-            `Retry ${attempt} for event ${event.eventId}: ${error.message}`,
-          );
+          this.logger.warn(`Retry ${attempt} for event ${event.eventId}: ${error.message}`);
         },
       });
 
@@ -126,7 +124,17 @@ export class EventBusService implements OnModuleInit {
    * @returns The serialized event
    */
   serializeEvent(event: BaseEvent): SerializedEvent {
-    const { eventId, eventType, eventVersion, occurredAt, aggregateId, aggregateType, correlationId, causationId, ...payload } = event;
+    const {
+      eventId,
+      eventType,
+      eventVersion,
+      occurredAt,
+      aggregateId,
+      aggregateType,
+      correlationId,
+      causationId,
+      ...payload
+    } = event;
 
     return {
       eventId,

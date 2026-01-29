@@ -39,7 +39,7 @@ describe('DeleteOrganizationCommand', () => {
     expect(() =>
       DeleteOrganizationCommand.validate({
         organizationId: 'not-a-uuid',
-      }),
+      })
     ).toThrow(ZodError);
   });
 
@@ -48,7 +48,7 @@ describe('DeleteOrganizationCommand', () => {
       DeleteOrganizationCommand.validate({
         organizationId,
         deletedByActorId: 'invalid-uuid',
-      }),
+      })
     ).toThrow(ZodError);
   });
 

@@ -66,7 +66,7 @@ describe('Formation Handlers', () => {
         formationServiceMock as unknown as FormationService,
         formationStatusRepositoryMock as unknown as Repository<FormationStatusEntity>,
         eventBusMock as unknown as EventBus,
-        eventBusServiceMock as any,
+        eventBusServiceMock as any
       );
     });
 
@@ -147,7 +147,8 @@ describe('Formation Handlers', () => {
       const result = await handler.execute(command);
 
       expect(formationStatusRepositoryMock.save).toHaveBeenCalledTimes(1);
-      const savedStatus = formationStatusRepositoryMock.save.mock.calls[0][0] as FormationStatusEntity;
+      const savedStatus = formationStatusRepositoryMock.save.mock
+        .calls[0][0] as FormationStatusEntity;
       expect(savedStatus.entityType).toBe(command.entityType);
       expect(savedStatus.entityId).toBe(command.entityId);
       expect(savedStatus.state).toBe(FormationState.PENDING);
@@ -157,7 +158,7 @@ describe('Formation Handlers', () => {
       expect(event.previousState).toBe(FormationState.DRAFT);
       expect(event.newState).toBe(FormationState.PENDING);
       expect(eventBusServiceMock.publishEvent).toHaveBeenCalledWith(event);
-      expect((requirement.toDomain as jest.Mock)).toHaveBeenCalled();
+      expect(requirement.toDomain as jest.Mock).toHaveBeenCalled();
 
       expect(result.unsatisfiedRequirements).toEqual([{ requirementId: 'req-1' }]);
     });
@@ -212,7 +213,7 @@ describe('Formation Handlers', () => {
         requirementRepositoryMock as unknown as Repository<RequirementEntity>,
         eventBusMock as unknown as EventBus,
         commandBusMock as unknown as CommandBus,
-        eventBusServiceMock as any,
+        eventBusServiceMock as any
       );
 
       requirementRepositoryMock.save.mockImplementation(async (entity) => entity);
@@ -294,7 +295,7 @@ describe('Formation Handlers', () => {
         requirementRepositoryMock as unknown as Repository<RequirementEntity>,
         eventBusMock as unknown as EventBus,
         commandBusMock as unknown as CommandBus,
-        eventBusServiceMock as any,
+        eventBusServiceMock as any
       );
 
       requirementRepositoryMock.save.mockImplementation(async (entity) => entity);
@@ -312,8 +313,8 @@ describe('Formation Handlers', () => {
         handler.execute(
           new SatisfyRequirementCommand({
             requirementId,
-          }),
-        ),
+          })
+        )
       ).rejects.toThrow(NotFoundException);
 
       expect(eventBusMock.publish).not.toHaveBeenCalled();
@@ -339,7 +340,7 @@ describe('Formation Handlers', () => {
       const result = await handler.execute(
         new SatisfyRequirementCommand({
           requirementId,
-        }),
+        })
       );
 
       expect(requirement.satisfied).toBe(true);

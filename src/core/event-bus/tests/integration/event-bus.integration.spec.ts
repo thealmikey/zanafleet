@@ -2,14 +2,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { of } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 
-import { OrganizationType, OrganizationStatus } from '../../../../modules/organization/dto/organization.enums';
+import {
+  OrganizationType,
+  OrganizationStatus,
+} from '../../../../modules/organization/dto/organization.enums';
 import { OrganizationCreatedEventV1 } from '../../../../modules/organization/events/organization-created.event';
 import { NatsSubjects, NATS_CLIENT } from '../../event-bus.constants';
 import { EventBusService } from '../../event-bus.service';
 import { EventLoggerService } from '../../services/event-logger.service';
 import { IdempotencyService } from '../../services/idempotency.service';
 import { RetryService } from '../../services/retry.service';
-
 
 describe('EventBus Integration Tests', () => {
   let app: TestingModule;
@@ -62,7 +64,7 @@ describe('EventBus Integration Tests', () => {
         expect.objectContaining({
           eventId: event.eventId,
           eventType: 'OrganizationCreatedEvent-V1',
-        }),
+        })
       );
     });
 

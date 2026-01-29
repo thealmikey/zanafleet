@@ -1,6 +1,6 @@
 /**
  * Organization Module Exports
- * 
+ *
  * Public API for the Organization module
  * Other modules should import from this barrel file
  */

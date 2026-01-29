@@ -28,9 +28,7 @@ import { ActorOnboardedEventV1 } from '../events/actor-onboarded.event';
  */
 @EventsHandler(ActorOnboardedEventV1)
 @Injectable()
-export class ActorNeo4jProjection
-  implements IEventHandler<ActorOnboardedEventV1>
-{
+export class ActorNeo4jProjection implements IEventHandler<ActorOnboardedEventV1> {
   private readonly logger = new Logger(ActorNeo4jProjection.name);
 
   constructor(private readonly neo4j: Neo4jService) {}
@@ -40,9 +38,7 @@ export class ActorNeo4jProjection
    * Creates or updates Actor node in Neo4j and establishes MEMBER_OF relationship
    */
   async handle(event: ActorOnboardedEventV1): Promise<void> {
-    this.logger.log(
-      `Handling ActorOnboardedEventV1 for actor: ${event.actorId}`,
-    );
+    this.logger.log(`Handling ActorOnboardedEventV1 for actor: ${event.actorId}`);
 
     const session = this.neo4j.getSession();
 
@@ -67,16 +63,16 @@ export class ActorNeo4jProjection
           workspaceId: event.workspaceId,
           createdAt: event.createdAt.toISOString(),
           updatedAt: new Date().toISOString(),
-        },
+        }
       );
 
       this.logger.debug(
-        `Actor node created/updated in Neo4j with MEMBER_OF relationship: ${event.actorId}`,
+        `Actor node created/updated in Neo4j with MEMBER_OF relationship: ${event.actorId}`
       );
     } catch (error) {
       this.logger.error(
         `Failed to project actor to Neo4j: ${(error as Error).message}`,
-        (error as Error).stack,
+        (error as Error).stack
       );
       throw error;
     } finally {
@@ -107,27 +103,27 @@ export class ActorNeo4jInitializer {
       // Create UNIQUE constraint on Actor.id
       await session.run(
         `CREATE CONSTRAINT actor_id_unique IF NOT EXISTS 
-         FOR (actor:Actor) REQUIRE actor.id IS UNIQUE`,
+         FOR (actor:Actor) REQUIRE actor.id IS UNIQUE`
       );
       this.logger.log('UNIQUE constraint on Actor.id created');
 
       // Create index on type for filtering
       await session.run(
         `CREATE INDEX actor_type_index IF NOT EXISTS 
-         FOR (actor:Actor) ON (actor.type)`,
+         FOR (actor:Actor) ON (actor.type)`
       );
       this.logger.log('Index on Actor.type created');
 
       // Create index on workspaceId for filtering
       await session.run(
         `CREATE INDEX actor_workspaceId_index IF NOT EXISTS 
-         FOR (actor:Actor) ON (actor.workspaceId)`,
+         FOR (actor:Actor) ON (actor.workspaceId)`
       );
       this.logger.log('Index on Actor.workspaceId created');
     } catch (error) {
       this.logger.error(
         `Failed to initialize Neo4j constraints/indexes: ${(error as Error).message}`,
-        (error as Error).stack,
+        (error as Error).stack
       );
       throw error;
     } finally {

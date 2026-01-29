@@ -1,9 +1,6 @@
 import { ZodError } from 'zod';
 
-import {
-  CreateActorCommand,
-  CreateActorCommandSchema,
-} from '../../commands/create-actor.command';
+import { CreateActorCommand, CreateActorCommandSchema } from '../../commands/create-actor.command';
 import { ActorType } from '../../dto/actor.enums';
 
 describe('CreateActorCommand', () => {
@@ -117,9 +114,7 @@ describe('CreateActorCommand', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          const workspaceError = result.error.errors.find(
-            (e) => e.path[0] === 'workspaceId',
-          );
+          const workspaceError = result.error.errors.find((e) => e.path[0] === 'workspaceId');
           expect(workspaceError?.message).toBe('Workspace ID must be a valid UUID');
         }
       });
@@ -166,9 +161,7 @@ describe('CreateActorCommand', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          const roleError = result.error.errors.find(
-            (e) => e.path[0] === 'roles',
-          );
+          const roleError = result.error.errors.find((e) => e.path[0] === 'roles');
           expect(roleError?.message).toBe('Each role ID must be a valid UUID');
         }
       });
@@ -256,9 +249,7 @@ describe('CreateActorCommand', () => {
 
         expect(result.success).toBe(false);
         if (!result.success) {
-          const walletError = result.error.errors.find(
-            (e) => e.path[0] === 'linkedWallets',
-          );
+          const walletError = result.error.errors.find((e) => e.path[0] === 'linkedWallets');
           expect(walletError?.message).toBe('Each wallet ID must be a valid UUID');
         }
       });

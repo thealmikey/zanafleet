@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
-import { CreateTransactionCommand, CreateTransactionCommandSchema } from '../../commands/create-transaction.command';
+import {
+  CreateTransactionCommand,
+  CreateTransactionCommandSchema,
+} from '../../commands/create-transaction.command';
 import { TransactionType } from '../../dto/transaction.enums';
 
 /**
@@ -13,7 +16,7 @@ describe('CreateTransactionCommand Unit Tests', () => {
         const input = {
           sourceWalletId: '550e8400-e29b-41d4-a716-446655440000',
           destinationWalletId: '550e8400-e29b-41d4-a716-446655440001',
-          amount: 100.50,
+          amount: 100.5,
           type: TransactionType.Settlement,
           linkedEventId: '550e8400-e29b-41d4-a716-446655440002',
         };
@@ -24,7 +27,7 @@ describe('CreateTransactionCommand Unit Tests', () => {
         if (result.success) {
           expect(result.data.sourceWalletId).toBe('550e8400-e29b-41d4-a716-446655440000');
           expect(result.data.destinationWalletId).toBe('550e8400-e29b-41d4-a716-446655440001');
-          expect(result.data.amount).toBe(100.50);
+          expect(result.data.amount).toBe(100.5);
           expect(result.data.type).toBe(TransactionType.Settlement);
           expect(result.data.linkedEventId).toBe('550e8400-e29b-41d4-a716-446655440002');
         }

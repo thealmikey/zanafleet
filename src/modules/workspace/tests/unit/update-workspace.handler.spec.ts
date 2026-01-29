@@ -52,7 +52,7 @@ describe('UpdateWorkspaceCommandHandler', () => {
 
     handler = module.get<UpdateWorkspaceCommandHandler>(UpdateWorkspaceCommandHandler);
     workspaceRepository = module.get<Repository<WorkspaceEntity>>(
-      getRepositoryToken(WorkspaceEntity),
+      getRepositoryToken(WorkspaceEntity)
     );
     eventBus = module.get<EventBus>(EventBus);
     eventBusService = module.get<EventBusService>(EventBusService);
@@ -85,9 +85,7 @@ describe('UpdateWorkspaceCommandHandler', () => {
       where: { id: workspaceId },
     });
     expect(workspaceRepository.save).toHaveBeenCalled();
-    expect(eventBus.publish).toHaveBeenCalledWith(
-      expect.any(WorkspaceUpdatedEventV1),
-    );
+    expect(eventBus.publish).toHaveBeenCalledWith(expect.any(WorkspaceUpdatedEventV1));
     expect(eventBusService.publish).toHaveBeenCalled();
   });
 

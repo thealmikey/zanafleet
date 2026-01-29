@@ -22,7 +22,7 @@ export class SatisfyRequirementCommandHandler
     private readonly requirementRepository: Repository<RequirementEntity>,
     private readonly eventBus: EventBus,
     private readonly commandBus: CommandBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: SatisfyRequirementCommand): Promise<string> {
@@ -37,9 +37,7 @@ export class SatisfyRequirementCommandHandler
 
       if (!requirement) {
         this.logger.warn(`Requirement not found: ${requirementId}`);
-        throw new NotFoundException(
-          `Requirement with ID '${requirementId}' does not exist`,
-        );
+        throw new NotFoundException(`Requirement with ID '${requirementId}' does not exist`);
       }
 
       const now = new Date();
@@ -63,12 +61,9 @@ export class SatisfyRequirementCommandHandler
         try {
           await this.eventBusService.publishEvent(event);
         } catch (publishError) {
-          const err =
-            publishError instanceof Error
-              ? publishError.message
-              : String(publishError);
+          const err = publishError instanceof Error ? publishError.message : String(publishError);
           this.logger.warn(
-            `Failed to publish RequirementSatisfiedEventV1 via EventBusService: ${err}`,
+            `Failed to publish RequirementSatisfiedEventV1 via EventBusService: ${err}`
           );
         }
       }
@@ -77,7 +72,7 @@ export class SatisfyRequirementCommandHandler
         new EvaluateFormationCommand({
           entityType: requirement.entityType,
           entityId: requirement.entityId,
-        }),
+        })
       );
 
       return requirement.requirementId;
@@ -85,7 +80,7 @@ export class SatisfyRequirementCommandHandler
       const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
         `Failed to satisfy requirement ${requirementId}: ${err.message}`,
-        err.stack,
+        err.stack
       );
       throw error;
     }

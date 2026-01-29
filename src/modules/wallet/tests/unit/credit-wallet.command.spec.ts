@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
-import { CreditWalletCommand, CreditWalletCommandSchema } from '../../commands/credit-wallet.command';
+import {
+  CreditWalletCommand,
+  CreditWalletCommandSchema,
+} from '../../commands/credit-wallet.command';
 
 /**
  * Unit Tests: CreditWalletCommand Zod Validation
@@ -11,7 +14,7 @@ describe('CreditWalletCommand Unit Tests', () => {
       it('should validate a complete valid input with reference', () => {
         const input = {
           walletId: '550e8400-e29b-41d4-a716-446655440000',
-          amount: 100.50,
+          amount: 100.5,
           reference: 'TXN-12345',
         };
 
@@ -20,7 +23,7 @@ describe('CreditWalletCommand Unit Tests', () => {
         expect(result.success).toBe(true);
         if (result.success) {
           expect(result.data.walletId).toBe('550e8400-e29b-41d4-a716-446655440000');
-          expect(result.data.amount).toBe(100.50);
+          expect(result.data.amount).toBe(100.5);
           expect(result.data.reference).toBe('TXN-12345');
         }
       });

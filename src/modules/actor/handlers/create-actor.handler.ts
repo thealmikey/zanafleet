@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+  Optional,
+} from '@nestjs/common';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -27,9 +33,7 @@ import { ActorOnboardedEventV1 } from '../events/actor-onboarded.event';
  */
 @CommandHandler(CreateActorCommand)
 @Injectable()
-export class CreateActorCommandHandler
-  implements ICommandHandler<CreateActorCommand>
-{
+export class CreateActorCommandHandler implements ICommandHandler<CreateActorCommand> {
   private readonly logger = new Logger(CreateActorCommandHandler.name);
 
   constructor(
@@ -38,7 +42,7 @@ export class CreateActorCommandHandler
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -63,22 +67,20 @@ export class CreateActorCommandHandler
 
     if (!workspace) {
       this.logger.warn(`Workspace not found: ${command.workspaceId}`);
-      throw new NotFoundException(
-        `Workspace with ID ${command.workspaceId} does not exist`,
-      );
+      throw new NotFoundException(`Workspace with ID ${command.workspaceId} does not exist`);
     }
 
     // Step 2: Validate all roles exist in workspace's roleTemplates
-    const invalidRoles = command.roles.filter(
-      (role) => !workspace.roleTemplates.includes(role),
-    );
+    const invalidRoles = command.roles.filter((role) => !workspace.roleTemplates.includes(role));
 
     if (invalidRoles.length > 0) {
       this.logger.warn(
-        `Invalid roles for workspace ${command.workspaceId}: ${invalidRoles.join(', ')}`,
+        `Invalid roles for workspace ${command.workspaceId}: ${invalidRoles.join(', ')}`
       );
       throw new BadRequestException(
-        `The following roles are not valid for workspace ${command.workspaceId}: ${invalidRoles.join(', ')}`,
+        `The following roles are not valid for workspace ${
+          command.workspaceId
+        }: ${invalidRoles.join(', ')}`
       );
     }
 
@@ -113,17 +115,16 @@ export class CreateActorCommandHandler
       this.logger.log(`ActorOnboardedEventV1 emitted to event bus: ${eventId}`);
 
       if (this.eventBusService) {
-        await this.eventBusService.publish(
-          NatsSubjects.Actor.ONBOARDED_V1,
-          event,
-        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+        await this.eventBusService
+          .publish(NatsSubjects.Actor.ONBOARDED_V1, event)
+          .catch((err) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
 
       return actorId;
     } catch (error) {
       this.logger.error(
         `Failed to create actor: ${(error as Error).message}`,
-        (error as Error).stack,
+        (error as Error).stack
       );
       throw error;
     }

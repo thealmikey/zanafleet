@@ -14,8 +14,7 @@ export interface CapabilityCreatedEventV1JSON {
 
 export class CapabilityCreatedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'CapabilityCreatedEvent-V1' =
-    'CapabilityCreatedEvent-V1';
+  readonly eventType: 'CapabilityCreatedEvent-V1' = 'CapabilityCreatedEvent-V1';
   readonly eventVersion: '1.0.0' = '1.0.0';
   readonly occurredAt: Date;
   readonly aggregateId: string;
@@ -61,9 +60,7 @@ export class CapabilityCreatedEventV1 {
     };
   }
 
-  static fromJSON(
-    data: CapabilityCreatedEventV1JSON,
-  ): CapabilityCreatedEventV1 {
+  static fromJSON(data: CapabilityCreatedEventV1JSON): CapabilityCreatedEventV1 {
     return new CapabilityCreatedEventV1({
       eventId: data.eventId,
       capabilityId: data.capabilityId,

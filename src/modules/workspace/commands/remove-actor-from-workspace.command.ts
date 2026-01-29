@@ -5,16 +5,16 @@ import { z } from 'zod';
  * Ensures type safety and input validation at command level
  */
 export const RemoveActorFromWorkspaceCommandSchema = z.object({
-  actorId: z
-    .string()
-    .uuid('Actor ID must be a valid UUID'),
-  workspaceId: z
-    .string()
-    .uuid('Workspace ID must be a valid UUID'),
+  actorId: z.string().uuid('Actor ID must be a valid UUID'),
+  workspaceId: z.string().uuid('Workspace ID must be a valid UUID'),
 });
 
-export type RemoveActorFromWorkspaceCommandInput = z.infer<typeof RemoveActorFromWorkspaceCommandSchema>;
-export type RemoveActorFromWorkspaceCommandRawInput = z.input<typeof RemoveActorFromWorkspaceCommandSchema>;
+export type RemoveActorFromWorkspaceCommandInput = z.infer<
+  typeof RemoveActorFromWorkspaceCommandSchema
+>;
+export type RemoveActorFromWorkspaceCommandRawInput = z.input<
+  typeof RemoveActorFromWorkspaceCommandSchema
+>;
 
 /**
  * RemoveActorFromWorkspaceCommand

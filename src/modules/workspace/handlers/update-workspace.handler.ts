@@ -14,22 +14,20 @@ import {
 
 /**
  * UpdateWorkspaceCommandHandler
- * 
+ *
  * Handles UpdateWorkspaceCommand by updating the WorkspaceEntity in PostgreSQL
  * and emitting WorkspaceUpdatedEventV1 to both internal and external event buses.
  */
 @CommandHandler(UpdateWorkspaceCommand)
 @Injectable()
-export class UpdateWorkspaceCommandHandler
-  implements ICommandHandler<UpdateWorkspaceCommand>
-{
+export class UpdateWorkspaceCommandHandler implements ICommandHandler<UpdateWorkspaceCommand> {
   private readonly logger = new Logger(UpdateWorkspaceCommandHandler.name);
 
   constructor(
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -93,16 +91,12 @@ export class UpdateWorkspaceCommandHandler
     // Step 6: Publish to NATS external event bus (for other modules)
     if (this.eventBusService) {
       try {
-        await this.eventBusService.publish(
-          NatsSubjects.Workspace.UPDATED_V1,
-          event,
+        await this.eventBusService.publish(NatsSubjects.Workspace.UPDATED_V1, event);
+        this.logger.log(
+          `WorkspaceUpdatedEvent-V1 published to NATS: ${NatsSubjects.Workspace.UPDATED_V1}`
         );
-        this.logger.log(`WorkspaceUpdatedEvent-V1 published to NATS: ${NatsSubjects.Workspace.UPDATED_V1}`);
       } catch (publishError: unknown) {
-        const err =
-          publishError instanceof Error
-            ? publishError
-            : new Error(String(publishError));
+        const err = publishError instanceof Error ? publishError : new Error(String(publishError));
         this.logger.warn(`NATS publish failed for workspace ${workspaceId}: ${err.message}`);
       }
     }

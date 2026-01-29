@@ -19,15 +19,15 @@ export interface OrganizationCreatedEventV1JSON {
 
 /**
  * OrganizationCreatedEvent-V1
- * 
+ *
  * Append-only event emitted when an organization is successfully created.
- * 
+ *
  * Event Contract:
  * - Immutable: Once created, event data cannot be modified
  * - Append-only: Only new events can be added to the event log
  * - Deterministic: Same input always produces same event
  * - Versioned: -V1 suffix indicates event schema version
- * 
+ *
  * This event triggers:
  * 1. Postgres persistence (Organization entity)
  * 2. Neo4j projection (Organization node in graph)
@@ -111,9 +111,7 @@ export class OrganizationCreatedEventV1 {
   /**
    * Deserializes event from persisted format
    */
-  static fromJSON(
-    data: OrganizationCreatedEventV1JSON,
-  ): OrganizationCreatedEventV1 {
+  static fromJSON(data: OrganizationCreatedEventV1JSON): OrganizationCreatedEventV1 {
     return new OrganizationCreatedEventV1({
       eventId: data.eventId,
       organizationId: data.organizationId,

@@ -16,14 +16,12 @@ import { SignUpSessionResult } from './signup-result.interfaces';
  */
 @QueryHandler(GetSignUpSessionQuery)
 @Injectable()
-export class GetSignUpSessionQueryHandler
-  implements IQueryHandler<GetSignUpSessionQuery>
-{
+export class GetSignUpSessionQueryHandler implements IQueryHandler<GetSignUpSessionQuery> {
   private readonly logger = new Logger(GetSignUpSessionQueryHandler.name);
 
   constructor(
     @InjectRepository(SignUpSessionEntity)
-    private readonly signupSessionRepository: Repository<SignUpSessionEntity>,
+    private readonly signupSessionRepository: Repository<SignUpSessionEntity>
   ) {}
 
   async execute(query: GetSignUpSessionQuery): Promise<SignUpSessionResult> {

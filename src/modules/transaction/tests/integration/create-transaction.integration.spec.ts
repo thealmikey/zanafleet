@@ -1,7 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandBus, EventBus, CqrsModule } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
-import { TypeOrmModule , getRepositoryToken } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { WalletType, OwnerType } from '../../../wallet/dto/wallet.enums';
@@ -23,8 +23,7 @@ import { CreateTransactionCommandHandler } from '../../handlers/create-transacti
  * 4. Verify event emission
  * 5. Test error scenarios: insufficient funds, non-existent wallets
  */
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 describeIntegration('CreateTransactionCommand Integration Tests', () => {
   let module!: TestingModule;
@@ -53,9 +52,7 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
           }),
           TypeOrmModule.forFeature([TransactionEntity, WalletEntity]),
         ],
-        providers: [
-          CreateTransactionCommandHandler,
-        ],
+        providers: [CreateTransactionCommandHandler],
       }).compile();
 
       await module.init();
@@ -63,11 +60,9 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
       commandBus = module.get<CommandBus>(CommandBus);
       eventBus = module.get<EventBus>(EventBus);
       transactionRepository = module.get<Repository<TransactionEntity>>(
-        getRepositoryToken(TransactionEntity),
+        getRepositoryToken(TransactionEntity)
       );
-      walletRepository = module.get<Repository<WalletEntity>>(
-        getRepositoryToken(WalletEntity),
-      );
+      walletRepository = module.get<Repository<WalletEntity>>(getRepositoryToken(WalletEntity));
 
       eventBus.subscribe((event) => {
         if (event instanceof TransactionCreatedEventV1) {
@@ -79,7 +74,7 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
     } catch (error) {
       console.warn(
         'Failed to initialize Transaction integration test module (database may not be available):',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? error.message : String(error)
       );
       moduleInitializationFailed = true;
     }
@@ -88,7 +83,7 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
   beforeEach((): void => {
     if (moduleInitializationFailed) {
       throw new Error(
-        'Transaction integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d) and TEST_DB_* env vars are set.',
+        'Transaction integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d) and TEST_DB_* env vars are set.'
       );
     }
   });
@@ -107,10 +102,7 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
     }
   });
 
-  async function createWallet(
-    id: string,
-    balance: number,
-  ): Promise<WalletEntity> {
+  async function createWallet(id: string, balance: number): Promise<WalletEntity> {
     const wallet = WalletEntity.fromDomain({
       walletId: id,
       ownerId: '550e8400-e29b-41d4-a716-446655440999',
@@ -273,9 +265,7 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
         type: TransactionType.Settlement,
       });
 
-      await expect(commandBus.execute(command)).rejects.toThrow(
-        InsufficientFundsException,
-      );
+      await expect(commandBus.execute(command)).rejects.toThrow(InsufficientFundsException);
 
       const sourceWallet = await walletRepository.findOne({
         where: { id: sourceWalletId },
@@ -304,9 +294,7 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
         type: TransactionType.Penalty,
       });
 
-      await expect(commandBus.execute(command)).rejects.toThrow(
-        InsufficientFundsException,
-      );
+      await expect(commandBus.execute(command)).rejects.toThrow(InsufficientFundsException);
 
       expect(emittedEvents.length).toBe(0);
     });
@@ -328,7 +316,7 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
 
       await expect(commandBus.execute(command)).rejects.toThrow(NotFoundException);
       await expect(commandBus.execute(command)).rejects.toThrow(
-        `Source wallet with ID ${sourceWalletId} not found`,
+        `Source wallet with ID ${sourceWalletId} not found`
       );
 
       const destWallet = await walletRepository.findOne({
@@ -354,7 +342,7 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
 
       await expect(commandBus.execute(command)).rejects.toThrow(NotFoundException);
       await expect(commandBus.execute(command)).rejects.toThrow(
-        `Destination wallet with ID ${destWalletId} not found`,
+        `Destination wallet with ID ${destWalletId} not found`
       );
 
       const sourceWallet = await walletRepository.findOne({
@@ -439,7 +427,7 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
           destinationWalletId: walletB,
           amount: 200,
           type: TransactionType.Settlement,
-        }),
+        })
       );
 
       await commandBus.execute(
@@ -448,7 +436,7 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
           destinationWalletId: walletA,
           amount: 100,
           type: TransactionType.Reward,
-        }),
+        })
       );
 
       await commandBus.execute(
@@ -457,7 +445,7 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
           destinationWalletId: walletB,
           amount: 50,
           type: TransactionType.Fee,
-        }),
+        })
       );
 
       const walletAFinal = await walletRepository.findOne({
@@ -486,7 +474,7 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
           destinationWalletId: destWalletId,
           amount: 10,
           type: TransactionType.Settlement,
-        }),
+        })
       );
 
       const id2 = await commandBus.execute(
@@ -495,7 +483,7 @@ describeIntegration('CreateTransactionCommand Integration Tests', () => {
           destinationWalletId: destWalletId,
           amount: 10,
           type: TransactionType.Settlement,
-        }),
+        })
       );
 
       expect(id1).not.toBe(id2);

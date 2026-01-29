@@ -21,13 +21,13 @@ export class RoleSubscriber {
   constructor(
     private readonly projection: RoleNeo4jProjection,
     private readonly idempotencyService: IdempotencyService,
-    private readonly eventLogger: EventLoggerService,
+    private readonly eventLogger: EventLoggerService
   ) {}
 
   @MessagePattern(NatsSubjects.Role.ALL)
   async handleRoleEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     const subject = context.getSubject();
     this.logger.debug(`Received event on subject: ${subject}`);
@@ -44,16 +44,18 @@ export class RoleSubscriber {
       if (data.eventType === 'RoleCreatedEvent-V1') {
         const eventData = {
           eventId: data.eventId,
-          roleId: (data.payload ).roleId as string,
-          name: (data.payload ).name as string,
-          permissions: (data.payload ).permissions as string[],
-          scope: (data.payload ).scope as string,
+          roleId: data.payload.roleId as string,
+          name: data.payload.name as string,
+          permissions: data.payload.permissions as string[],
+          scope: data.payload.scope as string,
           createdAt: data.payload.createdAt as string,
           occurredAt: data.occurredAt,
           correlationId: data.correlationId,
           causationId: data.causationId,
         };
-        const event = RoleCreatedEventV1.fromJSON(eventData as Parameters<typeof RoleCreatedEventV1.fromJSON>[0]);
+        const event = RoleCreatedEventV1.fromJSON(
+          eventData as Parameters<typeof RoleCreatedEventV1.fromJSON>[0]
+        );
         await this.projection.handle(event);
         this.eventLogger.logProcessed(event, RoleNeo4jProjection.name);
       }

@@ -1,12 +1,6 @@
 import { ActorType, SignUpSessionStatus } from '../types';
 
-import {
-  initiateSignup,
-  updateStep,
-  getSession,
-  finalizeSignup,
-  ApiError,
-} from './signupApi';
+import { initiateSignup, updateStep, getSession, finalizeSignup, ApiError } from './signupApi';
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch;

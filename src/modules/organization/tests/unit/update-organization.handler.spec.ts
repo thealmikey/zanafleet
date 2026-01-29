@@ -37,11 +37,7 @@ describe('UpdateOrganizationCommandHandler', () => {
       publish: eventBusServicePublishMock,
     } as unknown as EventBusService;
 
-    handler = new UpdateOrganizationCommandHandler(
-      repository,
-      eventBus,
-      eventBusService,
-    );
+    handler = new UpdateOrganizationCommandHandler(repository, eventBus, eventBusService);
   });
 
   it('updates organization and emits events', async () => {
@@ -50,9 +46,7 @@ describe('UpdateOrganizationCommandHandler', () => {
     existingOrganization.name = 'Old Name';
     existingOrganization.type = OrganizationType.SACCO;
     existingOrganization.status = OrganizationStatus.ACTIVE;
-    existingOrganization.linkedWallets = [
-      '11111111-1111-1111-1111-111111111111',
-    ];
+    existingOrganization.linkedWallets = ['11111111-1111-1111-1111-111111111111'];
     existingOrganization.createdAt = new Date('2023-01-01T00:00:00.000Z');
     existingOrganization.updatedAt = new Date('2023-01-01T00:00:00.000Z');
 
@@ -60,7 +54,7 @@ describe('UpdateOrganizationCommandHandler', () => {
 
     const updatedAt = new Date('2023-02-01T12:30:00.000Z');
     saveMock.mockImplementation(async (entity: OrganizationEntity) =>
-      Object.assign(entity, { updatedAt }),
+      Object.assign(entity, { updatedAt })
     );
 
     const command = new UpdateOrganizationCommand({
@@ -105,7 +99,7 @@ describe('UpdateOrganizationCommandHandler', () => {
     expect(eventBusServicePublishMock).toHaveBeenCalledTimes(1);
     expect(eventBusServicePublishMock).toHaveBeenCalledWith(
       NatsSubjects.Organization.UPDATED_V1,
-      publishedEvent,
+      publishedEvent
     );
   });
 
@@ -116,9 +110,7 @@ describe('UpdateOrganizationCommandHandler', () => {
       organizationId: 'f0f0f0f0-f0f0-f0f0-f0f0-f0f0f0f0f0f0',
     });
 
-    await expect(handler.execute(command)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(handler.execute(command)).rejects.toBeInstanceOf(NotFoundException);
     expect(saveMock).not.toHaveBeenCalled();
     expect(publishMock).not.toHaveBeenCalled();
     expect(eventBusServicePublishMock).not.toHaveBeenCalled();
@@ -140,7 +132,7 @@ describe('UpdateOrganizationCommandHandler', () => {
 
     const updatedAt = new Date('2023-03-05T08:00:00.000Z');
     saveMock.mockImplementation(async (entity: OrganizationEntity) =>
-      Object.assign(entity, { updatedAt }),
+      Object.assign(entity, { updatedAt })
     );
 
     const command = new UpdateOrganizationCommand({

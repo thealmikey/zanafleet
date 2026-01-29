@@ -51,9 +51,7 @@ describe('UpdateActorCommandHandler', () => {
     }).compile();
 
     handler = module.get<UpdateActorCommandHandler>(UpdateActorCommandHandler);
-    actorRepository = module.get<Repository<ActorEntity>>(
-      getRepositoryToken(ActorEntity),
-    );
+    actorRepository = module.get<Repository<ActorEntity>>(getRepositoryToken(ActorEntity));
     eventBus = module.get<EventBus>(EventBus);
     eventBusService = module.get<EventBusService>(EventBusService);
 
@@ -84,9 +82,7 @@ describe('UpdateActorCommandHandler', () => {
       where: { id: actorId },
     });
     expect(actorRepository.save).toHaveBeenCalled();
-    expect(eventBus.publish).toHaveBeenCalledWith(
-      expect.any(ActorUpdatedEventV1),
-    );
+    expect(eventBus.publish).toHaveBeenCalledWith(expect.any(ActorUpdatedEventV1));
     expect(eventBusService.publish).toHaveBeenCalled();
   });
 

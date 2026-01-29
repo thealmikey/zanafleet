@@ -10,23 +10,17 @@ describe('CreatePersonaCommand', () => {
   });
 
   it('should throw when name is missing', () => {
-    expect(() =>
-      CreatePersonaCommand.validate({} as Record<string, unknown>),
-    ).toThrow(ZodError);
+    expect(() => CreatePersonaCommand.validate({} as Record<string, unknown>)).toThrow(ZodError);
   });
 
   it('should throw when name is empty', () => {
-    expect(() => CreatePersonaCommand.validate({ name: '' })).toThrow(
-      ZodError,
-    );
+    expect(() => CreatePersonaCommand.validate({ name: '' })).toThrow(ZodError);
   });
 
   it('should throw when name exceeds maximum length', () => {
     const longName = 'a'.repeat(256);
 
-    expect(() => CreatePersonaCommand.validate({ name: longName })).toThrow(
-      ZodError,
-    );
+    expect(() => CreatePersonaCommand.validate({ name: longName })).toThrow(ZodError);
   });
 
   it('safeValidate should return success result for valid input', () => {
@@ -41,9 +35,7 @@ describe('CreatePersonaCommand', () => {
   });
 
   it('safeValidate should return error result for invalid input', () => {
-    const result = CreatePersonaCommand.safeValidate(
-      {} as Record<string, unknown>,
-    );
+    const result = CreatePersonaCommand.safeValidate({} as Record<string, unknown>);
 
     expect(result.success).toBe(false);
     if (!result.success) {

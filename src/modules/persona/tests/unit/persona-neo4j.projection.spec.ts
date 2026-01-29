@@ -36,9 +36,7 @@ describe('PersonaNeo4jProjection', () => {
     neo4jService = {
       getSession: jest.fn().mockReturnValue(session),
     };
-    projection = new PersonaNeo4jProjection(
-      neo4jService as unknown as never,
-    );
+    projection = new PersonaNeo4jProjection(neo4jService as unknown as never);
   });
 
   afterEach(() => {
@@ -63,7 +61,7 @@ describe('PersonaNeo4jProjection', () => {
         name: baseEvent.name,
         createdAt: baseEvent.createdAt.toISOString(),
         updatedAt: baseEvent.occurredAt.toISOString(),
-      },
+      }
     );
     expect(session.close).toHaveBeenCalledTimes(1);
   });
@@ -71,15 +69,13 @@ describe('PersonaNeo4jProjection', () => {
   it('logs error and rethrows when session.run fails', async () => {
     const error = new Error('Neo4j failure');
     session.run.mockRejectedValueOnce(error);
-    const errorSpy = jest
-      .spyOn(Logger.prototype, 'error')
-      .mockImplementation(() => undefined);
+    const errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
 
     await expect(projection.handle(baseEvent)).rejects.toBe(error);
 
     expect(errorSpy).toHaveBeenCalledWith(
       `Failed to project persona to Neo4j: ${error.message}`,
-      error.stack,
+      error.stack
     );
     expect(session.close).toHaveBeenCalledTimes(1);
   });
@@ -105,9 +101,7 @@ describe('PersonaNeo4jInitializer', () => {
     neo4jService = {
       getSession: jest.fn().mockReturnValue(session),
     };
-    initializer = new PersonaNeo4jInitializer(
-      neo4jService as unknown as never,
-    );
+    initializer = new PersonaNeo4jInitializer(neo4jService as unknown as never);
   });
 
   afterEach(() => {
@@ -121,22 +115,22 @@ describe('PersonaNeo4jInitializer', () => {
     expect(session.run).toHaveBeenNthCalledWith(
       1,
       `CREATE CONSTRAINT persona_id_unique IF NOT EXISTS
-         FOR (persona:Persona) REQUIRE persona.id IS UNIQUE`,
+         FOR (persona:Persona) REQUIRE persona.id IS UNIQUE`
     );
     expect(session.run).toHaveBeenNthCalledWith(
       2,
       `CREATE INDEX persona_name_index IF NOT EXISTS
-         FOR (persona:Persona) ON (persona.name)`,
+         FOR (persona:Persona) ON (persona.name)`
     );
     expect(session.run).toHaveBeenNthCalledWith(
       3,
       `CREATE INDEX persona_createdAt_index IF NOT EXISTS
-         FOR (persona:Persona) ON (persona.createdAt)`,
+         FOR (persona:Persona) ON (persona.createdAt)`
     );
     expect(session.run).toHaveBeenNthCalledWith(
       4,
       `CREATE INDEX persona_updatedAt_index IF NOT EXISTS
-         FOR (persona:Persona) ON (persona.updatedAt)`,
+         FOR (persona:Persona) ON (persona.updatedAt)`
     );
     expect(session.close).toHaveBeenCalledTimes(1);
   });
@@ -144,15 +138,13 @@ describe('PersonaNeo4jInitializer', () => {
   it('logs error and rethrows when schema initialization fails', async () => {
     const error = new Error('constraint failure');
     session.run.mockRejectedValueOnce(error);
-    const errorSpy = jest
-      .spyOn(Logger.prototype, 'error')
-      .mockImplementation(() => undefined);
+    const errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
 
     await expect(initializer.initialize()).rejects.toBe(error);
 
     expect(errorSpy).toHaveBeenCalledWith(
       `Failed to initialize Persona Neo4j constraints/indexes: ${error.message}`,
-      error.stack,
+      error.stack
     );
     expect(session.close).toHaveBeenCalledTimes(1);
   });
@@ -160,9 +152,7 @@ describe('PersonaNeo4jInitializer', () => {
   it('always closes the session in finally block', async () => {
     session.run.mockRejectedValueOnce(new Error('unexpected failure'));
 
-    await expect(initializer.initialize()).rejects.toThrow(
-      'unexpected failure',
-    );
+    await expect(initializer.initialize()).rejects.toThrow('unexpected failure');
 
     expect(session.close).toHaveBeenCalledTimes(1);
   });

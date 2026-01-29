@@ -14,7 +14,7 @@ export class TransactionFailedException extends HttpException {
         transactionId,
         reason,
       },
-      HttpStatus.UNPROCESSABLE_ENTITY,
+      HttpStatus.UNPROCESSABLE_ENTITY
     );
   }
 }

@@ -2,8 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { Neo4jModule, Neo4jService } from '../../index';
 
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 /**
  * Neo4j Integration Tests
@@ -37,7 +36,7 @@ describeIntegration('Neo4jModule Integration', () => {
     } catch (error) {
       console.warn(
         'Failed to initialize Neo4j integration test module (Neo4j may not be available):',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? error.message : String(error)
       );
       moduleInitializationFailed = true;
     }
@@ -46,7 +45,7 @@ describeIntegration('Neo4jModule Integration', () => {
   beforeEach((): void => {
     if (moduleInitializationFailed) {
       throw new Error(
-        'Neo4j integration test module failed to initialize. Ensure Neo4j is running (docker-compose -f docker-compose.test.yml up -d).',
+        'Neo4j integration test module failed to initialize. Ensure Neo4j is running (docker-compose -f docker-compose.test.yml up -d).'
       );
     }
   });
@@ -109,10 +108,9 @@ describeIntegration('Neo4jModule Integration', () => {
       const session = neo4jService.getSession();
 
       try {
-        const result = await session.run(
-          'CREATE (n:TestNode {id: $id}) RETURN n.id as id',
-          { id: 'integration-test-node' },
-        );
+        const result = await session.run('CREATE (n:TestNode {id: $id}) RETURN n.id as id', {
+          id: 'integration-test-node',
+        });
         const record = result.records[0];
 
         expect(record.get('id')).toBe('integration-test-node');
@@ -154,9 +152,7 @@ describeIntegration('Neo4jModule Integration', () => {
 
       try {
         const results = await Promise.all(
-          sessions.map((session, index) =>
-            session.run('RETURN $index as idx', { index }),
-          ),
+          sessions.map((session, index) => session.run('RETURN $index as idx', { index }))
         );
 
         results.forEach((result, index) => {

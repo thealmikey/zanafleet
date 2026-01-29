@@ -83,7 +83,7 @@ describe('AssignPersonaToActorCommandHandler', () => {
       personaRepository as unknown as Repository<PersonaEntity>,
       actorPersonaRepository as unknown as Repository<ActorPersonaEntity>,
       eventBus as unknown as EventBus,
-      eventBusService as unknown as EventBusService,
+      eventBusService as unknown as EventBusService
     );
 
     uuidMock.mockReset();
@@ -138,8 +138,7 @@ describe('AssignPersonaToActorCommandHandler', () => {
     });
 
     expect(actorPersonaRepository.save).toHaveBeenCalledTimes(1);
-    const savedEntity =
-      actorPersonaRepository.save.mock.calls[0][0] ;
+    const savedEntity = actorPersonaRepository.save.mock.calls[0][0];
     expect(savedEntity).toBeInstanceOf(ActorPersonaEntity);
     expect(savedEntity.actorId).toBe(ACTOR_ID);
     expect(savedEntity.workspaceId).toBe(WORKSPACE_ID);
@@ -147,8 +146,7 @@ describe('AssignPersonaToActorCommandHandler', () => {
     expect(savedEntity.assignedAt.toISOString()).toBe(now.toISOString());
 
     expect(eventBus.publish).toHaveBeenCalledTimes(1);
-    const publishedEvent =
-      eventBus.publish.mock.calls[0][0] as PersonaAssignedToActorEventV1;
+    const publishedEvent = eventBus.publish.mock.calls[0][0] as PersonaAssignedToActorEventV1;
     expect(publishedEvent).toBeInstanceOf(PersonaAssignedToActorEventV1);
     expect(publishedEvent.actorId).toBe(ACTOR_ID);
     expect(publishedEvent.workspaceId).toBe(WORKSPACE_ID);
@@ -158,7 +156,7 @@ describe('AssignPersonaToActorCommandHandler', () => {
 
     expect(eventBusService.publish).toHaveBeenCalledWith(
       'persona.assigned-to-actor.v1',
-      expect.any(PersonaAssignedToActorEventV1),
+      expect.any(PersonaAssignedToActorEventV1)
     );
   });
 
@@ -302,7 +300,7 @@ describe('AssignPersonaToActorCommandHandler', () => {
       workspaceRepository as unknown as Repository<WorkspaceEntity>,
       personaRepository as unknown as Repository<PersonaEntity>,
       actorPersonaRepository as unknown as Repository<ActorPersonaEntity>,
-      eventBus as unknown as EventBus,
+      eventBus as unknown as EventBus
     );
 
     const command = new AssignPersonaToActorCommand({

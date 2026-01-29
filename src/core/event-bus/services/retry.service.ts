@@ -40,7 +40,7 @@ export class RetryService {
    */
   async executeWithRetry<T>(
     operation: () => Promise<T>,
-    options: RetryOptions = {},
+    options: RetryOptions = {}
   ): Promise<RetryResult<T>> {
     const maxRetries = options.maxRetries ?? RetryDefaults.MAX_RETRIES;
     const baseDelayMs = options.baseDelayMs ?? RetryDefaults.BASE_DELAY_MS;
@@ -65,7 +65,9 @@ export class RetryService {
         if (attempt < maxRetries) {
           const delayMs = this.calculateDelay(attempt, baseDelayMs, multiplier);
           this.logger.warn(
-            `Attempt ${attempt + 1}/${maxRetries + 1} failed: ${lastError.message}. Retrying in ${delayMs}ms...`,
+            `Attempt ${attempt + 1}/${maxRetries + 1} failed: ${
+              lastError.message
+            }. Retrying in ${delayMs}ms...`
           );
 
           if (options.onRetry) {
@@ -75,7 +77,7 @@ export class RetryService {
           await this.delay(delayMs);
         } else {
           this.logger.error(
-            `All ${maxRetries + 1} attempts failed. Last error: ${lastError.message}`,
+            `All ${maxRetries + 1} attempts failed. Last error: ${lastError.message}`
           );
         }
       }
@@ -106,7 +108,7 @@ export class RetryService {
   getDelaySequence(
     maxRetries: number = RetryDefaults.MAX_RETRIES,
     baseDelayMs: number = RetryDefaults.BASE_DELAY_MS,
-    multiplier: number = RetryDefaults.MULTIPLIER,
+    multiplier: number = RetryDefaults.MULTIPLIER
   ): number[] {
     const delays: number[] = [];
     for (let i = 0; i < maxRetries; i++) {

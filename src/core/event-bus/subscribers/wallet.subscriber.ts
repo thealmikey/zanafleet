@@ -23,13 +23,13 @@ export class WalletSubscriber {
   constructor(
     private readonly projection: WalletNeo4jProjection,
     private readonly idempotencyService: IdempotencyService,
-    private readonly eventLogger: EventLoggerService,
+    private readonly eventLogger: EventLoggerService
   ) {}
 
   @MessagePattern(NatsSubjects.Wallet.ALL)
   async handleWalletEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     const subject = context.getSubject();
     this.logger.debug(`Received event on subject: ${subject}`);
@@ -47,17 +47,19 @@ export class WalletSubscriber {
         case 'WalletCreatedEvent-V1': {
           const eventData = {
             eventId: data.eventId,
-            walletId: (data.payload ).walletId as string,
-            ownerId: (data.payload ).ownerId as string,
-            ownerType: (data.payload ).ownerType as string,
-            type: (data.payload ).type as string,
-            currency: (data.payload ).currency as string,
+            walletId: data.payload.walletId as string,
+            ownerId: data.payload.ownerId as string,
+            ownerType: data.payload.ownerType as string,
+            type: data.payload.type as string,
+            currency: data.payload.currency as string,
             createdAt: data.payload.createdAt as string,
             occurredAt: data.occurredAt,
             correlationId: data.correlationId,
             causationId: data.causationId,
           };
-          const event = WalletCreatedEventV1.fromJSON(eventData as Parameters<typeof WalletCreatedEventV1.fromJSON>[0]);
+          const event = WalletCreatedEventV1.fromJSON(
+            eventData as Parameters<typeof WalletCreatedEventV1.fromJSON>[0]
+          );
           await this.projection.handle(event);
           this.eventLogger.logProcessed(event, WalletNeo4jProjection.name);
           break;
@@ -65,32 +67,40 @@ export class WalletSubscriber {
         case 'WalletCreditedEvent-V1': {
           const eventData = {
             eventId: data.eventId,
-            walletId: (data.payload ).walletId as string,
-            amount: (data.payload ).amount as number,
-            newBalance: (data.payload ).newBalance as number,
-            reference: (data.payload ).reference as string | undefined,
+            walletId: data.payload.walletId as string,
+            amount: data.payload.amount as number,
+            newBalance: data.payload.newBalance as number,
+            reference: data.payload.reference as string | undefined,
             occurredAt: data.occurredAt,
             correlationId: data.correlationId,
             causationId: data.causationId,
           };
-          const event = WalletCreditedEventV1.fromJSON(eventData as Parameters<typeof WalletCreditedEventV1.fromJSON>[0]);
-          this.logger.log(`Wallet credited event processed: ${event.walletId}, amount: ${event.amount}`);
+          const event = WalletCreditedEventV1.fromJSON(
+            eventData as Parameters<typeof WalletCreditedEventV1.fromJSON>[0]
+          );
+          this.logger.log(
+            `Wallet credited event processed: ${event.walletId}, amount: ${event.amount}`
+          );
           this.eventLogger.logProcessed(event, 'WalletCreditedHandler');
           break;
         }
         case 'WalletDebitedEvent-V1': {
           const eventData = {
             eventId: data.eventId,
-            walletId: (data.payload ).walletId as string,
-            amount: (data.payload ).amount as number,
-            newBalance: (data.payload ).newBalance as number,
-            reference: (data.payload ).reference as string | undefined,
+            walletId: data.payload.walletId as string,
+            amount: data.payload.amount as number,
+            newBalance: data.payload.newBalance as number,
+            reference: data.payload.reference as string | undefined,
             occurredAt: data.occurredAt,
             correlationId: data.correlationId,
             causationId: data.causationId,
           };
-          const event = WalletDebitedEventV1.fromJSON(eventData as Parameters<typeof WalletDebitedEventV1.fromJSON>[0]);
-          this.logger.log(`Wallet debited event processed: ${event.walletId}, amount: ${event.amount}`);
+          const event = WalletDebitedEventV1.fromJSON(
+            eventData as Parameters<typeof WalletDebitedEventV1.fromJSON>[0]
+          );
+          this.logger.log(
+            `Wallet debited event processed: ${event.walletId}, amount: ${event.amount}`
+          );
           this.eventLogger.logProcessed(event, 'WalletDebitedHandler');
           break;
         }

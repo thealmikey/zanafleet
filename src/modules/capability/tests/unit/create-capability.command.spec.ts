@@ -32,9 +32,7 @@ describe('CreateCapabilityCommandSchema', () => {
 
     if (!result.success) {
       const messages = result.error.issues.map((issue) => issue.message);
-      expect(messages).toContain(
-        'Capability name must not exceed 255 characters',
-      );
+      expect(messages).toContain('Capability name must not exceed 255 characters');
     } else {
       throw new Error('Expected validation to fail');
     }
@@ -49,7 +47,7 @@ describe('CreateCapabilityCommandSchema', () => {
     if (!result.success) {
       const messages = result.error.issues.map((issue) => issue.message);
       expect(messages).toContain(
-        'Capability name must use snake_case (lowercase letters, numbers, and underscores only)',
+        'Capability name must use snake_case (lowercase letters, numbers, and underscores only)'
       );
     } else {
       throw new Error('Expected validation to fail');

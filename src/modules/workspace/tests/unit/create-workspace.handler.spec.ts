@@ -44,7 +44,7 @@ describe('CreateWorkspaceCommandHandler', () => {
       workspaceRepository,
       organizationRepository,
       eventBus,
-      undefined,
+      undefined
     );
   });
 
@@ -60,7 +60,7 @@ describe('CreateWorkspaceCommandHandler', () => {
       const workspaceId = await handler.execute(validCommand);
 
       expect(workspaceId).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       );
       expect(organizationRepository.findOne).toHaveBeenCalledWith({
         where: { id: validCommand.orgId },
@@ -94,7 +94,7 @@ describe('CreateWorkspaceCommandHandler', () => {
 
       await expect(execution).rejects.toThrow(NotFoundException);
       await expect(execution).rejects.toThrow(
-        `Organization with ID '${validCommand.orgId}' does not exist`,
+        `Organization with ID '${validCommand.orgId}' does not exist`
       );
 
       expect(workspaceRepository.save).not.toHaveBeenCalled();

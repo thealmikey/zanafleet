@@ -33,7 +33,7 @@ export class WorkspaceController {
   constructor(
     private readonly commandBus: CommandBus,
     @InjectRepository(WorkspaceEntity)
-    private readonly workspaceRepository: Repository<WorkspaceEntity>,
+    private readonly workspaceRepository: Repository<WorkspaceEntity>
   ) {}
 
   /**
@@ -42,9 +42,7 @@ export class WorkspaceController {
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(
-    @Body() body: CreateWorkspaceDto,
-  ): Promise<{ workspaceId: string }> {
+  async create(@Body() body: CreateWorkspaceDto): Promise<{ workspaceId: string }> {
     let input;
     try {
       input = CreateWorkspaceCommand.validate(body);
@@ -56,10 +54,7 @@ export class WorkspaceController {
     }
 
     const command = new CreateWorkspaceCommand(input);
-    const workspaceId = await this.commandBus.execute<
-      CreateWorkspaceCommand,
-      string
-    >(command);
+    const workspaceId = await this.commandBus.execute<CreateWorkspaceCommand, string>(command);
 
     return { workspaceId };
   }
@@ -69,9 +64,7 @@ export class WorkspaceController {
    * Direct read from repository (projection)
    */
   @Get(':id')
-  async findOne(
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ): Promise<WorkspaceDto> {
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<WorkspaceDto> {
     const workspace = await this.workspaceRepository.findOne({
       where: { id },
     });
@@ -90,7 +83,7 @@ export class WorkspaceController {
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() body: UpdateWorkspaceDto,
+    @Body() body: UpdateWorkspaceDto
   ): Promise<WorkspaceDto> {
     let input;
     try {

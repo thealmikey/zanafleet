@@ -36,9 +36,7 @@ export class CommitmentNeo4jProjection
    * Handle commitment events
    * Routes to appropriate handler based on event type
    */
-  async handle(
-    event: CommitmentCreatedEventV1 | CommitmentStatusChangedEventV1,
-  ): Promise<void> {
+  async handle(event: CommitmentCreatedEventV1 | CommitmentStatusChangedEventV1): Promise<void> {
     if (event instanceof CommitmentCreatedEventV1) {
       await this.handleCommitmentCreated(event);
     } else if (event instanceof CommitmentStatusChangedEventV1) {
@@ -51,9 +49,7 @@ export class CommitmentNeo4jProjection
    * Creates Commitment node with COMMITTED and IN_WORKSPACE relationships
    */
   private async handleCommitmentCreated(event: CommitmentCreatedEventV1): Promise<void> {
-    this.logger.log(
-      `Handling CommitmentCreatedEvent-V1 for commitment: ${event.commitmentId}`,
-    );
+    this.logger.log(`Handling CommitmentCreatedEvent-V1 for commitment: ${event.commitmentId}`);
 
     const session = this.neo4j.getWriteSession();
 
@@ -79,18 +75,15 @@ export class CommitmentNeo4jProjection
           description: event.description,
           dueAt: event.dueAt.toISOString(),
           createdAt: event.createdAt.toISOString(),
-        },
+        }
       );
 
       this.logger.debug(
-        `Commitment node created in Neo4j with relationships: ${event.commitmentId}`,
+        `Commitment node created in Neo4j with relationships: ${event.commitmentId}`
       );
     } catch (error) {
       const err = error as Error;
-      this.logger.error(
-        `Failed to project commitment to Neo4j: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to project commitment to Neo4j: ${err.message}`, err.stack);
       throw error;
     } finally {
       await session.close();
@@ -103,7 +96,7 @@ export class CommitmentNeo4jProjection
    */
   private async handleStatusChanged(event: CommitmentStatusChangedEventV1): Promise<void> {
     this.logger.log(
-      `Handling CommitmentStatusChangedEvent-V1 for commitment: ${event.commitmentId}`,
+      `Handling CommitmentStatusChangedEvent-V1 for commitment: ${event.commitmentId}`
     );
 
     const session = this.neo4j.getWriteSession();
@@ -119,12 +112,10 @@ export class CommitmentNeo4jProjection
           {
             commitmentId: event.commitmentId,
             newStatus: event.newStatus,
-          },
+          }
         );
 
-        this.logger.debug(
-          `Commitment node updated with :Breached label: ${event.commitmentId}`,
-        );
+        this.logger.debug(`Commitment node updated with :Breached label: ${event.commitmentId}`);
       } else {
         await session.run(
           `
@@ -135,19 +126,14 @@ export class CommitmentNeo4jProjection
           {
             commitmentId: event.commitmentId,
             newStatus: event.newStatus,
-          },
+          }
         );
 
-        this.logger.debug(
-          `Commitment node status updated in Neo4j: ${event.commitmentId}`,
-        );
+        this.logger.debug(`Commitment node status updated in Neo4j: ${event.commitmentId}`);
       }
     } catch (error) {
       const err = error as Error;
-      this.logger.error(
-        `Failed to update commitment status in Neo4j: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to update commitment status in Neo4j: ${err.message}`, err.stack);
       throw error;
     } finally {
       await session.close();
@@ -177,35 +163,35 @@ export class CommitmentNeo4jInitializer {
       // Create UNIQUE constraint on Commitment.id
       await session.run(
         `CREATE CONSTRAINT commitment_id_unique IF NOT EXISTS 
-         FOR (c:Commitment) REQUIRE c.id IS UNIQUE`,
+         FOR (c:Commitment) REQUIRE c.id IS UNIQUE`
       );
       this.logger.log('UNIQUE constraint on Commitment.id created');
 
       // Create index on status for filtering
       await session.run(
         `CREATE INDEX commitment_status_index IF NOT EXISTS 
-         FOR (c:Commitment) ON (c.status)`,
+         FOR (c:Commitment) ON (c.status)`
       );
       this.logger.log('Index on Commitment.status created');
 
       // Create index on dueAt for time-based queries
       await session.run(
         `CREATE INDEX commitment_dueAt_index IF NOT EXISTS 
-         FOR (c:Commitment) ON (c.dueAt)`,
+         FOR (c:Commitment) ON (c.dueAt)`
       );
       this.logger.log('Index on Commitment.dueAt created');
 
       // Create index on createdAt for time-based queries
       await session.run(
         `CREATE INDEX commitment_createdAt_index IF NOT EXISTS 
-         FOR (c:Commitment) ON (c.createdAt)`,
+         FOR (c:Commitment) ON (c.createdAt)`
       );
       this.logger.log('Index on Commitment.createdAt created');
     } catch (error) {
       const err = error as Error;
       this.logger.error(
         `Failed to initialize Neo4j constraints/indexes for Commitment: ${err.message}`,
-        err.stack,
+        err.stack
       );
       throw error;
     } finally {

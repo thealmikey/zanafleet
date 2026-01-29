@@ -23,8 +23,7 @@ import { UpdateWorkspaceCommandHandler } from '../../handlers/update-workspace.h
  * Verifies persistence in PostgreSQL and event emission.
  */
 
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 describeIntegration('WorkspaceController (Integration)', () => {
   let module: TestingModule;
@@ -65,8 +64,12 @@ describeIntegration('WorkspaceController (Integration)', () => {
     }).compile();
 
     controller = module.get<WorkspaceController>(WorkspaceController);
-    workspaceRepository = module.get<Repository<WorkspaceEntity>>(getRepositoryToken(WorkspaceEntity));
-    organizationRepository = module.get<Repository<OrganizationEntity>>(getRepositoryToken(OrganizationEntity));
+    workspaceRepository = module.get<Repository<WorkspaceEntity>>(
+      getRepositoryToken(WorkspaceEntity)
+    );
+    organizationRepository = module.get<Repository<OrganizationEntity>>(
+      getRepositoryToken(OrganizationEntity)
+    );
     eventBus = module.get<EventBus>(EventBus);
     dataSource = module.get<DataSource>(DataSource);
   });
@@ -126,14 +129,16 @@ describeIntegration('WorkspaceController (Integration)', () => {
       expect(workspaceId).toBeDefined();
 
       // Verify persistence after create
-      const persistedAfterCreate = await workspaceRepository.findOne({ where: { id: workspaceId } });
+      const persistedAfterCreate = await workspaceRepository.findOne({
+        where: { id: workspaceId },
+      });
       expect(persistedAfterCreate).toBeDefined();
       expect(persistedAfterCreate?.name).toBe(createDto.name);
       expect(persistedAfterCreate?.orgId).toBe(orgId);
       expect(persistedAfterCreate?.type).toBe(WorkspaceType.BUSINESS);
       expect(persistedAfterCreate?.status).toBe(WorkspaceStatus.ACTIVE);
       expect(persistedAfterCreate?.roleTemplates).toEqual(roleTemplates);
-      
+
       // Verify event emission for creation (internal CQRS bus)
       expect(eventSpy).toHaveBeenCalledWith(expect.any(WorkspaceCreatedEventV1));
 
@@ -157,7 +162,9 @@ describeIntegration('WorkspaceController (Integration)', () => {
       expect(updateResult.name).toBe(updatedName);
 
       // Verify persistence after update
-      const persistedAfterUpdate = await workspaceRepository.findOne({ where: { id: workspaceId } });
+      const persistedAfterUpdate = await workspaceRepository.findOne({
+        where: { id: workspaceId },
+      });
       expect(persistedAfterUpdate?.name).toBe(updatedName);
       expect(persistedAfterUpdate?.roleTemplates).toEqual(updatedRoleTemplates);
 
@@ -172,7 +179,9 @@ describeIntegration('WorkspaceController (Integration)', () => {
 
     it('should throw NotFoundException when updating a non-existent workspace', async () => {
       const nonExistentId = uuidv4();
-      await expect(controller.update(nonExistentId, { name: 'New Name' })).rejects.toThrow(NotFoundException);
+      await expect(controller.update(nonExistentId, { name: 'New Name' })).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 });

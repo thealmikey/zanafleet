@@ -7,9 +7,7 @@ import { OrganizationStatus, OrganizationType } from '../dto/organization.enums'
  * Ensures input validation for organization updates
  */
 export const UpdateOrganizationCommandSchema = z.object({
-  organizationId: z
-    .string()
-    .uuid('organizationId must be a valid UUID'),
+  organizationId: z.string().uuid('organizationId must be a valid UUID'),
   name: z
     .string()
     .trim()
@@ -26,17 +24,13 @@ export const UpdateOrganizationCommandSchema = z.object({
   status: z
     .nativeEnum(OrganizationStatus, {
       errorMap: () => ({
-        message: `Organization status must be one of: ${Object.values(OrganizationStatus).join(', ')}`,
+        message: `Organization status must be one of: ${Object.values(OrganizationStatus).join(
+          ', '
+        )}`,
       }),
     })
     .optional(),
-  linkedWallets: z
-    .array(
-      z
-        .string()
-        .uuid('Each wallet ID must be a valid UUID'),
-    )
-    .optional(),
+  linkedWallets: z.array(z.string().uuid('Each wallet ID must be a valid UUID')).optional(),
 });
 
 export type UpdateOrganizationCommandInput = z.infer<typeof UpdateOrganizationCommandSchema>;

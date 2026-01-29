@@ -7,19 +7,12 @@ import { CommitmentStatus, CommitmentType } from '../dto/commitment.enums';
  * Ensures type safety and input validation at command level
  */
 export const CreateCommitmentCommandSchema = z.object({
-  actorId: z
-    .string()
-    .uuid('Actor ID must be a valid UUID'),
-  workspaceId: z
-    .string()
-    .uuid('Workspace ID must be a valid UUID'),
+  actorId: z.string().uuid('Actor ID must be a valid UUID'),
+  workspaceId: z.string().uuid('Workspace ID must be a valid UUID'),
   type: z.nativeEnum(CommitmentType, {
     errorMap: () => ({ message: 'Commitment type must be a valid CommitmentType' }),
   }),
-  status: z
-    .nativeEnum(CommitmentStatus)
-    .optional()
-    .default(CommitmentStatus.PENDING),
+  status: z.nativeEnum(CommitmentStatus).optional().default(CommitmentStatus.PENDING),
   description: z
     .string()
     .trim()

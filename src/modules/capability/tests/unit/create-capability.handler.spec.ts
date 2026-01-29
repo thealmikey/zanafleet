@@ -45,7 +45,7 @@ describe('CreateCapabilityCommandHandler', () => {
     handler = new CreateCapabilityCommandHandler(
       repository as unknown as Repository<CapabilityEntity>,
       eventBus as unknown as EventBus,
-      eventBusService as unknown as EventBusService,
+      eventBusService as unknown as EventBusService
     );
 
     uuidMock.mockReset();
@@ -66,7 +66,7 @@ describe('CreateCapabilityCommandHandler', () => {
     expect(capabilityId).toBe('capability-uuid');
     expect(repository.save).toHaveBeenCalledTimes(1);
 
-    const savedEntity = repository.save.mock.calls[0][0] ;
+    const savedEntity = repository.save.mock.calls[0][0];
     expect(savedEntity).toBeInstanceOf(CapabilityEntity);
     expect(savedEntity).toMatchObject({
       id: 'capability-uuid',
@@ -75,8 +75,7 @@ describe('CreateCapabilityCommandHandler', () => {
     expect(savedEntity.createdAt).toBeInstanceOf(Date);
 
     expect(eventBus.publish).toHaveBeenCalledTimes(1);
-    const publishedEvent =
-      eventBus.publish.mock.calls[0][0] as CapabilityCreatedEventV1;
+    const publishedEvent = eventBus.publish.mock.calls[0][0] as CapabilityCreatedEventV1;
     expect(publishedEvent).toBeInstanceOf(CapabilityCreatedEventV1);
     expect(publishedEvent.capabilityId).toBe('capability-uuid');
     expect(publishedEvent.name).toBe('manage_users');
@@ -84,7 +83,7 @@ describe('CreateCapabilityCommandHandler', () => {
 
     expect(eventBusService.publish).toHaveBeenCalledWith(
       NatsSubjects.Capability.CREATED_V1,
-      expect.any(CapabilityCreatedEventV1),
+      expect.any(CapabilityCreatedEventV1)
     );
   });
 
@@ -105,7 +104,7 @@ describe('CreateCapabilityCommandHandler', () => {
   it('does not attempt to publish to NATS when service is not provided', async () => {
     handler = new CreateCapabilityCommandHandler(
       repository as unknown as Repository<CapabilityEntity>,
-      eventBus as unknown as EventBus,
+      eventBus as unknown as EventBus
     );
 
     uuidMock.mockReturnValueOnce('capability-uuid');

@@ -13,7 +13,7 @@ export class FormationService {
     @InjectRepository(FormationStatusEntity)
     private readonly formationStatusRepository: Repository<FormationStatusEntity>,
     @InjectRepository(RequirementEntity)
-    private readonly requirementRepository: Repository<RequirementEntity>,
+    private readonly requirementRepository: Repository<RequirementEntity>
   ) {}
 
   async evaluateState(entityType: string, entityId: string): Promise<FormationState> {
@@ -101,7 +101,10 @@ export class FormationService {
     return false;
   }
 
-  async getUnsatisfiedRequirements(entityType: string, entityId: string): Promise<RequirementEntity[]> {
+  async getUnsatisfiedRequirements(
+    entityType: string,
+    entityId: string
+  ): Promise<RequirementEntity[]> {
     return this.requirementRepository.find({
       where: {
         entityType,
@@ -111,7 +114,10 @@ export class FormationService {
     });
   }
 
-  async getBlockingRequirements(entityType: string, entityId: string): Promise<RequirementEntity[]> {
+  async getBlockingRequirements(
+    entityType: string,
+    entityId: string
+  ): Promise<RequirementEntity[]> {
     return this.requirementRepository.find({
       where: {
         entityType,
@@ -125,7 +131,7 @@ export class FormationService {
   async initializeFormationStatus(
     entityType: string,
     entityId: string,
-    initialState: FormationState,
+    initialState: FormationState
   ): Promise<FormationStatusEntity> {
     const entity = FormationStatusEntity.fromDomain({
       formationStatusId: uuidv4(),

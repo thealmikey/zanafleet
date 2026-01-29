@@ -36,9 +36,7 @@ export class GrantCapabilityToPersonaCommand {
     return GrantCapabilityToPersonaCommandSchema.parse(input);
   }
 
-  static safeValidate(
-    input: unknown,
-  ): GrantCapabilityToPersonaCommandSafeParseResult {
+  static safeValidate(input: unknown): GrantCapabilityToPersonaCommandSafeParseResult {
     return GrantCapabilityToPersonaCommandSchema.safeParse(input);
   }
 }

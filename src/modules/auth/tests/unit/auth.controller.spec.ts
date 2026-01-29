@@ -1,8 +1,12 @@
 // Mock @nestjs/swagger to avoid import errors in test environment
-jest.mock('@nestjs/swagger', () => ({
-  ApiProperty: () => () => {},
-  ApiPropertyOptional: () => () => {},
-}), { virtual: true });
+jest.mock(
+  '@nestjs/swagger',
+  () => ({
+    ApiProperty: () => () => {},
+    ApiPropertyOptional: () => () => {},
+  }),
+  { virtual: true }
+);
 
 import { BadRequestException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';

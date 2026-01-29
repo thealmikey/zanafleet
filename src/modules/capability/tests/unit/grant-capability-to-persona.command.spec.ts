@@ -63,10 +63,7 @@ describe('GrantCapabilityToPersonaCommandSchema', () => {
     if (!result.success) {
       const messages = result.error.issues.map((issue) => issue.message);
       expect(messages).toEqual(
-        expect.arrayContaining([
-          'Persona ID is required',
-          'Capability ID is required',
-        ]),
+        expect.arrayContaining(['Persona ID is required', 'Capability ID is required'])
       );
     } else {
       throw new Error('Expected validation to fail');

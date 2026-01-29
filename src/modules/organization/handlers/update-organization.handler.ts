@@ -23,12 +23,12 @@ export class UpdateOrganizationCommandHandler
     @InjectRepository(OrganizationEntity)
     private readonly organizationRepository: Repository<OrganizationEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: UpdateOrganizationCommand): Promise<void> {
     this.logger.log(
-      `Executing UpdateOrganizationCommand for organization: ${command.organizationId}`,
+      `Executing UpdateOrganizationCommand for organization: ${command.organizationId}`
     );
 
     const organization = await this.organizationRepository.findOne({
@@ -36,9 +36,7 @@ export class UpdateOrganizationCommandHandler
     });
 
     if (!organization) {
-      throw new NotFoundException(
-        `Organization ${command.organizationId} not found`,
-      );
+      throw new NotFoundException(`Organization ${command.organizationId} not found`);
     }
 
     const changes: OrganizationUpdatedEventV1Changes = {};
@@ -64,12 +62,8 @@ export class UpdateOrganizationCommandHandler
       changes.linkedWallets = wallets;
     }
 
-    const updatedOrganization = await this.organizationRepository.save(
-      organization,
-    );
-    this.logger.debug(
-      `Organization updated in PostgreSQL: ${command.organizationId}`,
-    );
+    const updatedOrganization = await this.organizationRepository.save(organization);
+    this.logger.debug(`Organization updated in PostgreSQL: ${command.organizationId}`);
 
     const event = new OrganizationUpdatedEventV1({
       eventId: uuidv4(),
@@ -81,20 +75,14 @@ export class UpdateOrganizationCommandHandler
 
     this.eventBus.publish(event);
     this.logger.log(
-      `OrganizationUpdatedEvent-V1 emitted to event bus for: ${command.organizationId}`,
+      `OrganizationUpdatedEvent-V1 emitted to event bus for: ${command.organizationId}`
     );
 
     if (this.eventBusService) {
       try {
-        await this.eventBusService.publish(
-          NatsSubjects.Organization.UPDATED_V1,
-          event,
-        );
+        await this.eventBusService.publish(NatsSubjects.Organization.UPDATED_V1, event);
       } catch (publishError: unknown) {
-        const err =
-          publishError instanceof Error
-            ? publishError
-            : new Error(String(publishError));
+        const err = publishError instanceof Error ? publishError : new Error(String(publishError));
         this.logger.warn(`NATS publish failed: ${err.message}`);
       }
     }

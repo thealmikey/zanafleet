@@ -23,7 +23,7 @@ export const VALID_STATUS_TRANSITIONS: Record<CommitmentStatus, CommitmentStatus
  */
 export function isValidStatusTransition(
   currentStatus: CommitmentStatus,
-  newStatus: CommitmentStatus,
+  newStatus: CommitmentStatus
 ): boolean {
   return VALID_STATUS_TRANSITIONS[currentStatus].includes(newStatus);
 }
@@ -33,16 +33,18 @@ export function isValidStatusTransition(
  * Ensures type safety and input validation at command level
  */
 export const UpdateCommitmentStatusCommandSchema = z.object({
-  commitmentId: z
-    .string()
-    .uuid('Commitment ID must be a valid UUID'),
+  commitmentId: z.string().uuid('Commitment ID must be a valid UUID'),
   newStatus: z.nativeEnum(CommitmentStatus, {
     errorMap: () => ({ message: 'New status must be a valid CommitmentStatus' }),
   }),
 });
 
-export type UpdateCommitmentStatusCommandInput = z.infer<typeof UpdateCommitmentStatusCommandSchema>;
-export type UpdateCommitmentStatusCommandRawInput = z.input<typeof UpdateCommitmentStatusCommandSchema>;
+export type UpdateCommitmentStatusCommandInput = z.infer<
+  typeof UpdateCommitmentStatusCommandSchema
+>;
+export type UpdateCommitmentStatusCommandRawInput = z.input<
+  typeof UpdateCommitmentStatusCommandSchema
+>;
 
 /**
  * UpdateCommitmentStatusCommand

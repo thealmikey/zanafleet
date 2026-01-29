@@ -27,16 +27,14 @@ import { EvidenceCreatedEventV1 } from '../events/evidence-created.event';
  */
 @CommandHandler(CreateEvidenceCommand)
 @Injectable()
-export class CreateEvidenceCommandHandler
-  implements ICommandHandler<CreateEvidenceCommand>
-{
+export class CreateEvidenceCommandHandler implements ICommandHandler<CreateEvidenceCommand> {
   private readonly logger = new Logger(CreateEvidenceCommandHandler.name);
 
   constructor(
     @InjectRepository(EvidenceEntity)
     private readonly evidenceRepository: Repository<EvidenceEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -47,7 +45,7 @@ export class CreateEvidenceCommandHandler
    */
   async execute(command: CreateEvidenceCommand): Promise<string> {
     this.logger.log(
-      `Executing CreateEvidenceCommand: commandId=${command.commandId}, type=${command.type}`,
+      `Executing CreateEvidenceCommand: commandId=${command.commandId}, type=${command.type}`
     );
 
     try {
@@ -58,7 +56,7 @@ export class CreateEvidenceCommandHandler
 
       if (existingEvidence) {
         this.logger.log(
-          `Idempotent request detected: commandId=${command.commandId}, returning existing evidenceId=${existingEvidence.id}`,
+          `Idempotent request detected: commandId=${command.commandId}, returning existing evidenceId=${existingEvidence.id}`
         );
         return existingEvidence.id;
       }
@@ -69,7 +67,7 @@ export class CreateEvidenceCommandHandler
       const eventId = uuidv4();
 
       this.logger.debug(
-        `Creating new evidence: evidenceId=${evidenceId}, commandId=${command.commandId}`,
+        `Creating new evidence: evidenceId=${evidenceId}, commandId=${command.commandId}`
       );
 
       // Step 3: Create evidence entity (immutable - no updates allowed)
@@ -88,9 +86,7 @@ export class CreateEvidenceCommandHandler
 
       // Step 4: Persist to PostgreSQL
       await this.evidenceRepository.save(entity);
-      this.logger.debug(
-        `Evidence persisted to PostgreSQL: ${evidenceId}`,
-      );
+      this.logger.debug(`Evidence persisted to PostgreSQL: ${evidenceId}`);
 
       // Step 5: Create and emit event
       const event = new EvidenceCreatedEventV1({
@@ -109,25 +105,18 @@ export class CreateEvidenceCommandHandler
       });
 
       this.eventBus.publish(event);
-      this.logger.log(
-        `EvidenceCreatedEvent-V1 emitted to event bus: ${eventId}`,
-      );
+      this.logger.log(`EvidenceCreatedEvent-V1 emitted to event bus: ${eventId}`);
 
       if (this.eventBusService) {
         await this.eventBusService
           .publish('evidence.events.created-v1', event)
-          .catch((err: Error) =>
-            this.logger.warn(`NATS publish failed: ${err.message}`),
-          );
+          .catch((err: Error) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
 
       return evidenceId;
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to create evidence: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to create evidence: ${err.message}`, err.stack);
       throw error;
     }
   }

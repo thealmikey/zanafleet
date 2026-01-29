@@ -32,7 +32,7 @@ export class RoleEntity {
   @Column('varchar', { length: 255 })
   name!: string;
 
-  @Column('varchar', { array: true, default: () => "ARRAY[]::varchar[]" })
+  @Column('varchar', { array: true, default: () => 'ARRAY[]::varchar[]' })
   permissions!: string[];
 
   @Column('enum', { enum: RoleScope })

@@ -6,17 +6,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { ActorType } from '../../../actor/dto/actor.enums';
 import { ActorEntity } from '../../../actor/entities/actor.entity';
-import {
-  OrganizationStatus,
-  OrganizationType,
-} from '../../../organization/dto/organization.enums';
+import { OrganizationStatus, OrganizationType } from '../../../organization/dto/organization.enums';
 import { OrganizationEntity } from '../../../organization/entities/organization.entity';
 import { ActorPersonaEntity } from '../../../persona/entities/actor-persona.entity';
 import { PersonaEntity } from '../../../persona/entities/persona.entity';
-import {
-  WorkspaceStatus,
-  WorkspaceType,
-} from '../../../workspace/dto/workspace.enums';
+import { WorkspaceStatus, WorkspaceType } from '../../../workspace/dto/workspace.enums';
 import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
 import { CreateRequirementCommand } from '../../commands/create-requirement.command';
 import { EvaluateFormationCommand } from '../../commands/evaluate-formation.command';
@@ -29,8 +23,7 @@ import { EvaluateFormationCommandHandler } from '../../handlers/evaluate-formati
 import { SatisfyRequirementCommandHandler } from '../../handlers/satisfy-requirement.handler';
 import { FormationService } from '../../services/formation.service';
 
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 describeIntegration('Formation Module Integration', () => {
   let module!: TestingModule;
@@ -98,25 +91,21 @@ describeIntegration('Formation Module Integration', () => {
       eventBus = module.get<EventBus>(EventBus);
       formationService = module.get<FormationService>(FormationService);
       formationStatusRepository = module.get<Repository<FormationStatusEntity>>(
-        getRepositoryToken(FormationStatusEntity),
+        getRepositoryToken(FormationStatusEntity)
       );
       requirementRepository = module.get<Repository<RequirementEntity>>(
-        getRepositoryToken(RequirementEntity),
+        getRepositoryToken(RequirementEntity)
       );
       workspaceRepository = module.get<Repository<WorkspaceEntity>>(
-        getRepositoryToken(WorkspaceEntity),
+        getRepositoryToken(WorkspaceEntity)
       );
       organizationRepository = module.get<Repository<OrganizationEntity>>(
-        getRepositoryToken(OrganizationEntity),
+        getRepositoryToken(OrganizationEntity)
       );
-      actorRepository = module.get<Repository<ActorEntity>>(
-        getRepositoryToken(ActorEntity),
-      );
-      personaRepository = module.get<Repository<PersonaEntity>>(
-        getRepositoryToken(PersonaEntity),
-      );
+      actorRepository = module.get<Repository<ActorEntity>>(getRepositoryToken(ActorEntity));
+      personaRepository = module.get<Repository<PersonaEntity>>(getRepositoryToken(PersonaEntity));
       actorPersonaRepository = module.get<Repository<ActorPersonaEntity>>(
-        getRepositoryToken(ActorPersonaEntity),
+        getRepositoryToken(ActorPersonaEntity)
       );
       dataSource = module.get<DataSource>(DataSource);
 
@@ -133,7 +122,7 @@ describeIntegration('Formation Module Integration', () => {
     } catch (error) {
       console.warn(
         'Failed to initialize Formation integration test module (database may not be available):',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? error.message : String(error)
       );
       moduleInitializationFailed = true;
     }
@@ -142,7 +131,7 @@ describeIntegration('Formation Module Integration', () => {
   beforeEach(() => {
     if (moduleInitializationFailed) {
       throw new Error(
-        'Formation integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d).',
+        'Formation integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d).'
       );
     }
   });
@@ -192,7 +181,7 @@ describeIntegration('Formation Module Integration', () => {
       status?: WorkspaceStatus;
       name?: string;
       roleTemplates?: string[];
-    } = {},
+    } = {}
   ): Promise<WorkspaceEntity> => {
     const workspaceId = uuidv4();
     const workspace = WorkspaceEntity.fromDomain({
@@ -223,7 +212,7 @@ describeIntegration('Formation Module Integration', () => {
   const createActor = async (
     workspaceId: string,
     type: ActorType,
-    roles: string[] = [],
+    roles: string[] = []
   ): Promise<ActorEntity> => {
     const actor = ActorEntity.fromDomain({
       actorId: uuidv4(),
@@ -245,7 +234,7 @@ describeIntegration('Formation Module Integration', () => {
       await formationService.initializeFormationStatus(
         entityType,
         workspace.id,
-        FormationState.DRAFT,
+        FormationState.DRAFT
       );
 
       const requirementId = await commandBus.execute(
@@ -256,21 +245,19 @@ describeIntegration('Formation Module Integration', () => {
           key: 'optional-profile-photo',
           description: 'Upload an optional profile photo',
           blocking: false,
-        }),
+        })
       );
 
       const result = await commandBus.execute(
         new EvaluateFormationCommand({
           entityType,
           entityId: workspace.id,
-        }),
+        })
       );
 
       expect(result.state).toBe(FormationState.ACTIVE);
       expect(result.unsatisfiedRequirements).toHaveLength(1);
-      expect(result.unsatisfiedRequirements[0].requirementId).toBe(
-        requirementId,
-      );
+      expect(result.unsatisfiedRequirements[0].requirementId).toBe(requirementId);
       expect(result.unsatisfiedRequirements[0].blocking).toBe(false);
       expect(result.unsatisfiedRequirements[0].satisfied).toBe(false);
     });
@@ -288,12 +275,12 @@ describeIntegration('Formation Module Integration', () => {
       await formationService.initializeFormationStatus(
         entityType,
         workspaceA.id,
-        FormationState.DRAFT,
+        FormationState.DRAFT
       );
       await formationService.initializeFormationStatus(
         entityType,
         workspaceB.id,
-        FormationState.DRAFT,
+        FormationState.DRAFT
       );
 
       await commandBus.execute(
@@ -305,7 +292,7 @@ describeIntegration('Formation Module Integration', () => {
           description: 'Workspace A requires Workspace B',
           blocking: true,
           targetEntityId: workspaceB.id,
-        }),
+        })
       );
 
       await commandBus.execute(
@@ -317,21 +304,21 @@ describeIntegration('Formation Module Integration', () => {
           description: 'Workspace B requires Workspace A',
           blocking: true,
           targetEntityId: workspaceA.id,
-        }),
+        })
       );
 
       const evaluationA = await commandBus.execute(
         new EvaluateFormationCommand({
           entityType,
           entityId: workspaceA.id,
-        }),
+        })
       );
 
       const evaluationB = await commandBus.execute(
         new EvaluateFormationCommand({
           entityType,
           entityId: workspaceB.id,
-        }),
+        })
       );
 
       expect(evaluationA.state).toBe(FormationState.BLOCKED);
@@ -346,7 +333,7 @@ describeIntegration('Formation Module Integration', () => {
       await formationService.initializeFormationStatus(
         entityType,
         workspace.id,
-        FormationState.DRAFT,
+        FormationState.DRAFT
       );
 
       const requirementId = await commandBus.execute(
@@ -357,33 +344,31 @@ describeIntegration('Formation Module Integration', () => {
           key: 'business-registration',
           description: 'Provide business registration certificate',
           blocking: true,
-        }),
+        })
       );
 
       const initialEvaluation = await commandBus.execute(
         new EvaluateFormationCommand({
           entityType,
           entityId: workspace.id,
-        }),
+        })
       );
 
       expect(initialEvaluation.state).toBe(FormationState.PENDING);
       expect(initialEvaluation.unsatisfiedRequirements).toHaveLength(1);
-      expect(initialEvaluation.unsatisfiedRequirements[0].requirementId).toBe(
-        requirementId,
-      );
+      expect(initialEvaluation.unsatisfiedRequirements[0].requirementId).toBe(requirementId);
 
       await commandBus.execute(
         new SatisfyRequirementCommand({
           requirementId,
-        }),
+        })
       );
 
       const finalEvaluation = await commandBus.execute(
         new EvaluateFormationCommand({
           entityType,
           entityId: workspace.id,
-        }),
+        })
       );
 
       expect(finalEvaluation.state).toBe(FormationState.ACTIVE);
@@ -400,7 +385,7 @@ describeIntegration('Formation Module Integration', () => {
       await formationService.initializeFormationStatus(
         entityType,
         workspace.id,
-        FormationState.DRAFT,
+        FormationState.DRAFT
       );
 
       const requirementId = await commandBus.execute(
@@ -411,21 +396,19 @@ describeIntegration('Formation Module Integration', () => {
           key: 'rider-onboarding',
           description: 'Onboard riders to the SACCO',
           blocking: false,
-        }),
+        })
       );
 
       const evaluation = await commandBus.execute(
         new EvaluateFormationCommand({
           entityType,
           entityId: workspace.id,
-        }),
+        })
       );
 
       expect(evaluation.state).toBe(FormationState.ACTIVE);
       expect(evaluation.unsatisfiedRequirements).toHaveLength(1);
-      expect(evaluation.unsatisfiedRequirements[0].requirementId).toBe(
-        requirementId,
-      );
+      expect(evaluation.unsatisfiedRequirements[0].requirementId).toBe(requirementId);
       expect(evaluation.unsatisfiedRequirements[0].blocking).toBe(false);
     });
   });

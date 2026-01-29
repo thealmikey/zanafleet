@@ -20,23 +20,17 @@ import { FinalizeSignUpDto } from '../dto/finalize-signup.dto';
 import { InitiateSignUpDto } from '../dto/initiate-signup.dto';
 import { SignUpSessionDto } from '../dto/signup-session.dto';
 import { UpdateSignUpStepDto } from '../dto/update-signup-step.dto';
-import {
-  SignUpSessionResult,
-  UpdateSignUpStepResult,
-} from '../handlers/signup-result.interfaces';
+import { SignUpSessionResult, UpdateSignUpStepResult } from '../handlers/signup-result.interfaces';
 import { GetSignUpSessionQuery } from '../queries/get-signup-session.query';
 
 @Controller('signup')
 export class SignUpController {
-  constructor(
-    private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus,
-  ) {}
+  constructor(private readonly commandBus: CommandBus, private readonly queryBus: QueryBus) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async initiate(
-    @Body() body: InitiateSignUpDto,
+    @Body() body: InitiateSignUpDto
   ): Promise<{ sessionId: string; expiresAt: string }> {
     try {
       const input = InitiateSignUpCommand.validate(body);
@@ -61,7 +55,7 @@ export class SignUpController {
   @Patch(':id')
   async updateStep(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() body: UpdateSignUpStepDto,
+    @Body() body: UpdateSignUpStepDto
   ): Promise<UpdateSignUpStepResult> {
     try {
       const input = UpdateSignUpStepCommand.validate({
@@ -69,10 +63,9 @@ export class SignUpController {
         sessionId: id,
       });
       const command = new UpdateSignUpStepCommand(input);
-      const result = await this.commandBus.execute<
-        UpdateSignUpStepCommand,
-        UpdateSignUpStepResult
-      >(command);
+      const result = await this.commandBus.execute<UpdateSignUpStepCommand, UpdateSignUpStepResult>(
+        command
+      );
 
       return result;
     } catch (error: unknown) {
@@ -87,7 +80,7 @@ export class SignUpController {
   @HttpCode(HttpStatus.OK)
   async finalize(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() _body: FinalizeSignUpDto,
+    @Body() _body: FinalizeSignUpDto
   ): Promise<{ actorId: string; workspaceId: string }> {
     try {
       const input = FinalizeSignUpCommand.validate({ sessionId: id });
@@ -105,16 +98,11 @@ export class SignUpController {
   }
 
   @Get(':id')
-  async findOne(
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ): Promise<SignUpSessionDto> {
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<SignUpSessionDto> {
     try {
       const input = GetSignUpSessionQuery.validate({ sessionId: id });
       const query = new GetSignUpSessionQuery(input);
-      const result = await this.queryBus.execute<
-        GetSignUpSessionQuery,
-        SignUpSessionResult
-      >(query);
+      const result = await this.queryBus.execute<GetSignUpSessionQuery, SignUpSessionResult>(query);
       return this.mapResultToDto(result);
     } catch (error: unknown) {
       if (error instanceof ZodError) {

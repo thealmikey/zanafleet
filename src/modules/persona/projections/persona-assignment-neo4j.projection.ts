@@ -15,7 +15,7 @@ export class PersonaAssignmentNeo4jProjection
 
   async handle(event: PersonaAssignedToActorEventV1): Promise<void> {
     this.logger.log(
-      `Handling PersonaAssignedToActorEvent-V1 for actor: ${event.actorId}, workspace: ${event.workspaceId}, persona: ${event.personaId}`,
+      `Handling PersonaAssignedToActorEvent-V1 for actor: ${event.actorId}, workspace: ${event.workspaceId}, persona: ${event.personaId}`
     );
 
     const session = this.neo4j.getSession();
@@ -38,18 +38,15 @@ export class PersonaAssignmentNeo4jProjection
           personaId: event.personaId,
           workspaceId: event.workspaceId,
           assignedAt: event.assignedAt.toISOString(),
-        },
+        }
       );
 
       this.logger.debug(
-        `Persona assignment relationships projected to Neo4j: actor=${event.actorId}, workspace=${event.workspaceId}, persona=${event.personaId}`,
+        `Persona assignment relationships projected to Neo4j: actor=${event.actorId}, workspace=${event.workspaceId}, persona=${event.personaId}`
       );
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to project persona assignment to Neo4j: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to project persona assignment to Neo4j: ${err.message}`, err.stack);
       throw error;
     } finally {
       await session.close();

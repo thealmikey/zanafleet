@@ -29,15 +29,13 @@ import { TransactionFailedException } from '../exceptions/transaction-failed.exc
  */
 @CommandHandler(CreateTransactionCommand)
 @Injectable()
-export class CreateTransactionCommandHandler
-  implements ICommandHandler<CreateTransactionCommand>
-{
+export class CreateTransactionCommandHandler implements ICommandHandler<CreateTransactionCommand> {
   private readonly logger = new Logger(CreateTransactionCommandHandler.name);
 
   constructor(
     private readonly dataSource: DataSource,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: CreateTransactionCommand): Promise<string> {
@@ -46,7 +44,7 @@ export class CreateTransactionCommandHandler
     const now = new Date();
 
     this.logger.log(
-      `Executing CreateTransactionCommand: ${command.sourceWalletId} -> ${command.destinationWalletId}, amount: ${command.amount}`,
+      `Executing CreateTransactionCommand: ${command.sourceWalletId} -> ${command.destinationWalletId}, amount: ${command.amount}`
     );
 
     let finalStatus: TransactionStatus = TransactionStatus.Failed;
@@ -63,9 +61,7 @@ export class CreateTransactionCommandHandler
         });
 
         if (!sourceWallet) {
-          throw new NotFoundException(
-            `Source wallet with ID ${command.sourceWalletId} not found`,
-          );
+          throw new NotFoundException(`Source wallet with ID ${command.sourceWalletId} not found`);
         }
 
         const destinationWallet = await walletRepo.findOne({
@@ -75,7 +71,7 @@ export class CreateTransactionCommandHandler
 
         if (!destinationWallet) {
           throw new NotFoundException(
-            `Destination wallet with ID ${command.destinationWalletId} not found`,
+            `Destination wallet with ID ${command.destinationWalletId} not found`
           );
         }
 
@@ -85,7 +81,7 @@ export class CreateTransactionCommandHandler
           throw new InsufficientFundsException(
             command.sourceWalletId,
             sourceBalance,
-            command.amount,
+            command.amount
           );
         }
 
@@ -107,7 +103,7 @@ export class CreateTransactionCommandHandler
         sourceWallet.balance = newSourceBalance.toFixed(2);
         await walletRepo.save(sourceWallet);
         this.logger.debug(
-          `Source wallet ${command.sourceWalletId} debited. New balance: ${newSourceBalance}`,
+          `Source wallet ${command.sourceWalletId} debited. New balance: ${newSourceBalance}`
         );
 
         const destinationBalance = parseFloat(destinationWallet.balance);
@@ -115,7 +111,7 @@ export class CreateTransactionCommandHandler
         destinationWallet.balance = newDestinationBalance.toFixed(2);
         await walletRepo.save(destinationWallet);
         this.logger.debug(
-          `Destination wallet ${command.destinationWalletId} credited. New balance: ${newDestinationBalance}`,
+          `Destination wallet ${command.destinationWalletId} credited. New balance: ${newDestinationBalance}`
         );
 
         transactionEntity.status = TransactionStatus.Completed;
@@ -141,30 +137,20 @@ export class CreateTransactionCommandHandler
       this.logger.log(`TransactionCreatedEvent-V1 emitted: ${eventId}`);
 
       if (this.eventBusService) {
-        await this.eventBusService.publish(
-          NatsSubjects.Transaction.CREATED_V1,
-          event,
-        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+        await this.eventBusService
+          .publish(NatsSubjects.Transaction.CREATED_V1, event)
+          .catch((err) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
 
       return transactionId;
     } catch (error) {
-      this.logger.error(
-        `Transaction failed: ${(error as Error).message}`,
-        (error as Error).stack,
-      );
+      this.logger.error(`Transaction failed: ${(error as Error).message}`, (error as Error).stack);
 
-      if (
-        error instanceof NotFoundException ||
-        error instanceof InsufficientFundsException
-      ) {
+      if (error instanceof NotFoundException || error instanceof InsufficientFundsException) {
         throw error;
       }
 
-      throw new TransactionFailedException(
-        transactionId,
-        (error as Error).message,
-      );
+      throw new TransactionFailedException(transactionId, (error as Error).message);
     }
   }
 }

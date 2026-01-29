@@ -20,7 +20,7 @@ export class CreateCapabilityCommandHandler
     @InjectRepository(CapabilityEntity)
     private readonly capabilityRepository: Repository<CapabilityEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: CreateCapabilityCommand): Promise<string> {
@@ -28,9 +28,7 @@ export class CreateCapabilityCommandHandler
     const now = new Date();
     const eventId = uuidv4();
 
-    this.logger.log(
-      `Executing CreateCapabilityCommand for capability: ${capabilityId}`,
-    );
+    this.logger.log(`Executing CreateCapabilityCommand for capability: ${capabilityId}`);
 
     try {
       const capabilityEntity = CapabilityEntity.fromDomain({
@@ -53,21 +51,14 @@ export class CreateCapabilityCommandHandler
 
       this.eventBus.publish(event);
 
-      this.logger.log(
-        `CapabilityCreatedEvent-V1 emitted to internal event bus: ${eventId}`,
-      );
+      this.logger.log(`CapabilityCreatedEvent-V1 emitted to internal event bus: ${eventId}`);
 
       if (this.eventBusService) {
         try {
-          await this.eventBusService.publish(
-            NatsSubjects.Capability.CREATED_V1,
-            event,
-          );
+          await this.eventBusService.publish(NatsSubjects.Capability.CREATED_V1, event);
         } catch (publishError: unknown) {
           const err =
-            publishError instanceof Error
-              ? publishError
-              : new Error(String(publishError));
+            publishError instanceof Error ? publishError : new Error(String(publishError));
           this.logger.warn(`NATS publish failed: ${err.message}`);
         }
       }
@@ -75,10 +66,7 @@ export class CreateCapabilityCommandHandler
       return capabilityId;
     } catch (error: unknown) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to create capability: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to create capability: ${err.message}`, err.stack);
       throw err;
     }
   }

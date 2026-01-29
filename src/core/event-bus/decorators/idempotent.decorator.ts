@@ -13,8 +13,7 @@ export const IDEMPOTENT_KEY = 'isIdempotent';
  * Decorator to mark an event handler as idempotent.
  * Used in conjunction with IdempotentInterceptor.
  */
-export const Idempotent = (): ClassDecorator & MethodDecorator =>
-  SetMetadata(IDEMPOTENT_KEY, true);
+export const Idempotent = (): ClassDecorator & MethodDecorator => SetMetadata(IDEMPOTENT_KEY, true);
 
 /**
  * Creates a wrapper function that provides idempotency checking for event handlers.
@@ -28,7 +27,7 @@ export const Idempotent = (): ClassDecorator & MethodDecorator =>
 export function withIdempotency<T extends BaseEvent>(
   handler: (event: T) => Promise<void>,
   idempotencyService: IdempotencyService,
-  eventLogger?: EventLoggerService,
+  eventLogger?: EventLoggerService
 ): (event: T) => Promise<void> {
   return async (event: T): Promise<void> => {
     if (idempotencyService.isProcessed(event.eventId)) {
@@ -71,12 +70,12 @@ type AsyncEventHandler = (event: BaseEvent, ...args: unknown[]) => Promise<void>
 
 export function IdempotentHandler(
   idempotencyServiceKey = 'idempotencyService',
-  eventLoggerKey?: string,
+  eventLoggerKey?: string
 ): MethodDecorator {
   return function (
     _target: object,
     _propertyKey: string | symbol,
-    descriptor: PropertyDescriptor,
+    descriptor: PropertyDescriptor
   ): PropertyDescriptor {
     const originalMethod = descriptor.value as AsyncEventHandler;
 
@@ -86,14 +85,12 @@ export function IdempotentHandler(
       ...args: unknown[]
     ): Promise<void> {
       const idempotencyService = this[idempotencyServiceKey] as IdempotencyService;
-      const eventLogger = eventLoggerKey
-        ? (this[eventLoggerKey] as EventLoggerService)
-        : undefined;
+      const eventLogger = eventLoggerKey ? (this[eventLoggerKey] as EventLoggerService) : undefined;
 
       if (!idempotencyService) {
         throw new Error(
           `IdempotencyService not found on '${idempotencyServiceKey}'. ` +
-            'Ensure it is injected into the handler class.',
+            'Ensure it is injected into the handler class.'
         );
       }
 

@@ -12,21 +12,10 @@ export const CreateActorCommandSchema = z.object({
       message: `Actor type must be one of: ${Object.values(ActorType).join(', ')}`,
     }),
   }),
-  workspaceId: z
-    .string()
-    .uuid('Workspace ID must be a valid UUID'),
-  roles: z
-    .array(
-      z
-        .string()
-        .uuid('Each role ID must be a valid UUID'),
-    ),
+  workspaceId: z.string().uuid('Workspace ID must be a valid UUID'),
+  roles: z.array(z.string().uuid('Each role ID must be a valid UUID')),
   linkedWallets: z
-    .array(
-      z
-        .string()
-        .uuid('Each wallet ID must be a valid UUID'),
-    )
+    .array(z.string().uuid('Each wallet ID must be a valid UUID'))
     .optional()
     .default([]),
 });

@@ -17,9 +17,7 @@ export const UpdateSignUpStepCommandSchema = z.object({
  * UpdateSignUpStepCommandInput
  * Type derived from the Zod schema for validated input
  */
-export type UpdateSignUpStepCommandInput = z.infer<
-  typeof UpdateSignUpStepCommandSchema
->;
+export type UpdateSignUpStepCommandInput = z.infer<typeof UpdateSignUpStepCommandSchema>;
 
 /**
  * UpdateSignUpStepCommand

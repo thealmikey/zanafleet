@@ -59,7 +59,7 @@ describe('CreateCommitmentCommandHandler', () => {
       commitmentRepository,
       actorRepository,
       workspaceRepository,
-      eventBus,
+      eventBus
     );
   });
 
@@ -109,7 +109,7 @@ describe('CreateCommitmentCommandHandler', () => {
 
       await expect(handler.execute(validCommand)).rejects.toThrow(NotFoundException);
       await expect(handler.execute(validCommand)).rejects.toThrow(
-        `Actor with ID '${validCommand.actorId}' does not exist`,
+        `Actor with ID '${validCommand.actorId}' does not exist`
       );
 
       expect(workspaceRepository.findOne).not.toHaveBeenCalled();
@@ -123,7 +123,7 @@ describe('CreateCommitmentCommandHandler', () => {
 
       await expect(handler.execute(validCommand)).rejects.toThrow(NotFoundException);
       await expect(handler.execute(validCommand)).rejects.toThrow(
-        `Workspace with ID '${validCommand.workspaceId}' does not exist`,
+        `Workspace with ID '${validCommand.workspaceId}' does not exist`
       );
 
       expect(commitmentRepository.save).not.toHaveBeenCalled();

@@ -12,9 +12,7 @@ export const FinalizeSignUpCommandSchema = z.object({
  * FinalizeSignUpCommandInput
  * Type derived from the Zod schema for validated input
  */
-export type FinalizeSignUpCommandInput = z.infer<
-  typeof FinalizeSignUpCommandSchema
->;
+export type FinalizeSignUpCommandInput = z.infer<typeof FinalizeSignUpCommandSchema>;
 
 /**
  * FinalizeSignUpCommand

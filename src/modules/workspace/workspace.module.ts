@@ -12,8 +12,14 @@ import { AddActorToWorkspaceCommandHandler } from './handlers/add-actor-to-works
 import { CreateWorkspaceCommandHandler } from './handlers/create-workspace.handler';
 import { RemoveActorFromWorkspaceCommandHandler } from './handlers/remove-actor-from-workspace.handler';
 import { UpdateWorkspaceCommandHandler } from './handlers/update-workspace.handler';
-import { MembershipNeo4jProjection, MembershipNeo4jInitializer } from './projections/membership-neo4j.projection';
-import { WorkspaceNeo4jProjection, WorkspaceNeo4jInitializer } from './projections/workspace-neo4j.projection';
+import {
+  MembershipNeo4jProjection,
+  MembershipNeo4jInitializer,
+} from './projections/membership-neo4j.projection';
+import {
+  WorkspaceNeo4jProjection,
+  WorkspaceNeo4jInitializer,
+} from './projections/workspace-neo4j.projection';
 
 /**
  * Workspace Module
@@ -67,7 +73,7 @@ import { WorkspaceNeo4jProjection, WorkspaceNeo4jInitializer } from './projectio
 export class WorkspaceModule implements OnModuleInit {
   constructor(
     private readonly workspaceNeo4jInitializer: WorkspaceNeo4jInitializer,
-    private readonly membershipNeo4jInitializer: MembershipNeo4jInitializer,
+    private readonly membershipNeo4jInitializer: MembershipNeo4jInitializer
   ) {}
 
   /**

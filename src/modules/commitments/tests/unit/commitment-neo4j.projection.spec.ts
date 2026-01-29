@@ -103,7 +103,7 @@ describe('CommitmentNeo4jProjection', () => {
 
   describe('handle CommitmentStatusChangedEventV1', () => {
     const createStatusChangedEvent = (
-      newStatus: CommitmentStatus,
+      newStatus: CommitmentStatus
     ): CommitmentStatusChangedEventV1 => {
       return new CommitmentStatusChangedEventV1({
         eventId: 'event-123',
@@ -201,7 +201,9 @@ describe('CommitmentNeo4jInitializer', () => {
 
       const cypherCalls = mockSession.run.mock.calls.map(([cypher]: [string]) => cypher);
       expect(cypherCalls.some((c: string) => c.includes('commitment_id_unique'))).toBe(true);
-      expect(cypherCalls.some((c: string) => c.includes('FOR (c:Commitment) REQUIRE c.id IS UNIQUE'))).toBe(true);
+      expect(
+        cypherCalls.some((c: string) => c.includes('FOR (c:Commitment) REQUIRE c.id IS UNIQUE'))
+      ).toBe(true);
     });
 
     it('should create index on Commitment.status', async () => {

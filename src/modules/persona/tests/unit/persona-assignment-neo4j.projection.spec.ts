@@ -34,9 +34,7 @@ describe('PersonaAssignmentNeo4jProjection', () => {
     neo4jService = {
       getSession: jest.fn().mockReturnValue(session),
     };
-    projection = new PersonaAssignmentNeo4jProjection(
-      neo4jService as unknown as never,
-    );
+    projection = new PersonaAssignmentNeo4jProjection(neo4jService as unknown as never);
   });
 
   afterEach(() => {
@@ -64,7 +62,7 @@ describe('PersonaAssignmentNeo4jProjection', () => {
         personaId: baseEvent.personaId,
         workspaceId: baseEvent.workspaceId,
         assignedAt: baseEvent.assignedAt.toISOString(),
-      },
+      }
     );
     expect(session.close).toHaveBeenCalledTimes(1);
   });
@@ -72,15 +70,13 @@ describe('PersonaAssignmentNeo4jProjection', () => {
   it('logs error and rethrows when session.run fails', async () => {
     const error = new Error('Neo4j failure');
     session.run.mockRejectedValueOnce(error);
-    const errorSpy = jest
-      .spyOn(Logger.prototype, 'error')
-      .mockImplementation(() => undefined);
+    const errorSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
 
     await expect(projection.handle(baseEvent)).rejects.toBe(error);
 
     expect(errorSpy).toHaveBeenCalledWith(
       `Failed to project persona assignment to Neo4j: ${error.message}`,
-      error.stack,
+      error.stack
     );
     expect(session.close).toHaveBeenCalledTimes(1);
   });

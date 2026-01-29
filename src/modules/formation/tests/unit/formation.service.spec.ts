@@ -28,7 +28,7 @@ const createRequirement = (overrides: Partial<RequirementEntity> = {}): Requirem
     satisfied: overrides.satisfied ?? false,
     targetEntityId: overrides.targetEntityId ?? null,
     createdAt: overrides.createdAt ?? new Date(),
-  }) as RequirementEntity;
+  } as RequirementEntity);
 
 describe('FormationService', () => {
   let formationStatusRepository: MockRepository<FormationStatusEntity>;
@@ -41,7 +41,7 @@ describe('FormationService', () => {
 
     service = new FormationService(
       formationStatusRepository as unknown as Repository<FormationStatusEntity>,
-      requirementRepository as unknown as Repository<RequirementEntity>,
+      requirementRepository as unknown as Repository<RequirementEntity>
     );
   });
 

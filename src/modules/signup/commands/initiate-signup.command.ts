@@ -15,9 +15,7 @@ export const InitiateSignUpCommandSchema = z.object({
  * InitiateSignUpCommandInput
  * Type derived from the Zod schema for validated input
  */
-export type InitiateSignUpCommandInput = z.infer<
-  typeof InitiateSignUpCommandSchema
->;
+export type InitiateSignUpCommandInput = z.infer<typeof InitiateSignUpCommandSchema>;
 
 /**
  * InitiateSignUpCommand

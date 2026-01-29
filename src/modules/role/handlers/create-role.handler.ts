@@ -25,16 +25,14 @@ import { RoleCreatedEventV1 } from '../events/role-created.event';
  */
 @CommandHandler(CreateRoleCommand)
 @Injectable()
-export class CreateRoleCommandHandler
-  implements ICommandHandler<CreateRoleCommand>
-{
+export class CreateRoleCommandHandler implements ICommandHandler<CreateRoleCommand> {
   private readonly logger = new Logger(CreateRoleCommandHandler.name);
 
   constructor(
     @InjectRepository(RoleEntity)
     private readonly roleRepository: Repository<RoleEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -51,7 +49,7 @@ export class CreateRoleCommandHandler
     const eventId = uuidv4();
 
     this.logger.log(
-      `Executing CreateRoleCommand for role: ${command.name} (scope: ${command.scope})`,
+      `Executing CreateRoleCommand for role: ${command.name} (scope: ${command.scope})`
     );
 
     // Step 1: Check for duplicate (name, scope) combination
@@ -63,11 +61,9 @@ export class CreateRoleCommandHandler
     });
 
     if (existingRole) {
-      this.logger.warn(
-        `Duplicate role detected: ${command.name} with scope ${command.scope}`,
-      );
+      this.logger.warn(`Duplicate role detected: ${command.name} with scope ${command.scope}`);
       throw new ConflictException(
-        `Role with name "${command.name}" and scope "${command.scope}" already exists`,
+        `Role with name "${command.name}" and scope "${command.scope}" already exists`
       );
     }
 
@@ -100,19 +96,15 @@ export class CreateRoleCommandHandler
       this.logger.log(`RoleCreatedEvent-V1 emitted to event bus: ${eventId}`);
 
       if (this.eventBusService) {
-        await this.eventBusService.publish(
-          NatsSubjects.Role.CREATED_V1,
-          event,
-        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+        await this.eventBusService
+          .publish(NatsSubjects.Role.CREATED_V1, event)
+          .catch((err) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
 
       return roleId;
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to create role: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to create role: ${err.message}`, err.stack);
       throw error;
     }
   }

@@ -47,11 +47,9 @@ describe('InitiateSignUpCommandHandler', () => {
       ],
     }).compile();
 
-    handler = module.get<InitiateSignUpCommandHandler>(
-      InitiateSignUpCommandHandler,
-    );
+    handler = module.get<InitiateSignUpCommandHandler>(InitiateSignUpCommandHandler);
     repository = module.get<Repository<SignUpSessionEntity>>(
-      getRepositoryToken(SignUpSessionEntity),
+      getRepositoryToken(SignUpSessionEntity)
     );
     eventBus = module.get<EventBus>(EventBus);
     eventBusService = module.get<EventBusService>(EventBusService);
@@ -98,13 +96,9 @@ describe('InitiateSignUpCommandHandler', () => {
       actorType: ActorType.Internal,
     });
 
-    jest
-      .spyOn(repository, 'save')
-      .mockRejectedValueOnce(new Error('Postgres connection failed'));
+    jest.spyOn(repository, 'save').mockRejectedValueOnce(new Error('Postgres connection failed'));
 
-    await expect(handler.execute(command)).rejects.toThrow(
-      'Postgres connection failed',
-    );
+    await expect(handler.execute(command)).rejects.toThrow('Postgres connection failed');
     expect(eventBus.publish).not.toHaveBeenCalled();
     expect(eventBusService.publish).not.toHaveBeenCalled();
   });
@@ -114,9 +108,7 @@ describe('InitiateSignUpCommandHandler', () => {
       actorType: ActorType.BusinessOwner,
     });
 
-    jest
-      .spyOn(eventBusService, 'publish')
-      .mockRejectedValueOnce(new Error('NATS timed out'));
+    jest.spyOn(eventBusService, 'publish').mockRejectedValueOnce(new Error('NATS timed out'));
 
     const result = await handler.execute(command);
 

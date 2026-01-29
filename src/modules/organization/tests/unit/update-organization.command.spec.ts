@@ -46,9 +46,9 @@ describe('UpdateOrganizationCommand', () => {
   });
 
   it('throws when organizationId is not a valid UUID', () => {
-    expect(() =>
-      UpdateOrganizationCommand.validate({ organizationId: 'not-a-uuid' }),
-    ).toThrow(ZodError);
+    expect(() => UpdateOrganizationCommand.validate({ organizationId: 'not-a-uuid' })).toThrow(
+      ZodError
+    );
   });
 
   it('throws when type is invalid', () => {
@@ -56,7 +56,7 @@ describe('UpdateOrganizationCommand', () => {
       UpdateOrganizationCommand.validate({
         organizationId,
         type: 'INVALID' as OrganizationType,
-      }),
+      })
     ).toThrow(ZodError);
   });
 
@@ -65,7 +65,7 @@ describe('UpdateOrganizationCommand', () => {
       UpdateOrganizationCommand.validate({
         organizationId,
         status: 'INVALID' as OrganizationStatus,
-      }),
+      })
     ).toThrow(ZodError);
   });
 
@@ -74,7 +74,7 @@ describe('UpdateOrganizationCommand', () => {
       UpdateOrganizationCommand.validate({
         organizationId,
         linkedWallets: ['invalid-uuid'],
-      }),
+      })
     ).toThrow(ZodError);
   });
 

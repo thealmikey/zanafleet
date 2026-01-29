@@ -59,11 +59,9 @@ describe('FinalizeSignUpCommandHandler', () => {
       ],
     }).compile();
 
-    handler = module.get<FinalizeSignUpCommandHandler>(
-      FinalizeSignUpCommandHandler,
-    );
+    handler = module.get<FinalizeSignUpCommandHandler>(FinalizeSignUpCommandHandler);
     repository = module.get<Repository<SignUpSessionEntity>>(
-      getRepositoryToken(SignUpSessionEntity),
+      getRepositoryToken(SignUpSessionEntity)
     );
     eventBus = module.get<EventBus>(EventBus);
     commandBus = module.get<CommandBus>(CommandBus);
@@ -78,7 +76,7 @@ describe('FinalizeSignUpCommandHandler', () => {
     const sessionId = uuidv4();
     const workspaceId = uuidv4();
     const actorId = uuidv4();
-    
+
     const session = SignUpSessionEntity.fromDomain({
       sessionId,
       status: SignUpSessionStatus.PARTIAL,
@@ -118,7 +116,7 @@ describe('FinalizeSignUpCommandHandler', () => {
     expect(event.eventType).toBe('SignUpFinalizedEvent-V1');
     expect(event.sessionId).toBe(sessionId);
     expect(event.actorId).toBe(actorId);
-    
+
     expect(eventBusService.publish).toHaveBeenCalled();
   });
 
@@ -146,10 +144,10 @@ describe('FinalizeSignUpCommandHandler', () => {
   });
 
   it('should throw BadRequestException if workspaceId is missing', async () => {
-    const session = { 
+    const session = {
       status: SignUpSessionStatus.PARTIAL,
       actorType: ActorType.Rider,
-      workspaceId: null 
+      workspaceId: null,
     };
     mockRepository.findOne.mockResolvedValue(session);
     const command = new FinalizeSignUpCommand({ sessionId: uuidv4() });
@@ -159,12 +157,12 @@ describe('FinalizeSignUpCommandHandler', () => {
   });
 
   it('should rethrow errors from CommandBus (Actor creation failure)', async () => {
-    const session = { 
+    const session = {
       status: SignUpSessionStatus.PARTIAL,
       actorType: ActorType.Rider,
       workspaceId: uuidv4(),
       roles: [],
-      linkedWallets: []
+      linkedWallets: [],
     };
     mockRepository.findOne.mockResolvedValue(session);
     mockCommandBus.execute.mockRejectedValue(new Error('Workspace not found'));

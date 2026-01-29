@@ -9,21 +9,24 @@ import { OrganizationEntity } from './entities/organization.entity';
 import { CreateOrganizationCommandHandler } from './handlers/create-organization.handler';
 import { DeleteOrganizationCommandHandler } from './handlers/delete-organization.handler';
 import { UpdateOrganizationCommandHandler } from './handlers/update-organization.handler';
-import { OrganizationNeo4jProjection, OrganizationNeo4jInitializer } from './projections/organization-neo4j.projection';
+import {
+  OrganizationNeo4jProjection,
+  OrganizationNeo4jInitializer,
+} from './projections/organization-neo4j.projection';
 
 /**
  * Organization Module
- * 
+ *
  * Complete module for managing organizations in ZanaFleet.
  * Implements event-driven architecture with CQRS pattern.
- * 
+ *
  * Features:
  * 1. CreateOrganizationCommand with Zod validation
  * 2. OrganizationCreatedEvent-V1 (append-only, deterministic)
  * 3. PostgreSQL persistence via TypeORM
  * 4. Neo4j graph projections
  * 5. Comprehensive unit and integration tests
- * 
+ *
  * Dependencies:
  * - @nestjs/cqrs: Command/Event handling
  * - @nestjs/typeorm: PostgreSQL ORM

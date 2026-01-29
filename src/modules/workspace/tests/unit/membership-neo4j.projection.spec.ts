@@ -142,7 +142,9 @@ describe('MembershipNeo4jProjection', () => {
       expect(mockSession.run).toHaveBeenCalledTimes(1);
 
       const [cypher, params] = mockSession.run.mock.calls[0];
-      expect(cypher).toContain('MATCH (a:Actor {id: $actorId})-[r:MEMBER_OF]->(ws:Workspace {id: $workspaceId})');
+      expect(cypher).toContain(
+        'MATCH (a:Actor {id: $actorId})-[r:MEMBER_OF]->(ws:Workspace {id: $workspaceId})'
+      );
       expect(cypher).toContain('DELETE r');
       expect(params.actorId).toBe('actor-456');
       expect(params.workspaceId).toBe('workspace-789');
@@ -204,7 +206,9 @@ describe('MembershipNeo4jInitializer', () => {
 
       const cypherCalls = mockSession.run.mock.calls.map(([cypher]: [string]) => cypher);
       expect(cypherCalls.some((c: string) => c.includes('member_of_role_index'))).toBe(true);
-      expect(cypherCalls.some((c: string) => c.includes('FOR ()-[r:MEMBER_OF]-() ON (r.role)'))).toBe(true);
+      expect(
+        cypherCalls.some((c: string) => c.includes('FOR ()-[r:MEMBER_OF]-() ON (r.role)'))
+      ).toBe(true);
     });
 
     it('should create index on MEMBER_OF.since', async () => {
@@ -212,7 +216,9 @@ describe('MembershipNeo4jInitializer', () => {
 
       const cypherCalls = mockSession.run.mock.calls.map(([cypher]: [string]) => cypher);
       expect(cypherCalls.some((c: string) => c.includes('member_of_since_index'))).toBe(true);
-      expect(cypherCalls.some((c: string) => c.includes('FOR ()-[r:MEMBER_OF]-() ON (r.since)'))).toBe(true);
+      expect(
+        cypherCalls.some((c: string) => c.includes('FOR ()-[r:MEMBER_OF]-() ON (r.since)'))
+      ).toBe(true);
     });
 
     it('should use IF NOT EXISTS for idempotent initialization', async () => {

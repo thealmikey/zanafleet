@@ -45,7 +45,7 @@ describe('CreateActorCommandHandler', () => {
       actorRepository,
       workspaceRepository,
       eventBus,
-      undefined,
+      undefined
     );
   });
 
@@ -61,7 +61,7 @@ describe('CreateActorCommandHandler', () => {
       const actorId = await handler.execute(validCommand);
 
       expect(actorId).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       );
       expect(workspaceRepository.findOne).toHaveBeenCalledWith({
         where: { id: validCommand.workspaceId },
@@ -95,7 +95,7 @@ describe('CreateActorCommandHandler', () => {
 
       await expect(execution).rejects.toThrow(NotFoundException);
       await expect(execution).rejects.toThrow(
-        `Workspace with ID ${validCommand.workspaceId} does not exist`,
+        `Workspace with ID ${validCommand.workspaceId} does not exist`
       );
 
       expect(actorRepository.save).not.toHaveBeenCalled();
@@ -114,7 +114,7 @@ describe('CreateActorCommandHandler', () => {
 
       await expect(execution).rejects.toThrow(BadRequestException);
       await expect(execution).rejects.toThrow(
-        `The following roles are not valid for workspace ${invalidCommand.workspaceId}: invalid-role`,
+        `The following roles are not valid for workspace ${invalidCommand.workspaceId}: invalid-role`
       );
 
       expect(actorRepository.save).not.toHaveBeenCalled();

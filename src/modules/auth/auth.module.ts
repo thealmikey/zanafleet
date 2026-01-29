@@ -13,10 +13,7 @@ import { LoginCommandHandler } from './handlers/login.handler';
  * Handles user authentication.
  */
 @Module({
-  imports: [
-    CqrsModule,
-    TypeOrmModule.forFeature([ActorEntity]),
-  ],
+  imports: [CqrsModule, TypeOrmModule.forFeature([ActorEntity])],
   controllers: [AuthController],
   providers: [LoginCommandHandler],
   exports: [],

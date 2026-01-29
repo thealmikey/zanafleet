@@ -22,12 +22,12 @@ export class CreateRequirementCommandHandler
     private readonly requirementRepository: Repository<RequirementEntity>,
     private readonly eventBus: EventBus,
     private readonly commandBus: CommandBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: CreateRequirementCommand): Promise<string> {
     this.logger.log(
-      `Creating requirement '${command.key}' for ${command.entityType}:${command.entityId}`,
+      `Creating requirement '${command.key}' for ${command.entityType}:${command.entityId}`
     );
 
     const requirementId = uuidv4();
@@ -71,12 +71,9 @@ export class CreateRequirementCommandHandler
         try {
           await this.eventBusService.publishEvent(event);
         } catch (publishError) {
-          const err =
-            publishError instanceof Error
-              ? publishError.message
-              : String(publishError);
+          const err = publishError instanceof Error ? publishError.message : String(publishError);
           this.logger.warn(
-            `Failed to publish RequirementCreatedEventV1 via EventBusService: ${err}`,
+            `Failed to publish RequirementCreatedEventV1 via EventBusService: ${err}`
           );
         }
       }
@@ -85,7 +82,7 @@ export class CreateRequirementCommandHandler
         new EvaluateFormationCommand({
           entityType: command.entityType,
           entityId: command.entityId,
-        }),
+        })
       );
 
       return requirementId;
@@ -93,7 +90,7 @@ export class CreateRequirementCommandHandler
       const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
         `Failed to create requirement '${command.key}' for ${command.entityType}:${command.entityId}: ${err.message}`,
-        err.stack,
+        err.stack
       );
       throw error;
     }

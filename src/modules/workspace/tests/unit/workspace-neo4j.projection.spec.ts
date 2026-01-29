@@ -1,10 +1,7 @@
 import { Logger } from '@nestjs/common';
 
 import { Neo4jService } from '../../../../core/neo4j';
-import {
-  WorkspaceType,
-  WorkspaceStatus,
-} from '../../dto/workspace.enums';
+import { WorkspaceType, WorkspaceStatus } from '../../dto/workspace.enums';
 import { WorkspaceCreatedEventV1 } from '../../events/workspace-created.event';
 import {
   WorkspaceNeo4jProjection,
@@ -64,10 +61,7 @@ describe('WorkspaceNeo4jProjection', () => {
     expect(getSession).toHaveBeenCalledTimes(1);
     expect(mockSession.run).toHaveBeenCalledTimes(1);
 
-    const [query, params] = mockSession.run.mock.calls[0] as [
-      string,
-      Record<string, unknown>,
-    ];
+    const [query, params] = mockSession.run.mock.calls[0] as [string, Record<string, unknown>];
 
     expect(query).toContain('MERGE (ws:Workspace {id: $workspaceId})');
     expect(query).toContain('MERGE (ws)-[:PART_OF]->(org)');
@@ -96,7 +90,7 @@ describe('WorkspaceNeo4jProjection', () => {
     expect(mockSession.run).toHaveBeenCalledTimes(1);
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       `Failed to project workspace to Neo4j: ${error.message}`,
-      error.stack,
+      error.stack
     );
     expect(mockSession.close).toHaveBeenCalledTimes(1);
   });
@@ -133,15 +127,15 @@ describe('WorkspaceNeo4jInitializer', () => {
 
     expect(mockSession.run).toHaveBeenNthCalledWith(
       1,
-      expect.stringContaining('CREATE CONSTRAINT workspace_id_unique IF NOT EXISTS'),
+      expect.stringContaining('CREATE CONSTRAINT workspace_id_unique IF NOT EXISTS')
     );
     expect(mockSession.run).toHaveBeenNthCalledWith(
       2,
-      expect.stringContaining('CREATE INDEX workspace_orgId_index IF NOT EXISTS'),
+      expect.stringContaining('CREATE INDEX workspace_orgId_index IF NOT EXISTS')
     );
     expect(mockSession.run).toHaveBeenNthCalledWith(
       3,
-      expect.stringContaining('CREATE INDEX workspace_createdAt_index IF NOT EXISTS'),
+      expect.stringContaining('CREATE INDEX workspace_createdAt_index IF NOT EXISTS')
     );
 
     expect(loggerLogSpy).toHaveBeenCalledWith('UNIQUE constraint on Workspace.id created');
@@ -160,7 +154,7 @@ describe('WorkspaceNeo4jInitializer', () => {
     expect(mockSession.run).toHaveBeenCalledTimes(1);
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       `Failed to initialize Neo4j constraints/indexes: ${error.message}`,
-      error.stack,
+      error.stack
     );
     expect(mockSession.close).toHaveBeenCalledTimes(1);
   });

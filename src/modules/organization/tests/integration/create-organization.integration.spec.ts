@@ -21,19 +21,18 @@ import { OrganizationEntity } from '../../entities/organization.entity';
 import { OrganizationCreatedEventV1 } from '../../events/organization-created.event';
 import { CreateOrganizationCommandHandler } from '../../handlers/create-organization.handler';
 
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 /**
  * Integration Tests: CreateOrganizationCommand End-to-End
- * 
+ *
  * Test flow:
  * 1. Command is executed via CommandBus
  * 2. CommandHandler persists to PostgreSQL
  * 3. OrganizationCreatedEvent-V1 is emitted
  * 4. Neo4j projection handler receives event (mocked)
  * 5. Verify: No duplicate events, deterministic behavior
- * 
+ *
  * Prerequisites:
  * - TypeORM with test database (SQLite or PostgreSQL test DB)
  * - NestJS CQRS module
@@ -45,7 +44,7 @@ const describeIntegration =
  */
 async function createTestActor(
   repo: Repository<ActorEntity>,
-  workspaceId: string,
+  workspaceId: string
 ): Promise<string> {
   const actorId = uuidv4();
   const actor = ActorEntity.fromDomain({
@@ -83,12 +82,7 @@ describeIntegration('CreateOrganizationCommand Integration Tests', () => {
             username: process.env.TEST_DB_USER || 'test',
             password: process.env.TEST_DB_PASSWORD || 'test',
             database: process.env.TEST_DB_NAME || 'zanafleet_test',
-            entities: [
-              OrganizationEntity,
-              WorkspaceEntity,
-              MembershipEntity,
-              ActorEntity,
-            ],
+            entities: [OrganizationEntity, WorkspaceEntity, MembershipEntity, ActorEntity],
             synchronize: true,
             dropSchema: true,
           }),
@@ -109,17 +103,15 @@ describeIntegration('CreateOrganizationCommand Integration Tests', () => {
       commandBus = module.get<CommandBus>(CommandBus);
       eventBus = module.get<EventBus>(EventBus);
       organizationRepository = module.get<Repository<OrganizationEntity>>(
-        getRepositoryToken(OrganizationEntity),
+        getRepositoryToken(OrganizationEntity)
       );
       workspaceRepository = module.get<Repository<WorkspaceEntity>>(
-        getRepositoryToken(WorkspaceEntity),
+        getRepositoryToken(WorkspaceEntity)
       );
       membershipRepository = module.get<Repository<MembershipEntity>>(
-        getRepositoryToken(MembershipEntity),
+        getRepositoryToken(MembershipEntity)
       );
-      actorRepository = module.get<Repository<ActorEntity>>(
-        getRepositoryToken(ActorEntity),
-      );
+      actorRepository = module.get<Repository<ActorEntity>>(getRepositoryToken(ActorEntity));
 
       eventBus.subscribe((event) => {
         if (event instanceof OrganizationCreatedEventV1) {
@@ -135,7 +127,7 @@ describeIntegration('CreateOrganizationCommand Integration Tests', () => {
     } catch (error) {
       console.warn(
         'Failed to initialize Organization integration test module (database may not be available):',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? error.message : String(error)
       );
       moduleInitializationFailed = true;
     }
@@ -144,7 +136,7 @@ describeIntegration('CreateOrganizationCommand Integration Tests', () => {
   beforeEach((): void => {
     if (moduleInitializationFailed) {
       throw new Error(
-        'Organization integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d).',
+        'Organization integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d).'
       );
     }
   });
@@ -566,7 +558,7 @@ describeIntegration('CreateOrganizationCommand Integration Tests', () => {
         where: { actorId },
       });
       const relevantMemberships = memberships.filter(
-        (membership) => membership.workspaceId !== placeholderWorkspaceId,
+        (membership) => membership.workspaceId !== placeholderWorkspaceId
       );
       expect(relevantMemberships.length).toBe(0);
     });

@@ -21,13 +21,13 @@ export class TransactionSubscriber {
   constructor(
     private readonly projection: TransactionNeo4jProjection,
     private readonly idempotencyService: IdempotencyService,
-    private readonly eventLogger: EventLoggerService,
+    private readonly eventLogger: EventLoggerService
   ) {}
 
   @MessagePattern(NatsSubjects.Transaction.ALL)
   async handleTransactionEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     const subject = context.getSubject();
     this.logger.debug(`Received event on subject: ${subject}`);
@@ -44,18 +44,20 @@ export class TransactionSubscriber {
       if (data.eventType === 'TransactionCreatedEvent-V1') {
         const eventData = {
           eventId: data.eventId,
-          transactionId: (data.payload ).transactionId as string,
-          sourceWalletId: (data.payload ).sourceWalletId as string,
-          destinationWalletId: (data.payload ).destinationWalletId as string,
-          amount: (data.payload ).amount as number,
-          type: (data.payload ).type as string,
-          status: (data.payload ).status as string,
-          linkedEventId: (data.payload ).linkedEventId as string | null | undefined,
+          transactionId: data.payload.transactionId as string,
+          sourceWalletId: data.payload.sourceWalletId as string,
+          destinationWalletId: data.payload.destinationWalletId as string,
+          amount: data.payload.amount as number,
+          type: data.payload.type as string,
+          status: data.payload.status as string,
+          linkedEventId: data.payload.linkedEventId as string | null | undefined,
           occurredAt: data.occurredAt,
           correlationId: data.correlationId,
           causationId: data.causationId,
         };
-        const event = TransactionCreatedEventV1.fromJSON(eventData as Parameters<typeof TransactionCreatedEventV1.fromJSON>[0]);
+        const event = TransactionCreatedEventV1.fromJSON(
+          eventData as Parameters<typeof TransactionCreatedEventV1.fromJSON>[0]
+        );
         await this.projection.handle(event);
         this.eventLogger.logProcessed(event, TransactionNeo4jProjection.name);
       }

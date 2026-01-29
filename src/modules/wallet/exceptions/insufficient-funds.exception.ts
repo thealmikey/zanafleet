@@ -10,12 +10,14 @@ export class InsufficientFundsException extends HttpException {
       {
         statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
         error: 'Insufficient Funds',
-        message: `Wallet ${walletId} has insufficient funds. Balance: ${balance.toFixed(2)}, Requested: ${requestedAmount.toFixed(2)}`,
+        message: `Wallet ${walletId} has insufficient funds. Balance: ${balance.toFixed(
+          2
+        )}, Requested: ${requestedAmount.toFixed(2)}`,
         walletId,
         balance,
         requestedAmount,
       },
-      HttpStatus.UNPROCESSABLE_ENTITY,
+      HttpStatus.UNPROCESSABLE_ENTITY
     );
   }
 }

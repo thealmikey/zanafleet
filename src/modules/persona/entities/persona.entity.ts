@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('personas')
 export class PersonaEntity {
@@ -34,11 +28,7 @@ export class PersonaEntity {
     };
   }
 
-  static fromDomain(data: {
-    personaId: string;
-    name: string;
-    createdAt: Date;
-  }): PersonaEntity {
+  static fromDomain(data: { personaId: string; name: string; createdAt: Date }): PersonaEntity {
     const entity = new PersonaEntity();
     entity.id = data.personaId;
     entity.name = data.name;

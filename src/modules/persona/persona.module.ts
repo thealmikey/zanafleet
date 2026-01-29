@@ -18,12 +18,7 @@ import {
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([
-      PersonaEntity,
-      ActorPersonaEntity,
-      ActorEntity,
-      WorkspaceEntity,
-    ]),
+    TypeOrmModule.forFeature([PersonaEntity, ActorPersonaEntity, ActorEntity, WorkspaceEntity]),
   ],
   providers: [
     CreatePersonaCommandHandler,
@@ -32,16 +27,10 @@ import {
     PersonaAssignmentNeo4jProjection,
     PersonaNeo4jInitializer,
   ],
-  exports: [
-    TypeOrmModule,
-    CreatePersonaCommandHandler,
-    AssignPersonaToActorCommandHandler,
-  ],
+  exports: [TypeOrmModule, CreatePersonaCommandHandler, AssignPersonaToActorCommandHandler],
 })
 export class PersonaModule implements OnModuleInit {
-  constructor(
-    private readonly personaNeo4jInitializer: PersonaNeo4jInitializer,
-  ) {}
+  constructor(private readonly personaNeo4jInitializer: PersonaNeo4jInitializer) {}
 
   async onModuleInit(): Promise<void> {
     await this.personaNeo4jInitializer.initialize();

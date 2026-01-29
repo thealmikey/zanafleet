@@ -56,10 +56,7 @@ describe('WalletNeo4jProjection', () => {
     expect(getSession).toHaveBeenCalledTimes(1);
     expect(mockSession.run).toHaveBeenCalledTimes(1);
 
-    const [query, params] = mockSession.run.mock.calls[0] as [
-      string,
-      Record<string, unknown>,
-    ];
+    const [query, params] = mockSession.run.mock.calls[0] as [string, Record<string, unknown>];
 
     expect(query).toContain('MERGE (wallet:Wallet {id: $walletId})');
     expect(query).toContain('MERGE (wallet)-[:OWNED_BY]->(owner)');
@@ -90,13 +87,10 @@ describe('WalletNeo4jProjection', () => {
 
       await projection.handle(event);
 
-      const [query] = mockSession.run.mock.calls[0] as [
-        string,
-        Record<string, unknown>,
-      ];
+      const [query] = mockSession.run.mock.calls[0] as [string, Record<string, unknown>];
       expect(query).toContain(`MATCH (owner:${expectedLabel} {id: $ownerId})`);
       expect(mockSession.close).toHaveBeenCalledTimes(1);
-    },
+    }
   );
 
   it('logs and rethrows errors while ensuring the session is closed on failure', async () => {
@@ -110,7 +104,7 @@ describe('WalletNeo4jProjection', () => {
     expect(mockSession.run).toHaveBeenCalledTimes(1);
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       `Failed to project wallet to Neo4j: ${error.message}`,
-      error.stack,
+      error.stack
     );
     expect(mockSession.close).toHaveBeenCalledTimes(1);
   });
@@ -147,19 +141,19 @@ describe('WalletNeo4jInitializer', () => {
 
     expect(mockSession.run).toHaveBeenNthCalledWith(
       1,
-      expect.stringContaining('CREATE CONSTRAINT wallet_id_unique IF NOT EXISTS'),
+      expect.stringContaining('CREATE CONSTRAINT wallet_id_unique IF NOT EXISTS')
     );
     expect(mockSession.run).toHaveBeenNthCalledWith(
       2,
-      expect.stringContaining('CREATE INDEX wallet_ownerId_index IF NOT EXISTS'),
+      expect.stringContaining('CREATE INDEX wallet_ownerId_index IF NOT EXISTS')
     );
     expect(mockSession.run).toHaveBeenNthCalledWith(
       3,
-      expect.stringContaining('CREATE INDEX wallet_type_index IF NOT EXISTS'),
+      expect.stringContaining('CREATE INDEX wallet_type_index IF NOT EXISTS')
     );
     expect(mockSession.run).toHaveBeenNthCalledWith(
       4,
-      expect.stringContaining('CREATE INDEX wallet_ownerType_index IF NOT EXISTS'),
+      expect.stringContaining('CREATE INDEX wallet_ownerType_index IF NOT EXISTS')
     );
 
     expect(loggerLogSpy).toHaveBeenCalledWith('UNIQUE constraint on Wallet.id created');
@@ -179,7 +173,7 @@ describe('WalletNeo4jInitializer', () => {
     expect(mockSession.run).toHaveBeenCalledTimes(1);
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       `Failed to initialize Neo4j constraints/indexes: ${error.message}`,
-      error.stack,
+      error.stack
     );
     expect(mockSession.close).toHaveBeenCalledTimes(1);
   });

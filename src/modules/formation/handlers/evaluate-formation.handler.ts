@@ -35,12 +35,10 @@ export class EvaluateFormationCommandHandler
     @InjectRepository(FormationStatusEntity)
     private readonly formationStatusRepository: Repository<FormationStatusEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
-  async execute(
-    command: EvaluateFormationCommand,
-  ): Promise<{
+  async execute(command: EvaluateFormationCommand): Promise<{
     entityType: string;
     entityId: string;
     state: FormationState;
@@ -48,25 +46,19 @@ export class EvaluateFormationCommandHandler
   }> {
     const { entityType, entityId } = command;
 
-    this.logger.log(
-      `Evaluating formation state for ${entityType}:${entityId}`,
-    );
+    this.logger.log(`Evaluating formation state for ${entityType}:${entityId}`);
 
     try {
       const existingStatus = await this.formationStatusRepository.findOne({
         where: { entityType, entityId },
       });
 
-      const state = await this.formationService.evaluateState(
-        entityType,
-        entityId,
-      );
+      const state = await this.formationService.evaluateState(entityType, entityId);
 
-      const unsatisfiedRequirements =
-        await this.formationService.getUnsatisfiedRequirements(
-          entityType,
-          entityId,
-        );
+      const unsatisfiedRequirements = await this.formationService.getUnsatisfiedRequirements(
+        entityType,
+        entityId
+      );
 
       const previousState = existingStatus?.state ?? FormationState.DRAFT;
       const now = new Date();
@@ -104,12 +96,9 @@ export class EvaluateFormationCommandHandler
           try {
             await this.eventBusService.publishEvent(event);
           } catch (publishError) {
-            const err =
-              publishError instanceof Error
-                ? publishError.message
-                : String(publishError);
+            const err = publishError instanceof Error ? publishError.message : String(publishError);
             this.logger.warn(
-              `Failed to publish FormationStatusChangedEventV1 via EventBusService: ${err}`,
+              `Failed to publish FormationStatusChangedEventV1 via EventBusService: ${err}`
             );
           }
         }
@@ -120,14 +109,14 @@ export class EvaluateFormationCommandHandler
         entityId,
         state,
         unsatisfiedRequirements: unsatisfiedRequirements.map((requirement) =>
-          requirement.toDomain(),
+          requirement.toDomain()
         ),
       };
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(
         `Failed to evaluate formation state for ${entityType}:${entityId}: ${err.message}`,
-        err.stack,
+        err.stack
       );
       throw error;
     }

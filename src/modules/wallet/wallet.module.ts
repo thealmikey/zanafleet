@@ -6,7 +6,10 @@ import { WalletEntity } from './entities/wallet.entity';
 import { CreateWalletCommandHandler } from './handlers/create-wallet.handler';
 import { CreditWalletCommandHandler } from './handlers/credit-wallet.handler';
 import { DebitWalletCommandHandler } from './handlers/debit-wallet.handler';
-import { WalletNeo4jProjection, WalletNeo4jInitializer } from './projections/wallet-neo4j.projection';
+import {
+  WalletNeo4jProjection,
+  WalletNeo4jInitializer,
+} from './projections/wallet-neo4j.projection';
 
 /**
  * Wallet Module
@@ -24,10 +27,7 @@ import { WalletNeo4jProjection, WalletNeo4jInitializer } from './projections/wal
  * 7. Comprehensive unit and integration tests
  */
 @Module({
-  imports: [
-    CqrsModule,
-    TypeOrmModule.forFeature([WalletEntity]),
-  ],
+  imports: [CqrsModule, TypeOrmModule.forFeature([WalletEntity])],
   providers: [
     CreateWalletCommandHandler,
     CreditWalletCommandHandler,
@@ -35,11 +35,7 @@ import { WalletNeo4jProjection, WalletNeo4jInitializer } from './projections/wal
     WalletNeo4jProjection,
     WalletNeo4jInitializer,
   ],
-  exports: [
-    CreateWalletCommandHandler,
-    CreditWalletCommandHandler,
-    DebitWalletCommandHandler,
-  ],
+  exports: [CreateWalletCommandHandler, CreditWalletCommandHandler, DebitWalletCommandHandler],
 })
 export class WalletModule implements OnModuleInit {
   constructor(private readonly neo4jInitializer: WalletNeo4jInitializer) {}

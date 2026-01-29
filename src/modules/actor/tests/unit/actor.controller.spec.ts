@@ -42,9 +42,7 @@ describe('ActorController', () => {
 
     controller = module.get<ActorController>(ActorController);
     commandBus = module.get<CommandBus>(CommandBus);
-    actorRepository = module.get<Repository<ActorEntity>>(
-      getRepositoryToken(ActorEntity),
-    );
+    actorRepository = module.get<Repository<ActorEntity>>(getRepositoryToken(ActorEntity));
 
     jest.clearAllMocks();
   });
@@ -71,7 +69,7 @@ describe('ActorController', () => {
 
     it('should throw BadRequestException on validation error', async () => {
       const dto = { type: 'invalid' };
-      
+
       jest.spyOn(CreateActorCommand, 'validate').mockImplementation(() => {
         throw new ZodError([]);
       });
@@ -119,7 +117,7 @@ describe('ActorController', () => {
     it('should execute UpdateActorCommand and return updated ActorDto', async () => {
       const actorId = uuidv4();
       const dto = { roles: [uuidv4()] };
-      
+
       const actorEntity = {
         id: actorId,
         type: ActorType.Rider,

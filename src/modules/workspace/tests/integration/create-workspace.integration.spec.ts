@@ -13,8 +13,7 @@ import { WorkspaceEntity } from '../../entities/workspace.entity';
 import { WorkspaceCreatedEventV1 } from '../../events/workspace-created.event';
 import { CreateWorkspaceCommandHandler } from '../../handlers/create-workspace.handler';
 
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 describeIntegration('CreateWorkspaceCommand Integration', () => {
   let module!: TestingModule;
@@ -52,10 +51,10 @@ describeIntegration('CreateWorkspaceCommand Integration', () => {
       commandBus = module.get<CommandBus>(CommandBus);
       eventBus = module.get<EventBus>(EventBus);
       workspaceRepository = module.get<Repository<WorkspaceEntity>>(
-        getRepositoryToken(WorkspaceEntity),
+        getRepositoryToken(WorkspaceEntity)
       );
       organizationRepository = module.get<Repository<OrganizationEntity>>(
-        getRepositoryToken(OrganizationEntity),
+        getRepositoryToken(OrganizationEntity)
       );
       dataSource = module.get<DataSource>(DataSource);
 
@@ -67,7 +66,7 @@ describeIntegration('CreateWorkspaceCommand Integration', () => {
     } catch (error) {
       console.warn(
         'Failed to initialize Workspace integration test module (database may not be available):',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? error.message : String(error)
       );
       moduleInitializationFailed = true;
     }
@@ -76,7 +75,7 @@ describeIntegration('CreateWorkspaceCommand Integration', () => {
   beforeEach((): void => {
     if (moduleInitializationFailed) {
       throw new Error(
-        'Workspace integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d).',
+        'Workspace integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d).'
       );
     }
   });
@@ -128,7 +127,7 @@ describeIntegration('CreateWorkspaceCommand Integration', () => {
 
       await expect(commandBus.execute(command)).rejects.toThrow(NotFoundException);
       await expect(commandBus.execute(command)).rejects.toThrow(
-        `Organization with ID '${nonExistentOrgId}' does not exist`,
+        `Organization with ID '${nonExistentOrgId}' does not exist`
       );
     });
 
@@ -184,7 +183,7 @@ describeIntegration('CreateWorkspaceCommand Integration', () => {
       expect(workspaceId).toBeDefined();
       expect(typeof workspaceId).toBe('string');
       expect(workspaceId).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
       );
     });
 

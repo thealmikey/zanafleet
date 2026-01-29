@@ -74,9 +74,7 @@ export class OrganizationUpdatedEventV1 {
       normalizedChanges.status = data.changes.status;
     }
     if (data.changes.linkedWallets !== undefined) {
-      normalizedChanges.linkedWallets = Object.freeze([
-        ...data.changes.linkedWallets,
-      ]);
+      normalizedChanges.linkedWallets = Object.freeze([...data.changes.linkedWallets]);
     }
 
     this.changes = Object.freeze(normalizedChanges);

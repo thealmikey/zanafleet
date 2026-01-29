@@ -29,9 +29,7 @@ import { CommitmentCreatedEventV1 } from '../events/commitment-created.event';
  */
 @CommandHandler(CreateCommitmentCommand)
 @Injectable()
-export class CreateCommitmentCommandHandler
-  implements ICommandHandler<CreateCommitmentCommand>
-{
+export class CreateCommitmentCommandHandler implements ICommandHandler<CreateCommitmentCommand> {
   private readonly logger = new Logger(CreateCommitmentCommandHandler.name);
 
   constructor(
@@ -42,7 +40,7 @@ export class CreateCommitmentCommandHandler
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -59,7 +57,7 @@ export class CreateCommitmentCommandHandler
     const eventId = uuidv4();
 
     this.logger.log(
-      `Executing CreateCommitmentCommand for commitment: ${commitmentId}, actor: ${command.actorId}, workspace: ${command.workspaceId}`,
+      `Executing CreateCommitmentCommand for commitment: ${commitmentId}, actor: ${command.actorId}, workspace: ${command.workspaceId}`
     );
 
     try {
@@ -70,9 +68,7 @@ export class CreateCommitmentCommandHandler
 
       if (!actor) {
         this.logger.warn(`Actor not found: ${command.actorId}`);
-        throw new NotFoundException(
-          `Actor with ID '${command.actorId}' does not exist`,
-        );
+        throw new NotFoundException(`Actor with ID '${command.actorId}' does not exist`);
       }
 
       this.logger.debug(`Actor validated: ${command.actorId}`);
@@ -84,9 +80,7 @@ export class CreateCommitmentCommandHandler
 
       if (!workspace) {
         this.logger.warn(`Workspace not found: ${command.workspaceId}`);
-        throw new NotFoundException(
-          `Workspace with ID '${command.workspaceId}' does not exist`,
-        );
+        throw new NotFoundException(`Workspace with ID '${command.workspaceId}' does not exist`);
       }
 
       this.logger.debug(`Workspace validated: ${command.workspaceId}`);
@@ -127,9 +121,7 @@ export class CreateCommitmentCommandHandler
       if (this.eventBusService) {
         await this.eventBusService
           .publish('commitment.events.created-v1', event)
-          .catch((err: Error) =>
-            this.logger.warn(`NATS publish failed: ${err.message}`),
-          );
+          .catch((err: Error) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
 
       return commitmentId;

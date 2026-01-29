@@ -3,7 +3,11 @@ import { Repository } from 'typeorm';
 
 import { AddActorToWorkspaceCommand } from '../../../workspace/commands/add-actor-to-workspace.command';
 import { CreateWorkspaceCommand } from '../../../workspace/commands/create-workspace.command';
-import { MembershipRole, WorkspaceStatus, WorkspaceType } from '../../../workspace/dto/workspace.enums';
+import {
+  MembershipRole,
+  WorkspaceStatus,
+  WorkspaceType,
+} from '../../../workspace/dto/workspace.enums';
 import { CreateOrganizationCommand } from '../../commands/create-organization.command';
 import { OrganizationStatus, OrganizationType } from '../../dto/organization.enums';
 import { OrganizationEntity } from '../../entities/organization.entity';
@@ -29,11 +33,7 @@ describe('CreateOrganizationCommandHandler', () => {
       execute: jest.fn(),
     } as unknown as jest.Mocked<CommandBus>;
 
-    handler = new CreateOrganizationCommandHandler(
-      organizationRepository,
-      eventBus,
-      commandBus,
-    );
+    handler = new CreateOrganizationCommandHandler(organizationRepository, eventBus, commandBus);
   });
 
   afterEach(() => {
@@ -66,7 +66,7 @@ describe('CreateOrganizationCommandHandler', () => {
           type: command.type,
           status: command.status,
           linkedWallets: command.linkedWallets,
-        }),
+        })
       );
 
       expect(organizationRepository.save).toHaveBeenCalledTimes(1);
@@ -77,7 +77,7 @@ describe('CreateOrganizationCommandHandler', () => {
           type: command.type,
           status: command.status,
           linkedWallets: command.linkedWallets,
-        }),
+        })
       );
 
       expect(eventBus.publish).toHaveBeenCalledTimes(1);
@@ -111,8 +111,7 @@ describe('CreateOrganizationCommandHandler', () => {
       await handler.execute(command);
 
       expect(commandBus.execute).toHaveBeenCalledTimes(1);
-      const createWorkspaceCall =
-        commandBus.execute.mock.calls[0][0] as CreateWorkspaceCommand;
+      const createWorkspaceCall = commandBus.execute.mock.calls[0][0] as CreateWorkspaceCommand;
       expect(createWorkspaceCall).toBeInstanceOf(CreateWorkspaceCommand);
       expect(createWorkspaceCall).toMatchObject({
         name: 'Test SACCO Workspace',
@@ -135,8 +134,7 @@ describe('CreateOrganizationCommandHandler', () => {
       await handler.execute(command);
 
       expect(commandBus.execute).toHaveBeenCalledTimes(1);
-      const createWorkspaceCall =
-        commandBus.execute.mock.calls[0][0] as CreateWorkspaceCommand;
+      const createWorkspaceCall = commandBus.execute.mock.calls[0][0] as CreateWorkspaceCommand;
       expect(createWorkspaceCall).toBeInstanceOf(CreateWorkspaceCommand);
       expect(createWorkspaceCall).toMatchObject({
         name: 'Test Business Workspace',
@@ -186,15 +184,12 @@ describe('CreateOrganizationCommandHandler', () => {
       });
 
       organizationRepository.save.mockResolvedValue({} as OrganizationEntity);
-      commandBus.execute
-        .mockResolvedValueOnce(workspaceId)
-        .mockResolvedValueOnce(undefined);
+      commandBus.execute.mockResolvedValueOnce(workspaceId).mockResolvedValueOnce(undefined);
 
       await handler.execute(command);
 
       expect(commandBus.execute).toHaveBeenCalledTimes(2);
-      const addActorCall =
-        commandBus.execute.mock.calls[1][0] as AddActorToWorkspaceCommand;
+      const addActorCall = commandBus.execute.mock.calls[1][0] as AddActorToWorkspaceCommand;
       expect(addActorCall).toBeInstanceOf(AddActorToWorkspaceCommand);
       expect(addActorCall).toMatchObject({
         actorId,
@@ -226,9 +221,7 @@ describe('CreateOrganizationCommandHandler', () => {
       });
 
       organizationRepository.save.mockResolvedValue({} as OrganizationEntity);
-      commandBus.execute.mockRejectedValueOnce(
-        new Error('Workspace creation failed'),
-      );
+      commandBus.execute.mockRejectedValueOnce(new Error('Workspace creation failed'));
 
       const organizationId = await handler.execute(command);
 

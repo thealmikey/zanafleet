@@ -1,18 +1,11 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 
 import { OrganizationStatus, OrganizationType } from '../dto/organization.enums';
 
 /**
  * Organization Entity
  * Represents the Postgres persistence model for organizations
- * 
+ *
  * TypeORM entity with best practices:
  * - UUID primary key for distributed systems
  * - Indexed columns for common queries

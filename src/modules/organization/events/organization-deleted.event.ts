@@ -62,9 +62,7 @@ export class OrganizationDeletedEventV1 {
     };
   }
 
-  static fromJSON(
-    data: OrganizationDeletedEventV1JSON,
-  ): OrganizationDeletedEventV1 {
+  static fromJSON(data: OrganizationDeletedEventV1JSON): OrganizationDeletedEventV1 {
     return new OrganizationDeletedEventV1({
       eventId: data.eventId,
       organizationId: data.organizationId,

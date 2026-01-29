@@ -27,9 +27,7 @@ describe('GetSignUpSessionQueryHandler', () => {
       ],
     }).compile();
 
-    handler = module.get<GetSignUpSessionQueryHandler>(
-      GetSignUpSessionQueryHandler,
-    );
+    handler = module.get<GetSignUpSessionQueryHandler>(GetSignUpSessionQueryHandler);
   });
 
   afterEach(() => {
@@ -91,8 +89,6 @@ describe('GetSignUpSessionQueryHandler', () => {
     const query = new GetSignUpSessionQuery({ sessionId });
 
     await expect(handler.execute(query)).rejects.toThrow(NotFoundException);
-    await expect(handler.execute(query)).rejects.toThrow(
-      `SignUp session ${sessionId} not found`,
-    );
+    await expect(handler.execute(query)).rejects.toThrow(`SignUp session ${sessionId} not found`);
   });
 });

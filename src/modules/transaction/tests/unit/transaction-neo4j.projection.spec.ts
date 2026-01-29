@@ -1,10 +1,7 @@
 import { Logger } from '@nestjs/common';
 
 import { Neo4jService } from '../../../../core/neo4j';
-import {
-  TransactionType,
-  TransactionStatus,
-} from '../../dto/transaction.enums';
+import { TransactionType, TransactionStatus } from '../../dto/transaction.enums';
 import { TransactionCreatedEventV1 } from '../../events/transaction-created.event';
 import {
   TransactionNeo4jProjection,
@@ -64,10 +61,7 @@ describe('TransactionNeo4jProjection', () => {
     expect(getSession).toHaveBeenCalledTimes(1);
     expect(mockSession.run).toHaveBeenCalledTimes(1);
 
-    const [query, params] = mockSession.run.mock.calls[0] as [
-      string,
-      Record<string, unknown>,
-    ];
+    const [query, params] = mockSession.run.mock.calls[0] as [string, Record<string, unknown>];
 
     expect(query).toContain('MERGE (txn:Transaction {id: $transactionId})');
     expect(query).toContain('MERGE (txn)-[:FROM]->(sourceWallet)');
@@ -100,7 +94,7 @@ describe('TransactionNeo4jProjection', () => {
     expect(mockSession.run).toHaveBeenCalledTimes(1);
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       `Failed to project transaction to Neo4j: ${error.message}`,
-      error.stack,
+      error.stack
     );
     expect(mockSession.close).toHaveBeenCalledTimes(1);
   });
@@ -137,19 +131,19 @@ describe('TransactionNeo4jInitializer', () => {
 
     expect(mockSession.run).toHaveBeenNthCalledWith(
       1,
-      expect.stringContaining('CREATE CONSTRAINT transaction_id_unique IF NOT EXISTS'),
+      expect.stringContaining('CREATE CONSTRAINT transaction_id_unique IF NOT EXISTS')
     );
     expect(mockSession.run).toHaveBeenNthCalledWith(
       2,
-      expect.stringContaining('CREATE INDEX transaction_status_index IF NOT EXISTS'),
+      expect.stringContaining('CREATE INDEX transaction_status_index IF NOT EXISTS')
     );
     expect(mockSession.run).toHaveBeenNthCalledWith(
       3,
-      expect.stringContaining('CREATE INDEX transaction_type_index IF NOT EXISTS'),
+      expect.stringContaining('CREATE INDEX transaction_type_index IF NOT EXISTS')
     );
     expect(mockSession.run).toHaveBeenNthCalledWith(
       4,
-      expect.stringContaining('CREATE INDEX transaction_createdAt_index IF NOT EXISTS'),
+      expect.stringContaining('CREATE INDEX transaction_createdAt_index IF NOT EXISTS')
     );
 
     expect(loggerLogSpy).toHaveBeenCalledWith('UNIQUE constraint on Transaction.id created');
@@ -169,7 +163,7 @@ describe('TransactionNeo4jInitializer', () => {
     expect(mockSession.run).toHaveBeenCalledTimes(1);
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       `Failed to initialize Neo4j constraints/indexes: ${error.message}`,
-      error.stack,
+      error.stack
     );
     expect(mockSession.close).toHaveBeenCalledTimes(1);
   });

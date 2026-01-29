@@ -44,8 +44,7 @@ describe('OrganizationController', () => {
     const result = await controller.create(dto);
 
     expect(commandBusExecuteMock).toHaveBeenCalledTimes(1);
-    const commandArg =
-      commandBusExecuteMock.mock.calls[0][0] as CreateOrganizationCommand;
+    const commandArg = commandBusExecuteMock.mock.calls[0][0] as CreateOrganizationCommand;
     expect(commandArg).toBeInstanceOf(CreateOrganizationCommand);
     expect(commandArg).toMatchObject({
       name: 'Acme Corp',
@@ -57,9 +56,9 @@ describe('OrganizationController', () => {
   });
 
   it('throws BadRequestException when create validation fails', async () => {
-    await expect(
-      controller.create({} as CreateOrganizationDto),
-    ).rejects.toBeInstanceOf(BadRequestException);
+    await expect(controller.create({} as CreateOrganizationDto)).rejects.toBeInstanceOf(
+      BadRequestException
+    );
     expect(commandBusExecuteMock).not.toHaveBeenCalled();
   });
 
@@ -98,9 +97,7 @@ describe('OrganizationController', () => {
     const id = '5e3f4c12-7b8d-4dc7-8fa7-d4aa7088b5d4';
     repositoryFindOneMock.mockResolvedValue(undefined);
 
-    await expect(controller.findOne(id)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(controller.findOne(id)).rejects.toBeInstanceOf(NotFoundException);
   });
 
   it('updates organization and returns updated dto', async () => {
@@ -129,8 +126,7 @@ describe('OrganizationController', () => {
     const result = await controller.update(id, dto);
 
     expect(commandBusExecuteMock).toHaveBeenCalledTimes(1);
-    const commandArg =
-      commandBusExecuteMock.mock.calls[0][0] as UpdateOrganizationCommand;
+    const commandArg = commandBusExecuteMock.mock.calls[0][0] as UpdateOrganizationCommand;
     expect(commandArg).toBeInstanceOf(UpdateOrganizationCommand);
     expect(commandArg).toMatchObject({
       organizationId: id,
@@ -153,10 +149,7 @@ describe('OrganizationController', () => {
     const id = '94d5f873-8f98-4d8c-b15c-10fb1f5a0a51';
 
     await expect(
-      controller.update(
-        id,
-        { status: 'invalid' } as unknown as UpdateOrganizationDto,
-      ),
+      controller.update(id, { status: 'invalid' } as unknown as UpdateOrganizationDto)
     ).rejects.toBeInstanceOf(BadRequestException);
     expect(commandBusExecuteMock).not.toHaveBeenCalled();
   });
@@ -166,9 +159,9 @@ describe('OrganizationController', () => {
     commandBusExecuteMock.mockResolvedValue(undefined);
     repositoryFindOneMock.mockResolvedValue(undefined);
 
-    await expect(
-      controller.update(id, {} as UpdateOrganizationDto),
-    ).rejects.toBeInstanceOf(NotFoundException);
+    await expect(controller.update(id, {} as UpdateOrganizationDto)).rejects.toBeInstanceOf(
+      NotFoundException
+    );
     expect(commandBusExecuteMock).toHaveBeenCalledTimes(1);
   });
 
@@ -183,8 +176,7 @@ describe('OrganizationController', () => {
     await expect(controller.delete(id, body)).resolves.toBeUndefined();
 
     expect(commandBusExecuteMock).toHaveBeenCalledTimes(1);
-    const commandArg =
-      commandBusExecuteMock.mock.calls[0][0] as DeleteOrganizationCommand;
+    const commandArg = commandBusExecuteMock.mock.calls[0][0] as DeleteOrganizationCommand;
     expect(commandArg).toBeInstanceOf(DeleteOrganizationCommand);
     expect(commandArg).toMatchObject({
       organizationId: id,
@@ -196,9 +188,9 @@ describe('OrganizationController', () => {
   it('throws BadRequestException when delete validation fails', async () => {
     const id = '2fb1a4f3-1b1b-4ca6-9d57-77aa4d93c8eb';
 
-    await expect(
-      controller.delete(id, { deletedByActorId: 'invalid' }),
-    ).rejects.toBeInstanceOf(BadRequestException);
+    await expect(controller.delete(id, { deletedByActorId: 'invalid' })).rejects.toBeInstanceOf(
+      BadRequestException
+    );
     expect(commandBusExecuteMock).not.toHaveBeenCalled();
   });
 });

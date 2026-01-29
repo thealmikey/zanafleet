@@ -11,16 +11,14 @@ import { PersonaCreatedEventV1 } from '../events/persona-created.event';
 
 @CommandHandler(CreatePersonaCommand)
 @Injectable()
-export class CreatePersonaCommandHandler
-  implements ICommandHandler<CreatePersonaCommand>
-{
+export class CreatePersonaCommandHandler implements ICommandHandler<CreatePersonaCommand> {
   private readonly logger = new Logger(CreatePersonaCommandHandler.name);
 
   constructor(
     @InjectRepository(PersonaEntity)
     private readonly personaRepository: Repository<PersonaEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: CreatePersonaCommand): Promise<string> {
@@ -28,9 +26,7 @@ export class CreatePersonaCommandHandler
     const now = new Date();
     const eventId = uuidv4();
 
-    this.logger.log(
-      `Executing CreatePersonaCommand for persona: ${personaId}`,
-    );
+    this.logger.log(`Executing CreatePersonaCommand for persona: ${personaId}`);
 
     try {
       const entity = PersonaEntity.fromDomain({
@@ -51,18 +47,14 @@ export class CreatePersonaCommandHandler
       });
 
       this.eventBus.publish(event);
-      this.logger.log(
-        `PersonaCreatedEvent-V1 emitted to event bus: ${eventId}`,
-      );
+      this.logger.log(`PersonaCreatedEvent-V1 emitted to event bus: ${eventId}`);
 
       if (this.eventBusService) {
         try {
           await this.eventBusService.publish('persona.created.v1', event);
         } catch (publishError) {
           const err =
-            publishError instanceof Error
-              ? publishError
-              : new Error(String(publishError));
+            publishError instanceof Error ? publishError : new Error(String(publishError));
           this.logger.warn(`NATS publish failed: ${err.message}`);
         }
       }
@@ -70,10 +62,7 @@ export class CreatePersonaCommandHandler
       return personaId;
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to create persona: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to create persona: ${err.message}`, err.stack);
       throw error;
     }
   }

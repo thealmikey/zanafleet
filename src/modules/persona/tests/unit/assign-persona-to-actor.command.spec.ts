@@ -26,7 +26,7 @@ describe('AssignPersonaToActorCommand', () => {
       AssignPersonaToActorCommand.validate({
         workspaceId: VALID_WORKSPACE_ID,
         personaId: VALID_PERSONA_ID,
-      } as Record<string, unknown>),
+      } as Record<string, unknown>)
     ).toThrow(ZodError);
   });
 
@@ -35,7 +35,7 @@ describe('AssignPersonaToActorCommand', () => {
       AssignPersonaToActorCommand.validate({
         actorId: VALID_ACTOR_ID,
         personaId: VALID_PERSONA_ID,
-      } as Record<string, unknown>),
+      } as Record<string, unknown>)
     ).toThrow(ZodError);
   });
 
@@ -44,7 +44,7 @@ describe('AssignPersonaToActorCommand', () => {
       AssignPersonaToActorCommand.validate({
         actorId: VALID_ACTOR_ID,
         workspaceId: VALID_WORKSPACE_ID,
-      } as Record<string, unknown>),
+      } as Record<string, unknown>)
     ).toThrow(ZodError);
   });
 
@@ -54,7 +54,7 @@ describe('AssignPersonaToActorCommand', () => {
         actorId: 'not-a-uuid',
         workspaceId: VALID_WORKSPACE_ID,
         personaId: VALID_PERSONA_ID,
-      }),
+      })
     ).toThrow(ZodError);
   });
 
@@ -64,7 +64,7 @@ describe('AssignPersonaToActorCommand', () => {
         actorId: VALID_ACTOR_ID,
         workspaceId: 'invalid',
         personaId: VALID_PERSONA_ID,
-      }),
+      })
     ).toThrow(ZodError);
   });
 
@@ -74,7 +74,7 @@ describe('AssignPersonaToActorCommand', () => {
         actorId: VALID_ACTOR_ID,
         workspaceId: VALID_WORKSPACE_ID,
         personaId: 'invalid',
-      }),
+      })
     ).toThrow(ZodError);
   });
 

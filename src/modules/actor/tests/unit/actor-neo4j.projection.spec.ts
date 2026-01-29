@@ -2,7 +2,10 @@ import { Logger } from '@nestjs/common';
 
 import { Neo4jService } from '../../../../core/neo4j';
 import { ActorOnboardedEventV1 } from '../../events/actor-onboarded.event';
-import { ActorNeo4jProjection, ActorNeo4jInitializer } from '../../projections/actor-neo4j.projection';
+import {
+  ActorNeo4jProjection,
+  ActorNeo4jInitializer,
+} from '../../projections/actor-neo4j.projection';
 
 type MockSession = {
   run: jest.Mock<Promise<unknown>, [string, Record<string, unknown>?]>;
@@ -31,7 +34,7 @@ describe('ActorNeo4jProjection', () => {
       createdAt: new Date('2024-01-01T00:00:00.000Z'),
       correlationId: 'corr-1',
       causationId: 'caus-1',
-    }) as unknown as ActorOnboardedEventV1;
+    } as unknown as ActorOnboardedEventV1);
 
   beforeEach(() => {
     mockSession = {
@@ -57,7 +60,7 @@ describe('ActorNeo4jProjection', () => {
     expect(mockSession.run).toHaveBeenCalledTimes(1);
     expect(mockSession.run).toHaveBeenCalledWith(
       expect.stringContaining('MERGE (actor:Actor {id: $actorId})'),
-      expect.any(Object),
+      expect.any(Object)
     );
 
     const [, params] = mockSession.run.mock.calls[0];
@@ -84,7 +87,7 @@ describe('ActorNeo4jProjection', () => {
     expect(mockSession.run).toHaveBeenCalledTimes(1);
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       `Failed to project actor to Neo4j: ${error.message}`,
-      error.stack,
+      error.stack
     );
     expect(mockSession.close).toHaveBeenCalledTimes(1);
   });
@@ -121,15 +124,15 @@ describe('ActorNeo4jInitializer', () => {
 
     expect(mockSession.run).toHaveBeenNthCalledWith(
       1,
-      expect.stringContaining('CREATE CONSTRAINT actor_id_unique IF NOT EXISTS'),
+      expect.stringContaining('CREATE CONSTRAINT actor_id_unique IF NOT EXISTS')
     );
     expect(mockSession.run).toHaveBeenNthCalledWith(
       2,
-      expect.stringContaining('CREATE INDEX actor_type_index IF NOT EXISTS'),
+      expect.stringContaining('CREATE INDEX actor_type_index IF NOT EXISTS')
     );
     expect(mockSession.run).toHaveBeenNthCalledWith(
       3,
-      expect.stringContaining('CREATE INDEX actor_workspaceId_index IF NOT EXISTS'),
+      expect.stringContaining('CREATE INDEX actor_workspaceId_index IF NOT EXISTS')
     );
 
     expect(loggerLogSpy).toHaveBeenCalledWith('UNIQUE constraint on Actor.id created');
@@ -148,7 +151,7 @@ describe('ActorNeo4jInitializer', () => {
     expect(mockSession.run).toHaveBeenCalledTimes(1);
     expect(loggerErrorSpy).toHaveBeenCalledWith(
       `Failed to initialize Neo4j constraints/indexes: ${error.message}`,
-      error.stack,
+      error.stack
     );
     expect(mockSession.close).toHaveBeenCalledTimes(1);
   });

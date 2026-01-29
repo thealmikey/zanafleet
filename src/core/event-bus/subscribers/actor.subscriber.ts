@@ -21,13 +21,13 @@ export class ActorSubscriber {
   constructor(
     private readonly projection: ActorNeo4jProjection,
     private readonly idempotencyService: IdempotencyService,
-    private readonly eventLogger: EventLoggerService,
+    private readonly eventLogger: EventLoggerService
   ) {}
 
   @MessagePattern(NatsSubjects.Actor.ALL)
   async handleActorEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     const subject = context.getSubject();
     this.logger.debug(`Received event on subject: ${subject}`);

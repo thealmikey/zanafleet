@@ -32,16 +32,14 @@ import { UpdateSignUpStepResult } from './signup-result.interfaces';
  */
 @CommandHandler(UpdateSignUpStepCommand)
 @Injectable()
-export class UpdateSignUpStepCommandHandler
-  implements ICommandHandler<UpdateSignUpStepCommand>
-{
+export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSignUpStepCommand> {
   private readonly logger = new Logger(UpdateSignUpStepCommandHandler.name);
 
   constructor(
     @InjectRepository(SignUpSessionEntity)
     private readonly signupSessionRepository: Repository<SignUpSessionEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -49,20 +47,11 @@ export class UpdateSignUpStepCommandHandler
    *
    * @param command UpdateSignUpStepCommand
    */
-  async execute(
-    command: UpdateSignUpStepCommand,
-  ): Promise<UpdateSignUpStepResult> {
-    const {
-      sessionId,
-      stepName,
-      workspaceId,
-      roles,
-      linkedWallets,
-      idempotencyKey,
-    } = command;
+  async execute(command: UpdateSignUpStepCommand): Promise<UpdateSignUpStepResult> {
+    const { sessionId, stepName, workspaceId, roles, linkedWallets, idempotencyKey } = command;
 
     this.logger.log(
-      `Executing UpdateSignUpStepCommand for session: ${sessionId}, step: ${stepName}`,
+      `Executing UpdateSignUpStepCommand for session: ${sessionId}, step: ${stepName}`
     );
 
     // Step 1: Find session
@@ -80,9 +69,7 @@ export class UpdateSignUpStepCommandHandler
     }
 
     if (session.status === SignUpSessionStatus.COMPLETED) {
-      throw new BadRequestException(
-        `SignUp session ${sessionId} is already completed`,
-      );
+      throw new BadRequestException(`SignUp session ${sessionId} is already completed`);
     }
 
     // Step 3: Idempotency check
@@ -93,13 +80,9 @@ export class UpdateSignUpStepCommandHandler
       stepName,
     });
 
-    if (
-      idempotencyKey &&
-      session.idempotencyKey === idempotencyKey &&
-      !hasChanges
-    ) {
+    if (idempotencyKey && session.idempotencyKey === idempotencyKey && !hasChanges) {
       this.logger.log(
-        `Duplicate request detected via idempotency key: ${idempotencyKey}. No changes needed.`,
+        `Duplicate request detected via idempotency key: ${idempotencyKey}. No changes needed.`
       );
       return {
         sessionId: session.id,
@@ -116,10 +99,7 @@ export class UpdateSignUpStepCommandHandler
       session.workspaceId = workspaceId;
     }
 
-    if (
-      roles !== undefined &&
-      JSON.stringify(session.roles) !== JSON.stringify(roles)
-    ) {
+    if (roles !== undefined && JSON.stringify(session.roles) !== JSON.stringify(roles)) {
       changes.roles = roles;
       session.roles = [...roles];
     }
@@ -162,25 +142,16 @@ export class UpdateSignUpStepCommandHandler
     });
 
     this.eventBus.publish(event);
-    this.logger.log(
-      `SignUpStepCompletedEvent-V1 published for session: ${sessionId}`,
-    );
+    this.logger.log(`SignUpStepCompletedEvent-V1 published for session: ${sessionId}`);
 
     // Step 9: Publish to external NATS EventBus
     if (this.eventBusService) {
       try {
-        await this.eventBusService.publish(
-          NatsSubjects.SignUp.STEP_COMPLETED_V1,
-          event,
-        );
+        await this.eventBusService.publish(NatsSubjects.SignUp.STEP_COMPLETED_V1, event);
       } catch (publishError: unknown) {
         const errorMessage =
-          publishError instanceof Error
-            ? publishError.message
-            : String(publishError);
-        this.logger.warn(
-          `NATS publish failed for SignUpStepCompletedEvent-V1: ${errorMessage}`,
-        );
+          publishError instanceof Error ? publishError.message : String(publishError);
+        this.logger.warn(`NATS publish failed for SignUpStepCompletedEvent-V1: ${errorMessage}`);
       }
     }
 
@@ -201,12 +172,9 @@ export class UpdateSignUpStepCommandHandler
       roles?: string[];
       linkedWallets?: string[];
       stepName: string;
-    },
+    }
   ): boolean {
-    if (
-      updates.workspaceId !== undefined &&
-      session.workspaceId !== updates.workspaceId
-    )
+    if (updates.workspaceId !== undefined && session.workspaceId !== updates.workspaceId)
       return true;
 
     if (
@@ -217,8 +185,7 @@ export class UpdateSignUpStepCommandHandler
 
     if (
       updates.linkedWallets !== undefined &&
-      JSON.stringify(session.linkedWallets) !==
-        JSON.stringify(updates.linkedWallets)
+      JSON.stringify(session.linkedWallets) !== JSON.stringify(updates.linkedWallets)
     )
       return true;
 

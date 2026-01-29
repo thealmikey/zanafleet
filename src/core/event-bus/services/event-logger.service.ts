@@ -76,9 +76,7 @@ export class EventLoggerService {
   logFailed(event: BaseEvent, error: Error, attempt?: number): void {
     const entry = this.createLogEntry(event);
     const attemptStr = attempt !== undefined ? ` attempt=${attempt}` : '';
-    this.logger.error(
-      `[FAILED] ${this.formatLogEntry(entry)}${attemptStr} error=${error.message}`,
-    );
+    this.logger.error(`[FAILED] ${this.formatLogEntry(entry)}${attemptStr} error=${error.message}`);
   }
 
   /**
@@ -89,9 +87,7 @@ export class EventLoggerService {
    */
   logRetry(event: BaseEvent, attempt: number, delayMs: number): void {
     const entry = this.createLogEntry(event);
-    this.logger.warn(
-      `[RETRY] ${this.formatLogEntry(entry)} attempt=${attempt} delayMs=${delayMs}`,
-    );
+    this.logger.warn(`[RETRY] ${this.formatLogEntry(entry)} attempt=${attempt} delayMs=${delayMs}`);
   }
 
   private createLogEntry(event: BaseEvent, subject?: string): EventLogEntry {

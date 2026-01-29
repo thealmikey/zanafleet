@@ -1,13 +1,8 @@
 import { z } from 'zod';
 
 export const DeleteOrganizationCommandSchema = z.object({
-  organizationId: z
-    .string()
-    .uuid('organizationId must be a valid UUID'),
-  deletedByActorId: z
-    .string()
-    .uuid('deletedByActorId must be a valid UUID')
-    .optional(),
+  organizationId: z.string().uuid('organizationId must be a valid UUID'),
+  deletedByActorId: z.string().uuid('deletedByActorId must be a valid UUID').optional(),
 });
 
 export type DeleteOrganizationCommandInput = z.infer<typeof DeleteOrganizationCommandSchema>;

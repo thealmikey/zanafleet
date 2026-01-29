@@ -20,23 +20,21 @@ import { WalletCreditedEventV1 } from '../events/wallet-credited.event';
  */
 @CommandHandler(CreditWalletCommand)
 @Injectable()
-export class CreditWalletCommandHandler
-  implements ICommandHandler<CreditWalletCommand>
-{
+export class CreditWalletCommandHandler implements ICommandHandler<CreditWalletCommand> {
   private readonly logger = new Logger(CreditWalletCommandHandler.name);
 
   constructor(
     @InjectRepository(WalletEntity)
     private readonly walletRepository: Repository<WalletEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: CreditWalletCommand): Promise<number> {
     const eventId = uuidv4();
 
     this.logger.log(
-      `Executing CreditWalletCommand for wallet: ${command.walletId}, amount: ${command.amount}`,
+      `Executing CreditWalletCommand for wallet: ${command.walletId}, amount: ${command.amount}`
     );
 
     const wallet = await this.walletRepository.findOne({
@@ -53,9 +51,7 @@ export class CreditWalletCommandHandler
     try {
       wallet.balance = newBalance.toFixed(2);
       await this.walletRepository.save(wallet);
-      this.logger.debug(
-        `Wallet ${command.walletId} credited. New balance: ${newBalance}`,
-      );
+      this.logger.debug(`Wallet ${command.walletId} credited. New balance: ${newBalance}`);
 
       const event = new WalletCreditedEventV1({
         eventId,
@@ -70,17 +66,16 @@ export class CreditWalletCommandHandler
       this.logger.log(`WalletCreditedEvent-V1 emitted to event bus: ${eventId}`);
 
       if (this.eventBusService) {
-        await this.eventBusService.publish(
-          NatsSubjects.Wallet.CREDITED_V1,
-          event,
-        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+        await this.eventBusService
+          .publish(NatsSubjects.Wallet.CREDITED_V1, event)
+          .catch((err) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
 
       return newBalance;
     } catch (error) {
       this.logger.error(
         `Failed to credit wallet: ${(error as Error).message}`,
-        (error as Error).stack,
+        (error as Error).stack
       );
       throw error;
     }

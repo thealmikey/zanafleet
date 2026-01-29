@@ -18,16 +18,14 @@ import { WalletCreatedEventV1 } from '../events/wallet-created.event';
  */
 @CommandHandler(CreateWalletCommand)
 @Injectable()
-export class CreateWalletCommandHandler
-  implements ICommandHandler<CreateWalletCommand>
-{
+export class CreateWalletCommandHandler implements ICommandHandler<CreateWalletCommand> {
   private readonly logger = new Logger(CreateWalletCommandHandler.name);
 
   constructor(
     @InjectRepository(WalletEntity)
     private readonly walletRepository: Repository<WalletEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: CreateWalletCommand): Promise<string> {
@@ -36,7 +34,7 @@ export class CreateWalletCommandHandler
     const eventId = uuidv4();
 
     this.logger.log(
-      `Executing CreateWalletCommand for owner: ${command.ownerId} (type: ${command.ownerType})`,
+      `Executing CreateWalletCommand for owner: ${command.ownerId} (type: ${command.ownerType})`
     );
 
     try {
@@ -68,17 +66,16 @@ export class CreateWalletCommandHandler
       this.logger.log(`WalletCreatedEvent-V1 emitted to event bus: ${eventId}`);
 
       if (this.eventBusService) {
-        await this.eventBusService.publish(
-          NatsSubjects.Wallet.CREATED_V1,
-          event,
-        ).catch(err => this.logger.warn(`NATS publish failed: ${err.message}`));
+        await this.eventBusService
+          .publish(NatsSubjects.Wallet.CREATED_V1, event)
+          .catch((err) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
 
       return walletId;
     } catch (error) {
       this.logger.error(
         `Failed to create wallet: ${(error as Error).message}`,
-        (error as Error).stack,
+        (error as Error).stack
       );
       throw error;
     }

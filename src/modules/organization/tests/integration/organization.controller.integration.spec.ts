@@ -18,8 +18,7 @@ import { CreateOrganizationCommandHandler } from '../../handlers/create-organiza
 import { DeleteOrganizationCommandHandler } from '../../handlers/delete-organization.handler';
 import { UpdateOrganizationCommandHandler } from '../../handlers/update-organization.handler';
 
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 describeIntegration('OrganizationController (Integration)', () => {
   let moduleRef!: TestingModule;
@@ -42,12 +41,7 @@ describeIntegration('OrganizationController (Integration)', () => {
             username: process.env.TEST_DB_USER || 'test',
             password: process.env.TEST_DB_PASSWORD || 'test',
             database: process.env.TEST_DB_NAME || 'zanafleet_test',
-            entities: [
-              OrganizationEntity,
-              WorkspaceEntity,
-              MembershipEntity,
-              ActorEntity,
-            ],
+            entities: [OrganizationEntity, WorkspaceEntity, MembershipEntity, ActorEntity],
             synchronize: true,
             dropSchema: true,
           }),
@@ -72,17 +66,15 @@ describeIntegration('OrganizationController (Integration)', () => {
       await app.init();
 
       organizationRepository = moduleRef.get<Repository<OrganizationEntity>>(
-        getRepositoryToken(OrganizationEntity),
+        getRepositoryToken(OrganizationEntity)
       );
       workspaceRepository = moduleRef.get<Repository<WorkspaceEntity>>(
-        getRepositoryToken(WorkspaceEntity),
+        getRepositoryToken(WorkspaceEntity)
       );
       membershipRepository = moduleRef.get<Repository<MembershipEntity>>(
-        getRepositoryToken(MembershipEntity),
+        getRepositoryToken(MembershipEntity)
       );
-      actorRepository = moduleRef.get<Repository<ActorEntity>>(
-        getRepositoryToken(ActorEntity),
-      );
+      actorRepository = moduleRef.get<Repository<ActorEntity>>(getRepositoryToken(ActorEntity));
 
       const commandBus = moduleRef.get<CommandBus>(CommandBus);
       commandBus.register([
@@ -95,7 +87,7 @@ describeIntegration('OrganizationController (Integration)', () => {
     } catch (error) {
       console.warn(
         'Failed to initialize OrganizationController integration test module (database may not be available):',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? error.message : String(error)
       );
       moduleInitializationFailed = true;
     }
@@ -104,7 +96,7 @@ describeIntegration('OrganizationController (Integration)', () => {
   beforeEach(() => {
     if (moduleInitializationFailed) {
       throw new Error(
-        'OrganizationController integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d).',
+        'OrganizationController integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d).'
       );
     }
   });

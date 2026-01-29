@@ -1,9 +1,6 @@
 import { useContext } from 'react';
 
-import {
-  SignupWizardContext,
-  SignupWizardContextValue,
-} from '../contexts/SignupWizardContext';
+import { SignupWizardContext, SignupWizardContextValue } from '../contexts/SignupWizardContext';
 
 /**
  * Hook to access the SignupWizard context.

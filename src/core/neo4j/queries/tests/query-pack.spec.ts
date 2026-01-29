@@ -21,12 +21,7 @@ import {
   WORKSPACES_WITH_ACTIVE_COMMITMENTS,
 } from '../workspaces.queries';
 
-import {
-  TEST_ACTORS,
-  TEST_WORKSPACES,
-  TEST_COMMITMENTS,
-  EXPECTED_RESULTS,
-} from './test-dataset';
+import { TEST_ACTORS, TEST_WORKSPACES, TEST_COMMITMENTS, EXPECTED_RESULTS } from './test-dataset';
 
 /**
  * Creates a mock Neo4j record with get() method
@@ -136,7 +131,9 @@ describe('Neo4j Query Pack', () => {
 
         const result = await mockSession.run(RIDERS_IN_WORKSPACE, { workspaceId: 'ws-001' });
 
-        expect(mockSession.run).toHaveBeenCalledWith(RIDERS_IN_WORKSPACE, { workspaceId: 'ws-001' });
+        expect(mockSession.run).toHaveBeenCalledWith(RIDERS_IN_WORKSPACE, {
+          workspaceId: 'ws-001',
+        });
         expect(result.records).toHaveLength(2);
       });
     });
@@ -158,7 +155,9 @@ describe('Neo4j Query Pack', () => {
         const result = await mockSession.run(RIDER_COMMITMENT_SUMMARY, { riderId: 'actor-001' });
         const record = result.records[0];
 
-        expect(mockSession.run).toHaveBeenCalledWith(RIDER_COMMITMENT_SUMMARY, { riderId: 'actor-001' });
+        expect(mockSession.run).toHaveBeenCalledWith(RIDER_COMMITMENT_SUMMARY, {
+          riderId: 'actor-001',
+        });
         expect(record.get('total')).toBe(3);
         expect(record.get('fulfilled')).toBe(2);
         expect(record.get('breached')).toBe(1);
@@ -280,7 +279,9 @@ describe('Neo4j Query Pack', () => {
 
         const result = await mockSession.run(ACTORS_WITH_CAPABILITY, { capability: 'COLD_CHAIN' });
 
-        expect(mockSession.run).toHaveBeenCalledWith(ACTORS_WITH_CAPABILITY, { capability: 'COLD_CHAIN' });
+        expect(mockSession.run).toHaveBeenCalledWith(ACTORS_WITH_CAPABILITY, {
+          capability: 'COLD_CHAIN',
+        });
         expect(result.records).toHaveLength(2);
       });
     });
@@ -362,7 +363,9 @@ describe('Neo4j Query Pack', () => {
 
         const result = await mockSession.run(WORKSPACES_BY_TYPE, { workspaceType: 'BUSINESS' });
 
-        expect(mockSession.run).toHaveBeenCalledWith(WORKSPACES_BY_TYPE, { workspaceType: 'BUSINESS' });
+        expect(mockSession.run).toHaveBeenCalledWith(WORKSPACES_BY_TYPE, {
+          workspaceType: 'BUSINESS',
+        });
         expect(result.records).toHaveLength(2);
       });
     });

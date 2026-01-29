@@ -37,7 +37,7 @@ export class MembershipNeo4jProjection
    * Routes to appropriate handler based on event type
    */
   async handle(
-    event: ActorAddedToWorkspaceEventV1 | ActorRemovedFromWorkspaceEventV1,
+    event: ActorAddedToWorkspaceEventV1 | ActorRemovedFromWorkspaceEventV1
   ): Promise<void> {
     if (event instanceof ActorAddedToWorkspaceEventV1) {
       await this.handleActorAdded(event);
@@ -52,7 +52,7 @@ export class MembershipNeo4jProjection
    */
   private async handleActorAdded(event: ActorAddedToWorkspaceEventV1): Promise<void> {
     this.logger.log(
-      `Handling ActorAddedToWorkspaceEvent-V1: actor=${event.actorId}, workspace=${event.workspaceId}`,
+      `Handling ActorAddedToWorkspaceEvent-V1: actor=${event.actorId}, workspace=${event.workspaceId}`
     );
 
     const session = this.neo4j.getWriteSession();
@@ -71,18 +71,15 @@ export class MembershipNeo4jProjection
           workspaceId: event.workspaceId,
           role: event.role,
           since: event.since.toISOString(),
-        },
+        }
       );
 
       this.logger.debug(
-        `MEMBER_OF relationship created/updated in Neo4j: actor=${event.actorId}, workspace=${event.workspaceId}`,
+        `MEMBER_OF relationship created/updated in Neo4j: actor=${event.actorId}, workspace=${event.workspaceId}`
       );
     } catch (error) {
       const err = error as Error;
-      this.logger.error(
-        `Failed to project membership to Neo4j: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to project membership to Neo4j: ${err.message}`, err.stack);
       throw error;
     } finally {
       await session.close();
@@ -95,7 +92,7 @@ export class MembershipNeo4jProjection
    */
   private async handleActorRemoved(event: ActorRemovedFromWorkspaceEventV1): Promise<void> {
     this.logger.log(
-      `Handling ActorRemovedFromWorkspaceEvent-V1: actor=${event.actorId}, workspace=${event.workspaceId}`,
+      `Handling ActorRemovedFromWorkspaceEvent-V1: actor=${event.actorId}, workspace=${event.workspaceId}`
     );
 
     const session = this.neo4j.getWriteSession();
@@ -109,18 +106,15 @@ export class MembershipNeo4jProjection
         {
           actorId: event.actorId,
           workspaceId: event.workspaceId,
-        },
+        }
       );
 
       this.logger.debug(
-        `MEMBER_OF relationship deleted from Neo4j: actor=${event.actorId}, workspace=${event.workspaceId}`,
+        `MEMBER_OF relationship deleted from Neo4j: actor=${event.actorId}, workspace=${event.workspaceId}`
       );
     } catch (error) {
       const err = error as Error;
-      this.logger.error(
-        `Failed to delete membership from Neo4j: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to delete membership from Neo4j: ${err.message}`, err.stack);
       throw error;
     } finally {
       await session.close();
@@ -150,21 +144,21 @@ export class MembershipNeo4jInitializer {
       // Create index on MEMBER_OF.role for efficient queries by role
       await session.run(
         `CREATE INDEX member_of_role_index IF NOT EXISTS 
-         FOR ()-[r:MEMBER_OF]-() ON (r.role)`,
+         FOR ()-[r:MEMBER_OF]-() ON (r.role)`
       );
       this.logger.log('Index on MEMBER_OF.role created');
 
       // Create index on MEMBER_OF.since for time-based queries
       await session.run(
         `CREATE INDEX member_of_since_index IF NOT EXISTS 
-         FOR ()-[r:MEMBER_OF]-() ON (r.since)`,
+         FOR ()-[r:MEMBER_OF]-() ON (r.since)`
       );
       this.logger.log('Index on MEMBER_OF.since created');
     } catch (error) {
       const err = error as Error;
       this.logger.error(
         `Failed to initialize Neo4j indexes for MEMBER_OF: ${err.message}`,
-        err.stack,
+        err.stack
       );
       throw error;
     } finally {

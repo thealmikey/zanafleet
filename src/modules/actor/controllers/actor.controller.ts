@@ -34,7 +34,7 @@ export class ActorController {
   constructor(
     private readonly commandBus: CommandBus,
     @InjectRepository(ActorEntity)
-    private readonly actorRepository: Repository<ActorEntity>,
+    private readonly actorRepository: Repository<ActorEntity>
   ) {}
 
   /**
@@ -43,9 +43,7 @@ export class ActorController {
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(
-    @Body() body: CreateActorDto,
-  ): Promise<{ actorId: string }> {
+  async create(@Body() body: CreateActorDto): Promise<{ actorId: string }> {
     let input;
     try {
       input = CreateActorCommand.validate(body);
@@ -57,9 +55,7 @@ export class ActorController {
     }
 
     const command = new CreateActorCommand(input);
-    const actorId = await this.commandBus.execute<CreateActorCommand, string>(
-      command,
-    );
+    const actorId = await this.commandBus.execute<CreateActorCommand, string>(command);
 
     return { actorId };
   }
@@ -69,9 +65,7 @@ export class ActorController {
    * Direct read from repository (projection)
    */
   @Get(':id')
-  async findOne(
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ): Promise<ActorDto> {
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<ActorDto> {
     const actor = await this.actorRepository.findOne({
       where: { id },
     });
@@ -90,7 +84,7 @@ export class ActorController {
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() body: UpdateActorDto,
+    @Body() body: UpdateActorDto
   ): Promise<ActorDto> {
     let input;
     try {

@@ -28,9 +28,7 @@ import { WorkspaceCreatedEventV1 } from '../events/workspace-created.event';
  */
 @EventsHandler(WorkspaceCreatedEventV1)
 @Injectable()
-export class WorkspaceNeo4jProjection
-  implements IEventHandler<WorkspaceCreatedEventV1>
-{
+export class WorkspaceNeo4jProjection implements IEventHandler<WorkspaceCreatedEventV1> {
   private readonly logger = new Logger(WorkspaceNeo4jProjection.name);
 
   constructor(private readonly neo4j: Neo4jService) {}
@@ -40,9 +38,7 @@ export class WorkspaceNeo4jProjection
    * Creates or updates Workspace node in Neo4j and establishes PART_OF relationship
    */
   async handle(event: WorkspaceCreatedEventV1): Promise<void> {
-    this.logger.log(
-      `Handling WorkspaceCreatedEvent-V1 for workspace: ${event.workspaceId}`,
-    );
+    this.logger.log(`Handling WorkspaceCreatedEvent-V1 for workspace: ${event.workspaceId}`);
 
     const session = this.neo4j.getSession();
 
@@ -63,18 +59,15 @@ export class WorkspaceNeo4jProjection
           roleTemplates: event.roleTemplates,
           createdAt: event.createdAt.toISOString(),
           updatedAt: new Date().toISOString(),
-        },
+        }
       );
 
       this.logger.debug(
-        `Workspace node created/updated in Neo4j with PART_OF relationship: ${event.workspaceId}`,
+        `Workspace node created/updated in Neo4j with PART_OF relationship: ${event.workspaceId}`
       );
     } catch (error) {
       const err = error as Error;
-      this.logger.error(
-        `Failed to project workspace to Neo4j: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to project workspace to Neo4j: ${err.message}`, err.stack);
       throw error;
     } finally {
       await session.close();
@@ -104,28 +97,28 @@ export class WorkspaceNeo4jInitializer {
       // Create UNIQUE constraint on Workspace.id
       await session.run(
         `CREATE CONSTRAINT workspace_id_unique IF NOT EXISTS 
-         FOR (ws:Workspace) REQUIRE ws.id IS UNIQUE`,
+         FOR (ws:Workspace) REQUIRE ws.id IS UNIQUE`
       );
       this.logger.log('UNIQUE constraint on Workspace.id created');
 
       // Create index on orgId for filtering by organization
       await session.run(
         `CREATE INDEX workspace_orgId_index IF NOT EXISTS 
-         FOR (ws:Workspace) ON (ws.orgId)`,
+         FOR (ws:Workspace) ON (ws.orgId)`
       );
       this.logger.log('Index on Workspace.orgId created');
 
       // Create index on createdAt for time-based queries
       await session.run(
         `CREATE INDEX workspace_createdAt_index IF NOT EXISTS 
-         FOR (ws:Workspace) ON (ws.createdAt)`,
+         FOR (ws:Workspace) ON (ws.createdAt)`
       );
       this.logger.log('Index on Workspace.createdAt created');
     } catch (error) {
       const err = error as Error;
       this.logger.error(
         `Failed to initialize Neo4j constraints/indexes: ${err.message}`,
-        err.stack,
+        err.stack
       );
       throw error;
     } finally {

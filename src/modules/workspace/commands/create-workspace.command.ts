@@ -12,16 +12,11 @@ export const CreateWorkspaceCommandSchema = z.object({
     .trim()
     .min(1, 'Workspace name is required')
     .max(255, 'Workspace name must not exceed 255 characters'),
-  orgId: z
-    .string()
-    .uuid('Organization ID must be a valid UUID'),
+  orgId: z.string().uuid('Organization ID must be a valid UUID'),
   type: z.nativeEnum(WorkspaceType, {
     errorMap: () => ({ message: 'Workspace type is required' }),
   }),
-  status: z
-    .nativeEnum(WorkspaceStatus)
-    .optional()
-    .default(WorkspaceStatus.ACTIVE),
+  status: z.nativeEnum(WorkspaceStatus).optional().default(WorkspaceStatus.ACTIVE),
   roleTemplates: z
     .array(z.string().uuid('Each role template ID must be a valid UUID'))
     .optional()

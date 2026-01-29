@@ -54,7 +54,9 @@ export class CreateTransactionCommand {
   /**
    * Safe validation - returns result object instead of throwing
    */
-  static safeValidate(input: unknown): z.SafeParseReturnType<unknown, CreateTransactionCommandInput> {
+  static safeValidate(
+    input: unknown
+  ): z.SafeParseReturnType<unknown, CreateTransactionCommandInput> {
     return CreateTransactionCommandSchema.safeParse(input);
   }
 }

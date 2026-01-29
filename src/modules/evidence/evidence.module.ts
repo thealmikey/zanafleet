@@ -39,23 +39,12 @@ import {
  * - uuid: ID generation
  */
 @Module({
-  imports: [
-    CqrsModule,
-    TypeOrmModule.forFeature([EvidenceEntity]),
-  ],
-  providers: [
-    CreateEvidenceCommandHandler,
-    EvidenceNeo4jProjection,
-    EvidenceNeo4jInitializer,
-  ],
-  exports: [
-    CreateEvidenceCommandHandler,
-  ],
+  imports: [CqrsModule, TypeOrmModule.forFeature([EvidenceEntity])],
+  providers: [CreateEvidenceCommandHandler, EvidenceNeo4jProjection, EvidenceNeo4jInitializer],
+  exports: [CreateEvidenceCommandHandler],
 })
 export class EvidenceModule implements OnModuleInit {
-  constructor(
-    private readonly evidenceNeo4jInitializer: EvidenceNeo4jInitializer,
-  ) {}
+  constructor(private readonly evidenceNeo4jInitializer: EvidenceNeo4jInitializer) {}
 
   /**
    * Initialize module

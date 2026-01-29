@@ -58,7 +58,7 @@ describe('CreateRoleCommandHandler', () => {
           name: command.name,
           permissions: command.permissions,
           scope: command.scope,
-        }),
+        })
       );
 
       expect(roleRepository.save).toHaveBeenCalledTimes(1);
@@ -68,7 +68,7 @@ describe('CreateRoleCommandHandler', () => {
           name: command.name,
           permissions: command.permissions,
           scope: command.scope,
-        }),
+        })
       );
 
       expect(eventBus.publish).toHaveBeenCalledTimes(1);

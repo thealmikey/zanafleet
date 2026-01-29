@@ -19,17 +19,13 @@ import { WalletCreatedEventV1 } from '../events/wallet-created.event';
  */
 @EventsHandler(WalletCreatedEventV1)
 @Injectable()
-export class WalletNeo4jProjection
-  implements IEventHandler<WalletCreatedEventV1>
-{
+export class WalletNeo4jProjection implements IEventHandler<WalletCreatedEventV1> {
   private readonly logger = new Logger(WalletNeo4jProjection.name);
 
   constructor(private readonly neo4j: Neo4jService) {}
 
   async handle(event: WalletCreatedEventV1): Promise<void> {
-    this.logger.log(
-      `Handling WalletCreatedEvent-V1 for wallet: ${event.walletId}`,
-    );
+    this.logger.log(`Handling WalletCreatedEvent-V1 for wallet: ${event.walletId}`);
 
     const session = this.neo4j.getSession();
 
@@ -59,16 +55,14 @@ export class WalletNeo4jProjection
           currency: event.currency,
           createdAt: event.createdAt.toISOString(),
           updatedAt: new Date().toISOString(),
-        },
+        }
       );
 
-      this.logger.debug(
-        `Wallet node created/updated in Neo4j: ${event.walletId}`,
-      );
+      this.logger.debug(`Wallet node created/updated in Neo4j: ${event.walletId}`);
     } catch (error) {
       this.logger.error(
         `Failed to project wallet to Neo4j: ${(error as Error).message}`,
-        (error as Error).stack,
+        (error as Error).stack
       );
       throw error;
     } finally {
@@ -106,31 +100,31 @@ export class WalletNeo4jInitializer {
     try {
       await session.run(
         `CREATE CONSTRAINT wallet_id_unique IF NOT EXISTS 
-         FOR (wallet:Wallet) REQUIRE wallet.id IS UNIQUE`,
+         FOR (wallet:Wallet) REQUIRE wallet.id IS UNIQUE`
       );
       this.logger.log('UNIQUE constraint on Wallet.id created');
 
       await session.run(
         `CREATE INDEX wallet_ownerId_index IF NOT EXISTS 
-         FOR (wallet:Wallet) ON (wallet.ownerId)`,
+         FOR (wallet:Wallet) ON (wallet.ownerId)`
       );
       this.logger.log('Index on Wallet.ownerId created');
 
       await session.run(
         `CREATE INDEX wallet_type_index IF NOT EXISTS 
-         FOR (wallet:Wallet) ON (wallet.type)`,
+         FOR (wallet:Wallet) ON (wallet.type)`
       );
       this.logger.log('Index on Wallet.type created');
 
       await session.run(
         `CREATE INDEX wallet_ownerType_index IF NOT EXISTS 
-         FOR (wallet:Wallet) ON (wallet.ownerType)`,
+         FOR (wallet:Wallet) ON (wallet.ownerType)`
       );
       this.logger.log('Index on Wallet.ownerType created');
     } catch (error) {
       this.logger.error(
         `Failed to initialize Neo4j constraints/indexes: ${(error as Error).message}`,
-        (error as Error).stack,
+        (error as Error).stack
       );
       throw error;
     } finally {

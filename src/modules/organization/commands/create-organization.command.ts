@@ -19,21 +19,16 @@ export const CreateOrganizationCommandSchema = z.object({
   }),
   status: z.nativeEnum(OrganizationStatus, {
     errorMap: () => ({
-      message: `Organization status must be one of: ${Object.values(OrganizationStatus).join(', ')}`,
+      message: `Organization status must be one of: ${Object.values(OrganizationStatus).join(
+        ', '
+      )}`,
     }),
   }),
   linkedWallets: z
-    .array(
-      z
-        .string()
-        .uuid('Each wallet ID must be a valid UUID'),
-    )
+    .array(z.string().uuid('Each wallet ID must be a valid UUID'))
     .optional()
     .default([]),
-  createdByActorId: z
-    .string()
-    .uuid('createdByActorId must be a valid UUID')
-    .optional(),
+  createdByActorId: z.string().uuid('createdByActorId must be a valid UUID').optional(),
 });
 
 export type CreateOrganizationCommandInput = z.infer<typeof CreateOrganizationCommandSchema>;

@@ -24,10 +24,7 @@ type PersonaRepositoryMock = {
 };
 
 type PersonaCapabilityRepositoryMock = {
-  save: jest.Mock<
-    Promise<PersonaCapabilityEntity>,
-    [PersonaCapabilityEntity]
-  >;
+  save: jest.Mock<Promise<PersonaCapabilityEntity>, [PersonaCapabilityEntity]>;
 };
 
 type EventBusMock = {
@@ -72,7 +69,7 @@ describe('GrantCapabilityToPersonaCommandHandler', () => {
       personaRepository as unknown as Repository<PersonaEntity>,
       personaCapabilityRepository as unknown as Repository<PersonaCapabilityEntity>,
       eventBus as unknown as EventBus,
-      eventBusService as unknown as EventBusService,
+      eventBusService as unknown as EventBusService
     );
 
     uuidMock.mockReset();
@@ -112,8 +109,7 @@ describe('GrantCapabilityToPersonaCommandHandler', () => {
     });
     expect(personaCapabilityRepository.save).toHaveBeenCalledTimes(1);
 
-    const savedEntity =
-      personaCapabilityRepository.save.mock.calls[0][0] ;
+    const savedEntity = personaCapabilityRepository.save.mock.calls[0][0];
 
     expect(savedEntity).toBeInstanceOf(PersonaCapabilityEntity);
     expect(savedEntity.personaId).toBe(PERSONA_ID);
@@ -121,11 +117,8 @@ describe('GrantCapabilityToPersonaCommandHandler', () => {
     expect(savedEntity.grantedAt.toISOString()).toBe(now.toISOString());
 
     expect(eventBus.publish).toHaveBeenCalledTimes(1);
-    const emittedEvent =
-      eventBus.publish.mock.calls[0][0] as CapabilityGrantedToPersonaEventV1;
-    expect(emittedEvent).toBeInstanceOf(
-      CapabilityGrantedToPersonaEventV1,
-    );
+    const emittedEvent = eventBus.publish.mock.calls[0][0] as CapabilityGrantedToPersonaEventV1;
+    expect(emittedEvent).toBeInstanceOf(CapabilityGrantedToPersonaEventV1);
     expect(emittedEvent.personaId).toBe(PERSONA_ID);
     expect(emittedEvent.capabilityId).toBe(CAPABILITY_ID);
     expect(emittedEvent.grantedAt.toISOString()).toBe(now.toISOString());
@@ -133,7 +126,7 @@ describe('GrantCapabilityToPersonaCommandHandler', () => {
 
     expect(eventBusService.publish).toHaveBeenCalledWith(
       NatsSubjects.Capability.GRANTED_TO_PERSONA_V1,
-      expect.any(CapabilityGrantedToPersonaEventV1),
+      expect.any(CapabilityGrantedToPersonaEventV1)
     );
   });
 
@@ -145,9 +138,7 @@ describe('GrantCapabilityToPersonaCommandHandler', () => {
       capabilityId: CAPABILITY_ID,
     });
 
-    await expect(handler.execute(command)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(handler.execute(command)).rejects.toBeInstanceOf(NotFoundException);
 
     expect(personaRepository.findOne).not.toHaveBeenCalled();
     expect(personaCapabilityRepository.save).not.toHaveBeenCalled();
@@ -165,9 +156,7 @@ describe('GrantCapabilityToPersonaCommandHandler', () => {
       capabilityId: CAPABILITY_ID,
     });
 
-    await expect(handler.execute(command)).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(handler.execute(command)).rejects.toBeInstanceOf(NotFoundException);
 
     expect(personaCapabilityRepository.save).not.toHaveBeenCalled();
     expect(eventBus.publish).not.toHaveBeenCalled();
@@ -217,7 +206,7 @@ describe('GrantCapabilityToPersonaCommandHandler', () => {
       capabilityRepository as unknown as Repository<CapabilityEntity>,
       personaRepository as unknown as Repository<PersonaEntity>,
       personaCapabilityRepository as unknown as Repository<PersonaCapabilityEntity>,
-      eventBus as unknown as EventBus,
+      eventBus as unknown as EventBus
     );
 
     const command = new GrantCapabilityToPersonaCommand({

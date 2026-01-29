@@ -16,7 +16,7 @@ export class ApiError extends Error {
   constructor(
     public readonly status: number,
     public readonly statusText: string,
-    public readonly body?: unknown,
+    public readonly body?: unknown
   ) {
     super(`API Error: ${status} ${statusText}`);
     this.name = 'ApiError';
@@ -42,7 +42,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
  */
 export async function initiateSignup(
   actorType: ActorType,
-  idempotencyKey?: string,
+  idempotencyKey?: string
 ): Promise<InitiateSignupResponse> {
   const response = await fetch(`${API_BASE_URL}/signup`, {
     method: 'POST',
@@ -60,7 +60,7 @@ export async function initiateSignup(
  */
 export async function updateStep(
   sessionId: string,
-  data: UpdateStepRequest,
+  data: UpdateStepRequest
 ): Promise<UpdateStepResponse> {
   const response = await fetch(`${API_BASE_URL}/signup/${sessionId}`, {
     method: 'PATCH',
@@ -90,9 +90,7 @@ export async function getSession(sessionId: string): Promise<SignupSession> {
  * Finalize the sign-up process and create the actor
  * POST /signup/:id/finalize
  */
-export async function finalizeSignup(
-  sessionId: string,
-): Promise<FinalizeSignupResponse> {
+export async function finalizeSignup(sessionId: string): Promise<FinalizeSignupResponse> {
   const response = await fetch(`${API_BASE_URL}/signup/${sessionId}/finalize`, {
     method: 'POST',
     headers: {

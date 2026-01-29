@@ -43,7 +43,7 @@ describe('WorkspaceController', () => {
     controller = module.get<WorkspaceController>(WorkspaceController);
     commandBus = module.get<CommandBus>(CommandBus);
     workspaceRepository = module.get<Repository<WorkspaceEntity>>(
-      getRepositoryToken(WorkspaceEntity),
+      getRepositoryToken(WorkspaceEntity)
     );
 
     jest.clearAllMocks();
@@ -71,7 +71,7 @@ describe('WorkspaceController', () => {
 
     it('should throw BadRequestException on validation error', async () => {
       const dto = { name: '' };
-      
+
       jest.spyOn(CreateWorkspaceCommand, 'validate').mockImplementation(() => {
         throw new ZodError([]);
       });
@@ -119,7 +119,7 @@ describe('WorkspaceController', () => {
     it('should execute UpdateWorkspaceCommand and return updated WorkspaceDto', async () => {
       const workspaceId = uuidv4();
       const dto = { name: 'Updated Name' };
-      
+
       const workspaceEntity = {
         id: workspaceId,
         orgId: uuidv4(),
@@ -140,7 +140,9 @@ describe('WorkspaceController', () => {
       };
 
       // Mock validate to return input
-      jest.spyOn(UpdateWorkspaceCommand, 'validate').mockReturnValue({ ...dto, workspaceId } as any);
+      jest
+        .spyOn(UpdateWorkspaceCommand, 'validate')
+        .mockReturnValue({ ...dto, workspaceId } as any);
       mockCommandBus.execute.mockResolvedValue(undefined);
       mockWorkspaceRepository.findOne.mockResolvedValue(workspaceEntity);
 

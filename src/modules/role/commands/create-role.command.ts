@@ -12,10 +12,7 @@ export const CreateRoleCommandSchema = z.object({
     .trim()
     .min(1, 'Role name is required')
     .max(255, 'Role name must not exceed 255 characters'),
-  permissions: z
-    .array(z.string().min(1, 'Permission cannot be empty'))
-    .optional()
-    .default([]),
+  permissions: z.array(z.string().min(1, 'Permission cannot be empty')).optional().default([]),
   scope: z.nativeEnum(RoleScope, {
     errorMap: () => ({
       message: `Role scope must be one of: ${Object.values(RoleScope).join(', ')}`,

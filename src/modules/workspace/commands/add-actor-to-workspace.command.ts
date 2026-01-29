@@ -7,12 +7,8 @@ import { MembershipRole } from '../dto/workspace.enums';
  * Ensures type safety and input validation at command level
  */
 export const AddActorToWorkspaceCommandSchema = z.object({
-  actorId: z
-    .string()
-    .uuid('Actor ID must be a valid UUID'),
-  workspaceId: z
-    .string()
-    .uuid('Workspace ID must be a valid UUID'),
+  actorId: z.string().uuid('Actor ID must be a valid UUID'),
+  workspaceId: z.string().uuid('Workspace ID must be a valid UUID'),
   role: z.nativeEnum(MembershipRole, {
     errorMap: () => ({ message: 'Role must be a valid MembershipRole' }),
   }),

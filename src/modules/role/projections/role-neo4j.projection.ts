@@ -30,9 +30,7 @@ export class RoleNeo4jProjection implements IEventHandler<RoleCreatedEventV1> {
    * TODO: Creates or updates Role node in Neo4j
    */
   async handle(event: RoleCreatedEventV1): Promise<void> {
-    this.logger.log(
-      `Handling RoleCreatedEvent-V1 for role: ${event.roleId} (stub implementation)`,
-    );
+    this.logger.log(`Handling RoleCreatedEvent-V1 for role: ${event.roleId} (stub implementation)`);
 
     // TODO: Implement Neo4j projection
     // When implementing, follow the pattern from OrganizationNeo4jProjection:

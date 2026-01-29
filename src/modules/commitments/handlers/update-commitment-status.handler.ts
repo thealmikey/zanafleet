@@ -46,7 +46,7 @@ export class UpdateCommitmentStatusCommandHandler
     @InjectRepository(CommitmentEntity)
     private readonly commitmentRepository: Repository<CommitmentEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -62,7 +62,7 @@ export class UpdateCommitmentStatusCommandHandler
     const eventId = uuidv4();
 
     this.logger.log(
-      `Executing UpdateCommitmentStatusCommand: commitment=${command.commitmentId}, newStatus=${command.newStatus}`,
+      `Executing UpdateCommitmentStatusCommand: commitment=${command.commitmentId}, newStatus=${command.newStatus}`
     );
 
     try {
@@ -73,20 +73,16 @@ export class UpdateCommitmentStatusCommandHandler
 
       if (!commitment) {
         this.logger.warn(`Commitment not found: ${command.commitmentId}`);
-        throw new NotFoundException(
-          `Commitment with ID '${command.commitmentId}' does not exist`,
-        );
+        throw new NotFoundException(`Commitment with ID '${command.commitmentId}' does not exist`);
       }
 
       const previousStatus = commitment.status;
 
       // Step 2: Validate status transition
       if (!isValidStatusTransition(previousStatus, command.newStatus)) {
-        this.logger.warn(
-          `Invalid status transition: ${previousStatus} -> ${command.newStatus}`,
-        );
+        this.logger.warn(`Invalid status transition: ${previousStatus} -> ${command.newStatus}`);
         throw new BadRequestException(
-          `Invalid status transition from '${previousStatus}' to '${command.newStatus}'`,
+          `Invalid status transition from '${previousStatus}' to '${command.newStatus}'`
         );
       }
 
@@ -102,7 +98,7 @@ export class UpdateCommitmentStatusCommandHandler
       // Step 4: Persist to PostgreSQL
       await this.commitmentRepository.save(commitment);
       this.logger.debug(
-        `Commitment status updated in PostgreSQL: ${command.commitmentId} (${previousStatus} -> ${command.newStatus})`,
+        `Commitment status updated in PostgreSQL: ${command.commitmentId} (${previousStatus} -> ${command.newStatus})`
       );
 
       // Step 5: Create and emit event
@@ -121,16 +117,11 @@ export class UpdateCommitmentStatusCommandHandler
       if (this.eventBusService) {
         await this.eventBusService
           .publish('commitment.events.status-changed-v1', event)
-          .catch((err: Error) =>
-            this.logger.warn(`NATS publish failed: ${err.message}`),
-          );
+          .catch((err: Error) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to update commitment status: ${err.message}`,
-        err.stack,
-      );
+      this.logger.error(`Failed to update commitment status: ${err.message}`, err.stack);
       throw error;
     }
   }

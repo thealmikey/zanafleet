@@ -52,7 +52,7 @@ describe('CreateWalletCommandHandler', () => {
           type: command.type,
           currency: command.currency,
           balance: 0,
-        }),
+        })
       );
       expect(walletRepository.save).toHaveBeenCalledTimes(1);
       expect(eventBus.publish).toHaveBeenCalledTimes(1);

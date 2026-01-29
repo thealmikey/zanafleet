@@ -1,10 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  Ctx,
-  MessagePattern,
-  NatsContext,
-  Payload,
-} from '@nestjs/microservices';
+import { Ctx, MessagePattern, NatsContext, Payload } from '@nestjs/microservices';
 
 import {
   OrganizationCreatedEventV1,
@@ -29,13 +24,13 @@ export class OrganizationSubscriber {
   constructor(
     private readonly projection: OrganizationNeo4jProjection,
     private readonly idempotencyService: IdempotencyService,
-    private readonly eventLogger: EventLoggerService,
+    private readonly eventLogger: EventLoggerService
   ) {}
 
   @MessagePattern(NatsSubjects.Organization.ALL)
   async handleOrganizationEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     const subject = context.getSubject();
     this.logger.debug(`Received event on subject: ${String(subject)}`);
@@ -51,7 +46,7 @@ export class OrganizationSubscriber {
     try {
       if (data.eventType === 'OrganizationCreatedEvent-V1') {
         const event = OrganizationCreatedEventV1.fromJSON(
-          data as unknown as OrganizationCreatedEventV1JSON,
+          data as unknown as OrganizationCreatedEventV1JSON
         );
         await this.projection.handle(event);
         this.eventLogger.logProcessed(event, OrganizationNeo4jProjection.name);

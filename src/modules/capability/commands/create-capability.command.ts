@@ -10,16 +10,12 @@ export const CreateCapabilityCommandSchema = z.object({
     .max(255, 'Capability name must not exceed 255 characters')
     .regex(
       CAPABILITY_NAME_PATTERN,
-      'Capability name must use snake_case (lowercase letters, numbers, and underscores only)',
+      'Capability name must use snake_case (lowercase letters, numbers, and underscores only)'
     ),
 });
 
-export type CreateCapabilityCommandInput = z.infer<
-  typeof CreateCapabilityCommandSchema
->;
-export type CreateCapabilityCommandRawInput = z.input<
-  typeof CreateCapabilityCommandSchema
->;
+export type CreateCapabilityCommandInput = z.infer<typeof CreateCapabilityCommandSchema>;
+export type CreateCapabilityCommandRawInput = z.input<typeof CreateCapabilityCommandSchema>;
 export type CreateCapabilityCommandSafeParseResult = SafeParseReturnType<
   CreateCapabilityCommandRawInput,
   CreateCapabilityCommandInput
@@ -37,9 +33,7 @@ export class CreateCapabilityCommand {
     return CreateCapabilityCommandSchema.parse(input);
   }
 
-  static safeValidate(
-    input: unknown,
-  ): CreateCapabilityCommandSafeParseResult {
+  static safeValidate(input: unknown): CreateCapabilityCommandSafeParseResult {
     return CreateCapabilityCommandSchema.safeParse(input);
   }
 }

@@ -1,11 +1,14 @@
 import { z } from 'zod';
 
-import { CreateOrganizationCommand, CreateOrganizationCommandSchema } from '../../commands/create-organization.command';
+import {
+  CreateOrganizationCommand,
+  CreateOrganizationCommandSchema,
+} from '../../commands/create-organization.command';
 import { OrganizationType, OrganizationStatus } from '../../dto/organization.enums';
 
 /**
  * Unit Tests: CreateOrganizationCommand Validation
- * 
+ *
  * Tests focus on:
  * - Valid command creation
  * - Zod schema validation
@@ -74,9 +77,7 @@ describe('CreateOrganizationCommand', () => {
         status: 'active',
       };
 
-      expect(() => CreateOrganizationCommandSchema.parse(input)).toThrow(
-        z.ZodError,
-      );
+      expect(() => CreateOrganizationCommandSchema.parse(input)).toThrow(z.ZodError);
     });
 
     it('should reject name exceeding 255 characters', () => {
@@ -86,9 +87,7 @@ describe('CreateOrganizationCommand', () => {
         status: 'active',
       };
 
-      expect(() => CreateOrganizationCommandSchema.parse(input)).toThrow(
-        z.ZodError,
-      );
+      expect(() => CreateOrganizationCommandSchema.parse(input)).toThrow(z.ZodError);
     });
 
     it('should reject invalid organization type', () => {
@@ -98,9 +97,7 @@ describe('CreateOrganizationCommand', () => {
         status: 'active',
       };
 
-      expect(() => CreateOrganizationCommandSchema.parse(input)).toThrow(
-        z.ZodError,
-      );
+      expect(() => CreateOrganizationCommandSchema.parse(input)).toThrow(z.ZodError);
     });
 
     it('should reject invalid organization status', () => {
@@ -110,9 +107,7 @@ describe('CreateOrganizationCommand', () => {
         status: 'invalid-status',
       };
 
-      expect(() => CreateOrganizationCommandSchema.parse(input)).toThrow(
-        z.ZodError,
-      );
+      expect(() => CreateOrganizationCommandSchema.parse(input)).toThrow(z.ZodError);
     });
 
     it('should reject invalid wallet UUID', () => {
@@ -123,9 +118,7 @@ describe('CreateOrganizationCommand', () => {
         linkedWallets: ['not-a-uuid'],
       };
 
-      expect(() => CreateOrganizationCommandSchema.parse(input)).toThrow(
-        z.ZodError,
-      );
+      expect(() => CreateOrganizationCommandSchema.parse(input)).toThrow(z.ZodError);
     });
 
     it('should accept valid UUID in linkedWallets', () => {
@@ -287,9 +280,7 @@ describe('CreateOrganizationCommand', () => {
         createdByActorId: 'not-a-valid-uuid',
       };
 
-      expect(() => CreateOrganizationCommandSchema.parse(input)).toThrow(
-        z.ZodError,
-      );
+      expect(() => CreateOrganizationCommandSchema.parse(input)).toThrow(z.ZodError);
     });
 
     it('should work without createdByActorId (backward compatible)', () => {

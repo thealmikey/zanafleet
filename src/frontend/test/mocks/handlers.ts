@@ -17,7 +17,7 @@ const sessions = new Map<string, SignupSession>();
 function createMockSession(
   sessionId: string,
   actorType: ActorType,
-  overrides: Partial<SignupSession> = {},
+  overrides: Partial<SignupSession> = {}
 ): SignupSession {
   const now = new Date();
   const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
@@ -45,7 +45,7 @@ export const handlers = [
     if (!body.actorType) {
       return HttpResponse.json(
         { message: 'actorType is required', statusCode: 400 },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -67,10 +67,7 @@ export const handlers = [
     const session = sessions.get(sessionId);
 
     if (!session) {
-      return HttpResponse.json(
-        { message: 'Session not found', statusCode: 404 },
-        { status: 404 },
-      );
+      return HttpResponse.json({ message: 'Session not found', statusCode: 404 }, { status: 404 });
     }
 
     return HttpResponse.json(session);
@@ -82,10 +79,7 @@ export const handlers = [
     const session = sessions.get(sessionId);
 
     if (!session) {
-      return HttpResponse.json(
-        { message: 'Session not found', statusCode: 404 },
-        { status: 404 },
-      );
+      return HttpResponse.json({ message: 'Session not found', statusCode: 404 }, { status: 404 });
     }
 
     const body = (await request.json()) as {
@@ -134,17 +128,14 @@ export const handlers = [
     const session = sessions.get(sessionId);
 
     if (!session) {
-      return HttpResponse.json(
-        { message: 'Session not found', statusCode: 404 },
-        { status: 404 },
-      );
+      return HttpResponse.json({ message: 'Session not found', statusCode: 404 }, { status: 404 });
     }
 
     // Validate workspaceId is set (required for finalization)
     if (!session.workspaceId) {
       return HttpResponse.json(
         { message: 'workspaceId is required for finalization', statusCode: 400 },
-        { status: 400 },
+        { status: 400 }
       );
     }
 

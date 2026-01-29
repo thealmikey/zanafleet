@@ -8,15 +8,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { Neo4jService } from '../../../../core/neo4j';
 import { ActorType } from '../../../actor/dto/actor.enums';
 import { ActorEntity } from '../../../actor/entities/actor.entity';
-import {
-  OrganizationStatus,
-  OrganizationType,
-} from '../../../organization/dto/organization.enums';
+import { OrganizationStatus, OrganizationType } from '../../../organization/dto/organization.enums';
 import { OrganizationEntity } from '../../../organization/entities/organization.entity';
-import {
-  WorkspaceStatus,
-  WorkspaceType,
-} from '../../../workspace/dto/workspace.enums';
+import { WorkspaceStatus, WorkspaceType } from '../../../workspace/dto/workspace.enums';
 import { WorkspaceEntity } from '../../../workspace/entities/workspace.entity';
 import { AssignPersonaToActorCommand } from '../../commands/assign-persona-to-actor.command';
 import { CreatePersonaCommand } from '../../commands/create-persona.command';
@@ -38,8 +32,7 @@ import { CreatePersonaCommandHandler } from '../../handlers/create-persona.handl
  * Requires Docker services: Postgres (Neo4j interactions are mocked).
  * Run: docker-compose -f docker-compose.test.yml up -d
  */
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 function createMockNeo4jService(): Partial<Neo4jService> {
   return {
@@ -109,27 +102,20 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
       commandBus = testingModule.get<CommandBus>(CommandBus);
       eventBus = testingModule.get<EventBus>(EventBus);
       personaRepository = testingModule.get<Repository<PersonaEntity>>(
-        getRepositoryToken(PersonaEntity),
+        getRepositoryToken(PersonaEntity)
       );
-      actorPersonaRepository =
-        testingModule.get<Repository<ActorPersonaEntity>>(
-          getRepositoryToken(ActorPersonaEntity),
-        );
-      actorRepository = testingModule.get<Repository<ActorEntity>>(
-        getRepositoryToken(ActorEntity),
+      actorPersonaRepository = testingModule.get<Repository<ActorPersonaEntity>>(
+        getRepositoryToken(ActorPersonaEntity)
       );
+      actorRepository = testingModule.get<Repository<ActorEntity>>(getRepositoryToken(ActorEntity));
       workspaceRepository = testingModule.get<Repository<WorkspaceEntity>>(
-        getRepositoryToken(WorkspaceEntity),
+        getRepositoryToken(WorkspaceEntity)
       );
-      organizationRepository =
-        testingModule.get<Repository<OrganizationEntity>>(
-          getRepositoryToken(OrganizationEntity),
-        );
+      organizationRepository = testingModule.get<Repository<OrganizationEntity>>(
+        getRepositoryToken(OrganizationEntity)
+      );
 
-      commandBus.register([
-        CreatePersonaCommandHandler,
-        AssignPersonaToActorCommandHandler,
-      ]);
+      commandBus.register([CreatePersonaCommandHandler, AssignPersonaToActorCommandHandler]);
 
       jest.spyOn(eventBus, 'publish').mockImplementation((event: unknown) => {
         publishedEvents.push(event);
@@ -137,7 +123,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
     } catch (error) {
       console.warn(
         'Failed to initialize Persona integration test module (database may not be available):',
-        error instanceof Error ? error.message : String(error),
+        error instanceof Error ? error.message : String(error)
       );
       moduleInitializationFailed = true;
     }
@@ -146,7 +132,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
   beforeEach((): void => {
     if (moduleInitializationFailed) {
       throw new Error(
-        'Persona integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d). Neo4j is mocked for this suite.',
+        'Persona integration test module failed to initialize. Ensure Postgres is running (docker-compose -f docker-compose.test.yml up -d). Neo4j is mocked for this suite.'
       );
     }
   });
@@ -220,7 +206,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
   describe('entity validation', () => {
     it('should throw NotFoundException when actor does not exist', async () => {
       const personaId = await commandBus.execute(
-        new CreatePersonaCommand({ name: 'Persona for missing actor' }),
+        new CreatePersonaCommand({ name: 'Persona for missing actor' })
       );
 
       publishedEvents = [];
@@ -235,19 +221,19 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
             actorId: nonExistentActorId,
             workspaceId: testWorkspaceId,
             personaId,
-          }),
+          })
         );
       } catch (error) {
         expect(error).toBeInstanceOf(NotFoundException);
         expect((error as NotFoundException).message).toBe(
-          `Actor with ID '${nonExistentActorId}' does not exist`,
+          `Actor with ID '${nonExistentActorId}' does not exist`
         );
       }
     });
 
     it('should throw NotFoundException when workspace does not exist', async () => {
       const personaId = await commandBus.execute(
-        new CreatePersonaCommand({ name: 'Persona for missing workspace' }),
+        new CreatePersonaCommand({ name: 'Persona for missing workspace' })
       );
 
       publishedEvents = [];
@@ -262,12 +248,12 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
             actorId: testActorId,
             workspaceId: nonExistentWorkspaceId,
             personaId,
-          }),
+          })
         );
       } catch (error) {
         expect(error).toBeInstanceOf(NotFoundException);
         expect((error as NotFoundException).message).toBe(
-          `Workspace with ID '${nonExistentWorkspaceId}' does not exist`,
+          `Workspace with ID '${nonExistentWorkspaceId}' does not exist`
         );
       }
     });
@@ -285,12 +271,12 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
             actorId: testActorId,
             workspaceId: testWorkspaceId,
             personaId: nonExistentPersonaId,
-          }),
+          })
         );
       } catch (error) {
         expect(error).toBeInstanceOf(NotFoundException);
         expect((error as NotFoundException).message).toBe(
-          `Persona with ID '${nonExistentPersonaId}' does not exist`,
+          `Persona with ID '${nonExistentPersonaId}' does not exist`
         );
       }
     });
@@ -298,12 +284,8 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
 
   describe('multiple personas assignment', () => {
     it('should allow assigning multiple different personas to same actor in same workspace', async () => {
-      const personaIdA = await commandBus.execute(
-        new CreatePersonaCommand({ name: 'Persona A' }),
-      );
-      const personaIdB = await commandBus.execute(
-        new CreatePersonaCommand({ name: 'Persona B' }),
-      );
+      const personaIdA = await commandBus.execute(new CreatePersonaCommand({ name: 'Persona A' }));
+      const personaIdB = await commandBus.execute(new CreatePersonaCommand({ name: 'Persona B' }));
 
       publishedEvents = [];
 
@@ -312,14 +294,14 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
           actorId: testActorId,
           workspaceId: testWorkspaceId,
           personaId: personaIdA,
-        }),
+        })
       );
       await commandBus.execute(
         new AssignPersonaToActorCommand({
           actorId: testActorId,
           workspaceId: testWorkspaceId,
           personaId: personaIdB,
-        }),
+        })
       );
 
       const assignments = await actorPersonaRepository.find({
@@ -328,9 +310,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
 
       expect(assignments).toHaveLength(2);
 
-      const persistedPersonaIds = assignments
-        .map((assignment) => assignment.personaId)
-        .sort();
+      const persistedPersonaIds = assignments.map((assignment) => assignment.personaId).sort();
       const expectedPersonaIds = [personaIdA, personaIdB].sort();
 
       expect(persistedPersonaIds).toEqual(expectedPersonaIds);
@@ -338,14 +318,12 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
 
       const assignmentEvents = publishedEvents.filter(
         (event): event is PersonaAssignedToActorEventV1 =>
-          event instanceof PersonaAssignedToActorEventV1,
+          event instanceof PersonaAssignedToActorEventV1
       );
 
       expect(assignmentEvents).toHaveLength(2);
 
-      const emittedPersonaIds = assignmentEvents
-        .map((event) => event.personaId)
-        .sort();
+      const emittedPersonaIds = assignmentEvents.map((event) => event.personaId).sort();
 
       expect(emittedPersonaIds).toEqual(expectedPersonaIds);
     });
@@ -354,7 +332,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
   describe('duplicate assignment rejection', () => {
     it('should throw ConflictException when assigning same persona twice', async () => {
       const personaId = await commandBus.execute(
-        new CreatePersonaCommand({ name: 'Duplicate Persona' }),
+        new CreatePersonaCommand({ name: 'Duplicate Persona' })
       );
 
       publishedEvents = [];
@@ -364,7 +342,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
           actorId: testActorId,
           workspaceId: testWorkspaceId,
           personaId,
-        }),
+        })
       );
 
       expect.assertions(3);
@@ -375,12 +353,12 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
             actorId: testActorId,
             workspaceId: testWorkspaceId,
             personaId,
-          }),
+          })
         );
       } catch (error) {
         expect(error).toBeInstanceOf(ConflictException);
         expect((error as ConflictException).message).toBe(
-          'Persona is already assigned to this actor within the specified workspace',
+          'Persona is already assigned to this actor within the specified workspace'
         );
       }
 
@@ -390,7 +368,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
 
     it('should not emit event when duplicate assignment is rejected', async () => {
       const personaId = await commandBus.execute(
-        new CreatePersonaCommand({ name: 'Duplicate Event Persona' }),
+        new CreatePersonaCommand({ name: 'Duplicate Event Persona' })
       );
 
       publishedEvents = [];
@@ -400,7 +378,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
           actorId: testActorId,
           workspaceId: testWorkspaceId,
           personaId,
-        }),
+        })
       );
 
       publishedEvents = [];
@@ -413,12 +391,12 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
             actorId: testActorId,
             workspaceId: testWorkspaceId,
             personaId,
-          }),
+          })
         );
       } catch (error) {
         expect(error).toBeInstanceOf(ConflictException);
         expect((error as ConflictException).message).toBe(
-          'Persona is already assigned to this actor within the specified workspace',
+          'Persona is already assigned to this actor within the specified workspace'
         );
       }
 
@@ -431,7 +409,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
   describe('successful assignment', () => {
     it('should persist ActorPersonaEntity to database', async () => {
       const personaId = await commandBus.execute(
-        new CreatePersonaCommand({ name: 'Persistence Persona' }),
+        new CreatePersonaCommand({ name: 'Persistence Persona' })
       );
 
       publishedEvents = [];
@@ -441,7 +419,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
           actorId: testActorId,
           workspaceId: testWorkspaceId,
           personaId,
-        }),
+        })
       );
 
       const entity = await actorPersonaRepository.findOne({
@@ -461,7 +439,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
 
     it('should emit PersonaAssignedToActorEventV1', async () => {
       const personaId = await commandBus.execute(
-        new CreatePersonaCommand({ name: 'Event Persona' }),
+        new CreatePersonaCommand({ name: 'Event Persona' })
       );
 
       publishedEvents = [];
@@ -471,7 +449,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
           actorId: testActorId,
           workspaceId: testWorkspaceId,
           personaId,
-        }),
+        })
       );
 
       expect(publishedEvents).toHaveLength(1);
@@ -493,7 +471,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
 
     it('should return assignment IDs on success', async () => {
       const personaId = await commandBus.execute(
-        new CreatePersonaCommand({ name: 'Return Persona' }),
+        new CreatePersonaCommand({ name: 'Return Persona' })
       );
 
       publishedEvents = [];
@@ -503,7 +481,7 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
           actorId: testActorId,
           workspaceId: testWorkspaceId,
           personaId,
-        }),
+        })
       );
 
       expect(result).toEqual({

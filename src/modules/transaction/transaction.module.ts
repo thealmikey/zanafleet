@@ -6,7 +6,10 @@ import { WalletEntity } from '../wallet/entities/wallet.entity';
 
 import { TransactionEntity } from './entities/transaction.entity';
 import { CreateTransactionCommandHandler } from './handlers/create-transaction.handler';
-import { TransactionNeo4jProjection, TransactionNeo4jInitializer } from './projections/transaction-neo4j.projection';
+import {
+  TransactionNeo4jProjection,
+  TransactionNeo4jInitializer,
+} from './projections/transaction-neo4j.projection';
 
 /**
  * Transaction Module
@@ -23,18 +26,13 @@ import { TransactionNeo4jProjection, TransactionNeo4jInitializer } from './proje
  * 6. Comprehensive unit and integration tests
  */
 @Module({
-  imports: [
-    CqrsModule,
-    TypeOrmModule.forFeature([TransactionEntity, WalletEntity]),
-  ],
+  imports: [CqrsModule, TypeOrmModule.forFeature([TransactionEntity, WalletEntity])],
   providers: [
     CreateTransactionCommandHandler,
     TransactionNeo4jProjection,
     TransactionNeo4jInitializer,
   ],
-  exports: [
-    CreateTransactionCommandHandler,
-  ],
+  exports: [CreateTransactionCommandHandler],
 })
 export class TransactionModule implements OnModuleInit {
   constructor(private readonly neo4jInitializer: TransactionNeo4jInitializer) {}

@@ -29,10 +29,7 @@ import {
   UpdateOrganizationCommand,
   UpdateOrganizationCommandInput,
 } from '../commands/update-organization.command';
-import {
-  CreateOrganizationDto,
-  OrganizationDto,
-} from '../dto/create-organization.dto';
+import { CreateOrganizationDto, OrganizationDto } from '../dto/create-organization.dto';
 import { UpdateOrganizationDto } from '../dto/update-organization.dto';
 import { OrganizationEntity } from '../entities/organization.entity';
 
@@ -45,14 +42,12 @@ export class OrganizationController {
   constructor(
     private readonly commandBus: CommandBus,
     @InjectRepository(OrganizationEntity)
-    private readonly organizationRepository: Repository<OrganizationEntity>,
+    private readonly organizationRepository: Repository<OrganizationEntity>
   ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(
-    @Body() body: CreateOrganizationDto,
-  ): Promise<{ organizationId: string }> {
+  async create(@Body() body: CreateOrganizationDto): Promise<{ organizationId: string }> {
     let input: CreateOrganizationCommandInput;
     try {
       input = CreateOrganizationCommand.validate(body);
@@ -64,18 +59,15 @@ export class OrganizationController {
     }
 
     const command = new CreateOrganizationCommand(input);
-    const organizationId = await this.commandBus.execute<
-      CreateOrganizationCommand,
-      string
-    >(command);
+    const organizationId = await this.commandBus.execute<CreateOrganizationCommand, string>(
+      command
+    );
 
     return { organizationId };
   }
 
   @Get(':id')
-  async findOne(
-    @Param('id', new ParseUUIDPipe()) id: string,
-  ): Promise<OrganizationDto> {
+  async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<OrganizationDto> {
     const organization = await this.organizationRepository.findOne({
       where: { id },
     });
@@ -90,7 +82,7 @@ export class OrganizationController {
   @Patch(':id')
   async update(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() body: UpdateOrganizationDto,
+    @Body() body: UpdateOrganizationDto
   ): Promise<OrganizationDto> {
     let input: UpdateOrganizationCommandInput;
     try {
@@ -123,7 +115,7 @@ export class OrganizationController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() body: DeleteOrganizationBodyDto = {},
+    @Body() body: DeleteOrganizationBodyDto = {}
   ): Promise<void> {
     let input: DeleteOrganizationCommandInput;
     try {
