@@ -84,8 +84,10 @@ export class WorkspaceModule implements OnModuleInit {
    */
   async onModuleInit(): Promise<void> {
     try {
-      await this.workspaceNeo4jInitializer.initialize();
-      await this.membershipNeo4jInitializer.initialize();
+      await Promise.all([
+        this.workspaceNeo4jInitializer.initialize(),
+        this.membershipNeo4jInitializer.initialize(),
+      ]);
     } catch (error) {
       this.logger.error('Failed to initialize Neo4j constraints', error);
       if (process.env.NEO4J_STRICT_MODE === 'true') {
