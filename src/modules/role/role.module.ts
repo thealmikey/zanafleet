@@ -1,4 +1,4 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -39,6 +39,8 @@ import { RoleNeo4jProjection, RoleNeo4jInitializer } from './projections/role-ne
   exports: [CreateRoleCommandHandler],
 })
 export class RoleModule implements OnModuleInit {
+  private readonly logger = new Logger(RoleModule.name);
+
   constructor(private readonly neo4jInitializer: RoleNeo4jInitializer) {}
 
   /**
@@ -46,6 +48,13 @@ export class RoleModule implements OnModuleInit {
    * Sets up Neo4j constraints and indexes
    */
   async onModuleInit(): Promise<void> {
-    await this.neo4jInitializer.initialize();
+    try {
+      await this.neo4jInitializer.initialize();
+    } catch (error) {
+      this.logger.error('Failed to initialize Neo4j constraints', error);
+      if (process.env.NEO4J_STRICT_MODE === 'true') {
+        throw error;
+      }
+    }
   }
 }

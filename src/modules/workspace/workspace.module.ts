@@ -1,4 +1,4 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -71,6 +71,8 @@ import {
   ],
 })
 export class WorkspaceModule implements OnModuleInit {
+  private readonly logger = new Logger(WorkspaceModule.name);
+
   constructor(
     private readonly workspaceNeo4jInitializer: WorkspaceNeo4jInitializer,
     private readonly membershipNeo4jInitializer: MembershipNeo4jInitializer
@@ -81,7 +83,14 @@ export class WorkspaceModule implements OnModuleInit {
    * Sets up Neo4j constraints and indexes for Workspace nodes and MEMBER_OF relationships
    */
   async onModuleInit(): Promise<void> {
-    await this.workspaceNeo4jInitializer.initialize();
-    await this.membershipNeo4jInitializer.initialize();
+    try {
+      await this.workspaceNeo4jInitializer.initialize();
+      await this.membershipNeo4jInitializer.initialize();
+    } catch (error) {
+      this.logger.error('Failed to initialize Neo4j constraints', error);
+      if (process.env.NEO4J_STRICT_MODE === 'true') {
+        throw error;
+      }
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -44,6 +44,8 @@ import {
   exports: [CreateEvidenceCommandHandler],
 })
 export class EvidenceModule implements OnModuleInit {
+  private readonly logger = new Logger(EvidenceModule.name);
+
   constructor(private readonly evidenceNeo4jInitializer: EvidenceNeo4jInitializer) {}
 
   /**
@@ -51,6 +53,13 @@ export class EvidenceModule implements OnModuleInit {
    * Sets up Neo4j constraints and indexes for Evidence nodes
    */
   async onModuleInit(): Promise<void> {
-    await this.evidenceNeo4jInitializer.initialize();
+    try {
+      await this.evidenceNeo4jInitializer.initialize();
+    } catch (error) {
+      this.logger.error('Failed to initialize Neo4j constraints', error);
+      if (process.env.NEO4J_STRICT_MODE === 'true') {
+        throw error;
+      }
+    }
   }
 }

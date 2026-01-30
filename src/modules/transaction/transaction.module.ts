@@ -1,4 +1,4 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -35,9 +35,18 @@ import {
   exports: [CreateTransactionCommandHandler],
 })
 export class TransactionModule implements OnModuleInit {
+  private readonly logger = new Logger(TransactionModule.name);
+
   constructor(private readonly neo4jInitializer: TransactionNeo4jInitializer) {}
 
   async onModuleInit(): Promise<void> {
-    await this.neo4jInitializer.initialize();
+    try {
+      await this.neo4jInitializer.initialize();
+    } catch (error) {
+      this.logger.error('Failed to initialize Neo4j constraints', error);
+      if (process.env.NEO4J_STRICT_MODE === 'true') {
+        throw error;
+      }
+    }
   }
 }

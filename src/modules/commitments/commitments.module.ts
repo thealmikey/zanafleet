@@ -1,4 +1,4 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -49,6 +49,8 @@ import {
   exports: [CreateCommitmentCommandHandler, UpdateCommitmentStatusCommandHandler],
 })
 export class CommitmentsModule implements OnModuleInit {
+  private readonly logger = new Logger(CommitmentsModule.name);
+
   constructor(private readonly commitmentNeo4jInitializer: CommitmentNeo4jInitializer) {}
 
   /**
@@ -56,6 +58,13 @@ export class CommitmentsModule implements OnModuleInit {
    * Sets up Neo4j constraints and indexes for Commitment nodes
    */
   async onModuleInit(): Promise<void> {
-    await this.commitmentNeo4jInitializer.initialize();
+    try {
+      await this.commitmentNeo4jInitializer.initialize();
+    } catch (error) {
+      this.logger.error('Failed to initialize Neo4j constraints', error);
+      if (process.env.NEO4J_STRICT_MODE === 'true') {
+        throw error;
+      }
+    }
   }
 }
