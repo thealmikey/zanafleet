@@ -1,7 +1,5 @@
 {
-  "ignorePatterns": [
-    "src/frontend/**"
-  ],
+  "ignorePatterns": ["src/frontend/**"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2020,
