@@ -1,5 +1,3 @@
-dist
-node_modules
-coverage
-build
-*.js
+# Frontend has its own ESLint config and lint script
+# Prevent root ESLint from discovering and loading frontend/.eslintrc.json
+frontend/
