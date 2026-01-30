@@ -25,7 +25,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:unit": "jest --testPathPattern=\"\\.spec\\.ts$\" --testPathIgnore=\"integration\"",
-    "test:integration": "jest --testPathPattern=\"integration.*\\.spec\\.ts$\"",
+    "test:integration": "jest --config jest.integration.config.json",
     "test:all": "jest --coverage",
     "ci:lint": "npm run format:check && npm run lint:check",
     "ci:test": "npm run test:all",
