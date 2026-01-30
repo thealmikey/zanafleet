@@ -35,13 +35,7 @@ import {
  * - uuid: ID generation
  */
 @Module({
-  imports: [
-    CqrsModule,
-    TypeOrmModule.forFeature([OrganizationEntity, ActorEntity]),
-    // Neo4j module should be imported at root level
-    // Uncomment when Neo4j module is configured:
-    // Neo4jModule.forRoot({...}),
-  ],
+  imports: [CqrsModule, TypeOrmModule.forFeature([OrganizationEntity, ActorEntity])],
   controllers: [OrganizationController],
   providers: [
     // Command Handlers
