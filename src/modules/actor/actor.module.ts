@@ -53,14 +53,13 @@ import { ActorNeo4jProjection, ActorNeo4jInitializer } from './projections/actor
   ],
 })
 export class ActorModule implements OnModuleInit {
-  constructor(private readonly _neo4jInitializer: ActorNeo4jInitializer) {}
+  constructor(private readonly neo4jInitializer: ActorNeo4jInitializer) {}
 
   /**
    * Initialize module
    * Sets up Neo4j constraints and indexes
    */
   async onModuleInit(): Promise<void> {
-    // Uncomment when Neo4j is fully configured:
-    // await this.neo4jInitializer.initialize();
+    await this.neo4jInitializer.initialize();
   }
 }

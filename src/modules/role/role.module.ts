@@ -39,14 +39,13 @@ import { RoleNeo4jProjection, RoleNeo4jInitializer } from './projections/role-ne
   exports: [CreateRoleCommandHandler],
 })
 export class RoleModule implements OnModuleInit {
-  constructor(private readonly _neo4jInitializer: RoleNeo4jInitializer) {}
+  constructor(private readonly neo4jInitializer: RoleNeo4jInitializer) {}
 
   /**
    * Initialize module
-   * Sets up Neo4j constraints and indexes when implemented
+   * Sets up Neo4j constraints and indexes
    */
   async onModuleInit(): Promise<void> {
-    // TODO: Uncomment when Neo4j projection is fully implemented:
-    // await this.neo4jInitializer.initialize();
+    await this.neo4jInitializer.initialize();
   }
 }

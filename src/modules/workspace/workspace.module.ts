@@ -72,8 +72,8 @@ import {
 })
 export class WorkspaceModule implements OnModuleInit {
   constructor(
-    private readonly _workspaceNeo4jInitializer: WorkspaceNeo4jInitializer,
-    private readonly _membershipNeo4jInitializer: MembershipNeo4jInitializer
+    private readonly workspaceNeo4jInitializer: WorkspaceNeo4jInitializer,
+    private readonly membershipNeo4jInitializer: MembershipNeo4jInitializer
   ) {}
 
   /**
@@ -81,8 +81,7 @@ export class WorkspaceModule implements OnModuleInit {
    * Sets up Neo4j constraints and indexes for Workspace nodes and MEMBER_OF relationships
    */
   async onModuleInit(): Promise<void> {
-    // Uncomment when Neo4j is fully configured:
-    // await this.workspaceNeo4jInitializer.initialize();
-    // await this.membershipNeo4jInitializer.initialize();
+    await this.workspaceNeo4jInitializer.initialize();
+    await this.membershipNeo4jInitializer.initialize();
   }
 }

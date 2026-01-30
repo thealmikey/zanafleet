@@ -49,14 +49,13 @@ import {
   exports: [CreateCommitmentCommandHandler, UpdateCommitmentStatusCommandHandler],
 })
 export class CommitmentsModule implements OnModuleInit {
-  constructor(private readonly _commitmentNeo4jInitializer: CommitmentNeo4jInitializer) {}
+  constructor(private readonly commitmentNeo4jInitializer: CommitmentNeo4jInitializer) {}
 
   /**
    * Initialize module
    * Sets up Neo4j constraints and indexes for Commitment nodes
    */
   async onModuleInit(): Promise<void> {
-    // Uncomment when Neo4j is fully configured:
-    // await this.commitmentNeo4jInitializer.initialize();
+    await this.commitmentNeo4jInitializer.initialize();
   }
 }

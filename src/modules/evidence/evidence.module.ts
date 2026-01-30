@@ -44,14 +44,13 @@ import {
   exports: [CreateEvidenceCommandHandler],
 })
 export class EvidenceModule implements OnModuleInit {
-  constructor(private readonly _evidenceNeo4jInitializer: EvidenceNeo4jInitializer) {}
+  constructor(private readonly evidenceNeo4jInitializer: EvidenceNeo4jInitializer) {}
 
   /**
    * Initialize module
    * Sets up Neo4j constraints and indexes for Evidence nodes
    */
   async onModuleInit(): Promise<void> {
-    // Uncomment when Neo4j is fully configured:
-    // await this.evidenceNeo4jInitializer.initialize();
+    await this.evidenceNeo4jInitializer.initialize();
   }
 }
