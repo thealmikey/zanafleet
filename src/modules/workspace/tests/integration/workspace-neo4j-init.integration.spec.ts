@@ -4,8 +4,7 @@ import { Neo4jModule, Neo4jService } from '../../../../core/neo4j';
 import { MembershipNeo4jInitializer } from '../../projections/membership-neo4j.projection';
 import { WorkspaceNeo4jInitializer } from '../../projections/workspace-neo4j.projection';
 
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 /**
  * Workspace Neo4j Initialization Integration Tests
@@ -80,10 +79,9 @@ describeIntegration('Workspace Neo4j Initializers Integration', () => {
   async function indexExists(name: string): Promise<boolean> {
     const session = neo4jService.getSession();
     try {
-      const result = await session.run(
-        'SHOW INDEXES YIELD name WHERE name = $name RETURN name',
-        { name }
-      );
+      const result = await session.run('SHOW INDEXES YIELD name WHERE name = $name RETURN name', {
+        name,
+      });
       return result.records.length > 0;
     } finally {
       await session.close();
@@ -124,8 +122,7 @@ describeIntegration('Workspace Neo4j Initializers Integration', () => {
           providers: [WorkspaceNeo4jInitializer],
         }).compile();
 
-        const badInitializer =
-          badModule.get<WorkspaceNeo4jInitializer>(WorkspaceNeo4jInitializer);
+        const badInitializer = badModule.get<WorkspaceNeo4jInitializer>(WorkspaceNeo4jInitializer);
 
         await expect(badInitializer.initialize()).rejects.toThrow();
 
@@ -166,8 +163,9 @@ describeIntegration('Workspace Neo4j Initializers Integration', () => {
           providers: [MembershipNeo4jInitializer],
         }).compile();
 
-        const badInitializer =
-          badModule.get<MembershipNeo4jInitializer>(MembershipNeo4jInitializer);
+        const badInitializer = badModule.get<MembershipNeo4jInitializer>(
+          MembershipNeo4jInitializer
+        );
 
         await expect(badInitializer.initialize()).rejects.toThrow();
 

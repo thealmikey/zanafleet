@@ -3,8 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Neo4jModule, Neo4jService } from '../../../../core/neo4j';
 import { CommitmentNeo4jInitializer } from '../../projections/commitment-neo4j.projection';
 
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 /**
  * Commitment Neo4j Initialization Integration Tests
@@ -77,10 +76,9 @@ describeIntegration('CommitmentNeo4jInitializer Integration', () => {
   async function indexExists(name: string): Promise<boolean> {
     const session = neo4jService.getSession();
     try {
-      const result = await session.run(
-        'SHOW INDEXES YIELD name WHERE name = $name RETURN name',
-        { name }
-      );
+      const result = await session.run('SHOW INDEXES YIELD name WHERE name = $name RETURN name', {
+        name,
+      });
       return result.records.length > 0;
     } finally {
       await session.close();
@@ -122,8 +120,7 @@ describeIntegration('CommitmentNeo4jInitializer Integration', () => {
         providers: [CommitmentNeo4jInitializer],
       }).compile();
 
-      const badInitializer =
-        badModule.get<CommitmentNeo4jInitializer>(CommitmentNeo4jInitializer);
+      const badInitializer = badModule.get<CommitmentNeo4jInitializer>(CommitmentNeo4jInitializer);
 
       await expect(badInitializer.initialize()).rejects.toThrow();
 

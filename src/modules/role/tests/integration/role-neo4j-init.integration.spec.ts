@@ -3,8 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Neo4jModule } from '../../../../core/neo4j';
 import { RoleNeo4jInitializer } from '../../projections/role-neo4j.projection';
 
-const describeIntegration =
-  process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
+const describeIntegration = process.env.RUN_INTEGRATION_TESTS === 'true' ? describe : describe.skip;
 
 /**
  * Role Neo4j Initialization Integration Tests
