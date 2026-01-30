@@ -61,7 +61,7 @@ import {
   ],
 })
 export class OrganizationModule implements OnModuleInit {
-  constructor(private readonly neo4jInitializer: OrganizationNeo4jInitializer) {}
+  constructor(private readonly _neo4jInitializer: OrganizationNeo4jInitializer) {}
 
   /**
    * Initialize module

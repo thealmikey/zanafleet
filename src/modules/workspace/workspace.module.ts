@@ -72,8 +72,8 @@ import {
 })
 export class WorkspaceModule implements OnModuleInit {
   constructor(
-    private readonly workspaceNeo4jInitializer: WorkspaceNeo4jInitializer,
-    private readonly membershipNeo4jInitializer: MembershipNeo4jInitializer
+    private readonly _workspaceNeo4jInitializer: WorkspaceNeo4jInitializer,
+    private readonly _membershipNeo4jInitializer: MembershipNeo4jInitializer
   ) {}
 
   /**

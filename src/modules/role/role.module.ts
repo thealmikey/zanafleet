@@ -39,7 +39,7 @@ import { RoleNeo4jProjection, RoleNeo4jInitializer } from './projections/role-ne
   exports: [CreateRoleCommandHandler],
 })
 export class RoleModule implements OnModuleInit {
-  constructor(private readonly neo4jInitializer: RoleNeo4jInitializer) {}
+  constructor(private readonly _neo4jInitializer: RoleNeo4jInitializer) {}
 
   /**
    * Initialize module

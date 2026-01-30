@@ -49,7 +49,7 @@ import {
   exports: [CreateCommitmentCommandHandler, UpdateCommitmentStatusCommandHandler],
 })
 export class CommitmentsModule implements OnModuleInit {
-  constructor(private readonly commitmentNeo4jInitializer: CommitmentNeo4jInitializer) {}
+  constructor(private readonly _commitmentNeo4jInitializer: CommitmentNeo4jInitializer) {}
 
   /**
    * Initialize module

@@ -38,7 +38,7 @@ import {
   exports: [CreateWalletCommandHandler, CreditWalletCommandHandler, DebitWalletCommandHandler],
 })
 export class WalletModule implements OnModuleInit {
-  constructor(private readonly neo4jInitializer: WalletNeo4jInitializer) {}
+  constructor(private readonly _neo4jInitializer: WalletNeo4jInitializer) {}
 
   async onModuleInit(): Promise<void> {
     // Uncomment when Neo4j is fully configured:

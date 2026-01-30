@@ -3,7 +3,7 @@
  * Input payload for capability creation commands
  */
 export class CreateCapabilityDto {
-  name: string;
+  name!: string;
 }
 
 /**
@@ -11,8 +11,8 @@ export class CreateCapabilityDto {
  * Output DTO for queries and responses
  */
 export class CapabilityDto {
-  capabilityId: string; // UUID
-  name: string;
-  createdAt: Date;
-  updatedAt: Date;
+  capabilityId!: string; // UUID
+  name!: string;
+  createdAt!: Date;
+  updatedAt!: Date;
 }

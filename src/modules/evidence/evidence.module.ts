@@ -44,7 +44,7 @@ import {
   exports: [CreateEvidenceCommandHandler],
 })
 export class EvidenceModule implements OnModuleInit {
-  constructor(private readonly evidenceNeo4jInitializer: EvidenceNeo4jInitializer) {}
+  constructor(private readonly _evidenceNeo4jInitializer: EvidenceNeo4jInitializer) {}
 
   /**
    * Initialize module

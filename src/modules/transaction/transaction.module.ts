@@ -35,7 +35,7 @@ import {
   exports: [CreateTransactionCommandHandler],
 })
 export class TransactionModule implements OnModuleInit {
-  constructor(private readonly neo4jInitializer: TransactionNeo4jInitializer) {}
+  constructor(private readonly _neo4jInitializer: TransactionNeo4jInitializer) {}
 
   async onModuleInit(): Promise<void> {
     // Uncomment when Neo4j is fully configured:

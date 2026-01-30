@@ -53,7 +53,7 @@ import { ActorNeo4jProjection, ActorNeo4jInitializer } from './projections/actor
   ],
 })
 export class ActorModule implements OnModuleInit {
-  constructor(private readonly neo4jInitializer: ActorNeo4jInitializer) {}
+  constructor(private readonly _neo4jInitializer: ActorNeo4jInitializer) {}
 
   /**
    * Initialize module
