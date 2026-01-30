@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-ignore - Swagger decorators may not resolve in some IDE contexts
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsArray, IsOptional, IsString, IsUUID } from 'class-validator';
 

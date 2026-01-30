@@ -68,7 +68,7 @@ export class CreateWalletCommandHandler implements ICommandHandler<CreateWalletC
       if (this.eventBusService) {
         await this.eventBusService
           .publish(NatsSubjects.Wallet.CREATED_V1, event)
-          .catch((err) => this.logger.warn(`NATS publish failed: ${err.message}`));
+          .catch((err: Error) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
 
       return walletId;

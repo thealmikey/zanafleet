@@ -139,7 +139,7 @@ export class CreateTransactionCommandHandler implements ICommandHandler<CreateTr
       if (this.eventBusService) {
         await this.eventBusService
           .publish(NatsSubjects.Transaction.CREATED_V1, event)
-          .catch((err) => this.logger.warn(`NATS publish failed: ${err.message}`));
+          .catch((err: Error) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
 
       return transactionId;

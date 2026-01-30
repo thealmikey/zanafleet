@@ -14,7 +14,7 @@ describe('InitiateSignUpCommand', () => {
   });
 
   it('should validate a payload without an idempotency key', () => {
-    const { idempotencyKey, ...payload } = validPayload;
+    const { idempotencyKey: _idempotencyKey, ...payload } = validPayload;
     const result = InitiateSignUpCommand.validate(payload);
     expect(result.actorType).toBe(ActorType.Rider);
     expect(result.idempotencyKey).toBeUndefined();

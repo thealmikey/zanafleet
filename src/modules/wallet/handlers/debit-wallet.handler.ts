@@ -78,7 +78,7 @@ export class DebitWalletCommandHandler implements ICommandHandler<DebitWalletCom
       if (this.eventBusService) {
         await this.eventBusService
           .publish(NatsSubjects.Wallet.DEBITED_V1, event)
-          .catch((err) => this.logger.warn(`NATS publish failed: ${err.message}`));
+          .catch((err: Error) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
 
       return newBalance;

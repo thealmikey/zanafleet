@@ -117,7 +117,7 @@ export class CreateActorCommandHandler implements ICommandHandler<CreateActorCom
       if (this.eventBusService) {
         await this.eventBusService
           .publish(NatsSubjects.Actor.ONBOARDED_V1, event)
-          .catch((err) => this.logger.warn(`NATS publish failed: ${err.message}`));
+          .catch((err: Error) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
 
       return actorId;

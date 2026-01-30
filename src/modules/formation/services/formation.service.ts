@@ -56,7 +56,10 @@ export class FormationService {
     ];
 
     while (stack.length > 0) {
-      const current = stack.pop()!;
+      const current = stack.pop();
+      if (!current) {
+        continue;
+      }
       const currentKey = this.buildNodeKey(current.entityType, current.entityId);
 
       let requirements = relationshipCache.get(currentKey);

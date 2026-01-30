@@ -42,7 +42,7 @@ describe('UpdateSignUpStepCommand', () => {
   });
 
   it('should throw ZodError on missing stepName', () => {
-    const { stepName, ...invalidPayload } = validPayload as any;
+    const { stepName: _stepName, ...invalidPayload } = validPayload as any;
     expect(() => UpdateSignUpStepCommand.validate(invalidPayload)).toThrow();
   });
 

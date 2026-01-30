@@ -98,7 +98,7 @@ export class CreateRoleCommandHandler implements ICommandHandler<CreateRoleComma
       if (this.eventBusService) {
         await this.eventBusService
           .publish(NatsSubjects.Role.CREATED_V1, event)
-          .catch((err) => this.logger.warn(`NATS publish failed: ${err.message}`));
+          .catch((err: Error) => this.logger.warn(`NATS publish failed: ${err.message}`));
       }
 
       return roleId;

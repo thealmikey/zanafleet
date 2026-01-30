@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import neo4j, { auth } from 'neo4j-driver';
 
 import {
   NEO4J_MODULE_OPTIONS,
@@ -35,8 +36,6 @@ jest.mock('neo4j-driver', () => ({
     })),
   },
 }));
-
-import neo4j, { auth } from 'neo4j-driver';
 
 describe('Neo4jService', () => {
   let service: Neo4jService;
