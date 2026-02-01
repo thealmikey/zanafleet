@@ -7,6 +7,7 @@ describe('WorkspaceModule', () => {
     let mockWorkspaceInitializer: jest.Mocked<WorkspaceNeo4jInitializer>;
     let mockMembershipInitializer: jest.Mocked<MembershipNeo4jInitializer>;
     let workspaceModule: WorkspaceModule;
+    let loggerSpy: jest.SpyInstance;
     let originalStrictMode: string | undefined;
 
     beforeEach(() => {
@@ -25,9 +26,11 @@ describe('WorkspaceModule', () => {
         mockWorkspaceInitializer,
         mockMembershipInitializer
       );
+      loggerSpy = jest.spyOn(workspaceModule['logger'], 'error').mockImplementation();
     });
 
     afterEach(() => {
+      loggerSpy.mockRestore();
       if (originalStrictMode !== undefined) {
         process.env.NEO4J_STRICT_MODE = originalStrictMode;
       } else {
@@ -115,6 +118,36 @@ describe('WorkspaceModule', () => {
       workspaceResolve!();
 
       await expect(initPromise).resolves.toBeUndefined();
+    });
+
+    it('should log error when an initializer fails', async () => {
+      const error = new Error('Workspace Neo4j init failed');
+      mockWorkspaceInitializer.initialize.mockRejectedValue(error);
+      mockMembershipInitializer.initialize.mockResolvedValue(undefined);
+
+      await workspaceModule.onModuleInit();
+
+      expect(loggerSpy).toHaveBeenCalledWith('Failed to initialize Neo4j constraints', error);
+    });
+
+    it('should log error when an initializer fails and NEO4J_STRICT_MODE is true', async () => {
+      process.env.NEO4J_STRICT_MODE = 'true';
+      const error = new Error('Membership Neo4j init failed');
+      mockWorkspaceInitializer.initialize.mockResolvedValue(undefined);
+      mockMembershipInitializer.initialize.mockRejectedValue(error);
+
+      await expect(workspaceModule.onModuleInit()).rejects.toThrow();
+
+      expect(loggerSpy).toHaveBeenCalledWith('Failed to initialize Neo4j constraints', error);
+    });
+
+    it('should NOT log error when both initializers succeed', async () => {
+      mockWorkspaceInitializer.initialize.mockResolvedValue(undefined);
+      mockMembershipInitializer.initialize.mockResolvedValue(undefined);
+
+      await workspaceModule.onModuleInit();
+
+      expect(loggerSpy).not.toHaveBeenCalled();
     });
   });
 });

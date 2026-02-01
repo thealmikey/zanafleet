@@ -5,6 +5,7 @@ describe('ActorModule', () => {
   describe('onModuleInit', () => {
     let mockInitializer: jest.Mocked<ActorNeo4jInitializer>;
     let actorModule: ActorModule;
+    let loggerSpy: jest.SpyInstance;
     let originalStrictMode: string | undefined;
 
     beforeEach(() => {
@@ -16,9 +17,11 @@ describe('ActorModule', () => {
       } as unknown as jest.Mocked<ActorNeo4jInitializer>;
 
       actorModule = new ActorModule(mockInitializer);
+      loggerSpy = jest.spyOn(actorModule['logger'], 'error').mockImplementation();
     });
 
     afterEach(() => {
+      loggerSpy.mockRestore();
       if (originalStrictMode !== undefined) {
         process.env.NEO4J_STRICT_MODE = originalStrictMode;
       } else {
@@ -62,6 +65,33 @@ describe('ActorModule', () => {
       mockInitializer.initialize.mockRejectedValue(error);
 
       await expect(actorModule.onModuleInit()).resolves.toBeUndefined();
+    });
+
+    it('should log error when initialize() fails', async () => {
+      const error = new Error('Neo4j connection failed');
+      mockInitializer.initialize.mockRejectedValue(error);
+
+      await actorModule.onModuleInit();
+
+      expect(loggerSpy).toHaveBeenCalledWith('Failed to initialize Neo4j constraints', error);
+    });
+
+    it('should log error when initialize() fails and NEO4J_STRICT_MODE is true', async () => {
+      process.env.NEO4J_STRICT_MODE = 'true';
+      const error = new Error('Neo4j connection failed');
+      mockInitializer.initialize.mockRejectedValue(error);
+
+      await expect(actorModule.onModuleInit()).rejects.toThrow();
+
+      expect(loggerSpy).toHaveBeenCalledWith('Failed to initialize Neo4j constraints', error);
+    });
+
+    it('should NOT log error when initialize() succeeds', async () => {
+      mockInitializer.initialize.mockResolvedValue(undefined);
+
+      await actorModule.onModuleInit();
+
+      expect(loggerSpy).not.toHaveBeenCalled();
     });
   });
 });
