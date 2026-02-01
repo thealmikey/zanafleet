@@ -4,7 +4,6 @@ import React from 'react';
 import {
   SignupWizardProvider,
   WIZARD_STEPS,
-  WizardFormData,
 } from '../contexts/SignupWizardContext';
 import * as signupApi from '../services/signupApi';
 import { ActorType, SignUpSessionStatus } from '../types';
