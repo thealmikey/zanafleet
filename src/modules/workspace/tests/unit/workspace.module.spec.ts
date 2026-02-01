@@ -79,6 +79,8 @@ describe('WorkspaceModule', () => {
       mockMembershipInitializer.initialize.mockRejectedValue(new Error('Membership error'));
 
       await expect(workspaceModule.onModuleInit()).rejects.toThrow();
+
+      expect(loggerSpy).toHaveBeenCalledTimes(1);
     });
 
     it('should NOT throw error when workspaceNeo4jInitializer fails and NEO4J_STRICT_MODE is not set', async () => {
