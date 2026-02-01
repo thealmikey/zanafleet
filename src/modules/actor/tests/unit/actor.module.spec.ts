@@ -67,6 +67,15 @@ describe('ActorModule', () => {
       await expect(actorModule.onModuleInit()).resolves.toBeUndefined();
     });
 
+    it('should NOT throw error when initialize() fails and NEO4J_STRICT_MODE is TRUE (uppercase) - documents case-sensitive behavior', async () => {
+      process.env.NEO4J_STRICT_MODE = 'TRUE';
+      const error = new Error('Neo4j connection failed');
+      mockInitializer.initialize.mockRejectedValue(error);
+
+      // Current implementation is case-sensitive: 'TRUE' !== 'true'
+      await expect(actorModule.onModuleInit()).resolves.toBeUndefined();
+    });
+
     it('should log error when initialize() fails', async () => {
       const error = new Error('Neo4j connection failed');
       mockInitializer.initialize.mockRejectedValue(error);
