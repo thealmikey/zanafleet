@@ -66,7 +66,7 @@ export class ActorModule implements OnModuleInit {
       await this.neo4jInitializer.initialize();
     } catch (error) {
       this.logger.error('Failed to initialize Neo4j constraints', error);
-      if (process.env.NEO4J_STRICT_MODE === 'true') {
+      if (process.env.NEO4J_STRICT_MODE?.toLowerCase() === 'true') {
         throw error;
       }
     }

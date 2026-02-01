@@ -99,14 +99,22 @@ describe('WorkspaceModule', () => {
       await expect(workspaceModule.onModuleInit()).resolves.toBeUndefined();
     });
 
-    it('should NOT throw error when initializer fails and NEO4J_STRICT_MODE is TRUE (uppercase) - documents case-sensitive behavior', async () => {
+    it('should throw error when initializer fails and NEO4J_STRICT_MODE is TRUE (uppercase)', async () => {
       process.env.NEO4J_STRICT_MODE = 'TRUE';
       const error = new Error('Workspace Neo4j init failed');
       mockWorkspaceInitializer.initialize.mockRejectedValue(error);
       mockMembershipInitializer.initialize.mockResolvedValue(undefined);
 
-      // Current implementation is case-sensitive: 'TRUE' !== 'true'
-      await expect(workspaceModule.onModuleInit()).resolves.toBeUndefined();
+      await expect(workspaceModule.onModuleInit()).rejects.toThrow('Workspace Neo4j init failed');
+    });
+
+    it('should throw error when initializer fails and NEO4J_STRICT_MODE is True (mixed case)', async () => {
+      process.env.NEO4J_STRICT_MODE = 'True';
+      const error = new Error('Workspace Neo4j init failed');
+      mockWorkspaceInitializer.initialize.mockRejectedValue(error);
+      mockMembershipInitializer.initialize.mockResolvedValue(undefined);
+
+      await expect(workspaceModule.onModuleInit()).rejects.toThrow('Workspace Neo4j init failed');
     });
 
     it('should invoke both initializers concurrently before either settles (Promise.all starts all promises immediately)', async () => {
