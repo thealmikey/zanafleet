@@ -131,6 +131,54 @@ describe('WorkspaceModule', () => {
       );
     });
 
+    it('should only log the first rejection when both initializers fail (Promise.all logs first, loses second)', async () => {
+      // IMPORTANT: Promise.all rejects as soon as any promise rejects, and only that error
+      // is propagated. The second rejection is silently lost. If capturing all initialization
+      // errors is required for diagnostics, consider using Promise.allSettled instead:
+      //
+      //   const results = await Promise.allSettled([...]);
+      //   const failures = results.filter(r => r.status === 'rejected');
+      //   failures.forEach(f => this.logger.error('...', f.reason));
+      //
+      delete process.env.NEO4J_STRICT_MODE;
+
+      const workspaceError = new Error('Workspace init failed');
+      const membershipError = new Error('Membership init failed');
+
+      // Control timing: membership rejects immediately, workspace rejects after
+      let workspaceReject: (error: Error) => void = () => {};
+      const workspacePromise = new Promise<void>((_, reject) => {
+        workspaceReject = reject;
+      });
+
+      mockWorkspaceInitializer.initialize.mockReturnValue(workspacePromise);
+      mockMembershipInitializer.initialize.mockRejectedValue(membershipError);
+
+      const initPromise = workspaceModule.onModuleInit();
+
+      // Both initializers have been invoked
+      expect(mockWorkspaceInitializer.initialize).toHaveBeenCalledTimes(1);
+      expect(mockMembershipInitializer.initialize).toHaveBeenCalledTimes(1);
+
+      // Now reject workspace (after membership already rejected)
+      workspaceReject(workspaceError);
+
+      await expect(initPromise).resolves.toBeUndefined();
+
+      // Only the membership error (first to reject) is logged
+      expect(loggerSpy).toHaveBeenCalledTimes(1);
+      expect(loggerSpy).toHaveBeenCalledWith(
+        'Failed to initialize Neo4j constraints',
+        membershipError
+      );
+
+      // The workspace error is lost - this is the trade-off of using Promise.all
+      expect(loggerSpy).not.toHaveBeenCalledWith(
+        'Failed to initialize Neo4j constraints',
+        workspaceError
+      );
+    });
+
     it('should NOT throw error when workspaceNeo4jInitializer fails and NEO4J_STRICT_MODE is not set', async () => {
       delete process.env.NEO4J_STRICT_MODE;
       const error = new Error('Workspace Neo4j init failed');
