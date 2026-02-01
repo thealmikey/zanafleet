@@ -122,7 +122,7 @@ describe('WorkspaceModule', () => {
     it('should invoke both initializers concurrently before either settles (Promise.all starts all promises immediately)', async () => {
       delete process.env.NEO4J_STRICT_MODE;
 
-      let workspaceResolve: () => void;
+      let workspaceResolve: () => void = () => {};
       const workspacePromise = new Promise<void>((resolve) => {
         workspaceResolve = resolve;
       });
@@ -135,7 +135,7 @@ describe('WorkspaceModule', () => {
       expect(mockWorkspaceInitializer.initialize).toHaveBeenCalledTimes(1);
       expect(mockMembershipInitializer.initialize).toHaveBeenCalledTimes(1);
 
-      workspaceResolve!();
+      workspaceResolve();
 
       await expect(initPromise).resolves.toBeUndefined();
     });
