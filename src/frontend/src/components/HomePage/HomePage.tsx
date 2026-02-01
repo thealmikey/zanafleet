@@ -10,9 +10,10 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import {
-  RocketLaunch as RocketIcon,
-  Security as SecurityIcon,
-  Speed as SpeedIcon,
+  LocalShipping as ShippingIcon,
+  VerifiedUser as VerifiedIcon,
+  Public as GlobalIcon,
+  Business as EnterpriseIcon,
 } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 
@@ -71,7 +72,7 @@ export function HomePage(): React.ReactElement {
             gutterBottom
             sx={{ fontWeight: 700, textAlign: 'center' }}
           >
-            Welcome to ZanaFleet
+            Your Trusted Supply Chain Partner
           </Typography>
           <Typography
             variant={isMobile ? 'body1' : 'h6'}
@@ -79,12 +80,13 @@ export function HomePage(): React.ReactElement {
               textAlign: 'center',
               mb: 4,
               opacity: 0.9,
-              maxWidth: 600,
+              maxWidth: 650,
               mx: 'auto',
             }}
           >
-            Streamline your fleet management with our powerful, event-driven platform.
-            Built for scale, designed for simplicity.
+            End-to-end supply chain and logistics solutions for medium and large corporates.
+            With over 30 years of experience in Kenya and the Great Lakes region, we deliver
+            at national, regional, and global scale.
           </Typography>
           <Box
             sx={{
@@ -165,28 +167,35 @@ export function HomePage(): React.ReactElement {
           component="h2"
           sx={{ textAlign: 'center', mb: 6, fontWeight: 600 }}
         >
-          Why Choose ZanaFleet?
+          Why Partner With Us?
         </Typography>
         <Grid container spacing={4}>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <FeatureCard
-              icon={<SpeedIcon sx={{ fontSize: 48 }} />}
-              title="Real-Time Visibility"
-              description="Monitor your entire fleet in real-time with our advanced tracking and event-driven architecture."
+              icon={<ShippingIcon sx={{ fontSize: 48 }} />}
+              title="End-to-End Solutions"
+              description="Complete supply chain coverage from warehousing and inventory management to last-mile delivery across all channels."
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <FeatureCard
-              icon={<SecurityIcon sx={{ fontSize: 48 }} />}
-              title="Enterprise Security"
-              description="Bank-grade security with role-based access control and comprehensive audit trails."
+              icon={<VerifiedIcon sx={{ fontSize: 48 }} />}
+              title="Secure & Compliant"
+              description="Secure, compliant, and cost-effective logistics operations that meet regulatory standards and protect your goods."
             />
           </Grid>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} sm={6} md={3}>
             <FeatureCard
-              icon={<RocketIcon sx={{ fontSize: 48 }} />}
-              title="Scalable Platform"
-              description="Built to grow with your business, from small teams to enterprise-scale operations."
+              icon={<GlobalIcon sx={{ fontSize: 48 }} />}
+              title="Regional Expertise"
+              description="Over 30 years of experience in Kenya and the Great Lakes region with established international partnerships."
+            />
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <FeatureCard
+              icon={<EnterpriseIcon sx={{ fontSize: 48 }} />}
+              title="Enterprise Scale"
+              description="Tailored solutions for medium and large corporates operating at national, regional, and global scales."
             />
           </Grid>
         </Grid>
@@ -200,14 +209,15 @@ export function HomePage(): React.ReactElement {
             component="h2"
             sx={{ textAlign: 'center', mb: 2, fontWeight: 600 }}
           >
-            Ready to get started?
+            Ready to Optimize Your Supply Chain?
           </Typography>
           <Typography
             variant="body1"
             color="text.secondary"
             sx={{ textAlign: 'center', mb: 4 }}
           >
-            Join thousands of businesses already using ZanaFleet to manage their operations.
+            Partner with us to streamline your logistics operations and unlock efficiency
+            across your entire supply chain.
           </Typography>
           {!isAuthenticated && (
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
