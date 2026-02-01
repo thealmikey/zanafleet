@@ -2,11 +2,11 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 
-import HomePage from './components/HomePage';
-import SignIn from './components/SignIn';
-import Dashboard from './components/Dashboard';
-import SignupWizard from './components/SignupWizard';
-import ProtectedRoute from './components/ProtectedRoute';
+import { HomePage } from '../components/HomePage';
+import { SignIn } from '../components/SignIn';
+import { Dashboard } from '../components/Dashboard';
+import { SignupWizard } from '../components/SignupWizard';
+import { ProtectedRoute } from '../components/ProtectedRoute';
 
 const theme = createTheme();
 
