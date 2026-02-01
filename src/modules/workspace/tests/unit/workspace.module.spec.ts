@@ -22,10 +22,7 @@ describe('WorkspaceModule', () => {
         initialize: jest.fn(),
       } as unknown as jest.Mocked<MembershipNeo4jInitializer>;
 
-      workspaceModule = new WorkspaceModule(
-        mockWorkspaceInitializer,
-        mockMembershipInitializer
-      );
+      workspaceModule = new WorkspaceModule(mockWorkspaceInitializer, mockMembershipInitializer);
       loggerSpy = jest.spyOn(workspaceModule['logger'], 'error').mockImplementation();
     });
 
