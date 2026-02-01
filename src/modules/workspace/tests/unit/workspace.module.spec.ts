@@ -99,7 +99,7 @@ describe('WorkspaceModule', () => {
       await expect(workspaceModule.onModuleInit()).resolves.toBeUndefined();
     });
 
-    it('should call both initializers even when one fails (Promise.all behavior)', async () => {
+    it('should invoke both initializers concurrently before either settles (Promise.all starts all promises immediately)', async () => {
       delete process.env.NEO4J_STRICT_MODE;
 
       let workspaceResolve: () => void;
