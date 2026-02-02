@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 
 import { useSignupWizard } from '../../../hooks/useSignupWizard';
-import { getWorkspaceTypesForActor, listWorkspaces } from '../../../services/signupApi';
+import { getAllowedWorkspaceTypes, listWorkspaces } from '../../../services/signupApi';
 import { Workspace } from '../../../types';
 
 export function WorkspaceStep(): React.ReactElement {
@@ -23,11 +23,17 @@ export function WorkspaceStep(): React.ReactElement {
 
   useEffect(() => {
     async function fetchWorkspaces(): Promise<void> {
+      if (!formData.actorType) {
+        setWorkspaces([]);
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
       setFetchError(null);
 
       try {
-        const workspaceTypes = getWorkspaceTypesForActor(formData.actorType);
+        const workspaceTypes = await getAllowedWorkspaceTypes(formData.actorType);
 
         if (workspaceTypes.length === 0) {
           setWorkspaces([]);

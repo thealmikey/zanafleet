@@ -17,12 +17,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ZodError } from 'zod';
 
+import { ActorType } from '../../actor/dto/actor.enums';
 import { CreateWorkspaceCommand } from '../commands/create-workspace.command';
 import { UpdateWorkspaceCommand } from '../commands/update-workspace.command';
+import { AllowedWorkspaceTypesQueryDto } from '../dto/allowed-workspace-types-query.dto';
 import { CreateWorkspaceDto, WorkspaceDto } from '../dto/create-workspace.dto';
 import { ListWorkspacesQueryDto } from '../dto/list-workspaces-query.dto';
 import { UpdateWorkspaceDto } from '../dto/update-workspace.dto';
-import { WorkspaceStatus } from '../dto/workspace.enums';
+import { WorkspaceStatus, WorkspaceType } from '../dto/workspace.enums';
 import { WorkspaceEntity } from '../entities/workspace.entity';
 
 /**
@@ -60,6 +62,18 @@ export class WorkspaceController {
     const workspaceId = await this.commandBus.execute<CreateWorkspaceCommand, string>(command);
 
     return { workspaceId };
+  }
+
+  /**
+   * Get allowed workspace types for a given actor type
+   * Centralizes the business rule for actor-workspace type mapping
+   */
+  @Get('allowed-types')
+  getAllowedTypes(
+    @Query() query: AllowedWorkspaceTypesQueryDto
+  ): { allowedTypes: WorkspaceType[] } {
+    const allowedTypes = this.getWorkspaceTypesForActor(query.actorType);
+    return { allowedTypes };
   }
 
   /**
@@ -160,5 +174,25 @@ export class WorkspaceController {
         code,
       })),
     });
+  }
+
+  /**
+   * Maps an ActorType to the corresponding WorkspaceType(s)
+   * Centralizes the business rule for which workspace types are valid for each actor type
+   */
+  private getWorkspaceTypesForActor(actorType: ActorType): WorkspaceType[] {
+    switch (actorType) {
+      case ActorType.SaccoAdmin:
+      case ActorType.Rider:
+        return [WorkspaceType.SACCO];
+      case ActorType.Business:
+      case ActorType.BusinessOwner:
+        return [WorkspaceType.BUSINESS];
+      case ActorType.Internal:
+      case ActorType.AIService:
+        return [WorkspaceType.OPS];
+      default:
+        return [];
+    }
   }
 }
