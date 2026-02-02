@@ -37,6 +37,7 @@ export function WorkspaceStep(): React.ReactElement {
 
         if (workspaceTypes.length === 0) {
           setWorkspaces([]);
+          setLoading(false);
           return;
         }
 
