@@ -1,6 +1,6 @@
 // @ts-ignore - Swagger decorators may not resolve in some IDE contexts
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsArray, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsArray, IsEmail, IsOptional, IsString, IsUUID } from 'class-validator';
 
 /**
  * UpdateSignUpStepDto
@@ -52,4 +52,44 @@ export class UpdateSignUpStepDto {
   @IsString()
   @IsOptional()
   idempotencyKey?: string;
+
+  @ApiPropertyOptional({
+    description: 'Email address for the user account',
+    example: 'rider@example.com',
+  })
+  @IsEmail()
+  @IsOptional()
+  email?: string;
+
+  @ApiPropertyOptional({
+    description: 'Username for the user account',
+    example: 'john_rider',
+  })
+  @IsString()
+  @IsOptional()
+  username?: string;
+
+  @ApiPropertyOptional({
+    description: 'Password for the user account (will be hashed)',
+    example: 'securePassword123',
+  })
+  @IsString()
+  @IsOptional()
+  password?: string;
+
+  @ApiPropertyOptional({
+    description: 'Location of the user',
+    example: 'Nairobi, Kenya',
+  })
+  @IsString()
+  @IsOptional()
+  location?: string;
+
+  @ApiPropertyOptional({
+    description: 'Name of the workspace to create or join',
+    example: 'My Fleet Company',
+  })
+  @IsString()
+  @IsOptional()
+  workspaceName?: string;
 }

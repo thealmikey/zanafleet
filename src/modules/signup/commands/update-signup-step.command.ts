@@ -11,6 +11,11 @@ export const UpdateSignUpStepCommandSchema = z.object({
   roles: z.array(z.string()).optional().default([]),
   linkedWallets: z.array(z.string()).optional().default([]),
   idempotencyKey: z.string().optional().nullable(),
+  email: z.string().email().optional(),
+  username: z.string().optional(),
+  password: z.string().optional(),
+  location: z.string().optional(),
+  workspaceName: z.string().optional(),
 });
 
 /**
@@ -32,6 +37,11 @@ export class UpdateSignUpStepCommand {
   readonly roles: string[];
   readonly linkedWallets: string[];
   readonly idempotencyKey?: string | null;
+  readonly email?: string;
+  readonly username?: string;
+  readonly password?: string;
+  readonly location?: string;
+  readonly workspaceName?: string;
 
   constructor(input: UpdateSignUpStepCommandInput) {
     this.sessionId = input.sessionId;
@@ -40,6 +50,11 @@ export class UpdateSignUpStepCommand {
     this.roles = input.roles;
     this.linkedWallets = input.linkedWallets;
     this.idempotencyKey = input.idempotencyKey;
+    this.email = input.email;
+    this.username = input.username;
+    this.password = input.password;
+    this.location = input.location;
+    this.workspaceName = input.workspaceName;
   }
 
   /**
