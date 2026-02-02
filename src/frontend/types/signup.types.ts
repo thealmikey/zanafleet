@@ -24,6 +24,15 @@ export enum SignUpSessionStatus {
 }
 
 /**
+ * Workspace reference type for workspace selection
+ */
+export interface Workspace {
+  workspaceId: string;
+  name: string;
+  type: string;
+}
+
+/**
  * Request payload for initiating a new sign-up session
  * Mirrors backend: InitiateSignUpDto
  */
