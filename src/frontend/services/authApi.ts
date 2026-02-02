@@ -75,3 +75,18 @@ export async function getCurrentUser(token?: string): Promise<User> {
   });
   return handleResponse<User>(response);
 }
+
+/**
+ * Exchange Keycloak access token for local JWT
+ * POST /api/auth/keycloak/token
+ */
+export async function exchangeKeycloakToken(accessToken: string): Promise<LoginResponse> {
+  const response = await fetch(`${API_BASE_URL}/auth/keycloak/token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ accessToken }),
+  });
+  return handleResponse<LoginResponse>(response);
+}

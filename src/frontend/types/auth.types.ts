@@ -35,3 +35,17 @@ export interface LoginResponse {
   token: string;
   expiresAt: string;
 }
+
+/**
+ * Request payload for Keycloak token exchange
+ */
+export interface KeycloakTokenExchangeRequest {
+  accessToken: string;
+}
+
+/**
+ * Authentication method type
+ */
+export interface AuthMethod {
+  type: 'credentials' | 'keycloak';
+}
