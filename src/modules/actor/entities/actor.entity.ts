@@ -16,12 +16,26 @@ import { ActorType } from '../dto/actor.enums';
 @Index(['type'])
 @Index(['workspaceId'])
 @Index(['createdAt'])
+@Index(['email'], { unique: true })
+@Index(['username'], { unique: true })
 export class ActorEntity {
   @PrimaryColumn('uuid')
   id!: string; // actorId
 
   @Column('enum', { enum: ActorType })
   type!: ActorType;
+
+  @Column('varchar', { unique: true })
+  email!: string;
+
+  @Column('varchar', { unique: true })
+  username!: string;
+
+  @Column('varchar')
+  passwordHash!: string;
+
+  @Column('varchar', { nullable: true })
+  location?: string | null;
 
   @Column('uuid', { array: true, default: () => 'ARRAY[]::uuid[]' })
   roles!: string[]; // Array of role UUIDs
@@ -44,6 +58,10 @@ export class ActorEntity {
   toDomain(): {
     actorId: string;
     type: ActorType;
+    email: string;
+    username: string;
+    passwordHash: string;
+    location: string | null;
     roles: string[];
     workspaceId: string;
     linkedWallets: string[];
@@ -53,6 +71,10 @@ export class ActorEntity {
     return {
       actorId: this.id,
       type: this.type,
+      email: this.email,
+      username: this.username,
+      passwordHash: this.passwordHash,
+      location: this.location ?? null,
       roles: this.roles,
       workspaceId: this.workspaceId,
       linkedWallets: this.linkedWallets,
@@ -67,6 +89,10 @@ export class ActorEntity {
   static fromDomain(data: {
     actorId: string;
     type: ActorType;
+    email: string;
+    username: string;
+    passwordHash: string;
+    location?: string | null;
     roles: string[];
     workspaceId: string;
     linkedWallets: string[];
@@ -75,6 +101,10 @@ export class ActorEntity {
     const entity = new ActorEntity();
     entity.id = data.actorId;
     entity.type = data.type;
+    entity.email = data.email;
+    entity.username = data.username;
+    entity.passwordHash = data.passwordHash;
+    entity.location = data.location ?? null;
     entity.roles = data.roles;
     entity.workspaceId = data.workspaceId;
     entity.linkedWallets = data.linkedWallets;

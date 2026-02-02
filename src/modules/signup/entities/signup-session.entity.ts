@@ -21,6 +21,21 @@ export class SignUpSessionEntity {
   @Column('enum', { enum: ActorType })
   actorType!: ActorType;
 
+  @Column('varchar', { nullable: true })
+  email?: string | null;
+
+  @Column('varchar', { nullable: true })
+  username?: string | null;
+
+  @Column('varchar', { nullable: true })
+  passwordHash?: string | null;
+
+  @Column('varchar', { nullable: true })
+  location?: string | null;
+
+  @Column('varchar', { nullable: true })
+  workspaceName?: string | null;
+
   @Column('uuid', { array: true, default: () => 'ARRAY[]::uuid[]' })
   workspaceIds!: string[];
 
@@ -48,11 +63,33 @@ export class SignUpSessionEntity {
   /**
    * Convert entity to domain object
    */
-  toDomain() {
+  toDomain(): {
+    sessionId: string;
+    status: SignUpSessionStatus;
+    actorType: ActorType;
+    email: string | null;
+    username: string | null;
+    passwordHash: string | null;
+    location: string | null;
+    workspaceName: string | null;
+    workspaceIds: string[];
+    roles: string[];
+    linkedWallets: string[];
+    idempotencyKey: string | null | undefined;
+    completedSteps: string[];
+    expiresAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
+  } {
     return {
       sessionId: this.id,
       status: this.status,
       actorType: this.actorType,
+      email: this.email ?? null,
+      username: this.username ?? null,
+      passwordHash: this.passwordHash ?? null,
+      location: this.location ?? null,
+      workspaceName: this.workspaceName ?? null,
       workspaceIds: [...this.workspaceIds],
       roles: [...this.roles],
       linkedWallets: [...this.linkedWallets],
@@ -71,6 +108,11 @@ export class SignUpSessionEntity {
     sessionId: string;
     status: SignUpSessionStatus;
     actorType: ActorType;
+    email?: string | null;
+    username?: string | null;
+    passwordHash?: string | null;
+    location?: string | null;
+    workspaceName?: string | null;
     workspaceIds: string[];
     roles: string[];
     linkedWallets: string[];
@@ -83,6 +125,11 @@ export class SignUpSessionEntity {
     entity.id = data.sessionId;
     entity.status = data.status;
     entity.actorType = data.actorType;
+    entity.email = data.email ?? null;
+    entity.username = data.username ?? null;
+    entity.passwordHash = data.passwordHash ?? null;
+    entity.location = data.location ?? null;
+    entity.workspaceName = data.workspaceName ?? null;
     entity.workspaceIds = data.workspaceIds;
     entity.roles = data.roles;
     entity.linkedWallets = data.linkedWallets;
