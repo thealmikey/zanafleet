@@ -55,7 +55,7 @@ describe('KeycloakUserSyncService', () => {
 
       const createdActor = {
         id: expect.any(String),
-        type: ActorType.INDIVIDUAL,
+        type: ActorType.Rider,
         email: 'newuser@example.com',
         username: 'newuser',
         passwordHash: '',
@@ -93,7 +93,7 @@ describe('KeycloakUserSyncService', () => {
 
       const existingActor = {
         id: existingActorId,
-        type: ActorType.INDIVIDUAL,
+        type: ActorType.Rider,
         email: 'existing@example.com',
         username: 'existinguser',
         passwordHash: 'hashedpassword',

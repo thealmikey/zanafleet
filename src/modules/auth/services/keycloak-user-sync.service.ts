@@ -94,7 +94,7 @@ export class KeycloakUserSyncService {
 
     const actorData = {
       id: actorId,
-      type: ActorType.INDIVIDUAL,
+      type: ActorType.Rider,
       email,
       username,
       passwordHash: '',

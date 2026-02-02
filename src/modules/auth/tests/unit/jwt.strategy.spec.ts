@@ -76,7 +76,7 @@ describe('JwtStrategy', () => {
         id: actorId,
         email: 'test@example.com',
         username: 'testuser',
-        type: ActorType.INDIVIDUAL,
+        type: ActorType.Rider,
         workspaceId,
         roles: ['user'],
       };
@@ -112,7 +112,7 @@ describe('JwtStrategy', () => {
         id: localActorId,
         email: 'keycloak@example.com',
         username: 'keycloakuser',
-        type: ActorType.INDIVIDUAL,
+        type: ActorType.Rider,
         workspaceId,
         roles: ['admin'],
       };
@@ -147,7 +147,7 @@ describe('JwtStrategy', () => {
         id: actorId,
         email: 'noissuer@example.com',
         username: 'noissueruser',
-        type: ActorType.INDIVIDUAL,
+        type: ActorType.Rider,
         workspaceId,
         roles: [],
       };
