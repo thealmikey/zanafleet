@@ -173,6 +173,9 @@ describeIntegration('CreateActorCommand Integration', () => {
       const nonExistentWorkspaceId = uuidv4();
       const command = new CreateActorCommand({
         type: ActorType.Rider,
+        email: 'test@example.com',
+        username: 'testuser',
+        passwordHash: 'hashedpassword123',
         workspaceId: nonExistentWorkspaceId,
         roles: [roleTemplateId1],
         linkedWallets: [],
@@ -196,6 +199,9 @@ describeIntegration('CreateActorCommand Integration', () => {
     it('should fail when roles are not in workspace.roleTemplates', async () => {
       const command = new CreateActorCommand({
         type: ActorType.Business,
+        email: 'test@example.com',
+        username: 'testuser',
+        passwordHash: 'hashedpassword123',
         workspaceId: testWorkspaceId,
         roles: [invalidRoleId],
         linkedWallets: [],
@@ -217,6 +223,9 @@ describeIntegration('CreateActorCommand Integration', () => {
     it('should fail when some roles are valid and some are invalid', async () => {
       const command = new CreateActorCommand({
         type: ActorType.SaccoAdmin,
+        email: 'test@example.com',
+        username: 'testuser',
+        passwordHash: 'hashedpassword123',
         workspaceId: testWorkspaceId,
         roles: [roleTemplateId1, invalidRoleId],
         linkedWallets: [],
@@ -232,6 +241,9 @@ describeIntegration('CreateActorCommand Integration', () => {
     it('should succeed with empty roles array', async () => {
       const command = new CreateActorCommand({
         type: ActorType.Internal,
+        email: 'test@example.com',
+        username: 'testuser',
+        passwordHash: 'hashedpassword123',
         workspaceId: testWorkspaceId,
         roles: [],
         linkedWallets: [],
@@ -253,6 +265,9 @@ describeIntegration('CreateActorCommand Integration', () => {
       const walletId = uuidv4();
       const command = new CreateActorCommand({
         type: ActorType.Rider,
+        email: 'test@example.com',
+        username: 'testuser',
+        passwordHash: 'hashedpassword123',
         workspaceId: testWorkspaceId,
         roles: [roleTemplateId1, roleTemplateId2],
         linkedWallets: [walletId],
@@ -276,6 +291,9 @@ describeIntegration('CreateActorCommand Integration', () => {
     it('should emit ActorOnboardedEventV1', async () => {
       const command = new CreateActorCommand({
         type: ActorType.Business,
+        email: 'test@example.com',
+        username: 'testuser',
+        passwordHash: 'hashedpassword123',
         workspaceId: testWorkspaceId,
         roles: [roleTemplateId1],
         linkedWallets: [],
@@ -305,6 +323,9 @@ describeIntegration('CreateActorCommand Integration', () => {
     it('should return valid UUID as actorId', async () => {
       const command = new CreateActorCommand({
         type: ActorType.AIService,
+        email: 'test@example.com',
+        username: 'testuser',
+        passwordHash: 'hashedpassword123',
         workspaceId: testWorkspaceId,
         roles: [roleTemplateId1],
         linkedWallets: [],
@@ -323,6 +344,9 @@ describeIntegration('CreateActorCommand Integration', () => {
       for (const actorType of actorTypes) {
         const command = new CreateActorCommand({
           type: actorType,
+          email: `test-${actorType.toLowerCase()}@example.com`,
+          username: `testuser-${actorType.toLowerCase()}`,
+          passwordHash: 'hashedpassword123',
           workspaceId: testWorkspaceId,
           roles: [roleTemplateId1],
           linkedWallets: [],
@@ -485,6 +509,9 @@ describeIntegration('CreateActorCommand Integration', () => {
     it('should serialize ActorOnboardedEventV1 to JSON correctly', async () => {
       const command = new CreateActorCommand({
         type: ActorType.Rider,
+        email: 'test@example.com',
+        username: 'testuser',
+        passwordHash: 'hashedpassword123',
         workspaceId: testWorkspaceId,
         roles: [roleTemplateId1],
         linkedWallets: [],

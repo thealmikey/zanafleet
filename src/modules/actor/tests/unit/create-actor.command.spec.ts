@@ -8,12 +8,18 @@ describe('CreateActorCommand', () => {
   const validRoleId1 = '660e8400-e29b-41d4-a716-446655440001';
   const validRoleId2 = '770e8400-e29b-41d4-a716-446655440002';
   const validWalletId = '880e8400-e29b-41d4-a716-446655440003';
+  const validEmail = 'test@example.com';
+  const validUsername = 'testuser';
+  const validPasswordHash = 'hashedpassword123';
 
   describe('CreateActorCommandSchema', () => {
     describe('valid input', () => {
       it('should validate command with all fields', () => {
         const input = {
           type: ActorType.Rider,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1, validRoleId2],
           linkedWallets: [validWalletId],
@@ -22,6 +28,9 @@ describe('CreateActorCommand', () => {
         const result = CreateActorCommandSchema.parse(input);
 
         expect(result.type).toBe(ActorType.Rider);
+        expect(result.email).toBe(validEmail);
+        expect(result.username).toBe(validUsername);
+        expect(result.passwordHash).toBe(validPasswordHash);
         expect(result.workspaceId).toBe(validWorkspaceId);
         expect(result.roles).toEqual([validRoleId1, validRoleId2]);
         expect(result.linkedWallets).toEqual([validWalletId]);
@@ -33,6 +42,9 @@ describe('CreateActorCommand', () => {
         actorTypes.forEach((actorType) => {
           const input = {
             type: actorType,
+            email: validEmail,
+            username: validUsername,
+            passwordHash: validPasswordHash,
             workspaceId: validWorkspaceId,
             roles: [validRoleId1],
           };
@@ -45,6 +57,9 @@ describe('CreateActorCommand', () => {
       it('should accept empty roles array', () => {
         const input = {
           type: ActorType.Internal,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [],
         };
@@ -58,6 +73,9 @@ describe('CreateActorCommand', () => {
       it('should reject invalid ActorType enum values', () => {
         const input = {
           type: 'InvalidType',
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1],
         };
@@ -68,6 +86,9 @@ describe('CreateActorCommand', () => {
       it('should provide meaningful error message for invalid ActorType', () => {
         const input = {
           type: 'NotAnActorType',
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1],
         };
@@ -84,6 +105,147 @@ describe('CreateActorCommand', () => {
       it('should reject null ActorType', () => {
         const input = {
           type: null,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
+          workspaceId: validWorkspaceId,
+          roles: [validRoleId1],
+        };
+
+        expect(() => CreateActorCommandSchema.parse(input)).toThrow(ZodError);
+      });
+    });
+
+    describe('invalid email', () => {
+      it('should reject invalid email format', () => {
+        const input = {
+          type: ActorType.Rider,
+          email: 'not-an-email',
+          username: validUsername,
+          passwordHash: validPasswordHash,
+          workspaceId: validWorkspaceId,
+          roles: [validRoleId1],
+        };
+
+        expect(() => CreateActorCommandSchema.parse(input)).toThrow(ZodError);
+      });
+
+      it('should provide meaningful error message for invalid email', () => {
+        const input = {
+          type: ActorType.Rider,
+          email: 'invalid-email',
+          username: validUsername,
+          passwordHash: validPasswordHash,
+          workspaceId: validWorkspaceId,
+          roles: [validRoleId1],
+        };
+
+        const result = CreateActorCommandSchema.safeParse(input);
+
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          const emailError = result.error.errors.find((e) => e.path[0] === 'email');
+          expect(emailError?.message).toBe('Email must be a valid email address');
+        }
+      });
+
+      it('should reject missing email', () => {
+        const input = {
+          type: ActorType.Rider,
+          username: validUsername,
+          passwordHash: validPasswordHash,
+          workspaceId: validWorkspaceId,
+          roles: [validRoleId1],
+        };
+
+        expect(() => CreateActorCommandSchema.parse(input)).toThrow(ZodError);
+      });
+    });
+
+    describe('invalid username', () => {
+      it('should reject empty username', () => {
+        const input = {
+          type: ActorType.Rider,
+          email: validEmail,
+          username: '',
+          passwordHash: validPasswordHash,
+          workspaceId: validWorkspaceId,
+          roles: [validRoleId1],
+        };
+
+        expect(() => CreateActorCommandSchema.parse(input)).toThrow(ZodError);
+      });
+
+      it('should provide meaningful error message for empty username', () => {
+        const input = {
+          type: ActorType.Rider,
+          email: validEmail,
+          username: '',
+          passwordHash: validPasswordHash,
+          workspaceId: validWorkspaceId,
+          roles: [validRoleId1],
+        };
+
+        const result = CreateActorCommandSchema.safeParse(input);
+
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          const usernameError = result.error.errors.find((e) => e.path[0] === 'username');
+          expect(usernameError?.message).toBe('Username must not be empty');
+        }
+      });
+
+      it('should reject missing username', () => {
+        const input = {
+          type: ActorType.Rider,
+          email: validEmail,
+          passwordHash: validPasswordHash,
+          workspaceId: validWorkspaceId,
+          roles: [validRoleId1],
+        };
+
+        expect(() => CreateActorCommandSchema.parse(input)).toThrow(ZodError);
+      });
+    });
+
+    describe('invalid passwordHash', () => {
+      it('should reject empty passwordHash', () => {
+        const input = {
+          type: ActorType.Rider,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: '',
+          workspaceId: validWorkspaceId,
+          roles: [validRoleId1],
+        };
+
+        expect(() => CreateActorCommandSchema.parse(input)).toThrow(ZodError);
+      });
+
+      it('should provide meaningful error message for empty passwordHash', () => {
+        const input = {
+          type: ActorType.Rider,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: '',
+          workspaceId: validWorkspaceId,
+          roles: [validRoleId1],
+        };
+
+        const result = CreateActorCommandSchema.safeParse(input);
+
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          const passwordHashError = result.error.errors.find((e) => e.path[0] === 'passwordHash');
+          expect(passwordHashError?.message).toBe('Password hash must not be empty');
+        }
+      });
+
+      it('should reject missing passwordHash', () => {
+        const input = {
+          type: ActorType.Rider,
+          email: validEmail,
+          username: validUsername,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1],
         };
@@ -96,6 +258,9 @@ describe('CreateActorCommand', () => {
       it('should reject non-UUID workspaceId', () => {
         const input = {
           type: ActorType.Business,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: 'not-a-uuid',
           roles: [validRoleId1],
         };
@@ -106,6 +271,9 @@ describe('CreateActorCommand', () => {
       it('should provide meaningful error message for invalid workspaceId', () => {
         const input = {
           type: ActorType.Business,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: 'invalid-workspace-id',
           roles: [validRoleId1],
         };
@@ -122,6 +290,9 @@ describe('CreateActorCommand', () => {
       it('should reject empty workspaceId', () => {
         const input = {
           type: ActorType.SaccoAdmin,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: '',
           roles: [validRoleId1],
         };
@@ -132,6 +303,9 @@ describe('CreateActorCommand', () => {
       it('should reject missing workspaceId', () => {
         const input = {
           type: ActorType.Rider,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           roles: [validRoleId1],
         };
 
@@ -143,6 +317,9 @@ describe('CreateActorCommand', () => {
       it('should reject non-UUID role IDs in array', () => {
         const input = {
           type: ActorType.Rider,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: ['not-a-uuid'],
         };
@@ -153,6 +330,9 @@ describe('CreateActorCommand', () => {
       it('should provide meaningful error message for invalid role UUID', () => {
         const input = {
           type: ActorType.Rider,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1, 'invalid-role-id'],
         };
@@ -169,6 +349,9 @@ describe('CreateActorCommand', () => {
       it('should reject missing roles field', () => {
         const input = {
           type: ActorType.Internal,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
         };
 
@@ -178,6 +361,9 @@ describe('CreateActorCommand', () => {
       it('should reject mixed valid and invalid role UUIDs', () => {
         const input = {
           type: ActorType.AIService,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1, 'bad-uuid', validRoleId2],
         };
@@ -191,6 +377,9 @@ describe('CreateActorCommand', () => {
       it('should default linkedWallets to empty array when not provided', () => {
         const input = {
           type: ActorType.Rider,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1],
         };
@@ -203,6 +392,9 @@ describe('CreateActorCommand', () => {
       it('should accept valid linkedWallets array', () => {
         const input = {
           type: ActorType.Business,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1],
           linkedWallets: [validWalletId],
@@ -216,6 +408,9 @@ describe('CreateActorCommand', () => {
       it('should accept empty linkedWallets array', () => {
         const input = {
           type: ActorType.SaccoAdmin,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1],
           linkedWallets: [],
@@ -229,6 +424,9 @@ describe('CreateActorCommand', () => {
       it('should reject non-UUID wallet IDs', () => {
         const input = {
           type: ActorType.Rider,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1],
           linkedWallets: ['not-a-uuid'],
@@ -240,6 +438,9 @@ describe('CreateActorCommand', () => {
       it('should provide meaningful error message for invalid wallet UUID', () => {
         const input = {
           type: ActorType.Rider,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1],
           linkedWallets: ['invalid-wallet'],
@@ -261,6 +462,9 @@ describe('CreateActorCommand', () => {
       it('should create command with all fields', () => {
         const input = {
           type: ActorType.Rider,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1, validRoleId2],
           linkedWallets: [validWalletId],
@@ -269,6 +473,9 @@ describe('CreateActorCommand', () => {
         const command = new CreateActorCommand(input);
 
         expect(command.type).toBe(ActorType.Rider);
+        expect(command.email).toBe(validEmail);
+        expect(command.username).toBe(validUsername);
+        expect(command.passwordHash).toBe(validPasswordHash);
         expect(command.workspaceId).toBe(validWorkspaceId);
         expect(command.roles).toEqual([validRoleId1, validRoleId2]);
         expect(command.linkedWallets).toEqual([validWalletId]);
@@ -277,6 +484,9 @@ describe('CreateActorCommand', () => {
       it('should default linkedWallets to empty array in constructor', () => {
         const input = {
           type: ActorType.Internal,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1],
           linkedWallets: [],
@@ -292,6 +502,9 @@ describe('CreateActorCommand', () => {
       it('should return validated input for valid data', () => {
         const input = {
           type: ActorType.Business,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1],
         };
@@ -299,6 +512,9 @@ describe('CreateActorCommand', () => {
         const result = CreateActorCommand.validate(input);
 
         expect(result.type).toBe(ActorType.Business);
+        expect(result.email).toBe(validEmail);
+        expect(result.username).toBe(validUsername);
+        expect(result.passwordHash).toBe(validPasswordHash);
         expect(result.workspaceId).toBe(validWorkspaceId);
         expect(result.roles).toEqual([validRoleId1]);
         expect(result.linkedWallets).toEqual([]);
@@ -307,6 +523,9 @@ describe('CreateActorCommand', () => {
       it('should throw ZodError for invalid input', () => {
         const input = {
           type: 'InvalidType',
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: 'not-a-uuid',
           roles: [],
         };
@@ -319,6 +538,9 @@ describe('CreateActorCommand', () => {
       it('should return success result for valid input', () => {
         const input = {
           type: ActorType.AIService,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [validRoleId1],
           linkedWallets: [validWalletId],
@@ -329,6 +551,9 @@ describe('CreateActorCommand', () => {
         expect(result.success).toBe(true);
         if (result.success) {
           expect(result.data.type).toBe(ActorType.AIService);
+          expect(result.data.email).toBe(validEmail);
+          expect(result.data.username).toBe(validUsername);
+          expect(result.data.passwordHash).toBe(validPasswordHash);
           expect(result.data.workspaceId).toBe(validWorkspaceId);
           expect(result.data.roles).toEqual([validRoleId1]);
           expect(result.data.linkedWallets).toEqual([validWalletId]);
@@ -338,6 +563,9 @@ describe('CreateActorCommand', () => {
       it('should return failure result for invalid input', () => {
         const input = {
           type: 'BadType',
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: 'invalid',
           roles: ['not-uuid'],
         };
@@ -364,6 +592,9 @@ describe('CreateActorCommand', () => {
       it('should return result object with error property on failure', () => {
         const input = {
           type: ActorType.Rider,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: 'bad-uuid',
           roles: [],
         };
@@ -378,6 +609,9 @@ describe('CreateActorCommand', () => {
       it('should return result object with data property on success', () => {
         const input = {
           type: ActorType.Rider,
+          email: validEmail,
+          username: validUsername,
+          passwordHash: validPasswordHash,
           workspaceId: validWorkspaceId,
           roles: [],
         };
