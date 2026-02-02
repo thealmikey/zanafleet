@@ -48,7 +48,7 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
    * @param command UpdateSignUpStepCommand
    */
   async execute(command: UpdateSignUpStepCommand): Promise<UpdateSignUpStepResult> {
-    const { sessionId, stepName, workspaceId, roles, linkedWallets, idempotencyKey } = command;
+    const { sessionId, stepName, workspaceIds, roles, linkedWallets, idempotencyKey } = command;
 
     this.logger.log(
       `Executing UpdateSignUpStepCommand for session: ${sessionId}, step: ${stepName}`
@@ -74,7 +74,7 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
 
     // Step 3: Idempotency check
     const hasChanges = this.detectDeepChanges(session, {
-      workspaceId,
+      workspaceIds,
       roles,
       linkedWallets,
       stepName,
@@ -94,9 +94,12 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
     // Step 4: Apply changes and track for event
     const changes: Record<string, unknown> = {};
 
-    if (workspaceId !== undefined && session.workspaceId !== workspaceId) {
-      changes.workspaceId = workspaceId;
-      session.workspaceId = workspaceId;
+    if (
+      workspaceIds !== undefined &&
+      JSON.stringify(session.workspaceIds) !== JSON.stringify(workspaceIds)
+    ) {
+      changes.workspaceIds = workspaceIds;
+      session.workspaceIds = [...workspaceIds];
     }
 
     if (roles !== undefined && JSON.stringify(session.roles) !== JSON.stringify(roles)) {
@@ -168,13 +171,16 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
   private detectDeepChanges(
     session: SignUpSessionEntity,
     updates: {
-      workspaceId?: string | null;
+      workspaceIds?: string[];
       roles?: string[];
       linkedWallets?: string[];
       stepName: string;
     }
   ): boolean {
-    if (updates.workspaceId !== undefined && session.workspaceId !== updates.workspaceId)
+    if (
+      updates.workspaceIds !== undefined &&
+      JSON.stringify(session.workspaceIds) !== JSON.stringify(updates.workspaceIds)
+    )
       return true;
 
     if (

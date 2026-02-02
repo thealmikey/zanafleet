@@ -18,12 +18,14 @@ export class UpdateSignUpStepDto {
   stepName?: string;
 
   @ApiPropertyOptional({
-    description: 'Optional workspace ID to associate with the actor',
-    example: 'uuid-workspace-id',
+    description: 'Workspace IDs to associate with the actor',
+    example: ['uuid-workspace-id-1', 'uuid-workspace-id-2'],
+    type: [String],
   })
-  @IsUUID()
+  @IsArray()
+  @IsUUID('4', { each: true })
   @IsOptional()
-  workspaceId?: string;
+  workspaceIds?: string[];
 
   @ApiPropertyOptional({
     description: 'Roles to be assigned to the actor',

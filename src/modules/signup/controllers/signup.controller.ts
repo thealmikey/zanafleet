@@ -117,7 +117,7 @@ export class SignUpController {
     dto.sessionId = result.sessionId;
     dto.status = result.status;
     dto.actorType = result.actorType;
-    dto.workspaceId = result.workspaceId;
+    dto.workspaceIds = result.workspaceIds;
     dto.roles = result.roles;
     dto.linkedWallets = result.linkedWallets;
     dto.completedSteps = result.completedSteps;

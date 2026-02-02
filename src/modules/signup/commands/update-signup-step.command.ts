@@ -7,7 +7,7 @@ import { z } from 'zod';
 export const UpdateSignUpStepCommandSchema = z.object({
   sessionId: z.string().uuid(),
   stepName: z.string().min(1),
-  workspaceId: z.string().uuid().optional().nullable(),
+  workspaceIds: z.array(z.string().uuid()).optional().default([]),
   roles: z.array(z.string()).optional().default([]),
   linkedWallets: z.array(z.string()).optional().default([]),
   idempotencyKey: z.string().optional().nullable(),
@@ -28,7 +28,7 @@ export type UpdateSignUpStepCommandInput = z.infer<typeof UpdateSignUpStepComman
 export class UpdateSignUpStepCommand {
   readonly sessionId: string;
   readonly stepName: string;
-  readonly workspaceId?: string | null;
+  readonly workspaceIds: string[];
   readonly roles: string[];
   readonly linkedWallets: string[];
   readonly idempotencyKey?: string | null;
@@ -36,7 +36,7 @@ export class UpdateSignUpStepCommand {
   constructor(input: UpdateSignUpStepCommandInput) {
     this.sessionId = input.sessionId;
     this.stepName = input.stepName;
-    this.workspaceId = input.workspaceId;
+    this.workspaceIds = input.workspaceIds;
     this.roles = input.roles;
     this.linkedWallets = input.linkedWallets;
     this.idempotencyKey = input.idempotencyKey;

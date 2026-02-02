@@ -71,17 +71,18 @@ export class FinalizeSignUpCommandHandler implements ICommandHandler<FinalizeSig
     }
 
     // Step 3: Validate mandatory fields
-    if (!session.workspaceId) {
+    if (!session.workspaceIds || session.workspaceIds.length === 0) {
       throw new BadRequestException(
-        `SignUp session ${sessionId} is missing mandatory field: workspaceId. Please complete required steps before finalizing.`
+        `SignUp session ${sessionId} is missing mandatory field: workspaceIds. Please complete required steps before finalizing.`
       );
     }
 
     // Step 4: Orchestrate Actor creation
     // We reuse the existing CreateActorCommandHandler logic via CommandBus
+    // For now, use the first workspace ID since CreateActorCommand expects a single workspaceId
     const createActorCommand = new CreateActorCommand({
       type: session.actorType,
-      workspaceId: session.workspaceId,
+      workspaceId: session.workspaceIds[0],
       roles: session.roles,
       linkedWallets: session.linkedWallets,
     });
@@ -110,7 +111,7 @@ export class FinalizeSignUpCommandHandler implements ICommandHandler<FinalizeSig
       eventId,
       sessionId,
       actorId,
-      workspaceId: session.workspaceId,
+      workspaceId: session.workspaceIds[0],
       occurredAt: new Date(),
     });
 
@@ -130,7 +131,7 @@ export class FinalizeSignUpCommandHandler implements ICommandHandler<FinalizeSig
 
     return {
       actorId,
-      workspaceId: session.workspaceId,
+      workspaceId: session.workspaceIds[0],
     };
   }
 }

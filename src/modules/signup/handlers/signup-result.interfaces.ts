@@ -26,7 +26,7 @@ export interface SignUpSessionResult {
   sessionId: string;
   status: SignUpSessionStatus;
   actorType: ActorType;
-  workspaceId?: string | null;
+  workspaceIds: string[];
   roles: string[];
   linkedWallets: string[];
   idempotencyKey?: string | null;

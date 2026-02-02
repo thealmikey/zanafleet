@@ -21,8 +21,8 @@ export class SignUpSessionEntity {
   @Column('enum', { enum: ActorType })
   actorType!: ActorType;
 
-  @Column('uuid', { nullable: true })
-  workspaceId?: string | null;
+  @Column('uuid', { array: true, default: () => 'ARRAY[]::uuid[]' })
+  workspaceIds!: string[];
 
   @Column('varchar', { array: true, default: () => 'ARRAY[]::varchar[]' })
   roles!: string[];
@@ -53,7 +53,7 @@ export class SignUpSessionEntity {
       sessionId: this.id,
       status: this.status,
       actorType: this.actorType,
-      workspaceId: this.workspaceId,
+      workspaceIds: [...this.workspaceIds],
       roles: [...this.roles],
       linkedWallets: [...this.linkedWallets],
       idempotencyKey: this.idempotencyKey,
@@ -71,7 +71,7 @@ export class SignUpSessionEntity {
     sessionId: string;
     status: SignUpSessionStatus;
     actorType: ActorType;
-    workspaceId?: string | null;
+    workspaceIds: string[];
     roles: string[];
     linkedWallets: string[];
     idempotencyKey?: string | null;
@@ -83,7 +83,7 @@ export class SignUpSessionEntity {
     entity.id = data.sessionId;
     entity.status = data.status;
     entity.actorType = data.actorType;
-    entity.workspaceId = data.workspaceId;
+    entity.workspaceIds = data.workspaceIds;
     entity.roles = data.roles;
     entity.linkedWallets = data.linkedWallets;
     entity.idempotencyKey = data.idempotencyKey;

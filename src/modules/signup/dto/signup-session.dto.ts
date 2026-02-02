@@ -1,4 +1,4 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 import { ActorType } from '../../actor/dto/actor.enums';
 
@@ -30,11 +30,12 @@ export class SignUpSessionDto {
   })
   actorType!: ActorType;
 
-  @ApiPropertyOptional({
-    description: 'The workspace ID associated with the session',
-    example: 'uuid-workspace-id',
+  @ApiProperty({
+    type: [String],
+    description: 'The workspace IDs associated with the session',
+    example: ['uuid-workspace-id'],
   })
-  workspaceId?: string | null;
+  workspaceIds!: string[];
 
   @ApiProperty({
     type: [String],
