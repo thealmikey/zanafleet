@@ -82,6 +82,9 @@ describe('FinalizeSignUpCommandHandler', () => {
       status: SignUpSessionStatus.PARTIAL,
       actorType: ActorType.Rider,
       workspaceIds,
+      email: 'test@example.com',
+      username: 'testuser',
+      passwordHash: 'hashedpassword',
       roles: ['Rider'],
       linkedWallets: [],
       completedSteps: ['init', 'step1'],
@@ -156,11 +159,62 @@ describe('FinalizeSignUpCommandHandler', () => {
     await expect(handler.execute(command)).rejects.toThrow(/missing mandatory field: workspaceIds/);
   });
 
+  it('should throw BadRequestException if session is missing email', async () => {
+    const session = {
+      status: SignUpSessionStatus.PARTIAL,
+      actorType: ActorType.Rider,
+      workspaceIds: [uuidv4()],
+      email: null,
+      username: 'testuser',
+      passwordHash: 'hashedpassword',
+    };
+    mockRepository.findOne.mockResolvedValue(session);
+    const command = new FinalizeSignUpCommand({ sessionId: uuidv4() });
+
+    await expect(handler.execute(command)).rejects.toThrow(BadRequestException);
+    await expect(handler.execute(command)).rejects.toThrow(/missing mandatory field: email/);
+  });
+
+  it('should throw BadRequestException if session is missing username', async () => {
+    const session = {
+      status: SignUpSessionStatus.PARTIAL,
+      actorType: ActorType.Rider,
+      workspaceIds: [uuidv4()],
+      email: 'test@example.com',
+      username: null,
+      passwordHash: 'hashedpassword',
+    };
+    mockRepository.findOne.mockResolvedValue(session);
+    const command = new FinalizeSignUpCommand({ sessionId: uuidv4() });
+
+    await expect(handler.execute(command)).rejects.toThrow(BadRequestException);
+    await expect(handler.execute(command)).rejects.toThrow(/missing mandatory field: username/);
+  });
+
+  it('should throw BadRequestException if session is missing passwordHash', async () => {
+    const session = {
+      status: SignUpSessionStatus.PARTIAL,
+      actorType: ActorType.Rider,
+      workspaceIds: [uuidv4()],
+      email: 'test@example.com',
+      username: 'testuser',
+      passwordHash: null,
+    };
+    mockRepository.findOne.mockResolvedValue(session);
+    const command = new FinalizeSignUpCommand({ sessionId: uuidv4() });
+
+    await expect(handler.execute(command)).rejects.toThrow(BadRequestException);
+    await expect(handler.execute(command)).rejects.toThrow(/missing mandatory field: passwordHash/);
+  });
+
   it('should rethrow errors from CommandBus (Actor creation failure)', async () => {
     const session = {
       status: SignUpSessionStatus.PARTIAL,
       actorType: ActorType.Rider,
       workspaceIds: [uuidv4()],
+      email: 'test@example.com',
+      username: 'testuser',
+      passwordHash: 'hashedpassword',
       roles: [],
       linkedWallets: [],
     };
