@@ -1,6 +1,6 @@
 // @ts-ignore - Swagger decorators may not resolve in some IDE contexts
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 /**
  * LoginDto
@@ -16,4 +16,12 @@ export class LoginDto {
   @IsString()
   @IsNotEmpty()
   identifier!: string;
+
+  @ApiPropertyOptional({
+    description: 'Password for password-based authentication',
+    example: 'mySecurePassword123',
+  })
+  @IsString()
+  @IsOptional()
+  password?: string;
 }

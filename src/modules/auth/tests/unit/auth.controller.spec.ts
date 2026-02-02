@@ -90,6 +90,26 @@ describe('AuthController', () => {
       expect(commandBus.execute).toHaveBeenCalled();
     });
 
+    it('should login with password and return actor info', async () => {
+      const actorId = uuidv4();
+      const workspaceId = uuidv4();
+      const loginResult = {
+        actorId,
+        workspaceId,
+        type: ActorType.Rider,
+      };
+
+      mockCommandBus.execute.mockResolvedValue(loginResult);
+
+      const result = await controller.login({
+        identifier: 'test-user@example.com',
+        password: 'secret123',
+      });
+
+      expect(result).toEqual(loginResult);
+      expect(commandBus.execute).toHaveBeenCalled();
+    });
+
     it('should throw BadRequestException on validation failure', async () => {
       const body = { identifier: '' };
 
