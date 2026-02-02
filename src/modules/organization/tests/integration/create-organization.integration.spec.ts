@@ -50,6 +50,10 @@ async function createTestActor(
   const actor = ActorEntity.fromDomain({
     actorId,
     type: ActorType.SaccoAdmin,
+    email: `actor-${actorId}@test.local`,
+    username: `actor-${actorId}`,
+    passwordHash: 'hashed-password-placeholder',
+    location: null,
     roles: [],
     workspaceId,
     linkedWallets: [],

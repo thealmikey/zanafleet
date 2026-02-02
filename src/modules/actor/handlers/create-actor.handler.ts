@@ -89,6 +89,10 @@ export class CreateActorCommandHandler implements ICommandHandler<CreateActorCom
       const entity = ActorEntity.fromDomain({
         actorId,
         type: command.type,
+        email: command.email,
+        username: command.username,
+        passwordHash: command.passwordHash,
+        location: command.location,
         roles: command.roles,
         workspaceId: command.workspaceId,
         linkedWallets: command.linkedWallets,

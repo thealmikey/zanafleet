@@ -77,11 +77,32 @@ export class FinalizeSignUpCommandHandler implements ICommandHandler<FinalizeSig
       );
     }
 
-    // Step 4: Orchestrate Actor creation
+    // Step 4: Validate identity fields from session
+    if (!session.email) {
+      throw new BadRequestException(
+        `SignUp session ${sessionId} is missing mandatory field: email. Please complete required steps before finalizing.`
+      );
+    }
+    if (!session.username) {
+      throw new BadRequestException(
+        `SignUp session ${sessionId} is missing mandatory field: username. Please complete required steps before finalizing.`
+      );
+    }
+    if (!session.passwordHash) {
+      throw new BadRequestException(
+        `SignUp session ${sessionId} is missing mandatory field: passwordHash. Please complete required steps before finalizing.`
+      );
+    }
+
+    // Step 5: Orchestrate Actor creation
     // We reuse the existing CreateActorCommandHandler logic via CommandBus
     // For now, use the first workspace ID since CreateActorCommand expects a single workspaceId
     const createActorCommand = new CreateActorCommand({
       type: session.actorType,
+      email: session.email,
+      username: session.username,
+      passwordHash: session.passwordHash,
+      location: session.location,
       workspaceId: session.workspaceIds[0],
       roles: session.roles,
       linkedWallets: session.linkedWallets,
@@ -100,12 +121,12 @@ export class FinalizeSignUpCommandHandler implements ICommandHandler<FinalizeSig
       throw err;
     }
 
-    // Step 5: Update session status
+    // Step 6: Update session status
     session.status = SignUpSessionStatus.COMPLETED;
     await this.signupSessionRepository.save(session);
     this.logger.debug(`SignUp session ${sessionId} marked as COMPLETED`);
 
-    // Step 6: Create and publish domain event
+    // Step 7: Create and publish domain event
     const eventId = uuidv4();
     const event = new SignUpFinalizedEventV1({
       eventId,
@@ -118,7 +139,7 @@ export class FinalizeSignUpCommandHandler implements ICommandHandler<FinalizeSig
     this.eventBus.publish(event);
     this.logger.log(`SignUpFinalizedEvent-V1 published for session: ${sessionId}`);
 
-    // Step 7: Publish to external NATS EventBus
+    // Step 8: Publish to external NATS EventBus
     if (this.eventBusService) {
       try {
         await this.eventBusService.publish(NatsSubjects.SignUp.FINALIZED_V1, event);

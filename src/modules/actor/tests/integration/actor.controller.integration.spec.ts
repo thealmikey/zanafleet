@@ -134,6 +134,9 @@ describeIntegration('ActorController (Integration)', () => {
       // 1. Create Actor via Controller
       const createDto: CreateActorDto = {
         type: ActorType.Rider,
+        email: 'test-actor@example.com',
+        username: 'test-actor-user',
+        passwordHash: 'hashed-password-for-test',
         workspaceId,
         roles,
         linkedWallets,

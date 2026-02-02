@@ -177,6 +177,10 @@ describeIntegration('AssignPersonaToActorCommand Integration', () => {
     const actor = ActorEntity.fromDomain({
       actorId: testActorId,
       type: ActorType.Rider,
+      email: `actor-${testActorId}@test.local`,
+      username: `actor-${testActorId}`,
+      passwordHash: 'hashed-password-placeholder',
+      location: null,
       roles: [],
       workspaceId: testWorkspaceId,
       linkedWallets: [],
