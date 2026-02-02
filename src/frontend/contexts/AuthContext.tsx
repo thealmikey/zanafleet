@@ -4,11 +4,14 @@ import React, {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
 } from 'react';
 
+import { keycloakInstance } from '../config/keycloak.config';
 import {
   login as apiLogin,
   logout as apiLogout,
+  exchangeKeycloakToken,
   getCurrentUser,
 } from '../services/authApi';
 import { ApiError } from '../services/signupApi';
@@ -24,6 +27,8 @@ export interface AuthActions {
   login: (credentials: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
+  loginWithKeycloak: () => Promise<void>;
+  initKeycloak: () => Promise<void>;
 }
 
 export type AuthContextValue = AuthState & AuthActions;
@@ -33,7 +38,9 @@ type Action =
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'LOGIN_SUCCESS'; payload: { user: User; token: string } }
   | { type: 'LOGOUT' }
-  | { type: 'RESTORE_SESSION'; payload: { user: User; token: string } };
+  | { type: 'RESTORE_SESSION'; payload: { user: User; token: string } }
+  | { type: 'KEYCLOAK_INIT_SUCCESS'; payload: boolean }
+  | { type: 'KEYCLOAK_LOGIN_SUCCESS'; payload: { user: User; token: string } };
 
 const initialState: AuthState = {
   user: null,
@@ -41,6 +48,8 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  keycloakInitialized: false,
+  keycloakAuthenticated: false,
 };
 
 function reducer(state: AuthState, action: Action): AuthState {
@@ -63,6 +72,7 @@ function reducer(state: AuthState, action: Action): AuthState {
         user: null,
         token: null,
         isAuthenticated: false,
+        keycloakAuthenticated: false,
         error: null,
       };
     case 'RESTORE_SESSION':
@@ -71,6 +81,21 @@ function reducer(state: AuthState, action: Action): AuthState {
         user: action.payload.user,
         token: action.payload.token,
         isAuthenticated: true,
+      };
+    case 'KEYCLOAK_INIT_SUCCESS':
+      return {
+        ...state,
+        keycloakInitialized: true,
+        keycloakAuthenticated: action.payload,
+      };
+    case 'KEYCLOAK_LOGIN_SUCCESS':
+      return {
+        ...state,
+        user: action.payload.user,
+        token: action.payload.token,
+        isAuthenticated: true,
+        keycloakAuthenticated: true,
+        error: null,
       };
     default:
       return state;
@@ -85,6 +110,7 @@ export interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps): React.ReactElement {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const keycloakInitializedRef = useRef(false);
 
   const persistToken = useCallback((token: string | null): void => {
     if (token) {
@@ -94,26 +120,75 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
     }
   }, []);
 
+  const initKeycloak = useCallback(async (): Promise<void> => {
+    if (keycloakInitializedRef.current) {
+      return;
+    }
+    keycloakInitializedRef.current = true;
+
+    try {
+      const authenticated = await keycloakInstance.init({
+        onLoad: 'check-sso',
+        silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+        checkLoginIframe: false,
+      });
+
+      dispatch({ type: 'KEYCLOAK_INIT_SUCCESS', payload: authenticated });
+
+      if (authenticated && keycloakInstance.token) {
+        dispatch({ type: 'SET_LOADING', payload: true });
+        try {
+          const response = await exchangeKeycloakToken(keycloakInstance.token);
+          persistToken(response.token);
+          dispatch({ type: 'KEYCLOAK_LOGIN_SUCCESS', payload: { user: response.user, token: response.token } });
+        } catch (err) {
+          console.error('Failed to exchange Keycloak token:', err);
+          dispatch({ type: 'SET_ERROR', payload: 'Failed to complete Keycloak authentication' });
+        } finally {
+          dispatch({ type: 'SET_LOADING', payload: false });
+        }
+      }
+
+      keycloakInstance.onTokenExpired = (): void => {
+        void keycloakInstance.updateToken(30).then((refreshed) => {
+          if (refreshed && keycloakInstance.token) {
+            void exchangeKeycloakToken(keycloakInstance.token).then((response) => {
+              persistToken(response.token);
+              dispatch({ type: 'KEYCLOAK_LOGIN_SUCCESS', payload: { user: response.user, token: response.token } });
+            }).catch((err) => {
+              console.error('Failed to refresh token:', err);
+            });
+          }
+        }).catch(() => {
+          console.error('Failed to refresh Keycloak token');
+        });
+      };
+    } catch (err) {
+      console.error('Keycloak initialization failed:', err);
+      dispatch({ type: 'KEYCLOAK_INIT_SUCCESS', payload: false });
+    }
+  }, [persistToken]);
+
   const recoverSession = useCallback(async (): Promise<void> => {
     const storedToken = localStorage.getItem(STORAGE_KEY);
-    if (!storedToken) {
+    if (storedToken) {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      try {
+        const user = await getCurrentUser(storedToken);
+        dispatch({ type: 'RESTORE_SESSION', payload: { user, token: storedToken } });
+      } catch (err) {
+        localStorage.removeItem(STORAGE_KEY);
+        if (!(err instanceof ApiError && err.status === 401)) {
+          dispatch({ type: 'SET_ERROR', payload: 'Failed to restore session' });
+        }
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
       return;
     }
 
-    dispatch({ type: 'SET_LOADING', payload: true });
-    try {
-      const user = await getCurrentUser(storedToken);
-      dispatch({ type: 'RESTORE_SESSION', payload: { user, token: storedToken } });
-    } catch (err) {
-      localStorage.removeItem(STORAGE_KEY);
-      if (err instanceof ApiError && err.status === 401) {
-        return;
-      }
-      dispatch({ type: 'SET_ERROR', payload: 'Failed to restore session' });
-    } finally {
-      dispatch({ type: 'SET_LOADING', payload: false });
-    }
-  }, []);
+    await initKeycloak();
+  }, [initKeycloak]);
 
   useEffect(() => {
     void recoverSession();
@@ -148,8 +223,28 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
       persistToken(null);
       dispatch({ type: 'LOGOUT' });
       dispatch({ type: 'SET_LOADING', payload: false });
+
+      if (state.keycloakAuthenticated && keycloakInstance.authenticated) {
+        void keycloakInstance.logout({ redirectUri: window.location.origin });
+      }
     }
-  }, [state.token, persistToken]);
+  }, [state.token, state.keycloakAuthenticated, persistToken]);
+
+  const loginWithKeycloak = useCallback(async (): Promise<void> => {
+    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: 'SET_ERROR', payload: null });
+    try {
+      if (!state.keycloakInitialized) {
+        await initKeycloak();
+      }
+      await keycloakInstance.login({ redirectUri: window.location.origin });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Keycloak login failed';
+      dispatch({ type: 'SET_ERROR', payload: message });
+      dispatch({ type: 'SET_LOADING', payload: false });
+      throw err;
+    }
+  }, [state.keycloakInitialized, initKeycloak]);
 
   const clearError = useCallback((): void => {
     dispatch({ type: 'SET_ERROR', payload: null });
@@ -160,7 +255,9 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
     login,
     logout,
     clearError,
-  }), [state, login, logout, clearError]);
+    loginWithKeycloak,
+    initKeycloak,
+  }), [state, login, logout, clearError, loginWithKeycloak, initKeycloak]);
 
   return (
     <AuthContext.Provider value={value}>
