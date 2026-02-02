@@ -6,11 +6,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { ActorType } from '../../../actor/dto/actor.enums';
 import { ActorEntity } from '../../../actor/entities/actor.entity';
+import { KeycloakUserSyncService } from '../../services/keycloak-user-sync.service';
 import { JwtPayload, JwtStrategy } from '../../strategies/jwt.strategy';
 
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;
   let actorRepository: { findOne: jest.Mock };
+  let keycloakUserSyncService: { syncUser: jest.Mock };
 
   const mockConfigService = {
     get: jest.fn((key: string) => {
@@ -29,6 +31,10 @@ describe('JwtStrategy', () => {
       findOne: jest.fn(),
     };
 
+    keycloakUserSyncService = {
+      syncUser: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         JwtStrategy,
@@ -39,6 +45,10 @@ describe('JwtStrategy', () => {
         {
           provide: getRepositoryToken(ActorEntity),
           useValue: actorRepository,
+        },
+        {
+          provide: KeycloakUserSyncService,
+          useValue: keycloakUserSyncService,
         },
       ],
     }).compile();
@@ -86,11 +96,12 @@ describe('JwtStrategy', () => {
       });
     });
 
-    it('should accept tokens from Keycloak issuer', async () => {
-      const actorId = uuidv4();
+    it('should accept tokens from Keycloak issuer and sync user', async () => {
+      const keycloakSub = uuidv4();
+      const localActorId = uuidv4();
       const workspaceId = uuidv4();
       const payload: JwtPayload = {
-        sub: actorId,
+        sub: keycloakSub,
         email: 'keycloak@example.com',
         workspaceId,
         roles: ['admin'],
@@ -98,7 +109,7 @@ describe('JwtStrategy', () => {
       };
 
       const mockActor = {
-        id: actorId,
+        id: localActorId,
         email: 'keycloak@example.com',
         username: 'keycloakuser',
         type: ActorType.INDIVIDUAL,
@@ -106,12 +117,16 @@ describe('JwtStrategy', () => {
         roles: ['admin'],
       };
 
-      actorRepository.findOne.mockResolvedValue(mockActor);
+      keycloakUserSyncService.syncUser.mockResolvedValue({
+        actor: mockActor,
+        created: false,
+      });
 
       const result = await strategy.validate(payload);
 
+      expect(keycloakUserSyncService.syncUser).toHaveBeenCalledWith(payload);
       expect(result).toEqual({
-        actorId,
+        actorId: localActorId,
         email: 'keycloak@example.com',
         workspaceId,
         roles: ['admin'],

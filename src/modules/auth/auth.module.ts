@@ -4,13 +4,16 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { KeycloakConnectModule } from 'nest-keycloak-connect';
 
 import { ActorEntity } from '../actor/entities/actor.entity';
 
 import { authConfig, keycloakConfig } from './config/auth.config';
+import { keycloakConnectOptionsFactory } from './config/keycloak.config';
 import { AuthController } from './controllers/auth.controller';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LoginCommandHandler } from './handlers/login.handler';
+import { KeycloakUserSyncService } from './services/keycloak-user-sync.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 /**
@@ -37,9 +40,14 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       }),
       inject: [ConfigService],
     }),
+    KeycloakConnectModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: keycloakConnectOptionsFactory,
+      inject: [ConfigService],
+    }),
   ],
   controllers: [AuthController],
-  providers: [LoginCommandHandler, JwtStrategy, JwtAuthGuard],
-  exports: [JwtAuthGuard, JwtModule],
+  providers: [LoginCommandHandler, JwtStrategy, JwtAuthGuard, KeycloakUserSyncService],
+  exports: [JwtAuthGuard, JwtModule, KeycloakUserSyncService],
 })
 export class AuthModule {}

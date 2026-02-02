@@ -6,6 +6,10 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { Repository } from 'typeorm';
 
 import { ActorEntity } from '../../actor/entities/actor.entity';
+import {
+  KeycloakTokenPayload,
+  KeycloakUserSyncService,
+} from '../services/keycloak-user-sync.service';
 
 /**
  * JWT Payload interface for token claims
@@ -45,6 +49,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     configService: ConfigService,
     @InjectRepository(ActorEntity)
     private readonly actorRepository: Repository<ActorEntity>,
+    private readonly keycloakUserSyncService: KeycloakUserSyncService,
   ) {
     const jwtSecret = configService.get<string>('auth.jwt.secret');
     const jwtIssuer = configService.get<string>('auth.jwt.issuer') || 'zanafleet';
@@ -58,9 +63,10 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
 
     this.localIssuer = jwtIssuer;
-    this.keycloakIssuer = keycloakAuthUrl && keycloakRealm
-      ? `${keycloakAuthUrl}/realms/${keycloakRealm}`
-      : '';
+    this.keycloakIssuer =
+      keycloakAuthUrl && keycloakRealm
+        ? `${keycloakAuthUrl}/realms/${keycloakRealm}`
+        : '';
   }
 
   /**
@@ -71,7 +77,6 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
    * @throws UnauthorizedException if actor not found or issuer invalid
    */
   async validate(payload: JwtPayload): Promise<ValidatedUser> {
-    // Validate issuer if present
     if (payload.iss) {
       const validIssuers = [this.localIssuer];
       if (this.keycloakIssuer) {
@@ -83,20 +88,31 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       }
     }
 
-    // Verify actor exists in database
-    const actor = await this.actorRepository.findOne({
-      where: { id: payload.sub },
-    });
+    let actor: ActorEntity | null = null;
+
+    const isKeycloakToken =
+      payload.iss && this.keycloakIssuer && payload.iss === this.keycloakIssuer;
+
+    if (isKeycloakToken) {
+      const syncResult = await this.keycloakUserSyncService.syncUser(
+        payload as unknown as KeycloakTokenPayload,
+      );
+      actor = syncResult.actor;
+    } else {
+      actor = await this.actorRepository.findOne({
+        where: { id: payload.sub },
+      });
+    }
 
     if (!actor) {
       throw new UnauthorizedException('Actor not found');
     }
 
     return {
-      actorId: payload.sub,
-      email: payload.email,
-      workspaceId: payload.workspaceId,
-      roles: payload.roles,
+      actorId: actor.id,
+      email: actor.email,
+      workspaceId: actor.workspaceId,
+      roles: actor.roles,
     };
   }
 }
