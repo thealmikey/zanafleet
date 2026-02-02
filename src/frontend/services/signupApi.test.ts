@@ -1,6 +1,6 @@
 import { ActorType, SignUpSessionStatus } from '../types';
 
-import { initiateSignup, updateStep, getSession, finalizeSignup, ApiError } from './signupApi';
+import { initiateSignup, updateStep, getSession, finalizeSignup, listWorkspaces, getWorkspaceTypesForActor, ApiError } from './signupApi';
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
@@ -164,6 +164,88 @@ describe('signupApi', () => {
       });
 
       await expect(finalizeSignup('test-session-id')).rejects.toThrow(ApiError);
+    });
+  });
+
+  describe('listWorkspaces', () => {
+    it('should GET /workspaces and return workspace list', async () => {
+      const mockWorkspaces = [
+        { workspaceId: 'ws-1', name: 'Test SACCO', type: 'SACCO' },
+        { workspaceId: 'ws-2', name: 'Another SACCO', type: 'SACCO' },
+      ];
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockWorkspaces,
+      });
+
+      const result = await listWorkspaces();
+
+      expect(mockFetch).toHaveBeenCalledWith('/api/workspaces', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      expect(result).toEqual(mockWorkspaces);
+    });
+
+    it('should include type query parameter when provided', async () => {
+      const mockWorkspaces = [
+        { workspaceId: 'ws-1', name: 'Test SACCO', type: 'SACCO' },
+      ];
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockWorkspaces,
+      });
+
+      const result = await listWorkspaces('SACCO');
+
+      expect(mockFetch).toHaveBeenCalledWith('/api/workspaces?type=SACCO', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      expect(result).toEqual(mockWorkspaces);
+    });
+
+    it('should throw ApiError on non-ok response', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        json: async () => ({ message: 'Database connection failed' }),
+      });
+
+      await expect(listWorkspaces()).rejects.toThrow(ApiError);
+    });
+  });
+
+  describe('getWorkspaceTypesForActor', () => {
+    it("should return ['SACCO'] for SaccoAdmin", () => {
+      const result = getWorkspaceTypesForActor(ActorType.SaccoAdmin);
+      expect(result).toEqual(['SACCO']);
+    });
+
+    it("should return ['SACCO'] for Rider", () => {
+      const result = getWorkspaceTypesForActor(ActorType.Rider);
+      expect(result).toEqual(['SACCO']);
+    });
+
+    it("should return ['BUSINESS'] for Business", () => {
+      const result = getWorkspaceTypesForActor(ActorType.Business);
+      expect(result).toEqual(['BUSINESS']);
+    });
+
+    it("should return ['BUSINESS'] for BusinessOwner", () => {
+      const result = getWorkspaceTypesForActor(ActorType.BusinessOwner);
+      expect(result).toEqual(['BUSINESS']);
+    });
+
+    it("should return ['OPS'] for Internal", () => {
+      const result = getWorkspaceTypesForActor(ActorType.Internal);
+      expect(result).toEqual(['OPS']);
+    });
+
+    it("should return ['OPS'] for AIService", () => {
+      const result = getWorkspaceTypesForActor(ActorType.AIService);
+      expect(result).toEqual(['OPS']);
     });
   });
 
