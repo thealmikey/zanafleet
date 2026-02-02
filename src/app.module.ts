@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventBusModule } from './core/event-bus';
 import { Neo4jModule } from './core/neo4j';
 import { OrganizationModule } from './modules/organization/organization.module';
+import { SignUpModule } from './modules/signup/signup.module';
 
 /**
  * AppModule
@@ -29,6 +30,7 @@ import { OrganizationModule } from './modules/organization/organization.module';
       isGlobal: true,
     }),
     OrganizationModule,
+    SignUpModule,
   ],
 })
 export class AppModule {}
