@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { EventBusService, NatsSubjects } from '../../../core/event-bus';
+import { hashPassword } from '../../../core/utils/password.util';
 import { UpdateSignUpStepCommand } from '../commands/update-signup-step.command';
 import { SignUpSessionStatus } from '../dto/signup.enums';
 import { SignUpSessionEntity } from '../entities/signup-session.entity';
@@ -48,7 +49,19 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
    * @param command UpdateSignUpStepCommand
    */
   async execute(command: UpdateSignUpStepCommand): Promise<UpdateSignUpStepResult> {
-    const { sessionId, stepName, workspaceIds, roles, linkedWallets, idempotencyKey } = command;
+    const {
+      sessionId,
+      stepName,
+      workspaceIds,
+      roles,
+      linkedWallets,
+      idempotencyKey,
+      email,
+      username,
+      password,
+      location,
+      workspaceName,
+    } = command;
 
     this.logger.log(
       `Executing UpdateSignUpStepCommand for session: ${sessionId}, step: ${stepName}`
@@ -78,6 +91,11 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
       roles,
       linkedWallets,
       stepName,
+      email,
+      username,
+      password,
+      location,
+      workspaceName,
     });
 
     if (idempotencyKey && session.idempotencyKey === idempotencyKey && !hasChanges) {
@@ -113,6 +131,32 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
     ) {
       changes.linkedWallets = linkedWallets;
       session.linkedWallets = [...linkedWallets];
+    }
+
+    if (email !== undefined && session.email !== email) {
+      changes.email = email;
+      session.email = email;
+    }
+
+    if (username !== undefined && session.username !== username) {
+      changes.username = username;
+      session.username = username;
+    }
+
+    if (password !== undefined) {
+      const newPasswordHash = await hashPassword(password);
+      changes.passwordHash = true;
+      session.passwordHash = newPasswordHash;
+    }
+
+    if (location !== undefined && session.location !== location) {
+      changes.location = location;
+      session.location = location;
+    }
+
+    if (workspaceName !== undefined && session.workspaceName !== workspaceName) {
+      changes.workspaceName = workspaceName;
+      session.workspaceName = workspaceName;
     }
 
     if (idempotencyKey) {
@@ -175,6 +219,11 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
       roles?: string[];
       linkedWallets?: string[];
       stepName: string;
+      email?: string;
+      username?: string;
+      password?: string;
+      location?: string;
+      workspaceName?: string;
     }
   ): boolean {
     if (
@@ -196,6 +245,17 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
       return true;
 
     if (!session.completedSteps.includes(updates.stepName)) return true;
+
+    if (updates.email !== undefined && session.email !== updates.email) return true;
+
+    if (updates.username !== undefined && session.username !== updates.username) return true;
+
+    if (updates.password !== undefined) return true;
+
+    if (updates.location !== undefined && session.location !== updates.location) return true;
+
+    if (updates.workspaceName !== undefined && session.workspaceName !== updates.workspaceName)
+      return true;
 
     return false;
   }
