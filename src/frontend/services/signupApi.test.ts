@@ -1,6 +1,6 @@
 import { ActorType, SignUpSessionStatus } from '../types';
 
-import { initiateSignup, updateStep, getSession, finalizeSignup, listWorkspaces, getWorkspaceTypesForActor, ApiError } from './signupApi';
+import { initiateSignup, updateStep, getSession, finalizeSignup, listWorkspaces, getAllowedWorkspaceTypes, getWorkspaceTypesForActor, ApiError } from './signupApi';
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
@@ -214,6 +214,38 @@ describe('signupApi', () => {
       });
 
       await expect(listWorkspaces()).rejects.toThrow(ApiError);
+    });
+  });
+
+  describe('getAllowedWorkspaceTypes', () => {
+    it('should GET /workspaces/allowed-types with actorType query parameter', async () => {
+      const mockTypes = ['SACCO'];
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockTypes,
+      });
+
+      const result = await getAllowedWorkspaceTypes(ActorType.Rider);
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        '/api/workspaces/allowed-types?actorType=Rider',
+        {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+      expect(result).toEqual(mockTypes);
+    });
+
+    it('should throw ApiError on non-ok response', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        json: async () => ({ message: 'Server error' }),
+      });
+
+      await expect(getAllowedWorkspaceTypes(ActorType.Rider)).rejects.toThrow(ApiError);
     });
   });
 

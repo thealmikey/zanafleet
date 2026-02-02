@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Autocomplete,
   Box,
+  Button,
   CircularProgress,
   FormControl,
   FormHelperText,
@@ -20,6 +21,7 @@ export function WorkspaceStep(): React.ReactElement {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [touched, setTouched] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     async function fetchWorkspaces(): Promise<void> {
@@ -55,7 +57,11 @@ export function WorkspaceStep(): React.ReactElement {
     }
 
     void fetchWorkspaces();
-  }, [formData.actorType]);
+  }, [formData.actorType, retryCount]);
+
+  const handleRetry = useCallback((): void => {
+    setRetryCount((prev) => prev + 1);
+  }, []);
 
   const selectedWorkspace = useMemo((): Workspace | null => {
     if (formData.workspaceIds.length === 0) return null;
@@ -94,9 +100,20 @@ export function WorkspaceStep(): React.ReactElement {
       </Typography>
 
       {fetchError && (
-        <Typography color="error" sx={{ mb: 2 }}>
-          {fetchError}
-        </Typography>
+        <Box sx={{ mb: 2 }}>
+          <Typography color="error" sx={{ mb: 1 }}>
+            {fetchError}
+          </Typography>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={handleRetry}
+            disabled={loading}
+            aria-label="Retry loading workspaces"
+          >
+            Retry
+          </Button>
+        </Box>
       )}
 
       {noWorkspacesAvailable ? (

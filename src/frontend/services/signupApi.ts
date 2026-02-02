@@ -119,6 +119,23 @@ export async function listWorkspaces(type?: string): Promise<Workspace[]> {
 }
 
 /**
+ * Get allowed workspace types for an actor type from the backend
+ * GET /workspaces/allowed-types?actorType=...
+ */
+export async function getAllowedWorkspaceTypes(actorType: ActorType): Promise<string[]> {
+  const response = await fetch(
+    `${API_BASE_URL}/workspaces/allowed-types?actorType=${encodeURIComponent(actorType)}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
+  return handleResponse<string[]>(response);
+}
+
+/**
  * Maps an ActorType to the corresponding WorkspaceType(s)
  * Used to filter workspaces relevant to a specific actor type during signup
  */
