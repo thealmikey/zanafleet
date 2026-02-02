@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  Divider,
   Link as MuiLink,
   Paper,
   TextField,
@@ -43,7 +44,7 @@ function validatePassword(password: string): string | undefined {
 
 export function SignIn(): React.ReactElement {
   const navigate = useNavigate();
-  const { login, isLoading, error, clearError } = useAuth();
+  const { login, loginWithKeycloak, isLoading, error, clearError, keycloakInitialized } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -52,6 +53,7 @@ export function SignIn(): React.ReactElement {
     email: false,
     password: false,
   });
+  const [keycloakLoading, setKeycloakLoading] = useState(false);
 
   const validateForm = useCallback((): boolean => {
     const emailError = validateEmail(email);
@@ -102,6 +104,16 @@ export function SignIn(): React.ReactElement {
     setTouched((prev) => ({ ...prev, password: true }));
     setFormErrors((prev) => ({ ...prev, password: validatePassword(password) }));
   }, [password]);
+
+  const handleKeycloakLogin = useCallback(async () => {
+    setKeycloakLoading(true);
+    try {
+      await loginWithKeycloak();
+    } catch {
+      // Keycloak will redirect, errors handled by AuthContext
+    }
+    // Note: page will redirect, so loading state may not matter
+  }, [loginWithKeycloak]);
 
   const handleSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -193,6 +205,24 @@ export function SignIn(): React.ReactElement {
             <CircularProgress size={24} color="inherit" />
           ) : (
             'Sign In'
+          )}
+        </Button>
+
+        <Divider sx={{ my: 2 }}>
+          <Typography variant="body2" color="text.secondary">OR</Typography>
+        </Divider>
+
+        <Button
+          variant="outlined"
+          fullWidth
+          onClick={handleKeycloakLogin}
+          disabled={isLoading || keycloakLoading || !keycloakInitialized}
+          sx={{ py: 1.5, mb: 2 }}
+        >
+          {keycloakLoading ? (
+            <CircularProgress size={24} />
+          ) : (
+            'Login with Keycloak SSO'
           )}
         </Button>
 
