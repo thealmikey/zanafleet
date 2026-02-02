@@ -52,7 +52,53 @@ services:
       - zanafleet-test
 
   # ========================================================================
-  # Redis (Optional) - Event bus / caching for future use
+  # Keycloak - Identity and Access Management
+  # Test environment configuration with embedded H2 database
+  # ========================================================================
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0
+    container_name: zanafleet-keycloak-test
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: dev-file
+      KC_HEALTH_ENABLED: 'true'
+    ports:
+      - '8080:8080'
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    healthcheck:
+      test: ['CMD-SHELL', 'exec 3<>/dev/tcp/localhost/8080 && echo -e "GET /health/ready HTTP/1.1\nHost: localhost\nConnection: close\n\n" >&3 && cat <&3 | grep -q "200 OK"']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - zanafleet-test
+
+  # ========================================================================
+  # NATS - Event Bus for inter-module communication
+  # ========================================================================
+  nats:
+    image: nats:2.10-alpine
+    container_name: zanafleet-nats-test
+    command: ['--jetstream', '--store_dir', '/data', '-m', '8222']
+    ports:
+      - '4222:4222'
+      - '8222:8222'
+    volumes:
+      - nats_data:/data
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '--quiet', 'http://localhost:8222/healthz']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zanafleet-test
+
+  # ========================================================================
+  # Redis (Optional) - Caching for future use
   # ========================================================================
 
 
@@ -62,6 +108,10 @@ volumes:
   neo4j_data:
     driver: local
   neo4j_logs:
+    driver: local
+  keycloak_data:
+    driver: local
+  nats_data:
     driver: local
 
 networks:
