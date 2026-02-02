@@ -4,12 +4,12 @@ import { UpdateSignUpStepCommand } from '../../commands/update-signup-step.comma
 
 describe('UpdateSignUpStepCommand', () => {
   const sessionId = uuidv4();
-  const workspaceId = uuidv4();
+  const workspaceIds = [uuidv4()];
 
   const validPayload = {
     sessionId,
     stepName: 'work-details',
-    workspaceId,
+    workspaceIds,
     roles: ['Rider'],
     linkedWallets: [uuidv4()],
     idempotencyKey: 'test-key-123',
@@ -19,7 +19,7 @@ describe('UpdateSignUpStepCommand', () => {
     const result = UpdateSignUpStepCommand.validate(validPayload);
     expect(result.sessionId).toBe(sessionId);
     expect(result.stepName).toBe('work-details');
-    expect(result.workspaceId).toBe(workspaceId);
+    expect(result.workspaceIds).toEqual(workspaceIds);
     expect(result.roles).toEqual(['Rider']);
     expect(result.idempotencyKey).toBe('test-key-123');
   });
@@ -46,8 +46,8 @@ describe('UpdateSignUpStepCommand', () => {
     expect(() => UpdateSignUpStepCommand.validate(invalidPayload)).toThrow();
   });
 
-  it('should throw ZodError on invalid workspaceId', () => {
-    const invalidPayload = { ...validPayload, workspaceId: 'not-a-uuid' };
+  it('should throw ZodError on invalid workspaceIds', () => {
+    const invalidPayload = { ...validPayload, workspaceIds: ['not-a-uuid'] };
     expect(() => UpdateSignUpStepCommand.validate(invalidPayload)).toThrow();
   });
 

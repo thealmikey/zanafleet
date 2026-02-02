@@ -74,14 +74,14 @@ describe('FinalizeSignUpCommandHandler', () => {
 
   it('should successfully finalize sign-up, create actor and emit events', async () => {
     const sessionId = uuidv4();
-    const workspaceId = uuidv4();
+    const workspaceIds = [uuidv4()];
     const actorId = uuidv4();
 
     const session = SignUpSessionEntity.fromDomain({
       sessionId,
       status: SignUpSessionStatus.PARTIAL,
       actorType: ActorType.Rider,
-      workspaceId,
+      workspaceIds,
       roles: ['Rider'],
       linkedWallets: [],
       completedSteps: ['init', 'step1'],
@@ -100,7 +100,7 @@ describe('FinalizeSignUpCommandHandler', () => {
     expect(commandBus.execute).toHaveBeenCalled();
     const createActorCommand = (commandBus.execute as jest.Mock).mock.calls[0][0];
     expect(createActorCommand.type).toBe(ActorType.Rider);
-    expect(createActorCommand.workspaceId).toBe(workspaceId);
+    expect(createActorCommand.workspaceId).toBe(workspaceIds[0]);
 
     // Verify session update
     expect(repository.save).toHaveBeenCalled();
@@ -108,7 +108,7 @@ describe('FinalizeSignUpCommandHandler', () => {
     expect(saved.status).toBe(SignUpSessionStatus.COMPLETED);
 
     // Verify result
-    expect(result).toEqual({ actorId, workspaceId });
+    expect(result).toEqual({ actorId, workspaceId: workspaceIds[0] });
 
     // Verify events
     expect(eventBus.publish).toHaveBeenCalled();
@@ -143,24 +143,24 @@ describe('FinalizeSignUpCommandHandler', () => {
     await expect(handler.execute(command)).rejects.toThrow(BadRequestException);
   });
 
-  it('should throw BadRequestException if workspaceId is missing', async () => {
+  it('should throw BadRequestException if workspaceIds is missing', async () => {
     const session = {
       status: SignUpSessionStatus.PARTIAL,
       actorType: ActorType.Rider,
-      workspaceId: null,
+      workspaceIds: [],
     };
     mockRepository.findOne.mockResolvedValue(session);
     const command = new FinalizeSignUpCommand({ sessionId: uuidv4() });
 
     await expect(handler.execute(command)).rejects.toThrow(BadRequestException);
-    await expect(handler.execute(command)).rejects.toThrow(/missing mandatory field: workspaceId/);
+    await expect(handler.execute(command)).rejects.toThrow(/missing mandatory field: workspaceIds/);
   });
 
   it('should rethrow errors from CommandBus (Actor creation failure)', async () => {
     const session = {
       status: SignUpSessionStatus.PARTIAL,
       actorType: ActorType.Rider,
-      workspaceId: uuidv4(),
+      workspaceIds: [uuidv4()],
       roles: [],
       linkedWallets: [],
     };

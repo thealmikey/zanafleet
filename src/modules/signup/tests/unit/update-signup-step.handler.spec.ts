@@ -64,11 +64,12 @@ describe('UpdateSignUpStepCommandHandler', () => {
 
   it('should successfully update session and emit event', async () => {
     const sessionId = uuidv4();
-    const workspaceId = uuidv4();
+    const workspaceIds = [uuidv4()];
     const session = SignUpSessionEntity.fromDomain({
       sessionId,
       status: SignUpSessionStatus.INITIATED,
       actorType: ActorType.Rider,
+      workspaceIds: [],
       roles: [],
       linkedWallets: [],
       completedSteps: [],
@@ -81,7 +82,7 @@ describe('UpdateSignUpStepCommandHandler', () => {
     const command = new UpdateSignUpStepCommand({
       sessionId,
       stepName: 'work-info',
-      workspaceId,
+      workspaceIds,
       roles: ['Rider'],
       linkedWallets: [],
       idempotencyKey: 'key-1',
@@ -95,7 +96,7 @@ describe('UpdateSignUpStepCommandHandler', () => {
     expect(result.status).toBe(SignUpSessionStatus.PARTIAL);
     expect(result.completedSteps).toContain('work-info');
     const saved = (repository.save as jest.Mock).mock.calls[0][0];
-    expect(saved.workspaceId).toBe(workspaceId);
+    expect(saved.workspaceIds).toEqual(workspaceIds);
     expect(saved.roles).toEqual(['Rider']);
     expect(saved.completedSteps).toContain('work-info');
     expect(saved.status).toBe(SignUpSessionStatus.PARTIAL);
@@ -109,7 +110,7 @@ describe('UpdateSignUpStepCommandHandler', () => {
     expect(event.eventType).toBe('SignUpStepCompletedEvent-V1');
     expect(event.sessionId).toBe(sessionId);
     expect(event.stepName).toBe('work-info');
-    expect(event.changes).toHaveProperty('workspaceId', workspaceId);
+    expect(event.changes).toHaveProperty('workspaceIds', workspaceIds);
   });
 
   it('should throw NotFoundException if session does not exist', async () => {
@@ -117,6 +118,7 @@ describe('UpdateSignUpStepCommandHandler', () => {
     const command = new UpdateSignUpStepCommand({
       sessionId: uuidv4(),
       stepName: 'test',
+      workspaceIds: [],
       roles: [],
       linkedWallets: [],
     });
@@ -130,6 +132,7 @@ describe('UpdateSignUpStepCommandHandler', () => {
     const command = new UpdateSignUpStepCommand({
       sessionId: uuidv4(),
       stepName: 'test',
+      workspaceIds: [],
       roles: [],
       linkedWallets: [],
     });
@@ -143,6 +146,7 @@ describe('UpdateSignUpStepCommandHandler', () => {
     const command = new UpdateSignUpStepCommand({
       sessionId: uuidv4(),
       stepName: 'test',
+      workspaceIds: [],
       roles: [],
       linkedWallets: [],
     });
@@ -156,6 +160,7 @@ describe('UpdateSignUpStepCommandHandler', () => {
       sessionId,
       status: SignUpSessionStatus.PARTIAL,
       actorType: ActorType.Rider,
+      workspaceIds: [],
       roles: ['Rider'],
       linkedWallets: [],
       completedSteps: ['init', 'step1'],
@@ -169,6 +174,7 @@ describe('UpdateSignUpStepCommandHandler', () => {
     const command = new UpdateSignUpStepCommand({
       sessionId,
       stepName: 'step1', // Already in completedSteps
+      workspaceIds: [],
       roles: ['Rider'], // Same as in session
       linkedWallets: [],
       idempotencyKey: 'key-1',
@@ -190,6 +196,7 @@ describe('UpdateSignUpStepCommandHandler', () => {
       sessionId,
       status: SignUpSessionStatus.PARTIAL,
       actorType: ActorType.Rider,
+      workspaceIds: [],
       roles: ['Rider'],
       linkedWallets: [],
       completedSteps: ['init'],
@@ -203,6 +210,7 @@ describe('UpdateSignUpStepCommandHandler', () => {
     const command = new UpdateSignUpStepCommand({
       sessionId,
       stepName: 'step1', // New step -> Change detected
+      workspaceIds: [],
       roles: ['Rider'],
       linkedWallets: [],
       idempotencyKey: 'key-1',
