@@ -4,7 +4,7 @@ jest.mock(
     ApiProperty: () => () => {},
     ApiPropertyOptional: () => () => {},
   }),
-  { virtual: true },
+  { virtual: true }
 );
 
 import { UnauthorizedException } from '@nestjs/common';
@@ -125,12 +125,12 @@ describe('AuthController - Keycloak Token Exchange', () => {
     it('should return 401 for invalid/malformed token', async () => {
       const invalidToken = 'not-a-valid-jwt';
 
-      await expect(
-        controller.exchangeKeycloakToken({ accessToken: invalidToken }),
-      ).rejects.toThrow(UnauthorizedException);
-      await expect(
-        controller.exchangeKeycloakToken({ accessToken: invalidToken }),
-      ).rejects.toThrow('Invalid token format');
+      await expect(controller.exchangeKeycloakToken({ accessToken: invalidToken })).rejects.toThrow(
+        UnauthorizedException
+      );
+      await expect(controller.exchangeKeycloakToken({ accessToken: invalidToken })).rejects.toThrow(
+        'Invalid token format'
+      );
     });
 
     it('should return 401 for token missing email claim', async () => {
@@ -142,12 +142,12 @@ describe('AuthController - Keycloak Token Exchange', () => {
 
       const accessToken = createMockKeycloakToken(payloadWithoutEmail);
 
-      await expect(
-        controller.exchangeKeycloakToken({ accessToken }),
-      ).rejects.toThrow(UnauthorizedException);
-      await expect(
-        controller.exchangeKeycloakToken({ accessToken }),
-      ).rejects.toThrow('Token missing email claim');
+      await expect(controller.exchangeKeycloakToken({ accessToken })).rejects.toThrow(
+        UnauthorizedException
+      );
+      await expect(controller.exchangeKeycloakToken({ accessToken })).rejects.toThrow(
+        'Token missing email claim'
+      );
     });
 
     it('should return 401 for token with non-Keycloak issuer', async () => {
@@ -160,12 +160,12 @@ describe('AuthController - Keycloak Token Exchange', () => {
 
       const accessToken = createMockKeycloakToken(payloadWithInvalidIssuer);
 
-      await expect(
-        controller.exchangeKeycloakToken({ accessToken }),
-      ).rejects.toThrow(UnauthorizedException);
-      await expect(
-        controller.exchangeKeycloakToken({ accessToken }),
-      ).rejects.toThrow('Invalid token issuer');
+      await expect(controller.exchangeKeycloakToken({ accessToken })).rejects.toThrow(
+        UnauthorizedException
+      );
+      await expect(controller.exchangeKeycloakToken({ accessToken })).rejects.toThrow(
+        'Invalid token issuer'
+      );
     });
 
     it('should return user info (id, email, name, roles) along with token', async () => {
@@ -246,7 +246,7 @@ describe('AuthController - Keycloak Token Exchange', () => {
           email: 'sync-test@example.com',
           preferred_username: 'syncuser',
           iss: 'http://localhost:8080/realms/zanafleet',
-        }),
+        })
       );
     });
 
@@ -258,18 +258,16 @@ describe('AuthController - Keycloak Token Exchange', () => {
         iss: 'http://localhost:8080/realms/zanafleet',
       };
 
-      keycloakUserSyncService.syncUser.mockRejectedValue(
-        new Error('Database connection failed'),
-      );
+      keycloakUserSyncService.syncUser.mockRejectedValue(new Error('Database connection failed'));
 
       const accessToken = createMockKeycloakToken(keycloakPayload);
 
-      await expect(
-        controller.exchangeKeycloakToken({ accessToken }),
-      ).rejects.toThrow(UnauthorizedException);
-      await expect(
-        controller.exchangeKeycloakToken({ accessToken }),
-      ).rejects.toThrow('Database connection failed');
+      await expect(controller.exchangeKeycloakToken({ accessToken })).rejects.toThrow(
+        UnauthorizedException
+      );
+      await expect(controller.exchangeKeycloakToken({ accessToken })).rejects.toThrow(
+        'Database connection failed'
+      );
     });
 
     it('should use email prefix as name when username is not available', async () => {
@@ -310,12 +308,12 @@ describe('AuthController - Keycloak Token Exchange', () => {
 
       const accessToken = createMockKeycloakToken(payloadWithoutIssuer);
 
-      await expect(
-        controller.exchangeKeycloakToken({ accessToken }),
-      ).rejects.toThrow(UnauthorizedException);
-      await expect(
-        controller.exchangeKeycloakToken({ accessToken }),
-      ).rejects.toThrow('Invalid token issuer');
+      await expect(controller.exchangeKeycloakToken({ accessToken })).rejects.toThrow(
+        UnauthorizedException
+      );
+      await expect(controller.exchangeKeycloakToken({ accessToken })).rejects.toThrow(
+        'Invalid token issuer'
+      );
     });
   });
 });

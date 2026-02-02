@@ -27,7 +27,7 @@ export class AuthController {
     private readonly commandBus: CommandBus,
     private readonly keycloakUserSyncService: KeycloakUserSyncService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   @Post('login')

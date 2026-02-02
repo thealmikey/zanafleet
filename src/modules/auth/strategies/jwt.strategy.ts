@@ -49,7 +49,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     configService: ConfigService,
     @InjectRepository(ActorEntity)
     private readonly actorRepository: Repository<ActorEntity>,
-    private readonly keycloakUserSyncService: KeycloakUserSyncService,
+    private readonly keycloakUserSyncService: KeycloakUserSyncService
   ) {
     const jwtSecret = configService.get<string>('auth.jwt.secret');
     const jwtIssuer = configService.get<string>('auth.jwt.issuer') || 'zanafleet';
@@ -64,9 +64,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     this.localIssuer = jwtIssuer;
     this.keycloakIssuer =
-      keycloakAuthUrl && keycloakRealm
-        ? `${keycloakAuthUrl}/realms/${keycloakRealm}`
-        : '';
+      keycloakAuthUrl && keycloakRealm ? `${keycloakAuthUrl}/realms/${keycloakRealm}` : '';
   }
 
   /**
@@ -95,7 +93,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     if (isKeycloakToken) {
       const syncResult = await this.keycloakUserSyncService.syncUser(
-        payload as unknown as KeycloakTokenPayload,
+        payload as unknown as KeycloakTokenPayload
       );
       actor = syncResult.actor;
     } else {

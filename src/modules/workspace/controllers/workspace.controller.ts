@@ -69,9 +69,9 @@ export class WorkspaceController {
    * Centralizes the business rule for actor-workspace type mapping
    */
   @Get('allowed-types')
-  getAllowedTypes(
-    @Query() query: AllowedWorkspaceTypesQueryDto
-  ): { allowedTypes: WorkspaceType[] } {
+  getAllowedTypes(@Query() query: AllowedWorkspaceTypesQueryDto): {
+    allowedTypes: WorkspaceType[];
+  } {
     const allowedTypes = this.getWorkspaceTypesForActor(query.actorType);
     return { allowedTypes };
   }

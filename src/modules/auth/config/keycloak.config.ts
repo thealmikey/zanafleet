@@ -10,10 +10,9 @@ import {
  * Used with KeycloakConnectModule.registerAsync()
  */
 export const keycloakConnectOptionsFactory = (
-  configService: ConfigService,
+  configService: ConfigService
 ): KeycloakConnectOptions => ({
-  authServerUrl:
-    configService.get<string>('keycloak.authServerUrl') || 'http://localhost:8080',
+  authServerUrl: configService.get<string>('keycloak.authServerUrl') || 'http://localhost:8080',
   realm: configService.get<string>('keycloak.realm') || 'zanafleet',
   clientId: configService.get<string>('keycloak.clientId') || 'zanafleet-api',
   secret: configService.get<string>('keycloak.secret') || '',

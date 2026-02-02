@@ -55,7 +55,7 @@ describe('authApi - Keycloak', () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ accessToken: 'keycloak-access-token' }),
-        }),
+        })
       );
     });
 

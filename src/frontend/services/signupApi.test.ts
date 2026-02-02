@@ -1,6 +1,15 @@
 import { ActorType, SignUpSessionStatus } from '../types';
 
-import { initiateSignup, updateStep, getSession, finalizeSignup, listWorkspaces, getAllowedWorkspaceTypes, getWorkspaceTypesForActor, ApiError } from './signupApi';
+import {
+  initiateSignup,
+  updateStep,
+  getSession,
+  finalizeSignup,
+  listWorkspaces,
+  getAllowedWorkspaceTypes,
+  getWorkspaceTypesForActor,
+  ApiError,
+} from './signupApi';
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
@@ -188,9 +197,7 @@ describe('signupApi', () => {
     });
 
     it('should include type query parameter when provided', async () => {
-      const mockWorkspaces = [
-        { workspaceId: 'ws-1', name: 'Test SACCO', type: 'SACCO' },
-      ];
+      const mockWorkspaces = [{ workspaceId: 'ws-1', name: 'Test SACCO', type: 'SACCO' }];
       mockFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockWorkspaces,
@@ -227,13 +234,10 @@ describe('signupApi', () => {
 
       const result = await getAllowedWorkspaceTypes(ActorType.Rider);
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/api/workspaces/allowed-types?actorType=Rider',
-        {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+      expect(mockFetch).toHaveBeenCalledWith('/api/workspaces/allowed-types?actorType=Rider', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
       expect(result).toEqual(mockTypes);
     });
 
@@ -280,7 +284,7 @@ describe('signupApi', () => {
       expect(result).toEqual(['OPS']);
     });
 
-    it("should return empty array for null actorType", () => {
+    it('should return empty array for null actorType', () => {
       expect(getWorkspaceTypesForActor(null)).toEqual([]);
     });
   });

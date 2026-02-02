@@ -48,7 +48,7 @@ export class KeycloakUserSyncService {
 
   constructor(
     @InjectRepository(ActorEntity)
-    private readonly actorRepository: Repository<ActorEntity>,
+    private readonly actorRepository: Repository<ActorEntity>
   ) {
     this.defaultWorkspaceId =
       process.env.DEFAULT_WORKSPACE_ID || '00000000-0000-0000-0000-000000000000';
@@ -84,10 +84,7 @@ export class KeycloakUserSyncService {
   /**
    * Create a new Actor from Keycloak token data
    */
-  private async createNewActor(
-    email: string,
-    payload: KeycloakTokenPayload,
-  ): Promise<ActorEntity> {
+  private async createNewActor(email: string, payload: KeycloakTokenPayload): Promise<ActorEntity> {
     const actorId = uuidv4();
     const username = payload.preferred_username || email.split('@')[0];
     const roles = this.extractRoles(payload);
@@ -118,12 +115,11 @@ export class KeycloakUserSyncService {
    */
   private async updateExistingActor(
     actor: ActorEntity,
-    payload: KeycloakTokenPayload,
+    payload: KeycloakTokenPayload
   ): Promise<ActorEntity> {
     const roles = this.extractRoles(payload);
 
-    const rolesChanged =
-      JSON.stringify(actor.roles.sort()) !== JSON.stringify(roles.sort());
+    const rolesChanged = JSON.stringify(actor.roles.sort()) !== JSON.stringify(roles.sort());
 
     if (rolesChanged) {
       actor.roles = roles;

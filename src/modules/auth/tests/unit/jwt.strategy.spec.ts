@@ -175,9 +175,7 @@ describe('JwtStrategy', () => {
 
       actorRepository.findOne.mockResolvedValue(null);
 
-      await expect(strategy.validate(payload)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(strategy.validate(payload)).rejects.toThrow(UnauthorizedException);
       await expect(strategy.validate(payload)).rejects.toThrow('Actor not found');
     });
 
@@ -190,12 +188,8 @@ describe('JwtStrategy', () => {
         iss: 'malicious-issuer',
       };
 
-      await expect(strategy.validate(payload)).rejects.toThrow(
-        UnauthorizedException,
-      );
-      await expect(strategy.validate(payload)).rejects.toThrow(
-        'Invalid token issuer',
-      );
+      await expect(strategy.validate(payload)).rejects.toThrow(UnauthorizedException);
+      await expect(strategy.validate(payload)).rejects.toThrow('Invalid token issuer');
     });
   });
 });

@@ -34,7 +34,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     @InjectRepository(ActorEntity)
     private readonly actorRepository: Repository<ActorEntity>,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   /**

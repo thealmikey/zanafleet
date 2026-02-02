@@ -145,9 +145,7 @@ describe('KeycloakUserSyncService', () => {
         iss: 'http://localhost:8080/realms/zanafleet',
       };
 
-      await expect(service.syncUser(payload)).rejects.toThrow(
-        'Keycloak token missing email claim',
-      );
+      await expect(service.syncUser(payload)).rejects.toThrow('Keycloak token missing email claim');
     });
 
     it('should use email prefix as username when preferred_username is missing', async () => {
@@ -172,7 +170,7 @@ describe('KeycloakUserSyncService', () => {
       expect(actorRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           username: 'testuser',
-        }),
+        })
       );
     });
 
@@ -202,7 +200,7 @@ describe('KeycloakUserSyncService', () => {
       expect(actorRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           roles: ['user', 'admin'],
-        }),
+        })
       );
     });
   });
