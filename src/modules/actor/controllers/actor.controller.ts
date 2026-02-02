@@ -16,6 +16,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ZodError } from 'zod';
 
+import { hashPassword } from '../../../core/utils/password.util';
 import { CreateActorCommand } from '../commands/create-actor.command';
 import { UpdateActorCommand } from '../commands/update-actor.command';
 import { ActorDto } from '../dto/actor.dto';
@@ -40,13 +41,19 @@ export class ActorController {
   /**
    * Create a new actor
    * Uses CreateActorCommand with Zod validation
+   * Hashes the plaintext password server-side before creating the actor
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() body: CreateActorDto): Promise<{ actorId: string }> {
+    const passwordHash = await hashPassword(body.password);
+
     let input;
     try {
-      input = CreateActorCommand.validate(body);
+      input = CreateActorCommand.validate({
+        ...body,
+        passwordHash,
+      });
     } catch (error: unknown) {
       if (error instanceof ZodError) {
         throw this.createValidationException(error);

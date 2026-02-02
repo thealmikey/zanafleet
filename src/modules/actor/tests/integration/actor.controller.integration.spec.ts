@@ -136,7 +136,7 @@ describeIntegration('ActorController (Integration)', () => {
         type: ActorType.Rider,
         email: 'test-actor@example.com',
         username: 'test-actor-user',
-        passwordHash: 'hashed-password-for-test',
+        password: 'plaintext-password-for-test',
         workspaceId,
         roles,
         linkedWallets,
