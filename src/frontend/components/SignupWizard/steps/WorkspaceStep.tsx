@@ -43,7 +43,7 @@ export function WorkspaceStep(): React.ReactElement {
 
         const workspacePromises = workspaceTypes.map((type) => listWorkspaces(type));
         const results = await Promise.all(workspacePromises);
-        const allWorkspaces = results.flat();
+        const allWorkspaces = [...new Map(results.flat().map(ws => [ws.workspaceId, ws])).values()];
 
         setWorkspaces(allWorkspaces);
       } catch (error) {
