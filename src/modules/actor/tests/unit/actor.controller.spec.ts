@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { ZodError } from 'zod';
 
+import * as passwordUtil from '../../../../core/utils/password.util';
 import { CreateActorCommand } from '../../commands/create-actor.command';
 import { UpdateActorCommand } from '../../commands/update-actor.command';
 import { ActorController } from '../../controllers/actor.controller';
@@ -45,12 +46,16 @@ describe('ActorController', () => {
     actorRepository = module.get<Repository<ActorEntity>>(getRepositoryToken(ActorEntity));
 
     jest.clearAllMocks();
+    jest.spyOn(passwordUtil, 'hashPassword').mockResolvedValue('mocked-hash');
   });
 
   describe('create', () => {
     it('should execute CreateActorCommand and return actorId', async () => {
       const dto = {
         type: ActorType.Rider,
+        email: 'test@example.com',
+        username: 'testuser',
+        password: 'plaintext-password',
         workspaceId: uuidv4(),
         roles: [uuidv4()],
         linkedWallets: [uuidv4()],

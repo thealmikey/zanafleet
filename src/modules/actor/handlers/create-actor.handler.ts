@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   Logger,
   NotFoundException,
@@ -84,22 +85,44 @@ export class CreateActorCommandHandler implements ICommandHandler<CreateActorCom
       );
     }
 
+    // Step 3: Check for duplicate email
+    const existingByEmail = await this.actorRepository.findOne({
+      where: { email: command.email },
+    });
+    if (existingByEmail) {
+      this.logger.warn(`Actor with email already exists: ${command.email}`);
+      throw new ConflictException(`An actor with email "${command.email}" already exists`);
+    }
+
+    // Step 4: Check for duplicate username
+    const existingByUsername = await this.actorRepository.findOne({
+      where: { username: command.username },
+    });
+    if (existingByUsername) {
+      this.logger.warn(`Actor with username already exists: ${command.username}`);
+      throw new ConflictException(`An actor with username "${command.username}" already exists`);
+    }
+
     try {
-      // Step 3: Create actor entity
+      // Step 5: Create actor entity
       const entity = ActorEntity.fromDomain({
         actorId,
         type: command.type,
+        email: command.email,
+        username: command.username,
+        passwordHash: command.passwordHash,
+        location: command.location,
         roles: command.roles,
         workspaceId: command.workspaceId,
         linkedWallets: command.linkedWallets,
         createdAt: now,
       });
 
-      // Step 4: Persist to PostgreSQL
+      // Step 6: Persist to PostgreSQL
       await this.actorRepository.save(entity);
       this.logger.debug(`Actor persisted to PostgreSQL: ${actorId}`);
 
-      // Step 5: Create and emit event
+      // Step 7: Create and emit event
       const event = new ActorOnboardedEventV1({
         eventId,
         actorId,

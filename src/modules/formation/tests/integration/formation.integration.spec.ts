@@ -214,9 +214,14 @@ describeIntegration('Formation Module Integration', () => {
     type: ActorType,
     roles: string[] = []
   ): Promise<ActorEntity> => {
+    const actorId = uuidv4();
     const actor = ActorEntity.fromDomain({
-      actorId: uuidv4(),
+      actorId,
       type,
+      email: `actor-${actorId}@test.local`,
+      username: `actor-${actorId}`,
+      passwordHash: 'hashed-password-placeholder',
+      location: null,
       roles,
       workspaceId,
       linkedWallets: [],
