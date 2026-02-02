@@ -10,6 +10,7 @@ import {
   ParseUUIDPipe,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -19,7 +20,9 @@ import { ZodError } from 'zod';
 import { CreateWorkspaceCommand } from '../commands/create-workspace.command';
 import { UpdateWorkspaceCommand } from '../commands/update-workspace.command';
 import { CreateWorkspaceDto, WorkspaceDto } from '../dto/create-workspace.dto';
+import { ListWorkspacesQueryDto } from '../dto/list-workspaces-query.dto';
 import { UpdateWorkspaceDto } from '../dto/update-workspace.dto';
+import { WorkspaceStatus } from '../dto/workspace.enums';
 import { WorkspaceEntity } from '../entities/workspace.entity';
 
 /**
@@ -57,6 +60,22 @@ export class WorkspaceController {
     const workspaceId = await this.commandBus.execute<CreateWorkspaceCommand, string>(command);
 
     return { workspaceId };
+  }
+
+  /**
+   * Get all active workspaces, optionally filtered by type
+   * Direct read from repository (projection)
+   */
+  @Get()
+  async findAll(@Query() query: ListWorkspacesQueryDto): Promise<WorkspaceDto[]> {
+    const workspaces = await this.workspaceRepository.find({
+      where: {
+        status: WorkspaceStatus.ACTIVE,
+        ...(query.type && { type: query.type }),
+      },
+    });
+
+    return workspaces.map((entity) => this.mapToDto(entity));
   }
 
   /**

@@ -23,6 +23,7 @@ describe('WorkspaceController', () => {
 
   const mockWorkspaceRepository = {
     findOne: jest.fn(),
+    find: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -167,6 +168,112 @@ describe('WorkspaceController', () => {
       mockWorkspaceRepository.findOne.mockResolvedValue(null);
 
       await expect(controller.update(uuidv4(), {} as any)).rejects.toThrow(NotFoundException);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all active workspaces when no type filter provided', async () => {
+      const workspaceId1 = uuidv4();
+      const workspaceId2 = uuidv4();
+      const orgId = uuidv4();
+
+      const workspaceEntities = [
+        {
+          id: workspaceId1,
+          orgId,
+          name: 'Workspace One',
+          type: WorkspaceType.BUSINESS,
+          status: WorkspaceStatus.ACTIVE,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          toDomain: jest.fn().mockReturnValue({
+            workspaceId: workspaceId1,
+            orgId,
+            name: 'Workspace One',
+            type: WorkspaceType.BUSINESS,
+            status: WorkspaceStatus.ACTIVE,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }),
+        },
+        {
+          id: workspaceId2,
+          orgId,
+          name: 'Workspace Two',
+          type: WorkspaceType.SACCO,
+          status: WorkspaceStatus.ACTIVE,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          toDomain: jest.fn().mockReturnValue({
+            workspaceId: workspaceId2,
+            orgId,
+            name: 'Workspace Two',
+            type: WorkspaceType.SACCO,
+            status: WorkspaceStatus.ACTIVE,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }),
+        },
+      ];
+
+      mockWorkspaceRepository.find.mockResolvedValue(workspaceEntities);
+
+      const result = await controller.findAll({});
+
+      expect(mockWorkspaceRepository.find).toHaveBeenCalledWith({
+        where: { status: WorkspaceStatus.ACTIVE },
+      });
+      expect(result).toHaveLength(2);
+      expect(result[0].workspaceId).toBe(workspaceId1);
+      expect(result[1].workspaceId).toBe(workspaceId2);
+    });
+
+    it('should return workspaces filtered by type when type parameter provided', async () => {
+      const workspaceId = uuidv4();
+      const orgId = uuidv4();
+
+      const workspaceEntities = [
+        {
+          id: workspaceId,
+          orgId,
+          name: 'SACCO Workspace',
+          type: WorkspaceType.SACCO,
+          status: WorkspaceStatus.ACTIVE,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          toDomain: jest.fn().mockReturnValue({
+            workspaceId,
+            orgId,
+            name: 'SACCO Workspace',
+            type: WorkspaceType.SACCO,
+            status: WorkspaceStatus.ACTIVE,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }),
+        },
+      ];
+
+      mockWorkspaceRepository.find.mockResolvedValue(workspaceEntities);
+
+      const result = await controller.findAll({ type: WorkspaceType.SACCO });
+
+      expect(mockWorkspaceRepository.find).toHaveBeenCalledWith({
+        where: { status: WorkspaceStatus.ACTIVE, type: WorkspaceType.SACCO },
+      });
+      expect(result).toHaveLength(1);
+      expect(result[0].workspaceId).toBe(workspaceId);
+      expect(result[0].type).toBe(WorkspaceType.SACCO);
+    });
+
+    it('should return empty array when no workspaces found', async () => {
+      mockWorkspaceRepository.find.mockResolvedValue([]);
+
+      const result = await controller.findAll({});
+
+      expect(mockWorkspaceRepository.find).toHaveBeenCalledWith({
+        where: { status: WorkspaceStatus.ACTIVE },
+      });
+      expect(result).toEqual([]);
     });
   });
 });
