@@ -72,13 +72,13 @@ describe('signupApi', () => {
 
       const result = await updateStep('test-session-id', {
         stepName: 'workspace',
-        workspaceId: 'workspace-123',
+        workspaceIds: ['workspace-123'],
       });
 
       expect(mockFetch).toHaveBeenCalledWith('/api/signup/test-session-id', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stepName: 'workspace', workspaceId: 'workspace-123' }),
+        body: JSON.stringify({ stepName: 'workspace', workspaceIds: ['workspace-123'] }),
       });
       expect(result).toEqual(mockResponse);
     });
@@ -101,7 +101,7 @@ describe('signupApi', () => {
         sessionId: 'test-session-id',
         status: SignUpSessionStatus.PARTIAL,
         actorType: ActorType.Rider,
-        workspaceId: 'workspace-123',
+        workspaceIds: ['workspace-123'],
         roles: ['Rider'],
         linkedWallets: [],
         completedSteps: ['workspace'],
