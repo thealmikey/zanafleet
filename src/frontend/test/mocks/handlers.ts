@@ -38,6 +38,30 @@ function createMockSession(
 }
 
 export const handlers = [
+  // POST /auth/keycloak/token - Exchange Keycloak token for local JWT
+  http.post(`${API_BASE_URL}/auth/keycloak/token`, async ({ request }) => {
+    const body = (await request.json()) as { accessToken?: string };
+
+    if (!body.accessToken) {
+      return HttpResponse.json(
+        { message: 'accessToken is required', statusCode: 400 },
+        { status: 400 }
+      );
+    }
+
+    // Mock successful token exchange
+    return HttpResponse.json({
+      user: {
+        id: crypto.randomUUID(),
+        email: 'keycloak-user@example.com',
+        name: 'Keycloak User',
+        roles: ['user'],
+      },
+      token: 'mock-local-jwt-token',
+      expiresAt: new Date(Date.now() + 3600000).toISOString(),
+    });
+  }),
+
   // POST /signup - Initiate a new sign-up session
   http.post(`${API_BASE_URL}/signup`, async ({ request }) => {
     const body = (await request.json()) as { actorType: ActorType; idempotencyKey?: string };
