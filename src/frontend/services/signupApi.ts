@@ -122,7 +122,7 @@ export async function listWorkspaces(type?: string): Promise<Workspace[]> {
  * Maps an ActorType to the corresponding WorkspaceType(s)
  * Used to filter workspaces relevant to a specific actor type during signup
  */
-export function getWorkspaceTypesForActor(actorType: ActorType): string[] {
+export function getWorkspaceTypesForActor(actorType: ActorType | null): string[] {
   switch (actorType) {
     case ActorType.SaccoAdmin:
     case ActorType.Rider:

@@ -247,6 +247,10 @@ describe('signupApi', () => {
       const result = getWorkspaceTypesForActor(ActorType.AIService);
       expect(result).toEqual(['OPS']);
     });
+
+    it("should return empty array for null actorType", () => {
+      expect(getWorkspaceTypesForActor(null)).toEqual([]);
+    });
   });
 
   describe('ApiError', () => {
