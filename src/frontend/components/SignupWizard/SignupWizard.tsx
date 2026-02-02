@@ -48,12 +48,12 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
       case 'account-type':
         return formData.actorType !== null;
       case 'workspace':
-        return formData.workspaceId !== null && formData.workspaceId.trim() !== '';
+        return formData.workspaceIds.length > 0;
       case 'roles':
       case 'wallets':
         return true;
       case 'review':
-        return formData.actorType !== null && formData.workspaceId !== null;
+        return formData.actorType !== null && formData.workspaceIds.length > 0;
       default:
         return false;
     }

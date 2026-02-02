@@ -100,9 +100,9 @@ export function WorkspaceStep(): React.ReactElement {
       )}
 
       {noWorkspacesAvailable ? (
-        <Typography color="text.secondary" sx={{ mb: 2 }}>
-          No workspaces are currently available for your account type. You may proceed without
-          selecting a workspace, or contact your administrator.
+        <Typography color="error" sx={{ mb: 2 }}>
+          No workspaces are currently available for your account type. Please contact your
+          administrator to have a workspace created before you can continue.
         </Typography>
       ) : (
         <FormControl fullWidth required error={!!validationError}>
