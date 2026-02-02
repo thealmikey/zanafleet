@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { CqrsModule, EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
@@ -199,6 +199,105 @@ describeIntegration('ActorController (Integration)', () => {
       await expect(controller.update(nonExistentId, { roles: [uuidv4()] })).rejects.toThrow(
         NotFoundException
       );
+    });
+  });
+
+  describe('Duplicate Detection', () => {
+    it('should throw ConflictException when creating actor with duplicate email', async () => {
+      const { workspaceId } = await createPrerequisites();
+      const sharedEmail = `duplicate-${uuidv4()}@example.com`;
+
+      // Create first actor successfully
+      const firstDto: CreateActorDto = {
+        type: ActorType.Rider,
+        email: sharedEmail,
+        username: `first-user-${uuidv4()}`,
+        password: 'password-for-test',
+        workspaceId,
+        roles: [],
+        linkedWallets: [],
+      };
+
+      await controller.create(firstDto);
+
+      // Attempt to create second actor with same email
+      const secondDto: CreateActorDto = {
+        type: ActorType.Rider,
+        email: sharedEmail,
+        username: `second-user-${uuidv4()}`,
+        password: 'password-for-test',
+        workspaceId,
+        roles: [],
+        linkedWallets: [],
+      };
+
+      await expect(controller.create(secondDto)).rejects.toThrow(ConflictException);
+      await expect(controller.create(secondDto)).rejects.toThrow(/email/i);
+    });
+
+    it('should throw ConflictException when creating actor with duplicate username', async () => {
+      const { workspaceId } = await createPrerequisites();
+      const sharedUsername = `duplicate-user-${uuidv4()}`;
+
+      // Create first actor successfully
+      const firstDto: CreateActorDto = {
+        type: ActorType.Rider,
+        email: `first-${uuidv4()}@example.com`,
+        username: sharedUsername,
+        password: 'password-for-test',
+        workspaceId,
+        roles: [],
+        linkedWallets: [],
+      };
+
+      await controller.create(firstDto);
+
+      // Attempt to create second actor with same username
+      const secondDto: CreateActorDto = {
+        type: ActorType.Rider,
+        email: `second-${uuidv4()}@example.com`,
+        username: sharedUsername,
+        password: 'password-for-test',
+        workspaceId,
+        roles: [],
+        linkedWallets: [],
+      };
+
+      await expect(controller.create(secondDto)).rejects.toThrow(ConflictException);
+      await expect(controller.create(secondDto)).rejects.toThrow(/username/i);
+    });
+
+    it('should allow creating actors with unique email and username', async () => {
+      const { workspaceId } = await createPrerequisites();
+
+      // Create first actor
+      const firstDto: CreateActorDto = {
+        type: ActorType.Rider,
+        email: `unique1-${uuidv4()}@example.com`,
+        username: `unique1-user-${uuidv4()}`,
+        password: 'password-for-test',
+        workspaceId,
+        roles: [],
+        linkedWallets: [],
+      };
+
+      const firstResult = await controller.create(firstDto);
+      expect(firstResult.actorId).toBeDefined();
+
+      // Create second actor with different email and username
+      const secondDto: CreateActorDto = {
+        type: ActorType.Rider,
+        email: `unique2-${uuidv4()}@example.com`,
+        username: `unique2-user-${uuidv4()}`,
+        password: 'password-for-test',
+        workspaceId,
+        roles: [],
+        linkedWallets: [],
+      };
+
+      const secondResult = await controller.create(secondDto);
+      expect(secondResult.actorId).toBeDefined();
+      expect(secondResult.actorId).not.toBe(firstResult.actorId);
     });
   });
 });

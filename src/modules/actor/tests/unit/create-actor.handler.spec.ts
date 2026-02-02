@@ -22,6 +22,9 @@ describe('CreateActorCommandHandler', () => {
 
   const validCommand = new CreateActorCommand({
     type: ActorType.Internal,
+    email: 'test-actor@example.com',
+    username: 'test-actor-user',
+    passwordHash: 'hashed-password-for-test',
     workspaceId: '123e4567-e89b-12d3-a456-426614174001',
     roles: ['role-1-uuid'],
     linkedWallets: ['wallet-uuid-123'],
