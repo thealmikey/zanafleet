@@ -17,6 +17,8 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  keycloakInitialized: boolean;
+  keycloakAuthenticated: boolean;
 }
 
 /**
@@ -34,4 +36,18 @@ export interface LoginResponse {
   user: User;
   token: string;
   expiresAt: string;
+}
+
+/**
+ * Request payload for Keycloak token exchange
+ */
+export interface KeycloakTokenExchangeRequest {
+  accessToken: string;
+}
+
+/**
+ * Authentication method type
+ */
+export interface AuthMethod {
+  type: 'credentials' | 'keycloak';
 }

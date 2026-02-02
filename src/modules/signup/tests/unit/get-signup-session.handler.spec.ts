@@ -36,7 +36,7 @@ describe('GetSignUpSessionQueryHandler', () => {
 
   it('should return session data when session exists', async () => {
     const sessionId = uuidv4();
-    const workspaceId = uuidv4();
+    const workspaceIds = [uuidv4()];
     const now = new Date();
     const expiresAt = new Date(Date.now() + 86400000);
 
@@ -44,7 +44,7 @@ describe('GetSignUpSessionQueryHandler', () => {
       id: sessionId,
       status: SignUpSessionStatus.PARTIAL,
       actorType: ActorType.Rider,
-      workspaceId,
+      workspaceIds,
       roles: ['Rider'],
       linkedWallets: [],
       idempotencyKey: null,
@@ -56,7 +56,7 @@ describe('GetSignUpSessionQueryHandler', () => {
         sessionId,
         status: SignUpSessionStatus.PARTIAL,
         actorType: ActorType.Rider,
-        workspaceId,
+        workspaceIds,
         roles: ['Rider'],
         linkedWallets: [],
         idempotencyKey: null,
@@ -75,7 +75,7 @@ describe('GetSignUpSessionQueryHandler', () => {
     expect(result.sessionId).toBe(sessionId);
     expect(result.status).toBe(SignUpSessionStatus.PARTIAL);
     expect(result.actorType).toBe(ActorType.Rider);
-    expect(result.workspaceId).toBe(workspaceId);
+    expect(result.workspaceIds).toEqual(workspaceIds);
     expect(mockRepository.findOne).toHaveBeenCalledWith({
       where: { id: sessionId },
     });

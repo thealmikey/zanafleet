@@ -24,6 +24,15 @@ export enum SignUpSessionStatus {
 }
 
 /**
+ * Workspace reference type for workspace selection
+ */
+export interface Workspace {
+  workspaceId: string;
+  name: string;
+  type: string;
+}
+
+/**
  * Request payload for initiating a new sign-up session
  * Mirrors backend: InitiateSignUpDto
  */
@@ -46,7 +55,7 @@ export interface InitiateSignupResponse {
  */
 export interface UpdateStepRequest {
   stepName?: string;
-  workspaceId?: string;
+  workspaceIds?: string[];
   roles?: string[];
   linkedWallets?: string[];
   idempotencyKey?: string;
@@ -69,7 +78,7 @@ export interface SignupSession {
   sessionId: string;
   status: SignUpSessionStatus;
   actorType: ActorType;
-  workspaceId?: string | null;
+  workspaceIds: string[];
   roles: string[];
   linkedWallets: string[];
   completedSteps: string[];

@@ -50,8 +50,8 @@ export function ReviewStep({ onComplete }: ReviewStepProps): React.ReactElement 
     },
     {
       label: 'Workspace ID',
-      value: formData.workspaceId,
-      isFilled: formData.workspaceId !== null && formData.workspaceId.trim() !== '',
+      value: formData.workspaceIds.length > 0 ? formData.workspaceIds[0] : null,
+      isFilled: formData.workspaceIds.length > 0 && formData.workspaceIds[0]?.trim() !== '',
       isRequired: true,
       icon: <WorkspacesIcon />,
     },

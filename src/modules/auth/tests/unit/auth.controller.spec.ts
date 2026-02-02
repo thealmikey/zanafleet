@@ -9,12 +9,15 @@ jest.mock(
 );
 
 import { BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { CommandBus } from '@nestjs/cqrs';
+import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { v4 as uuidv4 } from 'uuid';
 
 import { ActorType } from '../../../actor/dto/actor.enums';
 import { AuthController } from '../../controllers/auth.controller';
+import { KeycloakUserSyncService } from '../../services/keycloak-user-sync.service';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -24,6 +27,20 @@ describe('AuthController', () => {
     execute: jest.fn(),
   };
 
+  const mockKeycloakUserSyncService = {
+    syncUser: jest.fn(),
+    isKeycloakToken: jest.fn(),
+  };
+
+  const mockJwtService = {
+    sign: jest.fn().mockReturnValue('mock-jwt-token'),
+    verify: jest.fn(),
+  };
+
+  const mockConfigService = {
+    get: jest.fn().mockReturnValue('1h'),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
@@ -31,6 +48,18 @@ describe('AuthController', () => {
         {
           provide: CommandBus,
           useValue: mockCommandBus,
+        },
+        {
+          provide: KeycloakUserSyncService,
+          useValue: mockKeycloakUserSyncService,
+        },
+        {
+          provide: JwtService,
+          useValue: mockJwtService,
+        },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
         },
       ],
     }).compile();

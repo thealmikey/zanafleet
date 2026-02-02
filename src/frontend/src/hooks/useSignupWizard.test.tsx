@@ -54,7 +54,7 @@ describe('useSignupWizard', () => {
       expect(result.current.currentStep).toBe(0);
       expect(result.current.formData).toEqual({
         actorType: null,
-        workspaceId: null,
+        workspaceIds: [],
         roles: [],
         linkedWallets: [],
       });
@@ -148,14 +148,14 @@ describe('useSignupWizard', () => {
       expect(result.current.formData.actorType).toBe(ActorType.Rider);
     });
 
-    it('should update workspaceId', () => {
+    it('should update workspaceIds', () => {
       const { result } = renderHook(() => useSignupWizard(), { wrapper });
 
       act(() => {
-        result.current.updateField('workspaceId', 'workspace-123');
+        result.current.updateField('workspaceIds', ['workspace-123']);
       });
 
-      expect(result.current.formData.workspaceId).toBe('workspace-123');
+      expect(result.current.formData.workspaceIds).toEqual(['workspace-123']);
     });
 
     it('should update roles array', () => {
@@ -183,13 +183,13 @@ describe('useSignupWizard', () => {
 
       act(() => {
         result.current.updateField('actorType', ActorType.Business);
-        result.current.updateField('workspaceId', 'ws-1');
+        result.current.updateField('workspaceIds', ['ws-1']);
         result.current.updateField('roles', ['Role1']);
       });
 
       expect(result.current.formData).toEqual({
         actorType: ActorType.Business,
-        workspaceId: 'ws-1',
+        workspaceIds: ['ws-1'],
         roles: ['Role1'],
         linkedWallets: [],
       });
@@ -294,7 +294,7 @@ describe('useSignupWizard', () => {
 
       expect(mockUpdateStep).toHaveBeenCalledWith('session-123', {
         stepName: 'account-type',
-        workspaceId: undefined,
+        workspaceIds: undefined,
         roles: undefined,
         linkedWallets: undefined,
       });
@@ -316,7 +316,7 @@ describe('useSignupWizard', () => {
 
       await act(async () => {
         await result.current.initSession(ActorType.Rider);
-        result.current.updateField('workspaceId', 'ws-456');
+        result.current.updateField('workspaceIds', ['ws-456']);
         result.current.updateField('roles', ['Manager']);
         result.current.goToStep(1);
       });
@@ -327,7 +327,7 @@ describe('useSignupWizard', () => {
 
       expect(mockUpdateStep).toHaveBeenCalledWith('session-123', {
         stepName: 'workspace',
-        workspaceId: 'ws-456',
+        workspaceIds: ['ws-456'],
         roles: ['Manager'],
         linkedWallets: undefined,
       });
@@ -386,7 +386,7 @@ describe('useSignupWizard', () => {
 
       await act(async () => {
         await result.current.initSession(ActorType.Rider);
-        result.current.updateField('workspaceId', 'ws-1');
+        result.current.updateField('workspaceIds', ['ws-1']);
         result.current.nextStep();
       });
 
@@ -412,7 +412,7 @@ describe('useSignupWizard', () => {
         sessionId: 'stored-session-id',
         status: SignUpSessionStatus.PARTIAL,
         actorType: ActorType.Business,
-        workspaceId: 'recovered-ws',
+        workspaceIds: ['recovered-ws'],
         roles: ['Admin'],
         linkedWallets: ['0xabc'],
         completedSteps: ['account-type', 'workspace'],
@@ -428,7 +428,7 @@ describe('useSignupWizard', () => {
       });
 
       expect(result.current.formData.actorType).toBe(ActorType.Business);
-      expect(result.current.formData.workspaceId).toBe('recovered-ws');
+      expect(result.current.formData.workspaceIds).toEqual(['recovered-ws']);
       expect(result.current.formData.roles).toEqual(['Admin']);
       expect(result.current.formData.linkedWallets).toEqual(['0xabc']);
       expect(result.current.completedSteps).toEqual(['account-type', 'workspace']);

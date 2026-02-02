@@ -20,20 +20,23 @@ export function WorkspaceStep(): React.ReactElement {
   const { formData, updateField, isLoading } = useSignupWizard();
   const [touched, setTouched] = useState(false);
 
+  const currentWorkspaceId = formData.workspaceIds[0] ?? '';
+
   const validationError = useMemo((): string | null => {
     if (!touched) return null;
-    if (!formData.workspaceId || formData.workspaceId.trim() === '') {
+    if (formData.workspaceIds.length === 0 || formData.workspaceIds[0]?.trim() === '') {
       return 'Workspace ID is required';
     }
-    if (!isValidUuid(formData.workspaceId)) {
+    if (!isValidUuid(formData.workspaceIds[0])) {
       return 'Please enter a valid UUID format (e.g., 123e4567-e89b-12d3-a456-426614174000)';
     }
     return null;
-  }, [formData.workspaceId, touched]);
+  }, [formData.workspaceIds, touched]);
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>): void => {
-      updateField('workspaceId', event.target.value || null);
+      const value = event.target.value;
+      updateField('workspaceIds', value ? [value] : []);
     },
     [updateField],
   );
@@ -57,7 +60,7 @@ export function WorkspaceStep(): React.ReactElement {
         </FormLabel>
         <TextField
           name="workspaceId"
-          value={formData.workspaceId ?? ''}
+          value={currentWorkspaceId}
           onChange={handleChange}
           onBlur={handleBlur}
           placeholder="123e4567-e89b-12d3-a456-426614174000"

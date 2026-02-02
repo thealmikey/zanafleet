@@ -56,6 +56,7 @@ export class InitiateSignUpCommandHandler implements ICommandHandler<InitiateSig
         sessionId,
         status: SignUpSessionStatus.INITIATED,
         actorType: command.actorType,
+        workspaceIds: [],
         idempotencyKey: command.idempotencyKey,
         roles: [],
         linkedWallets: [],

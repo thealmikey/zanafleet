@@ -7,6 +7,7 @@ export {
   type UpdateStepResponse,
   type SignupSession,
   type FinalizeSignupResponse,
+  type Workspace,
 } from './signup.types';
 
 export type { User, AuthState, LoginRequest, LoginResponse } from './auth.types';

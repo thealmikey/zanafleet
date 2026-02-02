@@ -6,6 +6,7 @@ import { z } from 'zod';
  */
 export const LoginCommandSchema = z.object({
   identifier: z.string().min(1, 'Identifier is required'),
+  password: z.string().optional(),
 });
 
 /**
@@ -18,12 +19,15 @@ export type LoginCommandInput = z.infer<typeof LoginCommandSchema>;
  * LoginCommand
  *
  * Command representing the intent to log in.
+ * Supports both identifier-only (Keycloak) and identifier+password (local) authentication.
  */
 export class LoginCommand {
   readonly identifier: string;
+  readonly password?: string;
 
   constructor(input: LoginCommandInput) {
     this.identifier = input.identifier;
+    this.password = input.password;
   }
 
   /**
