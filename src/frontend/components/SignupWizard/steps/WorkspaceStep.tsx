@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Autocomplete,
   Box,
-  Chip,
   CircularProgress,
   FormControl,
   FormHelperText,
@@ -51,21 +50,22 @@ export function WorkspaceStep(): React.ReactElement {
     void fetchWorkspaces();
   }, [formData.actorType]);
 
-  const selectedWorkspaces = useMemo((): Workspace[] => {
-    return workspaces.filter((ws) => formData.workspaceIds.includes(ws.workspaceId));
+  const selectedWorkspace = useMemo((): Workspace | null => {
+    if (formData.workspaceIds.length === 0) return null;
+    return workspaces.find((ws) => ws.workspaceId === formData.workspaceIds[0]) ?? null;
   }, [workspaces, formData.workspaceIds]);
 
   const validationError = useMemo((): string | null => {
     if (!touched) return null;
     if (workspaces.length > 0 && formData.workspaceIds.length === 0) {
-      return 'Please select at least one workspace';
+      return 'Please select a workspace';
     }
     return null;
   }, [touched, workspaces.length, formData.workspaceIds.length]);
 
   const handleChange = useCallback(
-    (_event: React.SyntheticEvent, newValue: Workspace[]): void => {
-      const selectedIds = newValue.map((ws) => ws.workspaceId);
+    (_event: React.SyntheticEvent, newValue: Workspace | null): void => {
+      const selectedIds = newValue ? [newValue.workspaceId] : [];
       updateField('workspaceIds', selectedIds);
     },
     [updateField],
@@ -83,7 +83,7 @@ export function WorkspaceStep(): React.ReactElement {
         Workspace Configuration
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Select the workspaces to associate with your account. You can join multiple workspaces.
+        Select the workspace to associate with your account.
       </Typography>
 
       {fetchError && (
@@ -100,33 +100,24 @@ export function WorkspaceStep(): React.ReactElement {
       ) : (
         <FormControl fullWidth required error={!!validationError}>
           <FormLabel sx={{ mb: 1 }}>
-            Workspaces{' '}
+            Workspace{' '}
             <Typography component="span" color="error">
               *
             </Typography>
           </FormLabel>
           <Autocomplete
-            multiple
             options={workspaces}
             getOptionLabel={(option) => option.name}
-            value={selectedWorkspaces}
+            value={selectedWorkspace}
             onChange={handleChange}
             onBlur={handleBlur}
             loading={loading}
             disabled={isLoading || loading}
             isOptionEqualToValue={(option, value) => option.workspaceId === value.workspaceId}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => {
-                const { key, ...tagProps } = getTagProps({ index });
-                return (
-                  <Chip key={key} label={option.name} variant="outlined" {...tagProps} />
-                );
-              })
-            }
             renderInput={(params) => (
               <TextField
                 {...params}
-                placeholder={loading ? 'Loading workspaces...' : 'Select workspaces'}
+                placeholder={loading ? 'Loading workspaces...' : 'Select a workspace'}
                 error={!!validationError}
                 InputProps={{
                   ...params.InputProps,
@@ -148,8 +139,8 @@ export function WorkspaceStep(): React.ReactElement {
           )}
 
           <FormHelperText sx={{ mt: 1, ml: 0 }}>
-            Select the workspaces you want to join. Contact your administrator if you need access to
-            additional workspaces.
+            Select the workspace you want to join. Contact your administrator if you need access to
+            a different workspace.
           </FormHelperText>
         </FormControl>
       )}
