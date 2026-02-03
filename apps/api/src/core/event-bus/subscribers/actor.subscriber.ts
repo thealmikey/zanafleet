@@ -44,7 +44,7 @@ export class ActorSubscriber {
       if (data.eventType === 'ActorOnboardedEvent-V1') {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         const event: ActorOnboardedEventV1 = ActorOnboardedEventV1.fromJSON(
-          data as unknown as Record<string, unknown>
+          data as unknown as Parameters<typeof ActorOnboardedEventV1.fromJSON>[0]
         );
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         await this.projection.handle(event);
