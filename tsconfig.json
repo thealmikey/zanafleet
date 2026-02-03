@@ -30,14 +30,13 @@
       "jest"
     ],
     "paths": {
-      "src/*": [
+      "@api/*": [
         "apps/api/src/*"
       ]
     }
   },
   "include": [
-    "apps/api/src/**/*",
-    "apps/api/test/**/*"
+    "apps/**/*"
   ],
   "exclude": [
     "node_modules",
