@@ -106,6 +106,24 @@ export enum SignUpSessionStatus {
   Expired = 'EXPIRED',
 }
 
+export enum VehicleType {
+  Bike = 'Bike',
+  Car = 'Car',
+  TukTuk = 'TukTuk',
+  Pickup = 'Pickup',
+  Lorry = 'Lorry',
+  Van = 'Van',
+}
+
+export enum BusinessType {
+  Retail = 'Retail',
+  Restaurant = 'Restaurant',
+  Logistics = 'Logistics',
+  Wholesale = 'Wholesale',
+  Services = 'Services',
+  Other = 'Other',
+}
+
 // ============================================================================
 // Placeholder DTOs (to be expanded as modules migrate)
 // ============================================================================
