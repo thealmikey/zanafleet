@@ -7,13 +7,16 @@ import { EventBusModule } from './core/event-bus';
 import { Neo4jModule } from './core/neo4j';
 import { ActorModule } from './modules/actor/actor.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { BusinessModule } from './modules/business/business.module';
 import { CapabilityModule } from './modules/capability/capability.module';
 import { CommitmentsModule } from './modules/commitments/commitments.module';
 import { EvidenceModule } from './modules/evidence/evidence.module';
 import { FormationModule } from './modules/formation/formation.module';
 import { OrganizationModule } from './modules/organization/organization.module';
 import { PersonaModule } from './modules/persona/persona.module';
+import { RiderModule } from './modules/rider/rider.module';
 import { RoleModule } from './modules/role/role.module';
+import { SaccoModule } from './modules/sacco/sacco.module';
 import { SignUpModule } from './modules/signup/signup.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { WalletModule } from './modules/wallet/wallet.module';
@@ -46,13 +49,16 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     }),
     ActorModule,
     AuthModule,
+    BusinessModule,
     CapabilityModule,
     CommitmentsModule,
     EvidenceModule,
     FormationModule,
     OrganizationModule,
     PersonaModule,
+    RiderModule,
     RoleModule,
+    SaccoModule,
     SignUpModule,
     TransactionModule,
     WalletModule,
