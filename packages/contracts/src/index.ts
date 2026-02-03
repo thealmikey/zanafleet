@@ -151,3 +151,72 @@ export interface SignUpSessionResponse {
   createdAt: Date;
   updatedAt: Date;
 }
+
+// ============================================================================
+// Sacco Contracts
+// ============================================================================
+
+export interface CreateSaccoInput {
+  name: string;
+  location: string;
+  contactPhone: string;
+}
+
+export interface SaccoResponse {
+  saccoId: string;
+  name: string;
+  location: string;
+  contactPhone: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============================================================================
+// Rider Contracts
+// ============================================================================
+
+export interface CreateRiderInput {
+  fullName: string;
+  nationalId: string;
+  phone: string;  // Primary identity
+  location: string;
+  vehicleType: VehicleType;
+  saccoId?: string | null;  // Optional
+  email?: string | null;    // Optional
+}
+
+export interface RiderResponse {
+  riderId: string;
+  fullName: string;
+  nationalId: string;
+  phone: string;
+  location: string;
+  vehicleType: VehicleType;
+  saccoId: string | null;
+  email: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============================================================================
+// Business Contracts
+// ============================================================================
+
+export interface CreateBusinessInput {
+  businessName: string;
+  phone: string;  // Primary identity
+  location: string;
+  businessType: BusinessType;
+  email?: string | null;  // Optional
+}
+
+export interface BusinessResponse {
+  businessId: string;
+  businessName: string;
+  phone: string;
+  location: string;
+  businessType: BusinessType;
+  email: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
