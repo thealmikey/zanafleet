@@ -27,7 +27,7 @@
     "<rootDir>/apps/api/src"
   ],
   "moduleNameMapper": {
-    "^src/(.*)$": "<rootDir>/apps/api/src/$1"
+    "^@api/(.*)$": "<rootDir>/apps/api/src/$1"
   },
   "setupFilesAfterEnv": [
     "<rootDir>/apps/api/test/jest-setup.ts"
