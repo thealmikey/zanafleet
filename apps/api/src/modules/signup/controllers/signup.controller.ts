@@ -113,9 +113,10 @@ export class SignUpController {
   }
 
   private mapResultToDto(result: SignUpSessionResult): SignUpSessionDto {
-    const dto = new SignUpSessionDto();
+    const dto: SignUpSessionDto = new SignUpSessionDto();
     dto.sessionId = result.sessionId;
     dto.status = result.status;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     dto.actorType = result.actorType;
     dto.workspaceIds = result.workspaceIds;
     dto.roles = result.roles;

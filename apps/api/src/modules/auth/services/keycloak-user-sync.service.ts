@@ -47,6 +47,7 @@ export class KeycloakUserSyncService {
   private readonly defaultWorkspaceId: string;
 
   constructor(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     @InjectRepository(ActorEntity)
     private readonly actorRepository: Repository<ActorEntity>
   ) {
@@ -62,34 +63,37 @@ export class KeycloakUserSyncService {
    * @returns SyncResult with actor and whether it was newly created
    */
   async syncUser(payload: KeycloakTokenPayload): Promise<SyncResult> {
-    const email = payload.email;
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
+    const email: string | undefined = payload.email;
 
     if (!email) {
       throw new Error('Keycloak token missing email claim');
     }
 
-    let actor = await this.actorRepository.findOne({
+    const existingActor: ActorEntity | null = await this.actorRepository.findOne({
       where: { email },
     });
 
-    if (actor) {
-      actor = await this.updateExistingActor(actor, payload);
-      return { actor, created: false };
+    if (existingActor) {
+      const updatedActor: ActorEntity = await this.updateExistingActor(existingActor, payload);
+      return { actor: updatedActor, created: false };
     }
 
-    actor = await this.createNewActor(email, payload);
-    return { actor, created: true };
+    const newActor: ActorEntity = await this.createNewActor(email, payload);
+    return { actor: newActor, created: true };
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
   }
 
   /**
    * Create a new Actor from Keycloak token data
    */
   private async createNewActor(email: string, payload: KeycloakTokenPayload): Promise<ActorEntity> {
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
     const actorId = uuidv4();
     const username = payload.preferred_username || email.split('@')[0];
     const roles = this.extractRoles(payload);
 
-    const actorData = {
+    const actorData: Partial<ActorEntity> = {
       id: actorId,
       type: ActorType.Rider,
       email,
@@ -100,14 +104,13 @@ export class KeycloakUserSyncService {
       linkedWallets: [],
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const actor = this.actorRepository.create(actorData);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    const savedActor = await this.actorRepository.save(actor);
+    const createdActor = this.actorRepository.create(actorData);
+    const savedActor = await this.actorRepository.save(createdActor);
 
     this.logger.log(`Created new Actor ${actorId} for Keycloak user ${email}`);
 
     return savedActor;
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
   }
 
   /**
@@ -117,17 +120,21 @@ export class KeycloakUserSyncService {
     actor: ActorEntity,
     payload: KeycloakTokenPayload
   ): Promise<ActorEntity> {
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
     const roles = this.extractRoles(payload);
 
-    const rolesChanged = JSON.stringify(actor.roles.sort()) !== JSON.stringify(roles.sort());
+    const currentRoles: string[] = actor.roles;
+    const rolesChanged = JSON.stringify(currentRoles.sort()) !== JSON.stringify(roles.sort());
 
     if (rolesChanged) {
       actor.roles = roles;
       await this.actorRepository.save(actor);
-      this.logger.log(`Updated roles for Actor ${actor.id}`);
+      const actorIdForLog: string = actor.id;
+      this.logger.log(`Updated roles for Actor ${actorIdForLog}`);
     }
 
     return actor;
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
   }
 
   /**

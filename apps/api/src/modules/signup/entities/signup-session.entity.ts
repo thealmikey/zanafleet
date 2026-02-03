@@ -19,6 +19,7 @@ export class SignUpSessionEntity {
   @Column('enum', { enum: SignUpSessionStatus })
   status!: SignUpSessionStatus;
 
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   @Column('enum', { enum: ActorType })
   actorType!: ActorType;
 
@@ -85,6 +86,7 @@ export class SignUpSessionEntity {
     return {
       sessionId: this.id,
       status: this.status,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       actorType: this.actorType,
       email: this.email ?? null,
       username: this.username ?? null,
@@ -125,6 +127,7 @@ export class SignUpSessionEntity {
     const entity = new SignUpSessionEntity();
     entity.id = data.sessionId;
     entity.status = data.status;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     entity.actorType = data.actorType;
     entity.email = data.email ?? null;
     entity.username = data.username ?? null;

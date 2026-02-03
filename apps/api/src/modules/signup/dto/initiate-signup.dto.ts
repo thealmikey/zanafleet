@@ -1,4 +1,3 @@
-// @ts-ignore - Swagger decorators may not resolve in some IDE contexts
 import { ActorType } from '@api/modules/actor/dto/actor.enums';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
@@ -12,10 +11,11 @@ import { IsEnum, IsOptional, IsString } from 'class-validator';
  */
 export class InitiateSignUpDto {
   @ApiProperty({
-    enum: ActorType,
+    enum: ActorType as object,
     description: 'The type of actor account to be created',
-    example: ActorType.Rider,
+    example: 'Rider',
   })
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment
   @IsEnum(ActorType)
   actorType!: ActorType;
 

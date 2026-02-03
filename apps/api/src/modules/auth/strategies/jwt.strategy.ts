@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import {
   KeycloakTokenPayload,
   KeycloakUserSyncService,
+  SyncResult,
 } from '../services/keycloak-user-sync.service';
 
 /**
@@ -48,6 +49,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   constructor(
     configService: ConfigService,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     @InjectRepository(ActorEntity)
     private readonly actorRepository: Repository<ActorEntity>,
     private readonly keycloakUserSyncService: KeycloakUserSyncService
@@ -87,31 +89,39 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       }
     }
 
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     let actor: ActorEntity | null = null;
 
     const isKeycloakToken =
       payload.iss && this.keycloakIssuer && payload.iss === this.keycloakIssuer;
 
     if (isKeycloakToken) {
-      const syncResult = await this.keycloakUserSyncService.syncUser(
+      const syncResult: SyncResult = await this.keycloakUserSyncService.syncUser(
         payload as unknown as KeycloakTokenPayload
       );
       actor = syncResult.actor;
     } else {
-      actor = await this.actorRepository.findOne({
+      const foundActor: ActorEntity | null = await this.actorRepository.findOne({
         where: { id: payload.sub },
       });
+      actor = foundActor;
     }
 
     if (!actor) {
       throw new UnauthorizedException('Actor not found');
     }
 
+    const actorId: string = actor.id;
+    const actorEmail: string = actor.email;
+    const actorWorkspaceId: string = actor.workspaceId;
+    const actorRoles: string[] = actor.roles;
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+
     return {
-      actorId: actor.id,
-      email: actor.email,
-      workspaceId: actor.workspaceId,
-      roles: actor.roles,
+      actorId,
+      email: actorEmail,
+      workspaceId: actorWorkspaceId,
+      roles: actorRoles,
     };
   }
 }

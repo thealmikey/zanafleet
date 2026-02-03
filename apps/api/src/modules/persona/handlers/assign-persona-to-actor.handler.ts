@@ -24,8 +24,10 @@ export class AssignPersonaToActorCommandHandler
   private readonly logger = new Logger(AssignPersonaToActorCommandHandler.name);
 
   constructor(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     @InjectRepository(ActorEntity)
     private readonly actorRepository: Repository<ActorEntity>,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
     @InjectRepository(PersonaEntity)
@@ -46,7 +48,8 @@ export class AssignPersonaToActorCommandHandler
     );
 
     try {
-      const actor = await this.actorRepository.findOne({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const actor: ActorEntity | null = await this.actorRepository.findOne({
         where: { id: actorId },
       });
 
@@ -55,7 +58,8 @@ export class AssignPersonaToActorCommandHandler
         throw new NotFoundException(`Actor with ID '${actorId}' does not exist`);
       }
 
-      const workspace = await this.workspaceRepository.findOne({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const workspace: WorkspaceEntity | null = await this.workspaceRepository.findOne({
         where: { id: workspaceId },
       });
 

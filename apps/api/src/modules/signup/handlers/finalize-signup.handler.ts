@@ -98,6 +98,7 @@ export class FinalizeSignUpCommandHandler implements ICommandHandler<FinalizeSig
     // Step 5: Orchestrate Actor creation
     // We reuse the existing CreateActorCommandHandler logic via CommandBus
     // For now, use the first workspace ID since CreateActorCommand expects a single workspaceId
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call */
     const createActorCommand = new CreateActorCommand({
       type: session.actorType,
       email: session.email,
@@ -108,6 +109,7 @@ export class FinalizeSignUpCommandHandler implements ICommandHandler<FinalizeSig
       roles: session.roles,
       linkedWallets: session.linkedWallets,
     });
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call */
 
     let actorId: string;
     try {

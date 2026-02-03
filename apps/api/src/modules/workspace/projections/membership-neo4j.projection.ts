@@ -24,6 +24,7 @@ import { ActorRemovedFromWorkspaceEventV1 } from '../events/actor-removed-from-w
  * - role: MembershipRole enum value
  * - since: DateTime when membership started
  */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 @EventsHandler(ActorAddedToWorkspaceEventV1, ActorRemovedFromWorkspaceEventV1)
 @Injectable()
 export class MembershipNeo4jProjection
@@ -52,8 +53,15 @@ export class MembershipNeo4jProjection
    * Creates MEMBER_OF relationship using MERGE for idempotency
    */
   private async handleActorAdded(event: ActorAddedToWorkspaceEventV1): Promise<void> {
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    const eventActorId: string = event.actorId;
+    const eventWorkspaceId: string = event.workspaceId;
+    const eventRole: string = event.role;
+    const eventSince: Date = event.since;
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+
     this.logger.log(
-      `Handling ActorAddedToWorkspaceEvent-V1: actor=${event.actorId}, workspace=${event.workspaceId}`
+      `Handling ActorAddedToWorkspaceEvent-V1: actor=${eventActorId}, workspace=${eventWorkspaceId}`
     );
 
     const session = this.neo4j.getWriteSession();
@@ -68,15 +76,15 @@ export class MembershipNeo4jProjection
         RETURN a.id as actorId, ws.id as workspaceId
         `,
         {
-          actorId: event.actorId,
-          workspaceId: event.workspaceId,
-          role: event.role,
-          since: event.since.toISOString(),
+          actorId: eventActorId,
+          workspaceId: eventWorkspaceId,
+          role: eventRole,
+          since: eventSince.toISOString(),
         }
       );
 
       this.logger.debug(
-        `MEMBER_OF relationship created/updated in Neo4j: actor=${event.actorId}, workspace=${event.workspaceId}`
+        `MEMBER_OF relationship created/updated in Neo4j: actor=${eventActorId}, workspace=${eventWorkspaceId}`
       );
     } catch (error) {
       const err = error as Error;
@@ -92,8 +100,13 @@ export class MembershipNeo4jProjection
    * Deletes MEMBER_OF relationship
    */
   private async handleActorRemoved(event: ActorRemovedFromWorkspaceEventV1): Promise<void> {
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+    const eventActorId: string = event.actorId;
+    const eventWorkspaceId: string = event.workspaceId;
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+
     this.logger.log(
-      `Handling ActorRemovedFromWorkspaceEvent-V1: actor=${event.actorId}, workspace=${event.workspaceId}`
+      `Handling ActorRemovedFromWorkspaceEvent-V1: actor=${eventActorId}, workspace=${eventWorkspaceId}`
     );
 
     const session = this.neo4j.getWriteSession();
@@ -105,13 +118,13 @@ export class MembershipNeo4jProjection
         DELETE r
         `,
         {
-          actorId: event.actorId,
-          workspaceId: event.workspaceId,
+          actorId: eventActorId,
+          workspaceId: eventWorkspaceId,
         }
       );
 
       this.logger.debug(
-        `MEMBER_OF relationship deleted from Neo4j: actor=${event.actorId}, workspace=${event.workspaceId}`
+        `MEMBER_OF relationship deleted from Neo4j: actor=${eventActorId}, workspace=${eventWorkspaceId}`
       );
     } catch (error) {
       const err = error as Error;

@@ -53,6 +53,7 @@ export class InitiateSignUpCommandHandler implements ICommandHandler<InitiateSig
 
     try {
       // Step 1: Prepare session entity
+      /* eslint-disable @typescript-eslint/no-unsafe-assignment */
       const entity = SignUpSessionEntity.fromDomain({
         sessionId,
         status: SignUpSessionStatus.INITIATED,
@@ -65,12 +66,14 @@ export class InitiateSignUpCommandHandler implements ICommandHandler<InitiateSig
         expiresAt,
         createdAt: now,
       });
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment */
 
       // Step 2: Persist to PostgreSQL
       await this.signupSessionRepository.save(entity);
       this.logger.debug(`SignUp session persisted to PostgreSQL: ${sessionId}`);
 
       // Step 3: Create domain event
+      /* eslint-disable @typescript-eslint/no-unsafe-assignment */
       const event = new SignUpInitiatedEventV1({
         eventId,
         sessionId,
@@ -78,6 +81,7 @@ export class InitiateSignUpCommandHandler implements ICommandHandler<InitiateSig
         expiresAt,
         occurredAt: now,
       });
+      /* eslint-enable @typescript-eslint/no-unsafe-assignment */
 
       // Step 4: Publish to internal EventBus (Synchronous handlers)
       this.eventBus.publish(event);

@@ -13,6 +13,7 @@ import { validate as isUuid } from 'uuid';
 
 import { LoginCommand } from '../commands/login.command';
 
+/** Result of a successful login operation */
 export interface LoginResult {
   actorId: string;
   workspaceId: string;
@@ -27,12 +28,14 @@ export interface LoginResult {
  * Handles LoginCommand by looking up an Actor by ID or wallet address,
  * optionally verifying password, and generating a JWT token.
  */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-argument
 @CommandHandler(LoginCommand)
 @Injectable()
 export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
   private readonly logger = new Logger(LoginCommandHandler.name);
 
   constructor(
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     @InjectRepository(ActorEntity)
     private readonly actorRepository: Repository<ActorEntity>,
     private readonly jwtService: JwtService,
@@ -47,7 +50,9 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
    * @throws UnauthorizedException if actor not found or credentials invalid
    */
   async execute(command: LoginCommand): Promise<LoginResult> {
-    const { identifier, password } = command;
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
+    const identifier: string = command.identifier;
+    const password: string | undefined = command.password;
 
     this.logger.log(`Attempting login for identifier: ${identifier}`);
 
@@ -55,17 +60,19 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
 
     // 1. Try to find by ID if identifier is a UUID
     if (isUuid(identifier)) {
-      actor = await this.actorRepository.findOne({
+      const foundById: ActorEntity | null = await this.actorRepository.findOne({
         where: { id: identifier },
       });
+      actor = foundById;
     }
 
     // 2. Try to find by linkedWallets if not found by ID
     if (!actor) {
-      actor = await this.actorRepository
+      const foundByWallet: ActorEntity | null = await this.actorRepository
         .createQueryBuilder('actor')
         .where(':identifier = ANY(actor.linkedWallets)', { identifier })
         .getOne();
+      actor = foundByWallet;
     }
 
     if (!actor) {
@@ -74,8 +81,9 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     }
 
     // 3. Verify password if provided and actor has a passwordHash
-    if (password && actor.passwordHash) {
-      const isPasswordValid = await verifyPassword(password, actor.passwordHash);
+    const actorPasswordHash: string | null = actor.passwordHash;
+    if (password && actorPasswordHash) {
+      const isPasswordValid = await verifyPassword(password, actorPasswordHash);
       if (!isPasswordValid) {
         this.logger.warn(`Login failed: Invalid password for actor ${actor.id}`);
         throw new UnauthorizedException('Invalid credentials');
@@ -83,11 +91,15 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     }
 
     // 4. Generate JWT token
+    const actorId: string = actor.id;
+    const actorEmail: string = actor.email;
+    const actorWorkspaceId: string = actor.workspaceId;
+    const actorRoles: string[] = actor.roles || [];
     const payload = {
-      sub: actor.id,
-      email: actor.email,
-      workspaceId: actor.workspaceId,
-      roles: actor.roles || [],
+      sub: actorId,
+      email: actorEmail,
+      workspaceId: actorWorkspaceId,
+      roles: actorRoles,
     };
 
     const token = this.jwtService.sign(payload);
@@ -96,16 +108,21 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     const expiresIn = this.configService.get<string>('auth.jwt.expiresIn') || '1h';
     const expiresAt = new Date(Date.now() + this.parseExpirationTime(expiresIn));
 
-    this.logger.log(`Login successful for actor: ${actor.id}`);
+    this.logger.log(`Login successful for actor: ${actorId}`);
 
     const domain = actor.toDomain();
+    const resultActorId: string = domain.actorId;
+    const resultWorkspaceId: string = domain.workspaceId;
+    const resultType: ActorType = domain.type;
+
     return {
-      actorId: domain.actorId,
-      workspaceId: domain.workspaceId,
-      type: domain.type,
+      actorId: resultActorId,
+      workspaceId: resultWorkspaceId,
+      type: resultType,
       token,
       expiresAt,
     };
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
   }
 
   /**

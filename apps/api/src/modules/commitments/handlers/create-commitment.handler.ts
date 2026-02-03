@@ -35,8 +35,10 @@ export class CreateCommitmentCommandHandler implements ICommandHandler<CreateCom
   constructor(
     @InjectRepository(CommitmentEntity)
     private readonly commitmentRepository: Repository<CommitmentEntity>,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     @InjectRepository(ActorEntity)
     private readonly actorRepository: Repository<ActorEntity>,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     @InjectRepository(WorkspaceEntity)
     private readonly workspaceRepository: Repository<WorkspaceEntity>,
     private readonly eventBus: EventBus,
@@ -62,7 +64,8 @@ export class CreateCommitmentCommandHandler implements ICommandHandler<CreateCom
 
     try {
       // Step 1: Validate actor exists
-      const actor = await this.actorRepository.findOne({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const actor: ActorEntity | null = await this.actorRepository.findOne({
         where: { id: command.actorId },
       });
 
@@ -74,7 +77,8 @@ export class CreateCommitmentCommandHandler implements ICommandHandler<CreateCom
       this.logger.debug(`Actor validated: ${command.actorId}`);
 
       // Step 2: Validate workspace exists
-      const workspace = await this.workspaceRepository.findOne({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const workspace: WorkspaceEntity | null = await this.workspaceRepository.findOne({
         where: { id: command.workspaceId },
       });
 

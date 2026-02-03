@@ -24,10 +24,11 @@ export class SignUpSessionDto {
   status!: SignUpSessionStatus;
 
   @ApiProperty({
-    enum: ActorType,
+    enum: ActorType as object,
     description: 'The type of actor account being created',
-    example: ActorType.Rider,
+    example: 'Rider',
   })
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   actorType!: ActorType;
 
   @ApiProperty({

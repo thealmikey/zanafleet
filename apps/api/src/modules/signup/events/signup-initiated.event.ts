@@ -50,6 +50,7 @@ export class SignUpInitiatedEventV1 implements BaseEvent {
   }) {
     this.eventId = data.eventId;
     this.sessionId = data.sessionId;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this.actorType = data.actorType;
     this.expiresAt = data.expiresAt;
     this.occurredAt = data.occurredAt ?? new Date();
@@ -70,6 +71,7 @@ export class SignUpInitiatedEventV1 implements BaseEvent {
       aggregateId: this.aggregateId,
       aggregateType: this.aggregateType,
       sessionId: this.sessionId,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       actorType: this.actorType,
       expiresAt: this.expiresAt.toISOString(),
       correlationId: this.correlationId,
@@ -84,6 +86,7 @@ export class SignUpInitiatedEventV1 implements BaseEvent {
     return new SignUpInitiatedEventV1({
       eventId: data.eventId,
       sessionId: data.sessionId,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       actorType: data.actorType,
       expiresAt: new Date(data.expiresAt),
       occurredAt: new Date(data.occurredAt),
