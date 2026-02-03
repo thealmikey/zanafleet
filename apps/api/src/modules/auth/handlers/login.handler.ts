@@ -81,7 +81,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     }
 
     // 3. Verify password if provided and actor has a passwordHash
-    const actorPasswordHash: string | null = actor.passwordHash;
+    const actorPasswordHash: string | null | undefined = actor.passwordHash;
     if (password && actorPasswordHash) {
       const isPasswordValid = await verifyPassword(password, actorPasswordHash);
       if (!isPasswordValid) {
