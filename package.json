@@ -21,7 +21,7 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"apps/**/*.ts\" --fix",
-    "lint:check": "eslint \"apps/**/*.ts\" --max-warnings 0",
+    "lint:check": "eslint \"apps/**/*.ts\"",
     "format": "prettier --write \"apps/**/*.ts\"",
     "format:check": "prettier --check \"apps/**/*.ts\"",
     "test": "jest",

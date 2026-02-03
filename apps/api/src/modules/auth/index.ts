@@ -7,6 +7,7 @@
 
 // Config
 export * from './config/auth.config';
+export * from './config/keycloak.config';
 
 // DTOs
 export * from './dto/keycloak-token.dto';
