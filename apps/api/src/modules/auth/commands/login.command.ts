@@ -5,13 +5,8 @@ import { z } from 'zod';
  * Ensures type safety and input validation at command level
  */
 export const LoginCommandSchema = z.object({
-  identifier: z
-    .string()
-    .trim()
-    .min(1, 'Identifier is required'),
-  password: z
-    .string()
-    .optional(),
+  identifier: z.string().trim().min(1, 'Identifier is required'),
+  password: z.string().optional(),
 });
 
 export type LoginCommandInput = z.infer<typeof LoginCommandSchema>;
@@ -23,7 +18,7 @@ export type LoginCommandInput = z.infer<typeof LoginCommandSchema>;
  */
 export class LoginCommand {
   readonly identifier: string;
-  readonly password: string | undefined;
+  readonly password?: string;
 
   constructor(input: LoginCommandInput) {
     this.identifier = input.identifier;
