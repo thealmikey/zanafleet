@@ -10,27 +10,27 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "collectCoverageFrom": [
-    "src/**/*.(t|j)s",
-    "!src/**/*.module.ts",
-    "!src/main.ts",
-    "!src/**/index.ts",
-    "!src/**/*.interface.ts",
-    "!src/**/*.entity.ts",
-    "!src/**/*.event.ts",
-    "!src/**/*.enum.ts",
-    "!src/**/*.dto.ts"
+    "apps/api/src/**/*.(t|j)s",
+    "!apps/api/src/**/*.module.ts",
+    "!apps/api/src/main.ts",
+    "!apps/api/src/**/index.ts",
+    "!apps/api/src/**/*.interface.ts",
+    "!apps/api/src/**/*.entity.ts",
+    "!apps/api/src/**/*.event.ts",
+    "!apps/api/src/**/*.enum.ts",
+    "!apps/api/src/**/*.dto.ts"
   ],
   "coverageDirectory": "coverage",
   "testEnvironment": "node",
   "passWithNoTests": true,
   "roots": [
-    "<rootDir>/src"
+    "<rootDir>/apps/api/src"
   ],
   "moduleNameMapper": {
-    "^src/(.*)$": "<rootDir>/src/$1"
+    "^src/(.*)$": "<rootDir>/apps/api/src/$1"
   },
   "setupFilesAfterEnv": [
-    "<rootDir>/test/jest-setup.ts"
+    "<rootDir>/apps/api/test/jest-setup.ts"
   ],
   "testTimeout": 30000,
   "verbose": true,

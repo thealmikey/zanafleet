@@ -31,18 +31,18 @@
     ],
     "paths": {
       "src/*": [
-        "src/*"
+        "apps/api/src/*"
       ]
     }
   },
   "include": [
-    "src/**/*",
-    "test/**/*"
+    "apps/api/src/**/*",
+    "apps/api/test/**/*"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "coverage",
-    "src/frontend"
+    "apps/web"
   ]
 }
