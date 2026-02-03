@@ -5,6 +5,9 @@
  * Other modules should import from this barrel file
  */
 
+// Config
+export * from './config/auth.config';
+
 // DTOs
 export * from './dto/keycloak-token.dto';
 export * from './dto/login.dto';
