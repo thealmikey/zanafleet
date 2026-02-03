@@ -8,8 +8,8 @@ import { KeycloakConnectModule } from 'nest-keycloak-connect';
 
 import { ActorEntity } from '../actor/entities/actor.entity';
 
-import { authConfig, keycloakConfig } from './config/auth.config';
-import { keycloakConnectOptionsFactory } from './config/keycloak.config';
+import { authConfig } from './config/auth.config';
+import { keycloakConfig, keycloakConnectOptionsFactory } from './config/keycloak.config';
 import { AuthController } from './controllers/auth.controller';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { LoginCommandHandler } from './handlers/login.handler';

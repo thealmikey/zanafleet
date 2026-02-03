@@ -1,5 +1,4 @@
-import { ConfigService } from '@nestjs/config';
-import { registerAs } from '@nestjs/config';
+import { ConfigService, registerAs } from '@nestjs/config';
 import {
   KeycloakConnectOptions,
   PolicyEnforcementMode,
