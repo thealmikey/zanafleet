@@ -13,10 +13,12 @@
     "prebuild": "npm run clean"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "uuid": "^9.0.0",
     "zod": "^3.22.0"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/uuid": "^9.0.0",
     "rimraf": "^5.0.0",
     "typescript": "^5.1.3"

@@ -192,3 +192,9 @@ export class ConflictError extends DomainError {
     Object.setPrototypeOf(this, ConflictError.prototype);
   }
 }
+
+// ============================================================================
+// Password Utilities
+// ============================================================================
+
+export { hashPassword, verifyPassword } from './password.util';

@@ -5,8 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { validate as isUuid } from 'uuid';
-
-import { verifyPassword } from '../../../core/utils/password.util';
+import { verifyPassword } from '@zanafleet/utils';
 import { ActorType } from '../../actor/dto/actor.enums';
 import { ActorEntity } from '../../actor/entities/actor.entity';
 import { LoginCommand } from '../commands/login.command';

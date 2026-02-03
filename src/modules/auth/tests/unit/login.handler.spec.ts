@@ -1,4 +1,4 @@
-jest.mock('../../../../core/utils/password.util', () => ({
+jest.mock('@zanafleet/utils', () => ({
   verifyPassword: jest.fn(),
 }));
 
@@ -8,8 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
-
-import { verifyPassword } from '../../../../core/utils/password.util';
+import { verifyPassword } from '@zanafleet/utils';
 import { ActorType } from '../../../actor/dto/actor.enums';
 import { ActorEntity } from '../../../actor/entities/actor.entity';
 import { LoginCommand } from '../../commands/login.command';
