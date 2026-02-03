@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "ZanaFleet React frontend with MUI",
   "private": true,
+  "proxy": "http://localhost:3000",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
