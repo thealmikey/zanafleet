@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2020",
+    "lib": ["ES2020"],
+    "baseUrl": ".",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "@zanafleet/contracts": ["packages/contracts/src"],
+      "@zanafleet/contracts/*": ["packages/contracts/src/*"],
+      "@zanafleet/domain": ["packages/domain/src"],
+      "@zanafleet/domain/*": ["packages/domain/src/*"],
+      "@zanafleet/utils": ["packages/utils/src"],
+      "@zanafleet/utils/*": ["packages/utils/src/*"],
+      "@api/*": ["apps/api/src/*"]
+    }
+  }
+}

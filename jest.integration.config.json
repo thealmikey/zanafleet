@@ -27,7 +27,13 @@
     "<rootDir>/apps/api/src"
   ],
   "moduleNameMapper": {
-    "^@api/(.*)$": "<rootDir>/apps/api/src/$1"
+    "^@api/(.*)$": "<rootDir>/apps/api/src/$1",
+    "^@zanafleet/contracts$": "<rootDir>/packages/contracts/src",
+    "^@zanafleet/contracts/(.*)$": "<rootDir>/packages/contracts/src/$1",
+    "^@zanafleet/domain$": "<rootDir>/packages/domain/src",
+    "^@zanafleet/domain/(.*)$": "<rootDir>/packages/domain/src/$1",
+    "^@zanafleet/utils$": "<rootDir>/packages/utils/src",
+    "^@zanafleet/utils/(.*)$": "<rootDir>/packages/utils/src/$1"
   },
   "setupFilesAfterEnv": [
     "<rootDir>/apps/api/test/jest-setup.ts"
