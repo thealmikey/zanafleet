@@ -1,9 +1,9 @@
-import { ActorEntity } from '@api/modules/actor/entities/actor.entity';
-import { OrganizationEntity } from '@api/modules/organization/entities/organization.entity';
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { ActorEntity } from '../actor/entities/actor.entity';
+import { OrganizationEntity } from '../organization/entities/organization.entity';
 
 import { WorkspaceController } from './controllers/workspace.controller';
 import { MembershipEntity } from './entities/membership.entity';
