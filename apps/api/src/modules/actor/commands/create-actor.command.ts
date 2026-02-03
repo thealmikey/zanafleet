@@ -18,6 +18,10 @@ export const CreateActorCommandSchema = z.object({
       message: `Actor type must be one of: ${Object.values(ActorType).join(', ')}`,
     }),
   }),
+  passwordHash: z.string().optional(),
+  location: z.string().trim().nullable().optional(),
+  roles: z.array(z.string()).optional(),
+  linkedWallets: z.array(z.string()).optional(),
   workspaceId: z.string().uuid('Workspace ID must be a valid UUID').nullable().optional(),
 });
 
@@ -32,12 +36,20 @@ export class CreateActorCommand {
   readonly email: string;
   readonly username: string;
   readonly type: ActorType;
+  readonly passwordHash?: string;
+  readonly location: string | null;
+  readonly roles: string[];
+  readonly linkedWallets: string[];
   readonly workspaceId: string | null;
 
   constructor(input: CreateActorCommandInput) {
     this.email = input.email;
     this.username = input.username;
     this.type = input.type;
+    this.passwordHash = input.passwordHash;
+    this.location = input.location ?? null;
+    this.roles = input.roles ?? [];
+    this.linkedWallets = input.linkedWallets ?? [];
     this.workspaceId = input.workspaceId ?? null;
   }
 
