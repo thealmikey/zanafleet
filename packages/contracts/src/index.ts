@@ -62,6 +62,12 @@ export enum ActorType {
   Driver = 'Driver',
   Admin = 'Admin',
   Support = 'Support',
+  HUMAN = 'HUMAN',
+  SaccoAdmin = 'SaccoAdmin',
+  Business = 'Business',
+  BusinessOwner = 'BusinessOwner',
+  Internal = 'Internal',
+  AIService = 'AIService',
 }
 
 export enum RoleScope {
