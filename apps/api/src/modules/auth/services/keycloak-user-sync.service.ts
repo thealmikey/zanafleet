@@ -1,10 +1,10 @@
+import { ActorType } from '@api/modules/actor/dto/actor.enums';
+import { ActorEntity } from '@api/modules/actor/entities/actor.entity';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ActorType } from '@api/modules/actor/dto/actor.enums';
-import { ActorEntity } from '@api/modules/actor/entities/actor.entity';
 
 /**
  * Keycloak token payload structure

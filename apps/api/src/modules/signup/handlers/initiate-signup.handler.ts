@@ -1,10 +1,10 @@
+import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 import { Logger, Optional, Injectable } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 
 import { InitiateSignUpCommand } from '../commands/initiate-signup.command';
 import { SignUpSessionStatus } from '../dto/signup.enums';

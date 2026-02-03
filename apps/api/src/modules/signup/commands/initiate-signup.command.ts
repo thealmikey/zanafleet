@@ -1,6 +1,6 @@
+import { ActorType } from '@api/modules/actor/dto/actor.enums';
 import { z } from 'zod';
 
-import { ActorType } from '@api/modules/actor/dto/actor.enums';
 
 /**
  * InitiateSignUpCommandSchema

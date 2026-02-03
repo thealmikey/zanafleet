@@ -1,7 +1,7 @@
+import { Neo4jService } from '@api/core/neo4j';
 import { Injectable, Logger } from '@nestjs/common';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 
-import { Neo4jService } from '@api/core/neo4j';
 
 import { ActorAddedToWorkspaceEventV1 } from '../events/actor-added-to-workspace.event';
 import { ActorRemovedFromWorkspaceEventV1 } from '../events/actor-removed-from-workspace.event';

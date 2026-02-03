@@ -1,3 +1,5 @@
+import { EventBusService, NatsSubjects } from '@api/core/event-bus';
+import { CreateActorCommand } from '@api/modules/actor/commands/create-actor.command';
 import {
   Logger,
   Optional,
@@ -10,8 +12,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService, NatsSubjects } from '@api/core/event-bus';
-import { CreateActorCommand } from '@api/modules/actor/commands/create-actor.command';
 
 import { FinalizeSignUpCommand } from '../commands/finalize-signup.command';
 import { SignUpSessionStatus } from '../dto/signup.enums';

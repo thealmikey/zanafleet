@@ -1,3 +1,4 @@
+import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 import {
   Logger,
   Optional,
@@ -7,12 +8,11 @@ import {
 } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
+import { hashPassword } from '@zanafleet/utils';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { hashPassword } from '@zanafleet/utils';
 
-import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 
 import { UpdateSignUpStepCommand } from '../commands/update-signup-step.command';
 import { SignUpSessionStatus } from '../dto/signup.enums';

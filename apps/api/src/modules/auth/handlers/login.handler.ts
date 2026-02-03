@@ -1,15 +1,15 @@
+import { ActorType } from '@api/modules/actor/dto/actor.enums';
+import { ActorEntity } from '@api/modules/actor/entities/actor.entity';
 import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import { verifyPassword } from '@zanafleet/utils';
 import { Repository } from 'typeorm';
 import { validate as isUuid } from 'uuid';
 
-import { verifyPassword } from '@zanafleet/utils';
 
-import { ActorType } from '@api/modules/actor/dto/actor.enums';
-import { ActorEntity } from '@api/modules/actor/entities/actor.entity';
 
 import { LoginCommand } from '../commands/login.command';
 

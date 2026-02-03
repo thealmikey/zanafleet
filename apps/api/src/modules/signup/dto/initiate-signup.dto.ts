@@ -1,8 +1,8 @@
 // @ts-ignore - Swagger decorators may not resolve in some IDE contexts
+import { ActorType } from '@api/modules/actor/dto/actor.enums';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
-import { ActorType } from '@api/modules/actor/dto/actor.enums';
 
 /**
  * InitiateSignUpDto
