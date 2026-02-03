@@ -42,6 +42,18 @@ export class ActorEntity {
   @Column('uuid', { nullable: true })
   workspaceId!: string | null;
 
+  @Column('varchar', { nullable: true })
+  passwordHash?: string | null;
+
+  @Column('varchar', { nullable: true })
+  location?: string | null;
+
+  @Column('text', { array: true, default: () => "ARRAY[]::text[]" })
+  roles!: string[];
+
+  @Column('text', { array: true, default: () => "ARRAY[]::text[]" })
+  linkedWallets!: string[];
+
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;
 
@@ -57,6 +69,10 @@ export class ActorEntity {
     username: string;
     type: ActorType;
     workspaceId: string | null;
+    passwordHash: string | null;
+    location: string | null;
+    roles: string[];
+    linkedWallets: string[];
     createdAt: Date;
     updatedAt: Date;
   } {
@@ -66,6 +82,10 @@ export class ActorEntity {
       username: this.username,
       type: this.type,
       workspaceId: this.workspaceId,
+      passwordHash: this.passwordHash ?? null,
+      location: this.location ?? null,
+      roles: this.roles,
+      linkedWallets: this.linkedWallets,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
@@ -80,6 +100,10 @@ export class ActorEntity {
     username: string;
     type: ActorType;
     workspaceId: string | null;
+    passwordHash?: string | null;
+    location?: string | null;
+    roles?: string[];
+    linkedWallets?: string[];
     createdAt: Date;
   }): ActorEntity {
     const entity = new ActorEntity();
@@ -88,6 +112,10 @@ export class ActorEntity {
     entity.username = data.username;
     entity.type = data.type;
     entity.workspaceId = data.workspaceId;
+    entity.passwordHash = data.passwordHash ?? null;
+    entity.location = data.location ?? null;
+    entity.roles = data.roles ?? [];
+    entity.linkedWallets = data.linkedWallets ?? [];
     entity.createdAt = data.createdAt;
     return entity;
   }

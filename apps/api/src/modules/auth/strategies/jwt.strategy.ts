@@ -113,7 +113,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
     const actorId: string = actor.id;
     const actorEmail: string = actor.email;
-    const actorWorkspaceId: string = actor.workspaceId;
+    const actorWorkspaceId: string = actor.workspaceId ?? '';
     const actorRoles: string[] = actor.roles;
     /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
 

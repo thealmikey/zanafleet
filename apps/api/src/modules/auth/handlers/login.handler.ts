@@ -93,7 +93,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
     // 4. Generate JWT token
     const actorId: string = actor.id;
     const actorEmail: string = actor.email;
-    const actorWorkspaceId: string = actor.workspaceId;
+    const actorWorkspaceId: string = actor.workspaceId ?? '';
     const actorRoles: string[] = actor.roles || [];
     const payload = {
       sub: actorId,
@@ -112,7 +112,7 @@ export class LoginCommandHandler implements ICommandHandler<LoginCommand> {
 
     const domain = actor.toDomain();
     const resultActorId: string = domain.actorId;
-    const resultWorkspaceId: string = domain.workspaceId;
+    const resultWorkspaceId: string = domain.workspaceId ?? '';
     const resultType: ActorType = domain.type;
 
     return {
