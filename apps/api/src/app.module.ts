@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -22,6 +24,8 @@ import { SignUpModule } from './modules/signup/signup.module';
       database: process.env.DB_NAME || 'zanafleet',
       autoLoadEntities: true,
       synchronize: process.env.NODE_ENV !== 'production',
+      migrations: [path.join(__dirname, '../../../infra/db/migrations/*.{ts,js}')],
+      migrationsRun: process.env.NODE_ENV === 'production',
     }),
     EventBusModule.forRoot({
       isGlobal: true,
