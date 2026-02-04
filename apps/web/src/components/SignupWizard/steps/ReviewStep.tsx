@@ -21,6 +21,9 @@ import PersonIcon from '@mui/icons-material/Person';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import BusinessIcon from '@mui/icons-material/Business';
 import GroupsIcon from '@mui/icons-material/Groups';
+import EmailIcon from '@mui/icons-material/Email';
+import PhoneIcon from '@mui/icons-material/Phone';
+import LockIcon from '@mui/icons-material/Lock';
 
 import { useSignupWizard } from '../../../hooks/useSignupWizard';
 import { ActorType, FinalizeSignupResponse } from '../../../types';
@@ -70,6 +73,27 @@ export function ReviewStep({ onComplete }: ReviewStepProps): React.ReactElement 
       isFilled: formData.location.trim() !== '',
       isRequired: true,
       icon: <LocationOnIcon />,
+    },
+    {
+      label: 'Email',
+      value: formData.email || null,
+      isFilled: formData.email.trim() !== '',
+      isRequired: true,
+      icon: <EmailIcon />,
+    },
+    {
+      label: 'Phone',
+      value: formData.phone || null,
+      isFilled: formData.phone.trim() !== '',
+      isRequired: true,
+      icon: <PhoneIcon />,
+    },
+    {
+      label: 'Password',
+      value: formData.password ? '••••••••' : null,
+      isFilled: formData.password.trim() !== '',
+      isRequired: true,
+      icon: <LockIcon />,
     },
   ];
 
