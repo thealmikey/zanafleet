@@ -16,8 +16,11 @@ import {
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import WorkspacesIcon from '@mui/icons-material/Workspaces';
 import BadgeIcon from '@mui/icons-material/Badge';
+import PersonIcon from '@mui/icons-material/Person';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import BusinessIcon from '@mui/icons-material/Business';
+import GroupsIcon from '@mui/icons-material/Groups';
 
 import { useSignupWizard } from '../../../hooks/useSignupWizard';
 import { ActorType, FinalizeSignupResponse } from '../../../types';
@@ -52,7 +55,7 @@ export function ReviewStep({ onComplete }: ReviewStepProps): React.ReactElement 
       value: formData.fullName || null,
       isFilled: formData.fullName.trim() !== '',
       isRequired: true,
-      icon: <AccountCircleIcon />,
+      icon: <PersonIcon />,
     },
     {
       label: 'National ID',
@@ -66,7 +69,7 @@ export function ReviewStep({ onComplete }: ReviewStepProps): React.ReactElement 
       value: formData.location || null,
       isFilled: formData.location.trim() !== '',
       isRequired: true,
-      icon: <WorkspacesIcon />,
+      icon: <LocationOnIcon />,
     },
   ];
 
@@ -77,7 +80,7 @@ export function ReviewStep({ onComplete }: ReviewStepProps): React.ReactElement 
       value: formData.businessName || null,
       isFilled: formData.businessName.trim() !== '',
       isRequired: true,
-      icon: <WorkspacesIcon />,
+      icon: <BusinessIcon />,
     });
   }
 
@@ -87,7 +90,7 @@ export function ReviewStep({ onComplete }: ReviewStepProps): React.ReactElement 
       value: formData.saccoId || null,
       isFilled: formData.saccoId.trim() !== '',
       isRequired: false,
-      icon: <WorkspacesIcon />,
+      icon: <GroupsIcon />,
     });
   }
 
