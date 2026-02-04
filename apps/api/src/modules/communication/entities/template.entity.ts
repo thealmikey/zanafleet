@@ -48,10 +48,10 @@ export class TemplateEntity {
   variables!: string[];
 
   @Column('int', { default: 1 })
-  version: number = 1;
+  version = 1;
 
   @Column('varchar', { length: 10, default: 'en' })
-  locale: string = 'en';
+  locale = 'en';
 
   @Column('uuid', { nullable: true })
   workspaceId: string | null = null;
@@ -60,7 +60,7 @@ export class TemplateEntity {
   brandingConfig: Record<string, unknown> | null = null;
 
   @Column('boolean', { default: true })
-  isActive: boolean = true;
+  isActive = true;
 
   @CreateDateColumn()
   createdAt!: Date;

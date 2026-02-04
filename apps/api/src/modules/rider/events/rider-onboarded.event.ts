@@ -129,7 +129,7 @@ export class RiderOnboardedEventV1 {
       fullName: data.fullName,
       nationalId: data.nationalId,
       phone: data.phone,
-      location: data.location as LocationData,
+      location: data.location,
       vehicleType: data.vehicleType,
       saccoId: data.saccoId,
       email: data.email,

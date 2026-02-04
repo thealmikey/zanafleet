@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
-import { MessagingService } from './services/messaging.service';
+
 import { EmailProvider } from './providers/email.provider';
-import { SmsProvider } from './providers/sms.provider';
 import { PushProvider } from './providers/push.provider';
+import { SmsProvider } from './providers/sms.provider';
+import { MessagingService } from './services/messaging.service';
 
 @Module({
   providers: [MessagingService, EmailProvider, SmsProvider, PushProvider],

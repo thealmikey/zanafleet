@@ -7,8 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { NotificationChannel } from '../dto/notification.enums';
-import { RecipientType } from '../dto/notification.enums';
+import { NotificationChannel, RecipientType } from '../dto/notification.enums';
 
 /**
  * NotificationPreferenceEntity
@@ -47,7 +46,7 @@ export class NotificationPreferenceEntity {
   channel!: NotificationChannel;
 
   @Column('boolean', { default: true })
-  enabled: boolean = true;
+  enabled = true;
 
   @Column('uuid', { nullable: true })
   workspaceId: string | null = null;

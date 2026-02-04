@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
+
 import { MessagePayload, SendResult } from '../interfaces/message-payload.interface';
 import { EmailProvider } from '../providers/email.provider';
-import { SmsProvider } from '../providers/sms.provider';
 import { PushProvider } from '../providers/push.provider';
+import { SmsProvider } from '../providers/sms.provider';
 
 @Injectable()
 export class MessagingService {
@@ -29,13 +30,14 @@ export class MessagingService {
       case 'push':
         return this.pushProvider.send(message);
 
-      default:
-        const exhaustiveCheck: never = message.channel;
-        this.logger.error(`Unknown channel type: ${exhaustiveCheck}`);
+      default: {
+        const channelStr = String((message as { channel: unknown }).channel);
+        this.logger.error(`Unknown channel type: ${channelStr}`);
         return {
           success: false,
-          error: `Unknown channel type: ${exhaustiveCheck}`,
+          error: `Unknown channel type: ${channelStr}`,
         };
+      }
     }
   }
 }

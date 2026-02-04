@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment */
+import { EventBusService } from '@api/core/event-bus';
 import { ConflictException, Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
+import { LocationData } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService } from '@api/core/event-bus';
-import { LocationData } from '@zanafleet/contracts';
 import { SaccoEntity } from '../../sacco/entities/sacco.entity';
 import { CreateRiderCommand } from '../commands/create-rider.command';
 import { RiderEntity } from '../entities/rider.entity';
@@ -60,7 +60,7 @@ export class CreateRiderCommandHandler implements ICommandHandler<CreateRiderCom
     this.logger.log(`Executing CreateRiderCommand for rider: ${command.phone}`);
 
     // Step 1: Validate Sacco existence and get location if needed
-    let location: LocationData | null = command.location as LocationData | null;
+    let location: LocationData | null = command.location ?? null;
     if (command.saccoId) {
       const sacco = await this.saccoRepository.findOne({
         where: { id: command.saccoId },
@@ -105,13 +105,17 @@ export class CreateRiderCommandHandler implements ICommandHandler<CreateRiderCom
     }
 
     try {
+      if (!location) {
+        this.logger.warn('Location is required but was not resolved');
+        throw new Error('Location is required but was not resolved');
+      }
       // Step 4: Create rider entity
       const entity = RiderEntity.fromDomain({
         riderId,
         fullName: command.fullName,
         nationalId: command.nationalId,
         phone: command.phone,
-        location: location as LocationData,
+        location: location,
         vehicleType: command.vehicleType,
         saccoId: command.saccoId,
         email: command.email,
@@ -129,7 +133,7 @@ export class CreateRiderCommandHandler implements ICommandHandler<CreateRiderCom
         fullName: command.fullName,
         nationalId: command.nationalId,
         phone: command.phone,
-        location: location as LocationData,
+        location: location,
         vehicleType: command.vehicleType,
         saccoId: command.saccoId,
         email: command.email,

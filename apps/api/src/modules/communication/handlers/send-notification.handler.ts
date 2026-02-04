@@ -1,14 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ICommandHandler, CommandHandler, EventBus } from '@nestjs/cqrs';
-import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+
 import { MessagingService } from '../../../core/messaging/services/messaging.service';
 import { SendNotificationCommand } from '../commands/send-notification.command';
-import { NotificationEntity } from '../entities/notification.entity';
 import { NotificationStatus } from '../dto/notification.enums';
-import { NotificationSentEventV1 } from '../events/notification-sent.event';
+import { NotificationEntity } from '../entities/notification.entity';
 import { NotificationFailedEventV1 } from '../events/notification-failed.event';
+import { NotificationSentEventV1 } from '../events/notification-sent.event';
 import { NotificationSkippedEventV1 } from '../events/notification-skipped.event';
 import { PreferenceService } from '../services/preference.service';
 
@@ -142,13 +143,14 @@ export class SendNotificationCommandHandler implements ICommandHandler<SendNotif
 
         this.eventBus.publish(failedEvent);
         this.logger.error(
-          `Notification ${notificationId} failed: ${sendResult.error}`,
+          `Notification ${notificationId} failed: ${sendResult.error ?? 'Unknown error'}`,
         );
       }
 
       return { notificationId };
     } catch (error) {
-      this.logger.error(`Error processing notification command: ${error}`, error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error(`Error processing notification command: ${errorMessage}`, error);
 
       const failedEvent = new NotificationFailedEventV1({
         eventId,

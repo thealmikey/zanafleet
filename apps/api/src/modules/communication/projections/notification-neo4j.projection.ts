@@ -2,10 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { IEventHandler } from '@nestjs/cqrs';
 
 import { Neo4jService } from '../../../core/neo4j/neo4j.service';
-import { NotificationSentEventV1 } from '../events/notification-sent.event';
-import { NotificationFailedEventV1 } from '../events/notification-failed.event';
-import { NotificationSkippedEventV1 } from '../events/notification-skipped.event';
 import { RecipientType } from '../dto/notification.enums';
+import { NotificationFailedEventV1 } from '../events/notification-failed.event';
+import { NotificationSentEventV1 } from '../events/notification-sent.event';
+import { NotificationSkippedEventV1 } from '../events/notification-skipped.event';
 
 /**
  * NotificationNeo4jProjection
@@ -29,18 +29,36 @@ export class NotificationNeo4jProjection
 
   constructor(private readonly neo4j: Neo4jService) {}
 
+  private isSentEvent(
+    event: NotificationSentEventV1 | NotificationFailedEventV1 | NotificationSkippedEventV1,
+  ): event is NotificationSentEventV1 {
+    return event.eventType === 'NotificationSentEvent-V1';
+  }
+
+  private isFailedEvent(
+    event: NotificationSentEventV1 | NotificationFailedEventV1 | NotificationSkippedEventV1,
+  ): event is NotificationFailedEventV1 {
+    return event.eventType === 'NotificationFailedEvent-V1';
+  }
+
+  private isSkippedEvent(
+    event: NotificationSentEventV1 | NotificationFailedEventV1 | NotificationSkippedEventV1,
+  ): event is NotificationSkippedEventV1 {
+    return event.eventType === 'NotificationSkippedEvent-V1';
+  }
+
   /**
    * Route events to appropriate handlers based on event type
    */
   async handle(
     event: NotificationSentEventV1 | NotificationFailedEventV1 | NotificationSkippedEventV1,
   ): Promise<void> {
-    if (event.eventType === 'NotificationSentEvent-V1') {
-      await this.handleNotificationSent(event as NotificationSentEventV1);
-    } else if (event.eventType === 'NotificationFailedEvent-V1') {
-      await this.handleNotificationFailed(event as NotificationFailedEventV1);
-    } else if (event.eventType === 'NotificationSkippedEvent-V1') {
-      await this.handleNotificationSkipped(event as NotificationSkippedEventV1);
+    if (this.isSentEvent(event)) {
+      await this.handleNotificationSent(event);
+    } else if (this.isFailedEvent(event)) {
+      await this.handleNotificationFailed(event);
+    } else if (this.isSkippedEvent(event)) {
+      await this.handleNotificationSkipped(event);
     }
   }
 

@@ -245,4 +245,40 @@ export interface BusinessResponse {
 // Test Account Definitions (Dev/Test Only)
 // ============================================================================
 
+/**
+ * ============================================================================
+ * Order Contracts
+ * ============================================================================
+ */
+
+export enum OrderStatus {
+  Pending = 'Pending',
+  Confirmed = 'Confirmed',
+  Fulfilled = 'Fulfilled',
+  Cancelled = 'Cancelled',
+}
+
+export interface CreateOrderInput {
+  businessId: string;
+  itemSummary?: string;
+  itemMetadata?: Record<string, unknown>;
+  customerName?: string;
+  customerPhone?: string;
+  scheduledTime?: Date;
+}
+
+export interface OrderResponse {
+  orderId: string;
+  businessId: string;
+  deliveryId: string | null;
+  itemSummary: string | null;
+  itemMetadata?: Record<string, unknown> | null;
+  customerName: string | null;
+  customerPhone: string | null;
+  scheduledTime: Date | null;
+  status: OrderStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export * from './test-accounts';

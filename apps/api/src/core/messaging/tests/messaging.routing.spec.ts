@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MessagingService } from '../services/messaging.service';
-import { EmailProvider } from '../providers/email.provider';
-import { SmsProvider } from '../providers/sms.provider';
-import { PushProvider } from '../providers/push.provider';
+
 import { MessagePayload } from '../interfaces/message-payload.interface';
+import { EmailProvider } from '../providers/email.provider';
+import { PushProvider } from '../providers/push.provider';
+import { SmsProvider } from '../providers/sms.provider';
+import { MessagingService } from '../services/messaging.service';
 
 describe('MessagingService - Routing Logic', () => {
   let service: MessagingService;
