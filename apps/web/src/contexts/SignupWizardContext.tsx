@@ -23,9 +23,7 @@ const STORAGE_KEY = 'zanafleet_signup_session_id';
 
 export const WIZARD_STEPS = [
   'account-type',
-  'workspace',
-  'roles',
-  'wallets',
+  'personal-details',
   'review',
 ] as const;
 
@@ -33,9 +31,11 @@ export type WizardStepName = (typeof WIZARD_STEPS)[number];
 
 export interface WizardFormData {
   actorType: ActorType | null;
-  workspaceIds: string[];
-  roles: string[];
-  linkedWallets: string[];
+  fullName: string;
+  nationalId: string;
+  location: string;
+  businessName: string;
+  saccoId: string;
 }
 
 export interface SignupWizardState {
@@ -72,9 +72,11 @@ type Action =
 
 const initialFormData: WizardFormData = {
   actorType: null,
-  workspaceIds: [],
-  roles: [],
-  linkedWallets: [],
+  fullName: '',
+  nationalId: '',
+  location: '',
+  businessName: '',
+  saccoId: '',
 };
 
 const initialState: SignupWizardState = {
@@ -109,9 +111,11 @@ function reducer(state: SignupWizardState, action: Action): SignupWizardState {
         sessionId: action.payload.sessionId,
         formData: {
           actorType: action.payload.actorType,
-          workspaceIds: action.payload.workspaceIds ?? [],
-          roles: action.payload.roles,
-          linkedWallets: action.payload.linkedWallets,
+          fullName: action.payload.fullName ?? '',
+          nationalId: action.payload.nationalId ?? '',
+          location: action.payload.location ?? '',
+          businessName: action.payload.businessName ?? '',
+          saccoId: action.payload.saccoId ?? '',
         },
         completedSteps: action.payload.completedSteps,
         currentStep: Math.max(0, action.payload.completedSteps.length),
@@ -224,9 +228,11 @@ export function SignupWizardProvider({ children }: SignupWizardProviderProps): R
     try {
       const response = await updateStep(state.sessionId, {
         stepName: currentStepName,
-        workspaceIds: state.formData.workspaceIds.length > 0 ? state.formData.workspaceIds : undefined,
-        roles: state.formData.roles.length > 0 ? state.formData.roles : undefined,
-        linkedWallets: state.formData.linkedWallets.length > 0 ? state.formData.linkedWallets : undefined,
+        fullName: state.formData.fullName || undefined,
+        nationalId: state.formData.nationalId || undefined,
+        location: state.formData.location || undefined,
+        businessName: state.formData.businessName || undefined,
+        saccoId: state.formData.saccoId || undefined,
       });
       dispatch({ type: 'SET_COMPLETED_STEPS', payload: response.completedSteps });
     } catch (err) {

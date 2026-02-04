@@ -18,10 +18,9 @@ import WarningIcon from '@mui/icons-material/Warning';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import WorkspacesIcon from '@mui/icons-material/Workspaces';
 import BadgeIcon from '@mui/icons-material/Badge';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 
 import { useSignupWizard } from '../../../hooks/useSignupWizard';
-import { FinalizeSignupResponse } from '../../../types';
+import { ActorType, FinalizeSignupResponse } from '../../../types';
 
 interface FieldSummary {
   label: string;
@@ -49,30 +48,48 @@ export function ReviewStep({ onComplete }: ReviewStepProps): React.ReactElement 
       icon: <AccountCircleIcon />,
     },
     {
-      label: 'Workspace ID',
-      value: formData.workspaceIds.length > 0 ? formData.workspaceIds[0] : null,
-      isFilled: formData.workspaceIds.length > 0 && formData.workspaceIds[0]?.trim() !== '',
+      label: 'Full Name',
+      value: formData.fullName || null,
+      isFilled: formData.fullName.trim() !== '',
       isRequired: true,
-      icon: <WorkspacesIcon />,
+      icon: <AccountCircleIcon />,
     },
     {
-      label: 'Roles',
-      value: formData.roles.length > 0 ? formData.roles.join(', ') : null,
-      isFilled: formData.roles.length > 0,
-      isRequired: false,
+      label: 'National ID',
+      value: formData.nationalId || null,
+      isFilled: formData.nationalId.trim() !== '',
+      isRequired: true,
       icon: <BadgeIcon />,
     },
     {
-      label: 'Linked Wallets',
-      value:
-        formData.linkedWallets.length > 0
-          ? `${formData.linkedWallets.length} wallet(s)`
-          : null,
-      isFilled: formData.linkedWallets.length > 0,
-      isRequired: false,
-      icon: <AccountBalanceWalletIcon />,
+      label: 'Location',
+      value: formData.location || null,
+      isFilled: formData.location.trim() !== '',
+      isRequired: true,
+      icon: <WorkspacesIcon />,
     },
   ];
+
+  // Add conditional fields
+  if (formData.actorType === ActorType.Business || formData.actorType === ActorType.BusinessOwner) {
+    fieldSummaries.push({
+      label: 'Business Name',
+      value: formData.businessName || null,
+      isFilled: formData.businessName.trim() !== '',
+      isRequired: true,
+      icon: <WorkspacesIcon />,
+    });
+  }
+
+  if (formData.actorType === ActorType.Rider) {
+    fieldSummaries.push({
+      label: 'SACCO ID',
+      value: formData.saccoId || null,
+      isFilled: formData.saccoId.trim() !== '',
+      isRequired: false,
+      icon: <WorkspacesIcon />,
+    });
+  }
 
   const missingRequired = fieldSummaries.filter(
     (field) => field.isRequired && !field.isFilled,
@@ -238,28 +255,6 @@ export function ReviewStep({ onComplete }: ReviewStepProps): React.ReactElement 
           ))}
         </List>
       </Paper>
-
-      {formData.linkedWallets.length > 0 && (
-        <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
-          <Typography variant="subtitle2" gutterBottom>
-            Linked Wallet Addresses
-          </Typography>
-          {formData.linkedWallets.map((wallet) => (
-            <Typography
-              key={wallet}
-              variant="caption"
-              sx={{
-                display: 'block',
-                fontFamily: 'monospace',
-                wordBreak: 'break-all',
-                mb: 0.5,
-              }}
-            >
-              {wallet}
-            </Typography>
-          ))}
-        </Paper>
-      )}
 
       <Button
         variant="contained"

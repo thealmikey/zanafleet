@@ -13,15 +13,13 @@ import {
 
 import { useSignupWizard } from '../../hooks/useSignupWizard';
 import { WIZARD_STEPS, WizardStepName } from '../../contexts/SignupWizardContext';
-import { FinalizeSignupResponse } from '../../types';
-import { AccountTypeStep, RolesStep, WalletsStep, ReviewStep, WorkspaceStep } from './steps';
+import { ActorType, FinalizeSignupResponse } from '../../types';
+import { AccountTypeStep, PersonalDetailsStep, ReviewStep } from './steps';
 
 const STEP_LABELS: Record<WizardStepName, string> = {
   'account-type': 'Account Type',
-  workspace: 'Workspace',
-  roles: 'Roles',
-  wallets: 'Wallets',
-  review: 'Review',
+  'personal-details': 'Personal Details',
+  'review': 'Review',
 };
 
 export interface SignupWizardProps {
@@ -47,13 +45,26 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
     switch (stepName) {
       case 'account-type':
         return formData.actorType !== null;
-      case 'workspace':
-        return formData.workspaceIds.length > 0;
-      case 'roles':
-      case 'wallets':
-        return true;
+      case 'personal-details': {
+        const hasRequiredFields =
+          formData.fullName.trim() !== '' &&
+          formData.nationalId.trim() !== '' &&
+          formData.location.trim() !== '';
+
+        // Check conditional fields based on actor type
+        if (formData.actorType === ActorType.Business || formData.actorType === ActorType.BusinessOwner) {
+          return hasRequiredFields && formData.businessName.trim() !== '';
+        }
+        // saccoId is optional for Riders
+        return hasRequiredFields;
+      }
       case 'review':
-        return formData.actorType !== null && formData.workspaceIds.length > 0;
+        return (
+          formData.actorType !== null &&
+          formData.fullName.trim() !== '' &&
+          formData.nationalId.trim() !== '' &&
+          formData.location.trim() !== ''
+        );
       default:
         return false;
     }
@@ -84,12 +95,8 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
     switch (stepName) {
       case 'account-type':
         return <AccountTypeStep />;
-      case 'workspace':
-        return <WorkspaceStep />;
-      case 'roles':
-        return <RolesStep />;
-      case 'wallets':
-        return <WalletsStep />;
+      case 'personal-details':
+        return <PersonalDetailsStep />;
       case 'review':
         return <ReviewStep onComplete={handleReviewComplete} />;
       default:
