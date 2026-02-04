@@ -8,6 +8,8 @@ import {
   UpdateStepResponse,
   FinalizeSignupResponse,
 } from '../../types';
+import { User, LoginRequest, LoginResponse } from '../../src/types/auth.types';
+import { TEST_ACCOUNTS, TEST_PASSWORD, TestAccount } from '@zanafleet/contracts';
 
 const API_BASE_URL = '/api';
 
@@ -39,6 +41,48 @@ function createMockSession(
   };
 }
 
+// Helper to get all test accounts
+export function getTestAccounts(): readonly TestAccount[] {
+  return TEST_ACCOUNTS;
+}
+
+// Helper to find test account by email
+export function getTestAccountByEmail(email: string): TestAccount | undefined {
+  return TEST_ACCOUNTS.find(account => account.email === email);
+}
+
+// Helper to create a mock JWT token (simple base64-encoded JSON, no real signing)
+export function createMockToken(account: TestAccount): string {
+  const payload = {
+    sub: account.id,
+    email: account.email,
+    roles: account.roles,
+    iat: Math.floor(Date.now() / 1000),
+    exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour
+  };
+  return btoa(JSON.stringify(payload));
+}
+
+// Helper to decode mock token and get user ID
+function decodeTokenUserId(token: string): string | null {
+  try {
+    const payload = JSON.parse(atob(token));
+    return payload.sub || null;
+  } catch {
+    return null;
+  }
+}
+
+// Helper to convert TestAccount to User (maps username -> name)
+function testAccountToUser(account: TestAccount): User {
+  return {
+    id: account.id,
+    email: account.email,
+    name: account.username, // Map username to name
+    roles: [...account.roles], // Convert readonly to mutable array
+  };
+}
+
 export const handlers = [
   // POST /auth/keycloak/token - Exchange Keycloak token for local JWT
   http.post(`${API_BASE_URL}/auth/keycloak/token`, async ({ request }) => {
@@ -62,6 +106,79 @@ export const handlers = [
       token: 'mock-local-jwt-token',
       expiresAt: new Date(Date.now() + 3600000).toISOString(),
     });
+  }),
+
+  // POST /auth/login - Login with email/password
+  http.post(`${API_BASE_URL}/auth/login`, async ({ request }) => {
+    const body = (await request.json()) as LoginRequest;
+
+    if (!body.email || !body.password) {
+      return HttpResponse.json(
+        { message: 'email and password are required', statusCode: 400 },
+        { status: 400 }
+      );
+    }
+
+    const account = getTestAccountByEmail(body.email);
+
+    if (!account) {
+      return HttpResponse.json(
+        { message: 'Invalid email or password', statusCode: 401 },
+        { status: 401 }
+      );
+    }
+
+    // Validate password against test password
+    if (body.password !== TEST_PASSWORD) {
+      return HttpResponse.json(
+        { message: 'Invalid email or password', statusCode: 401 },
+        { status: 401 }
+      );
+    }
+
+    const token = createMockToken(account);
+    const expiresAt = new Date(Date.now() + 3600000).toISOString(); // 1 hour
+
+    const response: LoginResponse = {
+      user: testAccountToUser(account),
+      token,
+      expiresAt,
+    };
+
+    return HttpResponse.json(response);
+  }),
+
+  // GET /auth/me - Get current user from token
+  http.get(`${API_BASE_URL}/auth/me`, ({ request }) => {
+    const authHeader = request.headers.get('Authorization');
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return HttpResponse.json(
+        { message: 'Unauthorized', statusCode: 401 },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const userId = decodeTokenUserId(token);
+
+    if (!userId) {
+      return HttpResponse.json(
+        { message: 'Invalid token', statusCode: 401 },
+        { status: 401 }
+      );
+    }
+
+    const account = TEST_ACCOUNTS.find(a => a.id === userId);
+
+    if (!account) {
+      return HttpResponse.json(
+        { message: 'User not found', statusCode: 404 },
+        { status: 404 }
+      );
+    }
+
+    return HttpResponse.json(testAccountToUser(account));
   }),
 
   // POST /signup - Initiate a new sign-up session
