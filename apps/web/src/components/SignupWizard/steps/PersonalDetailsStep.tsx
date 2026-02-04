@@ -6,6 +6,9 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import EmailIcon from '@mui/icons-material/Email';
+import PhoneIcon from '@mui/icons-material/Phone';
+import LockIcon from '@mui/icons-material/Lock';
 
 import { useSignupWizard } from '../../../hooks/useSignupWizard';
 import { ActorType } from '../../../types';
@@ -18,6 +21,9 @@ export function PersonalDetailsStep(): React.ReactElement {
     location: false,
     businessName: false,
     saccoName: false,
+    email: false,
+    phone: false,
+    password: false,
   });
 
   const validationErrors = useMemo(
@@ -42,12 +48,24 @@ export function PersonalDetailsStep(): React.ReactElement {
             : null
           : null,
       saccoName: null,
+      email:
+        touched.email && formData.email.trim() === ''
+          ? 'Email is required'
+          : null,
+      phone:
+        touched.phone && formData.phone.trim() === ''
+          ? 'Phone number is required'
+          : null,
+      password:
+        touched.password && formData.password.trim() === ''
+          ? 'Password is required'
+          : null,
     }),
     [formData, touched],
   );
 
   const handleFieldChange = useCallback(
-    (field: 'fullName' | 'nationalId' | 'location' | 'businessName' | 'saccoName') =>
+    (field: 'fullName' | 'nationalId' | 'location' | 'businessName' | 'saccoName' | 'email' | 'phone' | 'password') =>
       (event: React.ChangeEvent<HTMLInputElement>): void => {
         const value = event.target.value;
         updateField(field, value);
@@ -56,7 +74,7 @@ export function PersonalDetailsStep(): React.ReactElement {
   );
 
   const handleFieldBlur = useCallback(
-    (field: 'fullName' | 'nationalId' | 'location' | 'businessName' | 'saccoName') =>
+    (field: 'fullName' | 'nationalId' | 'location' | 'businessName' | 'saccoName' | 'email' | 'phone' | 'password') =>
       (): void => {
         setTouched((prev) => ({ ...prev, [field]: true }));
       },
@@ -137,6 +155,86 @@ export function PersonalDetailsStep(): React.ReactElement {
             variant="outlined"
             inputProps={{
               'aria-label': 'Location',
+              'aria-required': true,
+            }}
+          />
+        </FormControl>
+
+        {/* Email */}
+        <FormControl fullWidth required error={!!validationErrors.email}>
+          <FormLabel sx={{ mb: 1 }}>
+            Email <Typography component="span" color="error">*</Typography>
+          </FormLabel>
+          <TextField
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleFieldChange('email')}
+            onBlur={handleFieldBlur('email')}
+            placeholder="rider@example.com"
+            disabled={isLoading}
+            error={!!validationErrors.email}
+            helperText={validationErrors.email}
+            fullWidth
+            variant="outlined"
+            InputProps={{
+              startAdornment: <EmailIcon sx={{ mr: 1, color: 'action.active' }} />,
+            }}
+            inputProps={{
+              'aria-label': 'Email',
+              'aria-required': true,
+            }}
+          />
+        </FormControl>
+
+        {/* Phone */}
+        <FormControl fullWidth required error={!!validationErrors.phone}>
+          <FormLabel sx={{ mb: 1 }}>
+            Phone Number <Typography component="span" color="error">*</Typography>
+          </FormLabel>
+          <TextField
+            name="phone"
+            value={formData.phone}
+            onChange={handleFieldChange('phone')}
+            onBlur={handleFieldBlur('phone')}
+            placeholder="+254 712 345 678"
+            disabled={isLoading}
+            error={!!validationErrors.phone}
+            helperText={validationErrors.phone}
+            fullWidth
+            variant="outlined"
+            InputProps={{
+              startAdornment: <PhoneIcon sx={{ mr: 1, color: 'action.active' }} />,
+            }}
+            inputProps={{
+              'aria-label': 'Phone Number',
+              'aria-required': true,
+            }}
+          />
+        </FormControl>
+
+        {/* Password */}
+        <FormControl fullWidth required error={!!validationErrors.password}>
+          <FormLabel sx={{ mb: 1 }}>
+            Password <Typography component="span" color="error">*</Typography>
+          </FormLabel>
+          <TextField
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleFieldChange('password')}
+            onBlur={handleFieldBlur('password')}
+            placeholder="Enter a secure password"
+            disabled={isLoading}
+            error={!!validationErrors.password}
+            helperText={validationErrors.password}
+            fullWidth
+            variant="outlined"
+            InputProps={{
+              startAdornment: <LockIcon sx={{ mr: 1, color: 'action.active' }} />,
+            }}
+            inputProps={{
+              'aria-label': 'Password',
               'aria-required': true,
             }}
           />
