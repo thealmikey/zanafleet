@@ -178,14 +178,14 @@ export interface CreateLocationInput {
 
 export interface CreateSaccoInput {
   name: string;
-  location: string;
+  location: LocationData;
   contactPhone: string;
 }
 
 export interface SaccoResponse {
   saccoId: string;
   name: string;
-  location: string;
+  location: LocationData;
   contactPhone: string;
   createdAt: Date;
   updatedAt: Date;
@@ -199,7 +199,7 @@ export interface CreateRiderInput {
   fullName: string;
   nationalId: string;
   phone: string;  // Primary identity
-  location: string;
+  location: LocationData | undefined;
   vehicleType: VehicleType;
   saccoId?: string | null;  // Optional
   email?: string | null;    // Optional
@@ -210,7 +210,7 @@ export interface RiderResponse {
   fullName: string;
   nationalId: string;
   phone: string;
-  location: string;
+  location: LocationData;
   vehicleType: VehicleType;
   saccoId: string | null;
   email: string | null;
@@ -225,7 +225,7 @@ export interface RiderResponse {
 export interface CreateBusinessInput {
   businessName: string;
   phone: string;  // Primary identity
-  location: string;
+  location: LocationData;
   businessType: BusinessType;
   email?: string | null;  // Optional
 }
@@ -234,7 +234,7 @@ export interface BusinessResponse {
   businessId: string;
   businessName: string;
   phone: string;
-  location: string;
+  location: LocationData;
   businessType: BusinessType;
   email: string | null;
   createdAt: Date;
