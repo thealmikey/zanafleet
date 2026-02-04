@@ -240,3 +240,9 @@ export interface BusinessResponse {
   createdAt: Date;
   updatedAt: Date;
 }
+
+// ============================================================================
+// Test Account Definitions (Dev/Test Only)
+// ============================================================================
+
+export * from './test-accounts';
