@@ -10,6 +10,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { BusinessModule } from './modules/business/business.module';
 import { CapabilityModule } from './modules/capability/capability.module';
 import { CommitmentsModule } from './modules/commitments/commitments.module';
+import { CommunicationModule } from './modules/communication/communication.module';
 import { EvidenceModule } from './modules/evidence/evidence.module';
 import { FormationModule } from './modules/formation/formation.module';
 import { OrganizationModule } from './modules/organization/organization.module';
@@ -52,6 +53,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     BusinessModule,
     CapabilityModule,
     CommitmentsModule,
+    CommunicationModule,
     EvidenceModule,
     FormationModule,
     OrganizationModule,

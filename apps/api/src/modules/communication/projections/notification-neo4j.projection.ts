@@ -77,7 +77,7 @@ export class NotificationNeo4jProjection
         recipientId: event.recipientId,
         notificationId: event.aggregateId,
         channel: event.channel,
-        sentAt: event.sentAt,
+        sentAt: event.occurredAt,
       });
 
       // Link to template if available
@@ -128,7 +128,7 @@ export class NotificationNeo4jProjection
       await session.run(mergeNotificationQuery, {
         notificationId: event.aggregateId,
         error: event.error,
-        failedAt: event.failedAt,
+        failedAt: event.occurredAt,
       });
 
       this.logger.debug(`Notification failed: ${event.aggregateId} - ${event.error}`);

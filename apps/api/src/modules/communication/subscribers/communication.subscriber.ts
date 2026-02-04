@@ -52,7 +52,7 @@ export class CommunicationSubscriber {
           ...data.payload,
         };
         const event = ActorOnboardedEventV1.fromJSON(
-          jsonData as Parameters<typeof ActorOnboardedEventV1.fromJSON>[0],
+          jsonData as unknown as Parameters<typeof ActorOnboardedEventV1.fromJSON>[0],
         );
 
         const command = new SendNotificationCommand(
@@ -102,7 +102,7 @@ export class CommunicationSubscriber {
           ...data.payload,
         };
         const event = SignUpFinalizedEventV1.fromJSON(
-          jsonData as Parameters<typeof SignUpFinalizedEventV1.fromJSON>[0],
+          jsonData as unknown as Parameters<typeof SignUpFinalizedEventV1.fromJSON>[0],
         );
 
         const command = new SendNotificationCommand(
