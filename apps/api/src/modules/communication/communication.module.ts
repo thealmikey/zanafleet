@@ -10,6 +10,8 @@ import { TemplateEntity } from './entities/template.entity';
 import { SendNotificationCommandHandler } from './handlers/send-notification.handler';
 import { TemplateService } from './services/template.service';
 import { CommunicationSubscriber } from './subscribers/communication.subscriber';
+import { NotificationSubscriber } from './subscribers/notification.subscriber';
+import { NotificationNeo4jProjection } from './projections/notification-neo4j.projection';
 
 /**
  * CommunicationModule
@@ -17,6 +19,7 @@ import { CommunicationSubscriber } from './subscribers/communication.subscriber'
  * Integrates with MessagingService for multi-channel message delivery
  * Subscribes to domain events to trigger notifications
  * Manages notification templates with variable interpolation and workspace branding
+ * Maintains Neo4j graph projections for real-time notification visibility
  */
 @Module({
   imports: [
@@ -25,7 +28,13 @@ import { CommunicationSubscriber } from './subscribers/communication.subscriber'
     EventBusModule.forFeature(),
     TypeOrmModule.forFeature([NotificationEntity, TemplateEntity]),
   ],
-  providers: [SendNotificationCommandHandler, TemplateService, CommunicationSubscriber],
+  providers: [
+    SendNotificationCommandHandler,
+    TemplateService,
+    CommunicationSubscriber,
+    NotificationNeo4jProjection,
+    NotificationSubscriber,
+  ],
   exports: [TemplateService],
 })
 export class CommunicationModule {}

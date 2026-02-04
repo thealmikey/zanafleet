@@ -21,4 +21,5 @@ export { NotificationFailedEventV1 } from './events/notification-failed.event';
 export { NotificationSkippedEventV1 } from './events/notification-skipped.event';
 
 export { SendNotificationCommandHandler } from './handlers/send-notification.handler';
+export { NotificationNeo4jProjection } from './projections/notification-neo4j.projection';
 export { TemplateService, RenderedMessage, ValidationResult } from './services/template.service';
