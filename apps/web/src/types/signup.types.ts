@@ -59,6 +59,10 @@ export interface UpdateStepRequest {
   roles?: string[];
   linkedWallets?: string[];
   idempotencyKey?: string;
+  fullName?: string;
+  nationalId?: string;
+  saccoId?: string;
+  businessName?: string;
 }
 
 /**
@@ -85,6 +89,10 @@ export interface SignupSession {
   expiresAt: string;
   createdAt: string;
   updatedAt: string;
+  fullName: string | null;
+  nationalId: string | null;
+  saccoId: string | null;
+  businessName: string | null;
 }
 
 /**
