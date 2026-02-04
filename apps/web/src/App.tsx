@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 
 import { AuthProvider } from './contexts/AuthContext';
 import { SignupWizardProvider } from './contexts/SignupWizardContext';
+import { DevAccountSwitcher } from './components/DevAccountSwitcher';
 import { HomePage } from './components/HomePage';
 import { SignIn } from './components/SignIn';
 import { Dashboard } from './components/Dashboard';
@@ -34,6 +35,7 @@ function App(): React.ReactElement {
             </Routes>
           </BrowserRouter>
         </SignupWizardProvider>
+        <DevAccountSwitcher />
       </AuthProvider>
     </ThemeProvider>
   );
