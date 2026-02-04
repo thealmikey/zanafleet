@@ -14,7 +14,7 @@ import {
 import { useSignupWizard } from '../../hooks/useSignupWizard';
 import { WIZARD_STEPS, WizardStepName } from '../../contexts/SignupWizardContext';
 import { FinalizeSignupResponse } from '../../types';
-import { AccountTypeStep, WorkspaceStep, RolesStep, WalletsStep, ReviewStep } from './steps';
+import { AccountTypeStep, RolesStep, WalletsStep, ReviewStep, WorkspaceStep } from './steps';
 
 const STEP_LABELS: Record<WizardStepName, string> = {
   'account-type': 'Account Type',
