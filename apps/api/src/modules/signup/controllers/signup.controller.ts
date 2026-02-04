@@ -16,7 +16,6 @@ import { ZodError } from 'zod';
 import { FinalizeSignUpCommand } from '../commands/finalize-signup.command';
 import { InitiateSignUpCommand } from '../commands/initiate-signup.command';
 import { UpdateSignUpStepCommand } from '../commands/update-signup-step.command';
-import { FinalizeSignUpDto } from '../dto/finalize-signup.dto';
 import { InitiateSignUpDto } from '../dto/initiate-signup.dto';
 import { SignUpSessionDto } from '../dto/signup-session.dto';
 import { UpdateSignUpStepDto } from '../dto/update-signup-step.dto';
@@ -79,8 +78,7 @@ export class SignUpController {
   @Post(':id/finalize')
   @HttpCode(HttpStatus.OK)
   async finalize(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() _body: FinalizeSignUpDto
+    @Param('id', new ParseUUIDPipe()) id: string
   ): Promise<{ actorId: string; workspaceId: string }> {
     try {
       const input = FinalizeSignUpCommand.validate({ sessionId: id });
