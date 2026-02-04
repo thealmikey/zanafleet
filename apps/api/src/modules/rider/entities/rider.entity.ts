@@ -10,7 +10,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { VehicleType } from '@zanafleet/contracts';
+import { VehicleType, LocationData } from '@zanafleet/contracts';
 import { SaccoEntity } from '../../sacco/entities/sacco.entity';
 
 /**
@@ -20,14 +20,14 @@ import { SaccoEntity } from '../../sacco/entities/sacco.entity';
  * TypeORM entity with best practices:
  * - UUID primary key for distributed systems
  * - Unique constraints on phone (primary identity) and nationalId
- * - Indexed columns for common queries (location, vehicleType, saccoId)
+ * - Indexed columns for common queries (vehicleType, saccoId)
+ * - Location stored as JSONB with embedded LocationData
  * - Optional ManyToOne relationship to Sacco
  * - Timestamps for audit trail
  */
 @Entity('riders')
 @Unique('UQ_rider_phone', ['phone'])
 @Unique('UQ_rider_national_id', ['nationalId'])
-@Index(['location'])
 @Index(['vehicleType'])
 @Index(['saccoId'])
 export class RiderEntity {
@@ -43,8 +43,8 @@ export class RiderEntity {
   @Column('varchar', { length: 20 })
   phone!: string;
 
-  @Column('varchar', { length: 255 })
-  location!: string;
+  @Column('jsonb')
+  location!: LocationData;
 
   @Column('enum', { enum: VehicleType })
   vehicleType!: VehicleType;
@@ -73,7 +73,7 @@ export class RiderEntity {
     fullName: string;
     nationalId: string;
     phone: string;
-    location: string;
+    location: LocationData;
     vehicleType: VehicleType;
     saccoId: string | null;
     email: string | null;
@@ -102,7 +102,7 @@ export class RiderEntity {
     fullName: string;
     nationalId: string;
     phone: string;
-    location: string;
+    location: LocationData;
     vehicleType: VehicleType;
     saccoId: string | null;
     email?: string | null;

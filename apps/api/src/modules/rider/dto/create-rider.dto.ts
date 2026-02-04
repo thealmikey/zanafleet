@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { VehicleType } from '@zanafleet/contracts';
+import { CreateLocationDto } from '@api/core/location';
 
 /**
  * CreateRiderDto
@@ -26,10 +27,10 @@ export class CreateRiderDto {
   phone!: string;
 
   @ApiPropertyOptional({
-    description: 'Location/city where rider operates (auto-filled from Sacco if provided)',
-    example: 'Nairobi, Kenya',
+    type: CreateLocationDto,
+    description: 'Location where rider operates (auto-filled from Sacco if provided)',
   })
-  location?: string;
+  location?: CreateLocationDto;
 
   @ApiProperty({
     description: 'Type of vehicle operated',

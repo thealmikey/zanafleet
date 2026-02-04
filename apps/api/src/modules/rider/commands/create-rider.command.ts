@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { VehicleType } from '@zanafleet/contracts';
+import { LocationSchema, LocationInput } from '@api/core/location';
 
 /**
  * Zod validation schema for CreateRiderCommand
@@ -23,12 +24,7 @@ export const CreateRiderCommandSchema = z.object({
     .regex(/^\+?[\d\-\s()]+$/, 'Phone must be a valid phone number')
     .min(5, 'Phone must be at least 5 characters')
     .max(20, 'Phone must not exceed 20 characters'),
-  location: z
-    .string()
-    .trim()
-    .max(255, 'Location must not exceed 255 characters')
-    .optional()
-    .or(z.null()),
+  location: LocationSchema.optional().or(z.null()),
   vehicleType: z.nativeEnum(VehicleType, {
     errorMap: () => ({
       message: `Vehicle type must be one of: ${Object.values(VehicleType).join(', ')}`,
@@ -55,7 +51,7 @@ export class CreateRiderCommand {
   readonly fullName: string;
   readonly nationalId: string;
   readonly phone: string;
-  readonly location: string | null;
+  readonly location: LocationInput | null;
   readonly vehicleType: VehicleType;
   readonly saccoId: string | null;
   readonly email: string | null;

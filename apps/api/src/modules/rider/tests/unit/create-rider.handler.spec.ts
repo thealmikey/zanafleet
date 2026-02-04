@@ -4,7 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { VehicleType } from '@zanafleet/contracts';
+import { VehicleType, LocationData } from '@zanafleet/contracts';
 import { SaccoEntity } from '../../../sacco/entities/sacco.entity';
 import { CreateRiderCommand } from '../../commands/create-rider.command';
 import { RiderEntity } from '../../entities/rider.entity';
@@ -16,6 +16,22 @@ describe('CreateRiderCommandHandler', () => {
   let riderRepository: any;
   let saccoRepository: any;
   let eventBus: any;
+
+  const nairobiLocation: LocationData = {
+    latitude: -1.29,
+    longitude: 36.82,
+    humanReadableName: 'Nairobi',
+    administrativeArea: 'Nairobi',
+    country: 'Kenya',
+  };
+
+  const mombasaLocation: LocationData = {
+    latitude: -4.05,
+    longitude: 39.67,
+    humanReadableName: 'Mombasa',
+    administrativeArea: 'Mombasa',
+    country: 'Kenya',
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -55,7 +71,7 @@ describe('CreateRiderCommandHandler', () => {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: nairobiLocation,
         vehicleType: VehicleType.Bike,
         saccoId: null,
         email: 'john@example.com',
@@ -69,7 +85,11 @@ describe('CreateRiderCommandHandler', () => {
       expect(riderId).toBeDefined();
       expect(riderRepository.findOne).toHaveBeenCalledTimes(2);
       expect(riderRepository.save).toHaveBeenCalled();
+      const savedEntity = (riderRepository.save as jest.Mock).mock.calls[0][0];
+      expect(savedEntity.location).toEqual(nairobiLocation);
       expect(eventBus.publish).toHaveBeenCalledWith(expect.any(RiderOnboardedEventV1));
+      const publishedEvent = (eventBus.publish as jest.Mock).mock.calls[0][0];
+      expect(publishedEvent.location).toEqual(nairobiLocation);
     });
 
     it('should create a rider with a Sacco and auto-fill location', async () => {
@@ -77,13 +97,14 @@ describe('CreateRiderCommandHandler', () => {
       const sacco = new SaccoEntity();
       sacco.id = saccoId;
       sacco.name = 'Nairobi Taxi Sacco';
-      sacco.location = 'Nairobi, Kenya';
+      sacco.location = mombasaLocation;
       sacco.contactPhone = '+254712345678';
 
       const command = new CreateRiderCommand({
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: '+254712345678',
+        location: null,
         vehicleType: VehicleType.Bike,
         saccoId,
         email: null,
@@ -101,7 +122,9 @@ describe('CreateRiderCommandHandler', () => {
       });
       expect(riderRepository.save).toHaveBeenCalled();
       const savedEntity = (riderRepository.save as jest.Mock).mock.calls[0][0];
-      expect(savedEntity.location).toBe('Nairobi, Kenya');
+      expect(savedEntity.location).toEqual(mombasaLocation);
+      const publishedEvent = (eventBus.publish as jest.Mock).mock.calls[0][0];
+      expect(publishedEvent.location).toEqual(mombasaLocation);
     });
 
     it('should throw NotFoundException if Sacco does not exist', async () => {
@@ -111,7 +134,7 @@ describe('CreateRiderCommandHandler', () => {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: '+254712345678',
-        location: undefined,
+        location: null,
         vehicleType: VehicleType.Bike,
         saccoId,
         email: null,
@@ -132,7 +155,7 @@ describe('CreateRiderCommandHandler', () => {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: nairobiLocation,
         vehicleType: VehicleType.Bike,
         saccoId: null,
         email: null,
@@ -153,7 +176,7 @@ describe('CreateRiderCommandHandler', () => {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: nairobiLocation,
         vehicleType: VehicleType.Bike,
         saccoId: null,
         email: null,

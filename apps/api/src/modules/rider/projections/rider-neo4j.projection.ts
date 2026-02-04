@@ -45,7 +45,11 @@ export class RiderNeo4jProjection implements IEventHandler<RiderOnboardedEventV1
         SET r.fullName = $fullName,
             r.nationalId = $nationalId,
             r.phone = $phone,
-            r.location = $location,
+            r.latitude = $latitude,
+            r.longitude = $longitude,
+            r.humanReadableName = $humanReadableName,
+            r.administrativeArea = $administrativeArea,
+            r.country = $country,
             r.vehicleType = $vehicleType,
             r.saccoId = $saccoId,
             r.email = $email,
@@ -58,7 +62,11 @@ export class RiderNeo4jProjection implements IEventHandler<RiderOnboardedEventV1
           fullName: event.fullName,
           nationalId: event.nationalId,
           phone: event.phone,
-          location: event.location,
+          latitude: event.location.latitude,
+          longitude: event.location.longitude,
+          humanReadableName: event.location.humanReadableName,
+          administrativeArea: event.location.administrativeArea,
+          country: event.location.country,
           vehicleType: event.vehicleType,
           saccoId: event.saccoId,
           email: event.email,
@@ -139,12 +147,19 @@ export class RiderNeo4jInitializer {
       );
       this.logger.log('Unique constraint on Rider.nationalId created');
 
-      // Create index on Rider.location for location-based queries
+      // Create index on Rider.humanReadableName for location-based queries
       await session.run(
-        `CREATE INDEX rider_location_index IF NOT EXISTS 
-         FOR (r:Rider) ON (r.location)`
+        `CREATE INDEX rider_human_readable_name_index IF NOT EXISTS 
+         FOR (r:Rider) ON (r.humanReadableName)`
       );
-      this.logger.log('Index on Rider.location created');
+      this.logger.log('Index on Rider.humanReadableName created');
+
+      // Create index on Rider.administrativeArea for location-based queries
+      await session.run(
+        `CREATE INDEX rider_administrative_area_index IF NOT EXISTS 
+         FOR (r:Rider) ON (r.administrativeArea)`
+      );
+      this.logger.log('Index on Rider.administrativeArea created');
 
       // Create index on Rider.vehicleType for filtering by vehicle type
       await session.run(

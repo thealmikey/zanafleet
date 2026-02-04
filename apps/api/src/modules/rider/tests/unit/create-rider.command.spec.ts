@@ -4,13 +4,21 @@ import { VehicleType } from '@zanafleet/contracts';
 import { CreateRiderCommand } from '../../commands/create-rider.command';
 
 describe('CreateRiderCommand', () => {
+  const validLocation = {
+    latitude: -1.29,
+    longitude: 36.82,
+    humanReadableName: 'Nairobi',
+    administrativeArea: 'Nairobi',
+    country: 'Kenya',
+  };
+
   describe('validate', () => {
-    it('should validate a valid command input', () => {
+    it('should validate a valid command input with location object', () => {
       const input = {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: validLocation,
         vehicleType: VehicleType.Bike,
         saccoId: null,
         email: 'john@example.com',
@@ -26,7 +34,7 @@ describe('CreateRiderCommand', () => {
         fullName: '  John Kamau  ',
         nationalId: '12345678',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: validLocation,
         vehicleType: VehicleType.Bike,
       };
 
@@ -40,7 +48,7 @@ describe('CreateRiderCommand', () => {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: validLocation,
         vehicleType: VehicleType.Bike,
         email: 'invalid-email',
       };
@@ -53,7 +61,7 @@ describe('CreateRiderCommand', () => {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: 'invalid@phone',
-        location: 'Nairobi, Kenya',
+        location: validLocation,
         vehicleType: VehicleType.Bike,
       };
 
@@ -65,7 +73,7 @@ describe('CreateRiderCommand', () => {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: validLocation,
         vehicleType: 'InvalidVehicle',
       };
 
@@ -77,9 +85,45 @@ describe('CreateRiderCommand', () => {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: validLocation,
         vehicleType: VehicleType.Bike,
         saccoId: 'not-a-uuid',
+      };
+
+      expect(() => CreateRiderCommand.validate(input)).toThrow(ZodError);
+    });
+
+    it('should reject location with invalid latitude', () => {
+      const input = {
+        fullName: 'John Kamau',
+        nationalId: '12345678',
+        phone: '+254712345678',
+        location: { ...validLocation, latitude: 95 },
+        vehicleType: VehicleType.Bike,
+      };
+
+      expect(() => CreateRiderCommand.validate(input)).toThrow(ZodError);
+    });
+
+    it('should reject location with invalid longitude', () => {
+      const input = {
+        fullName: 'John Kamau',
+        nationalId: '12345678',
+        phone: '+254712345678',
+        location: { ...validLocation, longitude: 200 },
+        vehicleType: VehicleType.Bike,
+      };
+
+      expect(() => CreateRiderCommand.validate(input)).toThrow(ZodError);
+    });
+
+    it('should reject location with missing required fields', () => {
+      const input = {
+        fullName: 'John Kamau',
+        nationalId: '12345678',
+        phone: '+254712345678',
+        location: { latitude: -1.29, longitude: 36.82 },
+        vehicleType: VehicleType.Bike,
       };
 
       expect(() => CreateRiderCommand.validate(input)).toThrow(ZodError);
@@ -90,7 +134,7 @@ describe('CreateRiderCommand', () => {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: validLocation,
         vehicleType: VehicleType.Bike,
         saccoId: null,
       };
@@ -113,6 +157,20 @@ describe('CreateRiderCommand', () => {
 
       expect(result.location).toBeUndefined();
     });
+
+    it('should allow null location', () => {
+      const input = {
+        fullName: 'John Kamau',
+        nationalId: '12345678',
+        phone: '+254712345678',
+        vehicleType: VehicleType.Bike,
+        location: null,
+      };
+
+      const result = CreateRiderCommand.validate(input);
+
+      expect(result.location).toBeNull();
+    });
   });
 
   describe('safeValidate', () => {
@@ -121,7 +179,7 @@ describe('CreateRiderCommand', () => {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: validLocation,
         vehicleType: VehicleType.Bike,
       };
 
@@ -136,7 +194,7 @@ describe('CreateRiderCommand', () => {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: 'invalid',
-        location: 'Nairobi, Kenya',
+        location: validLocation,
         vehicleType: VehicleType.Bike,
       };
 
@@ -153,7 +211,7 @@ describe('CreateRiderCommand', () => {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: validLocation,
         vehicleType: VehicleType.Bike,
         saccoId: null,
         email: 'JOHN@EXAMPLE.COM',
@@ -166,6 +224,7 @@ describe('CreateRiderCommand', () => {
       expect(command.phone).toBe('+254712345678');
       expect(command.email).toBe('john@example.com');
       expect(command.saccoId).toBeNull();
+      expect(command.location).toEqual(validLocation);
     });
 
     it('should default null values correctly', () => {
@@ -173,7 +232,7 @@ describe('CreateRiderCommand', () => {
         fullName: 'John Kamau',
         nationalId: '12345678',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: validLocation,
         vehicleType: VehicleType.Bike,
       };
 
@@ -181,7 +240,7 @@ describe('CreateRiderCommand', () => {
 
       expect(command.saccoId).toBeNull();
       expect(command.email).toBeNull();
-      expect(command.location).toBe('Nairobi, Kenya');
+      expect(command.location).toEqual(validLocation);
     });
   });
 });
