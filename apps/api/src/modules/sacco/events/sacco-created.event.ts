@@ -1,4 +1,4 @@
-import { BaseEvent } from '@zanafleet/contracts';
+import { BaseEvent, LocationData } from '@zanafleet/contracts';
 
 /**
  * SaccoCreatedEventV1
@@ -19,7 +19,7 @@ export class SaccoCreatedEventV1 implements BaseEvent {
 
   readonly saccoId: string;
   readonly name: string;
-  readonly location: string;
+  readonly location: LocationData;
   readonly contactPhone: string;
   readonly createdAt: Date;
 
@@ -27,7 +27,7 @@ export class SaccoCreatedEventV1 implements BaseEvent {
     eventId: string;
     saccoId: string;
     name: string;
-    location: string;
+    location: LocationData;
     contactPhone: string;
     createdAt: Date;
     occurredAt: Date;
@@ -44,5 +44,37 @@ export class SaccoCreatedEventV1 implements BaseEvent {
     this.occurredAt = data.occurredAt;
     this.correlationId = data.correlationId;
     this.causationId = data.causationId;
+  }
+
+  toJSON(): Record<string, unknown> {
+    return {
+      eventId: this.eventId,
+      eventType: this.eventType,
+      eventVersion: this.eventVersion,
+      aggregateId: this.aggregateId,
+      aggregateType: this.aggregateType,
+      occurredAt: this.occurredAt.toISOString(),
+      correlationId: this.correlationId,
+      causationId: this.causationId,
+      saccoId: this.saccoId,
+      name: this.name,
+      location: this.location,
+      contactPhone: this.contactPhone,
+      createdAt: this.createdAt.toISOString(),
+    };
+  }
+
+  static fromJSON(data: Record<string, unknown>): SaccoCreatedEventV1 {
+    return new SaccoCreatedEventV1({
+      eventId: data.eventId as string,
+      saccoId: data.saccoId as string,
+      name: data.name as string,
+      location: data.location as LocationData,
+      contactPhone: data.contactPhone as string,
+      createdAt: new Date(data.createdAt as string),
+      occurredAt: new Date(data.occurredAt as string),
+      correlationId: data.correlationId as string | undefined,
+      causationId: data.causationId as string | undefined,
+    });
   }
 }

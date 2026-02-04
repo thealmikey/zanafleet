@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { LocationSchema, LocationInput } from '@api/core/location';
 
 /**
  * Zod validation schema for CreateSaccoCommand
@@ -10,11 +11,7 @@ export const CreateSaccoCommandSchema = z.object({
     .trim()
     .min(1, 'Name is required')
     .max(255, 'Name must not exceed 255 characters'),
-  location: z
-    .string()
-    .trim()
-    .min(1, 'Location is required')
-    .max(255, 'Location must not exceed 255 characters'),
+  location: LocationSchema,
   contactPhone: z
     .string()
     .trim()
@@ -32,7 +29,7 @@ export type CreateSaccoCommandInput = z.infer<typeof CreateSaccoCommandSchema>;
  */
 export class CreateSaccoCommand {
   readonly name: string;
-  readonly location: string;
+  readonly location: LocationInput;
   readonly contactPhone: string;
 
   constructor(input: CreateSaccoCommandInput) {

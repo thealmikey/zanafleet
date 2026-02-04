@@ -73,7 +73,13 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
     it('should create a Sacco with valid data and return saccoId', async () => {
       const command = new CreateSaccoCommand({
         name: `Test Sacco ${uuidv4().slice(0, 8)}`,
-        location: 'Nairobi, Kenya',
+        location: {
+          latitude: -1.29,
+          longitude: 36.82,
+          humanReadableName: 'Nairobi',
+          administrativeArea: 'Nairobi',
+          country: 'Kenya',
+        },
         contactPhone: '+254712345678',
       });
 
@@ -88,12 +94,24 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
       const name = `Test Sacco ${uuidv4().slice(0, 8)}`;
       const command1 = new CreateSaccoCommand({
         name,
-        location: 'Nairobi, Kenya',
+        location: {
+          latitude: -1.29,
+          longitude: 36.82,
+          humanReadableName: 'Nairobi',
+          administrativeArea: 'Nairobi',
+          country: 'Kenya',
+        },
         contactPhone: '+254712345678',
       });
       const command2 = new CreateSaccoCommand({
         name,
-        location: 'Mombasa, Kenya',
+        location: {
+          latitude: -4.05,
+          longitude: 39.67,
+          humanReadableName: 'Mombasa',
+          administrativeArea: 'Mombasa',
+          country: 'Kenya',
+        },
         contactPhone: '+254712345679',
       });
 
@@ -106,7 +124,13 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
       const name = `Test Sacco ${uuidv4().slice(0, 8)}`;
       const command = new CreateSaccoCommand({
         name,
-        location: 'Nairobi, Kenya',
+        location: {
+          latitude: -1.29,
+          longitude: 36.82,
+          humanReadableName: 'Nairobi',
+          administrativeArea: 'Nairobi',
+          country: 'Kenya',
+        },
         contactPhone: '+254712345678',
       });
 
@@ -125,7 +149,11 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         expect(result.records.length).toBe(1);
         const node = result.records[0].get('s').properties;
         expect(node.name).toBe(name);
-        expect(node.location).toBe('Nairobi, Kenya');
+        expect(node.latitude).toBe(-1.29);
+        expect(node.longitude).toBe(36.82);
+        expect(node.humanReadableName).toBe('Nairobi');
+        expect(node.administrativeArea).toBe('Nairobi');
+        expect(node.country).toBe('Kenya');
         expect(node.contactPhone).toBe('+254712345678');
       } finally {
         await session.close();

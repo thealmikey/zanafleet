@@ -4,9 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
-  Index,
   Unique,
 } from 'typeorm';
+import { LocationData } from '@zanafleet/contracts';
 
 /**
  * Sacco Entity
@@ -20,7 +20,6 @@ import {
  */
 @Entity('saccos')
 @Unique('UQ_sacco_name', ['name'])
-@Index(['location'])
 export class SaccoEntity {
   @PrimaryColumn('uuid')
   id!: string;
@@ -28,8 +27,8 @@ export class SaccoEntity {
   @Column('varchar', { length: 255 })
   name!: string;
 
-  @Column('varchar', { length: 255 })
-  location!: string;
+  @Column('jsonb')
+  location!: LocationData;
 
   @Column('varchar', { length: 20 })
   contactPhone!: string;
@@ -46,7 +45,7 @@ export class SaccoEntity {
   toDomain(): {
     saccoId: string;
     name: string;
-    location: string;
+    location: LocationData;
     contactPhone: string;
     createdAt: Date;
     updatedAt: Date;
@@ -67,7 +66,7 @@ export class SaccoEntity {
   static fromDomain(data: {
     saccoId: string;
     name: string;
-    location: string;
+    location: LocationData;
     contactPhone: string;
     createdAt: Date;
   }): SaccoEntity {

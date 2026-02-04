@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { CreateLocationDto } from '@api/core/location';
 
 /**
  * CreateSaccoDto
@@ -12,10 +13,10 @@ export class CreateSaccoDto {
   name!: string;
 
   @ApiProperty({
-    description: 'Location/city where the Sacco operates',
-    example: 'Nairobi, Kenya',
+    type: CreateLocationDto,
+    description: 'Location where the Sacco operates',
   })
-  location!: string;
+  location!: CreateLocationDto;
 
   @ApiProperty({
     description: 'Contact phone number for the Sacco',

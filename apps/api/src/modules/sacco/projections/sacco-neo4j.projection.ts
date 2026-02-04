@@ -15,7 +15,7 @@ import { SaccoCreatedEventV1 } from '../events/sacco-created.event';
  * - Maintains graph consistency with Postgres sacco records
  *
  * Node Structure:
- * (:Sacco {id, name, location, contactPhone, createdAt, updatedAt})
+ * (:Sacco {id, name, latitude, longitude, humanReadableName, administrativeArea, country, contactPhone, createdAt, updatedAt})
  *
  * Relationships:
  * (:Sacco)-[:OPERATES_IN]->(:Location) - can be added later as locations domain evolves
@@ -41,7 +41,11 @@ export class SaccoNeo4jProjection implements IEventHandler<SaccoCreatedEventV1> 
         `
         MERGE (s:Sacco {id: $saccoId})
         SET s.name = $name,
-            s.location = $location,
+            s.latitude = $latitude,
+            s.longitude = $longitude,
+            s.humanReadableName = $humanReadableName,
+            s.administrativeArea = $administrativeArea,
+            s.country = $country,
             s.contactPhone = $contactPhone,
             s.createdAt = datetime($createdAt),
             s.updatedAt = datetime($createdAt)
@@ -50,7 +54,11 @@ export class SaccoNeo4jProjection implements IEventHandler<SaccoCreatedEventV1> 
         {
           saccoId: event.saccoId,
           name: event.name,
-          location: event.location,
+          latitude: event.location.latitude,
+          longitude: event.location.longitude,
+          humanReadableName: event.location.humanReadableName,
+          administrativeArea: event.location.administrativeArea,
+          country: event.location.country,
           contactPhone: event.contactPhone,
           createdAt: event.createdAt.toISOString(),
         }
@@ -99,13 +107,6 @@ export class SaccoNeo4jInitializer {
          FOR (s:Sacco) REQUIRE s.name IS UNIQUE`
       );
       this.logger.log('Unique constraint on Sacco.name created');
-
-      // Create index on Sacco.location for location-based queries
-      await session.run(
-        `CREATE INDEX sacco_location_index IF NOT EXISTS 
-         FOR (s:Sacco) ON (s.location)`
-      );
-      this.logger.log('Index on Sacco.location created');
 
       // Create index on Sacco.createdAt for time-based queries
       await session.run(

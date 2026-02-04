@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { LocationResponseDto } from '@api/core/location';
 
 /**
  * SaccoResponseDto
@@ -18,10 +19,10 @@ export class SaccoResponseDto {
   name!: string;
 
   @ApiProperty({
-    description: 'Location/city where the Sacco operates',
-    example: 'Nairobi, Kenya',
+    type: LocationResponseDto,
+    description: 'Location where the Sacco operates',
   })
-  location!: string;
+  location!: LocationResponseDto;
 
   @ApiProperty({
     description: 'Contact phone number',
