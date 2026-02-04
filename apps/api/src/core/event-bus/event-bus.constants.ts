@@ -75,6 +75,14 @@ export const NatsSubjects = {
     SKIPPED_V1: 'notification.events.skipped-v1',
     ALL: 'notification.events.*',
   },
+  Order: {
+    CREATED_V1: 'order.events.created-v1',
+    ALL: 'order.events.*',
+  },
+  Delivery: {
+    SCHEDULED_V1: 'delivery.events.scheduled-v1',
+    ALL: 'delivery.events.*',
+  },
 } as const;
 
 /**
