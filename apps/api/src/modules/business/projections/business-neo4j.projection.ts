@@ -15,7 +15,7 @@ import { BusinessOnboardedEventV1 } from '../events/business-onboarded.event';
  * - Maintains graph consistency with Postgres business records
  *
  * Node Structure:
- * (:Business {id, businessName, phone, location, businessType, email, createdAt, updatedAt})
+ * (:Business {id, businessName, phone, latitude, longitude, humanReadableName, administrativeArea, country, businessType, email, createdAt, updatedAt})
  *
  * Relationships:
  * Can be extended with relationships to other entities as needed
@@ -42,7 +42,11 @@ export class BusinessNeo4jProjection implements IEventHandler<BusinessOnboardedE
         MERGE (b:Business {id: $businessId})
         SET b.businessName = $businessName,
             b.phone = $phone,
-            b.location = $location,
+            b.latitude = $latitude,
+            b.longitude = $longitude,
+            b.humanReadableName = $humanReadableName,
+            b.administrativeArea = $administrativeArea,
+            b.country = $country,
             b.businessType = $businessType,
             b.email = $email,
             b.createdAt = datetime($createdAt),
@@ -53,7 +57,11 @@ export class BusinessNeo4jProjection implements IEventHandler<BusinessOnboardedE
           businessId: event.businessId,
           businessName: event.businessName,
           phone: event.phone,
-          location: event.location,
+          latitude: event.location.latitude,
+          longitude: event.location.longitude,
+          humanReadableName: event.location.humanReadableName,
+          administrativeArea: event.location.administrativeArea,
+          country: event.location.country,
           businessType: event.businessType,
           email: event.email,
           createdAt: event.createdAt.toISOString(),
@@ -103,13 +111,6 @@ export class BusinessNeo4jInitializer {
          FOR (b:Business) REQUIRE b.phone IS UNIQUE`
       );
       this.logger.log('Unique constraint on Business.phone created');
-
-      // Create index on Business.location for location-based queries
-      await session.run(
-        `CREATE INDEX business_location_index IF NOT EXISTS 
-         FOR (b:Business) ON (b.location)`
-      );
-      this.logger.log('Index on Business.location created');
 
       // Create index on Business.businessType for business type filtering
       await session.run(

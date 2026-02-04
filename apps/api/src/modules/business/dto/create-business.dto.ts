@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 import { BusinessType } from '@zanafleet/contracts';
+import { CreateLocationDto } from '@api/core/location';
 
 /**
  * CreateBusinessDto
@@ -20,10 +21,10 @@ export class CreateBusinessDto {
   phone!: string;
 
   @ApiProperty({
-    description: 'Location/city where the business operates',
-    example: 'Nairobi, Kenya',
+    type: CreateLocationDto,
+    description: 'Location where the business operates',
   })
-  location!: string;
+  location!: CreateLocationDto;
 
   @ApiProperty({
     description: 'Type of business',

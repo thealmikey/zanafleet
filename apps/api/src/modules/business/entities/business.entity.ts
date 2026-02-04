@@ -8,7 +8,7 @@ import {
   Unique,
 } from 'typeorm';
 
-import { BusinessType } from '@zanafleet/contracts';
+import { BusinessType, LocationData } from '@zanafleet/contracts';
 
 /**
  * Business Entity
@@ -20,10 +20,10 @@ import { BusinessType } from '@zanafleet/contracts';
  * - Indexed columns for common queries
  * - Timestamps for audit trail
  * - Enum type for business type field
+ * - JSONB column for embedded location data
  */
 @Entity('businesses')
 @Unique('UQ_business_phone', ['phone'])
-@Index(['location'])
 @Index(['businessType'])
 export class BusinessEntity {
   @PrimaryColumn('uuid')
@@ -35,8 +35,8 @@ export class BusinessEntity {
   @Column('varchar', { length: 20 })
   phone!: string;
 
-  @Column('varchar', { length: 255 })
-  location!: string;
+  @Column('jsonb')
+  location!: LocationData;
 
   @Column('enum', { enum: BusinessType })
   businessType!: BusinessType;
@@ -57,7 +57,7 @@ export class BusinessEntity {
     businessId: string;
     businessName: string;
     phone: string;
-    location: string;
+    location: LocationData;
     businessType: BusinessType;
     email: string | null;
     createdAt: Date;
@@ -82,7 +82,7 @@ export class BusinessEntity {
     businessId: string;
     businessName: string;
     phone: string;
-    location: string;
+    location: LocationData;
     businessType: BusinessType;
     email?: string | null;
     createdAt: Date;

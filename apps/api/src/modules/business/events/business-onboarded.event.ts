@@ -1,4 +1,4 @@
-import { BusinessType } from '@zanafleet/contracts';
+import { BusinessType, LocationData } from '@zanafleet/contracts';
 
 /**
  * BusinessOnboardedEventV1
@@ -27,7 +27,7 @@ export class BusinessOnboardedEventV1 {
   readonly businessId: string;
   readonly businessName: string;
   readonly phone: string;
-  readonly location: string;
+  readonly location: LocationData;
   readonly businessType: BusinessType;
   readonly email: string | null;
   readonly createdAt: Date;
@@ -40,7 +40,7 @@ export class BusinessOnboardedEventV1 {
     businessId: string;
     businessName: string;
     phone: string;
-    location: string;
+    location: LocationData;
     businessType: BusinessType;
     email: string | null;
     createdAt: Date;
@@ -72,7 +72,7 @@ export class BusinessOnboardedEventV1 {
     businessId: string;
     businessName: string;
     phone: string;
-    location: string;
+    location: LocationData;
     businessType: BusinessType;
     email: string | null;
     createdAt: string;
@@ -103,7 +103,7 @@ export class BusinessOnboardedEventV1 {
     businessId: string;
     businessName: string;
     phone: string;
-    location: string;
+    location: LocationData;
     businessType: BusinessType;
     email: string | null;
     createdAt: string;

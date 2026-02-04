@@ -76,7 +76,13 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
       const command = new CreateBusinessCommand({
         businessName: `Test Business ${uuidv4().slice(0, 8)}`,
         phone,
-        location: 'Nairobi, Kenya',
+        location: {
+          latitude: -1.29,
+          longitude: 36.82,
+          humanReadableName: 'Nairobi',
+          administrativeArea: 'Nairobi',
+          country: 'Kenya',
+        },
         businessType: BusinessType.Retail,
         email: null,
       });
@@ -93,14 +99,26 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
       const command1 = new CreateBusinessCommand({
         businessName: `Test Business ${uuidv4().slice(0, 8)}`,
         phone,
-        location: 'Nairobi, Kenya',
+        location: {
+          latitude: -1.29,
+          longitude: 36.82,
+          humanReadableName: 'Nairobi',
+          administrativeArea: 'Nairobi',
+          country: 'Kenya',
+        },
         businessType: BusinessType.Retail,
         email: null,
       });
       const command2 = new CreateBusinessCommand({
         businessName: `Test Business ${uuidv4().slice(0, 8)}`,
         phone, // Same phone
-        location: 'Mombasa, Kenya',
+        location: {
+          latitude: -4.05,
+          longitude: 39.67,
+          humanReadableName: 'Mombasa',
+          administrativeArea: 'Mombasa',
+          country: 'Kenya',
+        },
         businessType: BusinessType.Restaurant,
         email: null,
       });
@@ -110,13 +128,19 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
       await expect(commandBus.execute(command2)).rejects.toThrow(ConflictException);
     });
 
-    it('should create :Business node in Neo4j after creation', async () => {
+    it('should create :Business node in Neo4j after creation with location properties', async () => {
       const businessName = `Test Business ${uuidv4().slice(0, 8)}`;
       const phone = `+2547${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
       const command = new CreateBusinessCommand({
         businessName,
         phone,
-        location: 'Nairobi, Kenya',
+        location: {
+          latitude: -1.29,
+          longitude: 36.82,
+          humanReadableName: 'Westlands',
+          administrativeArea: 'Nairobi',
+          country: 'Kenya',
+        },
         businessType: BusinessType.Logistics,
         email: 'test@business.com',
       });
@@ -126,7 +150,7 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
       // Wait for event handler to process
       await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Verify Neo4j node exists
+      // Verify Neo4j node exists with separate location properties
       const session = neo4jService.getReadSession();
       try {
         const result = await session.run(
@@ -137,7 +161,11 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         const node = result.records[0].get('b').properties;
         expect(node.businessName).toBe(businessName);
         expect(node.phone).toBe(phone);
-        expect(node.location).toBe('Nairobi, Kenya');
+        expect(node.latitude).toBe(-1.29);
+        expect(node.longitude).toBe(36.82);
+        expect(node.humanReadableName).toBe('Westlands');
+        expect(node.administrativeArea).toBe('Nairobi');
+        expect(node.country).toBe('Kenya');
         expect(node.businessType).toBe(BusinessType.Logistics);
         expect(node.email).toBe('test@business.com');
       } finally {

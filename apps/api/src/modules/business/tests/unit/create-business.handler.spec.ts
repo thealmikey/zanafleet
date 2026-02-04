@@ -2,7 +2,6 @@ import { ConflictException } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { v4 as uuidv4 } from 'uuid';
 
 import { BusinessType } from '@zanafleet/contracts';
 import { CreateBusinessCommand } from '../../commands/create-business.command';
@@ -14,6 +13,14 @@ describe('CreateBusinessCommandHandler', () => {
   let handler: CreateBusinessCommandHandler;
   let businessRepository: any;
   let eventBus: any;
+
+  const testLocation = {
+    latitude: -1.29,
+    longitude: 36.82,
+    humanReadableName: 'Westlands',
+    administrativeArea: 'Nairobi',
+    country: 'Kenya',
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -41,11 +48,11 @@ describe('CreateBusinessCommandHandler', () => {
   });
 
   describe('execute', () => {
-    it('should create a business with all fields', async () => {
+    it('should create a business with all fields including location object', async () => {
       const command = new CreateBusinessCommand({
         businessName: 'Nairobi Supermarket Ltd',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: testLocation,
         businessType: BusinessType.Retail,
         email: 'info@business.com',
       });
@@ -67,7 +74,7 @@ describe('CreateBusinessCommandHandler', () => {
       const command = new CreateBusinessCommand({
         businessName: 'Nairobi Restaurant',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: testLocation,
         businessType: BusinessType.Restaurant,
         email: null,
       });
@@ -81,6 +88,7 @@ describe('CreateBusinessCommandHandler', () => {
       expect(businessRepository.save).toHaveBeenCalled();
       const savedEntity = (businessRepository.save as jest.Mock).mock.calls[0][0];
       expect(savedEntity.email).toBeNull();
+      expect(savedEntity.location).toEqual(testLocation);
     });
 
     it('should create a business with different businessType values', async () => {
@@ -90,7 +98,7 @@ describe('CreateBusinessCommandHandler', () => {
         const command = new CreateBusinessCommand({
           businessName: `Business ${type}`,
           phone: `+2547${Math.random().toString().slice(2, 9)}`,
-          location: 'Nairobi, Kenya',
+          location: testLocation,
           businessType: type,
           email: null,
         });
@@ -112,13 +120,13 @@ describe('CreateBusinessCommandHandler', () => {
 
     it('should throw ConflictException if phone already exists', async () => {
       const existingBusiness = new BusinessEntity();
-      existingBusiness.id = uuidv4();
+      existingBusiness.id = '550e8400-e29b-41d4-a716-446655440000';
       existingBusiness.phone = '+254712345678';
 
       const command = new CreateBusinessCommand({
         businessName: 'Test Business',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: testLocation,
         businessType: BusinessType.Retail,
         email: null,
       });
@@ -130,11 +138,11 @@ describe('CreateBusinessCommandHandler', () => {
       expect(eventBus.publish).not.toHaveBeenCalled();
     });
 
-    it('should emit correct event with business data', async () => {
+    it('should emit correct event with business data including location object', async () => {
       const command = new CreateBusinessCommand({
         businessName: 'Test Business',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: testLocation,
         businessType: BusinessType.Logistics,
         email: 'test@business.com',
       });
@@ -148,18 +156,41 @@ describe('CreateBusinessCommandHandler', () => {
         expect.objectContaining({
           businessName: 'Test Business',
           phone: '+254712345678',
-          location: 'Nairobi, Kenya',
+          location: testLocation,
           businessType: BusinessType.Logistics,
           email: 'test@business.com',
         })
       );
     });
 
+    it('should pass location object correctly to entity', async () => {
+      const command = new CreateBusinessCommand({
+        businessName: 'Test Business',
+        phone: '+254712345678',
+        location: testLocation,
+        businessType: BusinessType.Services,
+        email: null,
+      });
+
+      businessRepository.findOne.mockResolvedValue(null);
+      businessRepository.save.mockResolvedValue(undefined);
+
+      await handler.execute(command);
+
+      const saveCall = (businessRepository.save as jest.Mock).mock.calls[0][0] as BusinessEntity;
+      expect(saveCall.location).toEqual(testLocation);
+      expect(saveCall.location.latitude).toBe(-1.29);
+      expect(saveCall.location.longitude).toBe(36.82);
+      expect(saveCall.location.humanReadableName).toBe('Westlands');
+      expect(saveCall.location.administrativeArea).toBe('Nairobi');
+      expect(saveCall.location.country).toBe('Kenya');
+    });
+
     it('should persist entity before emitting event', async () => {
       const command = new CreateBusinessCommand({
         businessName: 'Test Business',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: testLocation,
         businessType: BusinessType.Services,
         email: null,
       });
@@ -188,7 +219,7 @@ describe('CreateBusinessCommandHandler', () => {
       const command = new CreateBusinessCommand({
         businessName: 'Test Business',
         phone: '+254712345678',
-        location: 'Nairobi, Kenya',
+        location: testLocation,
         businessType: BusinessType.Wholesale,
         email: null,
       });
@@ -204,7 +235,7 @@ describe('CreateBusinessCommandHandler', () => {
       const command1 = new CreateBusinessCommand({
         businessName: 'Business 1',
         phone: '+254712345671',
-        location: 'Location 1',
+        location: testLocation,
         businessType: BusinessType.Retail,
         email: null,
       });
@@ -212,7 +243,13 @@ describe('CreateBusinessCommandHandler', () => {
       const command2 = new CreateBusinessCommand({
         businessName: 'Business 2',
         phone: '+254712345672',
-        location: 'Location 2',
+        location: {
+          latitude: -4.05,
+          longitude: 39.67,
+          humanReadableName: 'Mombasa',
+          administrativeArea: 'Mombasa',
+          country: 'Kenya',
+        },
         businessType: BusinessType.Retail,
         email: null,
       });

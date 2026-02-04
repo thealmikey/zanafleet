@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { BusinessType } from '@zanafleet/contracts';
+import { LocationSchema, LocationInput } from '@api/core/location';
 
 /**
  * Zod validation schema for CreateBusinessCommand
@@ -18,11 +19,7 @@ export const CreateBusinessCommandSchema = z.object({
     .regex(/^\+?[\d\-\s()]+$/, 'Phone must be a valid phone number')
     .min(5, 'Phone must be at least 5 characters')
     .max(20, 'Phone must not exceed 20 characters'),
-  location: z
-    .string()
-    .trim()
-    .min(1, 'Location is required')
-    .max(255, 'Location must not exceed 255 characters'),
+  location: LocationSchema,
   businessType: z.nativeEnum(BusinessType, {
     errorMap: () => ({
       message: `Business type must be one of: ${Object.values(BusinessType).join(', ')}`,
@@ -47,7 +44,7 @@ export type CreateBusinessCommandInput = z.infer<typeof CreateBusinessCommandSch
 export class CreateBusinessCommand {
   readonly businessName: string;
   readonly phone: string;
-  readonly location: string;
+  readonly location: LocationInput;
   readonly businessType: BusinessType;
   readonly email: string | null;
 
