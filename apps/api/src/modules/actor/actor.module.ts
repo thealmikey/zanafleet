@@ -8,6 +8,7 @@ import { ActorEntity } from './entities/actor.entity';
 import { CreateActorCommandHandler } from './handlers/create-actor.handler';
 import { UpdateActorCommandHandler } from './handlers/update-actor.handler';
 import { ActorNeo4jProjection, ActorNeo4jInitializer } from './projections/actor-neo4j.projection';
+import { TestAccountSeederService } from './services/test-account-seeder.service';
 
 /**
  * Actor Module
@@ -44,6 +45,9 @@ import { ActorNeo4jProjection, ActorNeo4jInitializer } from './projections/actor
     // Event Handlers / Projections
     ActorNeo4jProjection,
     ActorNeo4jInitializer,
+
+    // Services
+    TestAccountSeederService,
   ],
   exports: [
     // Export for use in other modules
@@ -54,11 +58,15 @@ import { ActorNeo4jProjection, ActorNeo4jInitializer } from './projections/actor
 export class ActorModule implements OnModuleInit {
   private readonly logger = new Logger(ActorModule.name);
 
-  constructor(private readonly neo4jInitializer: ActorNeo4jInitializer) {}
+  constructor(
+    private readonly neo4jInitializer: ActorNeo4jInitializer,
+    private readonly testAccountSeeder: TestAccountSeederService,
+  ) {}
 
   /**
    * Initialize module
    * Sets up Neo4j constraints and indexes
+   * Seeds test accounts in dev/test mode
    */
   async onModuleInit(): Promise<void> {
     try {
@@ -69,5 +77,7 @@ export class ActorModule implements OnModuleInit {
         throw error;
       }
     }
+
+    await this.testAccountSeeder.onModuleInit();
   }
 }
