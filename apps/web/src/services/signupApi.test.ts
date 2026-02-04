@@ -63,7 +63,7 @@ describe('signupApi', () => {
       const mockResponse = {
         sessionId: 'test-session-id',
         status: SignUpSessionStatus.PARTIAL,
-        completedSteps: ['workspace'],
+        completedSteps: ['personal-details'],
       };
       mockFetch.mockResolvedValueOnce({
         ok: true,
@@ -71,14 +71,15 @@ describe('signupApi', () => {
       });
 
       const result = await updateStep('test-session-id', {
-        stepName: 'workspace',
-        workspaceIds: ['workspace-123'],
+        stepName: 'personal-details',
+        fullName: 'Test User',
+        location: 'Nairobi',
       });
 
       expect(mockFetch).toHaveBeenCalledWith('/api/signup/test-session-id', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stepName: 'workspace', workspaceIds: ['workspace-123'] }),
+        body: JSON.stringify({ stepName: 'personal-details', fullName: 'Test User', location: 'Nairobi' }),
       });
       expect(result).toEqual(mockResponse);
     });
@@ -101,10 +102,12 @@ describe('signupApi', () => {
         sessionId: 'test-session-id',
         status: SignUpSessionStatus.PARTIAL,
         actorType: ActorType.Rider,
-        workspaceIds: ['workspace-123'],
-        roles: ['Rider'],
-        linkedWallets: [],
-        completedSteps: ['workspace'],
+        fullName: 'John Doe',
+        nationalId: '12345678',
+        location: 'Nairobi',
+        saccoId: 'workspace-123',
+        businessName: null,
+        completedSteps: ['personal-details'],
         expiresAt: '2024-01-02T00:00:00Z',
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T12:00:00Z',

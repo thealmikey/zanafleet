@@ -298,9 +298,11 @@ describe('useSignupWizard', () => {
 
       expect(mockUpdateStep).toHaveBeenCalledWith('session-123', {
         stepName: 'account-type',
-        workspaceIds: undefined,
-        roles: undefined,
-        linkedWallets: undefined,
+        fullName: undefined,
+        nationalId: undefined,
+        location: undefined,
+        businessName: undefined,
+        saccoId: undefined,
       });
       expect(result.current.completedSteps).toEqual(['account-type']);
     });
