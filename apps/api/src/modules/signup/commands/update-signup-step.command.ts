@@ -16,6 +16,10 @@ export const UpdateSignUpStepCommandSchema = z.object({
   password: z.string().optional(),
   location: z.string().optional(),
   workspaceName: z.string().optional(),
+  fullName: z.string().optional(),
+  nationalId: z.string().optional(),
+  saccoId: z.string().uuid().optional(),
+  businessName: z.string().optional(),
 });
 
 /**
@@ -42,6 +46,10 @@ export class UpdateSignUpStepCommand {
   readonly password?: string;
   readonly location?: string;
   readonly workspaceName?: string;
+  readonly fullName?: string;
+  readonly nationalId?: string;
+  readonly saccoId?: string;
+  readonly businessName?: string;
 
   constructor(input: UpdateSignUpStepCommandInput) {
     this.sessionId = input.sessionId;
@@ -55,6 +63,10 @@ export class UpdateSignUpStepCommand {
     this.password = input.password;
     this.location = input.location;
     this.workspaceName = input.workspaceName;
+    this.fullName = input.fullName;
+    this.nationalId = input.nationalId;
+    this.saccoId = input.saccoId;
+    this.businessName = input.businessName;
   }
 
   /**

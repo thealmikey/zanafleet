@@ -38,6 +38,18 @@ export class SignUpSessionEntity {
   @Column('varchar', { nullable: true })
   workspaceName?: string | null;
 
+  @Column('varchar', { length: 255, nullable: true })
+  fullName?: string | null;
+
+  @Column('varchar', { length: 20, nullable: true })
+  nationalId?: string | null;
+
+  @Column('uuid', { nullable: true })
+  saccoId?: string | null;
+
+  @Column('varchar', { length: 255, nullable: true })
+  businessName?: string | null;
+
   @Column('uuid', { array: true, default: () => 'ARRAY[]::uuid[]' })
   workspaceIds!: string[];
 
@@ -74,6 +86,10 @@ export class SignUpSessionEntity {
     passwordHash: string | null;
     location: string | null;
     workspaceName: string | null;
+    fullName: string | null;
+    nationalId: string | null;
+    saccoId: string | null;
+    businessName: string | null;
     workspaceIds: string[];
     roles: string[];
     linkedWallets: string[];
@@ -93,6 +109,10 @@ export class SignUpSessionEntity {
       passwordHash: this.passwordHash ?? null,
       location: this.location ?? null,
       workspaceName: this.workspaceName ?? null,
+      fullName: this.fullName ?? null,
+      nationalId: this.nationalId ?? null,
+      saccoId: this.saccoId ?? null,
+      businessName: this.businessName ?? null,
       workspaceIds: [...this.workspaceIds],
       roles: [...this.roles],
       linkedWallets: [...this.linkedWallets],
@@ -116,6 +136,10 @@ export class SignUpSessionEntity {
     passwordHash?: string | null;
     location?: string | null;
     workspaceName?: string | null;
+    fullName?: string | null;
+    nationalId?: string | null;
+    saccoId?: string | null;
+    businessName?: string | null;
     workspaceIds: string[];
     roles: string[];
     linkedWallets: string[];
@@ -134,6 +158,10 @@ export class SignUpSessionEntity {
     entity.passwordHash = data.passwordHash ?? null;
     entity.location = data.location ?? null;
     entity.workspaceName = data.workspaceName ?? null;
+    entity.fullName = data.fullName ?? null;
+    entity.nationalId = data.nationalId ?? null;
+    entity.saccoId = data.saccoId ?? null;
+    entity.businessName = data.businessName ?? null;
     entity.workspaceIds = data.workspaceIds;
     entity.roles = data.roles;
     entity.linkedWallets = data.linkedWallets;

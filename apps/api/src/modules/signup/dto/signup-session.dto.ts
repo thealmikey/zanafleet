@@ -72,6 +72,30 @@ export class SignUpSessionDto {
   createdAt!: Date;
 
   @ApiProperty({
+    description: 'Full name of the user',
+    example: 'John Doe',
+  })
+  fullName?: string;
+
+  @ApiProperty({
+    description: 'National ID of the user',
+    example: '12345678',
+  })
+  nationalId?: string;
+
+  @ApiProperty({
+    description: 'SACCO ID that the user is affiliated with',
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  })
+  saccoId?: string;
+
+  @ApiProperty({
+    description: 'Business name associated with the user',
+    example: 'John Doe Transporters',
+  })
+  businessName?: string;
+
+  @ApiProperty({
     description: 'When the session was last updated',
     example: '2024-01-01T00:00:00Z',
   })

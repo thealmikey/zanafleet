@@ -92,4 +92,36 @@ export class UpdateSignUpStepDto {
   @IsString()
   @IsOptional()
   workspaceName?: string;
+
+  @ApiPropertyOptional({
+    description: 'Full name of the user',
+    example: 'John Doe',
+  })
+  @IsString()
+  @IsOptional()
+  fullName?: string;
+
+  @ApiPropertyOptional({
+    description: 'National ID of the user',
+    example: '12345678',
+  })
+  @IsString()
+  @IsOptional()
+  nationalId?: string;
+
+  @ApiPropertyOptional({
+    description: 'SACCO ID that the user is affiliated with',
+    example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+  })
+  @IsUUID('4')
+  @IsOptional()
+  saccoId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Business name associated with the user',
+    example: 'John Doe Transporters',
+  })
+  @IsString()
+  @IsOptional()
+  businessName?: string;
 }
