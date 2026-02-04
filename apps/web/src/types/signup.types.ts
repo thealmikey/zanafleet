@@ -55,9 +55,6 @@ export interface InitiateSignupResponse {
  */
 export interface UpdateStepRequest {
   stepName?: string;
-  workspaceIds?: string[];
-  roles?: string[];
-  linkedWallets?: string[];
   idempotencyKey?: string;
   fullName?: string;
   nationalId?: string;
@@ -83,9 +80,6 @@ export interface SignupSession {
   sessionId: string;
   status: SignUpSessionStatus;
   actorType: ActorType;
-  workspaceIds: string[];
-  roles: string[];
-  linkedWallets: string[];
   completedSteps: string[];
   expiresAt: string;
   createdAt: string;
