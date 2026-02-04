@@ -32,6 +32,18 @@ export class SignUpSessionDto {
   actorType!: ActorType;
 
   @ApiProperty({
+    description: 'Email address for the user account',
+    example: 'rider@example.com',
+  })
+  email?: string;
+
+  @ApiProperty({
+    description: 'Phone number of the user',
+    example: '254712345678',
+  })
+  phone?: string;
+
+  @ApiProperty({
     type: [String],
     description: 'The workspace IDs associated with the session',
     example: ['uuid-workspace-id'],

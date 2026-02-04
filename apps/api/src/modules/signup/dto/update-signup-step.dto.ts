@@ -110,6 +110,14 @@ export class UpdateSignUpStepDto {
   nationalId?: string;
 
   @ApiPropertyOptional({
+    description: 'Phone number of the user',
+    example: '254712345678',
+  })
+  @IsString()
+  @IsOptional()
+  phone?: string;
+
+  @ApiPropertyOptional({
     description: 'SACCO ID that the user is affiliated with',
     example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   })

@@ -61,6 +61,7 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
       email,
       username,
       password,
+      phone,
       location,
       workspaceName,
     } = command;
@@ -96,6 +97,7 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
       email,
       username,
       password,
+      phone,
       location,
       workspaceName,
     });
@@ -161,6 +163,11 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
       session.workspaceName = workspaceName;
     }
 
+    if (phone !== undefined && session.phone !== phone) {
+      changes.phone = phone;
+      session.phone = phone;
+    }
+
     if (idempotencyKey) {
       session.idempotencyKey = idempotencyKey;
     }
@@ -224,6 +231,7 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
       email?: string;
       username?: string;
       password?: string;
+      phone?: string;
       location?: string;
       workspaceName?: string;
     }
@@ -253,6 +261,8 @@ export class UpdateSignUpStepCommandHandler implements ICommandHandler<UpdateSig
     if (updates.username !== undefined && session.username !== updates.username) return true;
 
     if (updates.password !== undefined) return true;
+
+    if (updates.phone !== undefined && session.phone !== updates.phone) return true;
 
     if (updates.location !== undefined && session.location !== updates.location) return true;
 

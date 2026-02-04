@@ -14,6 +14,7 @@ export const UpdateSignUpStepCommandSchema = z.object({
   email: z.string().email().optional(),
   username: z.string().optional(),
   password: z.string().optional(),
+  phone: z.string().optional(),
   location: z.string().optional(),
   workspaceName: z.string().optional(),
   fullName: z.string().optional(),
@@ -44,6 +45,7 @@ export class UpdateSignUpStepCommand {
   readonly email?: string;
   readonly username?: string;
   readonly password?: string;
+  readonly phone?: string;
   readonly location?: string;
   readonly workspaceName?: string;
   readonly fullName?: string;
@@ -61,6 +63,7 @@ export class UpdateSignUpStepCommand {
     this.email = input.email;
     this.username = input.username;
     this.password = input.password;
+    this.phone = input.phone;
     this.location = input.location;
     this.workspaceName = input.workspaceName;
     this.fullName = input.fullName;

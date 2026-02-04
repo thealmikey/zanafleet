@@ -44,6 +44,9 @@ export class SignUpSessionEntity {
   @Column('varchar', { length: 20, nullable: true })
   nationalId?: string | null;
 
+  @Column('varchar', { length: 20, nullable: true })
+  phone?: string | null;
+
   @Column('uuid', { nullable: true })
   saccoId?: string | null;
 
@@ -88,6 +91,7 @@ export class SignUpSessionEntity {
     workspaceName: string | null;
     fullName: string | null;
     nationalId: string | null;
+    phone: string | null;
     saccoId: string | null;
     businessName: string | null;
     workspaceIds: string[];
@@ -111,6 +115,7 @@ export class SignUpSessionEntity {
       workspaceName: this.workspaceName ?? null,
       fullName: this.fullName ?? null,
       nationalId: this.nationalId ?? null,
+      phone: this.phone ?? null,
       saccoId: this.saccoId ?? null,
       businessName: this.businessName ?? null,
       workspaceIds: [...this.workspaceIds],
@@ -138,6 +143,7 @@ export class SignUpSessionEntity {
     workspaceName?: string | null;
     fullName?: string | null;
     nationalId?: string | null;
+    phone?: string | null;
     saccoId?: string | null;
     businessName?: string | null;
     workspaceIds: string[];
@@ -160,6 +166,7 @@ export class SignUpSessionEntity {
     entity.workspaceName = data.workspaceName ?? null;
     entity.fullName = data.fullName ?? null;
     entity.nationalId = data.nationalId ?? null;
+    entity.phone = data.phone ?? null;
     entity.saccoId = data.saccoId ?? null;
     entity.businessName = data.businessName ?? null;
     entity.workspaceIds = data.workspaceIds;
