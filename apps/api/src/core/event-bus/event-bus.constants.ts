@@ -69,6 +69,12 @@ export const NatsSubjects = {
     FINALIZED_V1: 'signup.events.finalized-v1',
     ALL: 'signup.events.*',
   },
+  Communication: {
+    SENT_V1: 'communication.events.sent-v1',
+    FAILED_V1: 'communication.events.failed-v1',
+    SKIPPED_V1: 'communication.events.skipped-v1',
+    ALL: 'communication.events.*',
+  },
 } as const;
 
 /**
