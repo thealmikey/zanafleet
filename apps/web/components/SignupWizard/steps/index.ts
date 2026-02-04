@@ -1,5 +1,1 @@
-export { AccountTypeStep } from './AccountTypeStep';
-export { RolesStep } from './RolesStep';
-export { WalletsStep } from './WalletsStep';
-export { ReviewStep } from './ReviewStep';
-export type { ReviewStepProps } from './ReviewStep';
+// This file has been removed. Use the steps from src/components/SignupWizard/steps instead.

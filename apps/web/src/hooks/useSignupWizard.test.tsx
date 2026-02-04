@@ -54,9 +54,11 @@ describe('useSignupWizard', () => {
       expect(result.current.currentStep).toBe(0);
       expect(result.current.formData).toEqual({
         actorType: null,
-        workspaceIds: [],
-        roles: [],
-        linkedWallets: [],
+        fullName: '',
+        nationalId: '',
+        location: '',
+        businessName: '',
+        saccoId: '',
       });
       expect(result.current.completedSteps).toEqual([]);
       expect(result.current.isLoading).toBe(false);
@@ -148,34 +150,34 @@ describe('useSignupWizard', () => {
       expect(result.current.formData.actorType).toBe(ActorType.Rider);
     });
 
-    it('should update workspaceIds', () => {
+    it('should update fullName', () => {
       const { result } = renderHook(() => useSignupWizard(), { wrapper });
 
       act(() => {
-        result.current.updateField('workspaceIds', ['workspace-123']);
+        result.current.updateField('fullName', 'John Doe');
       });
 
-      expect(result.current.formData.workspaceIds).toEqual(['workspace-123']);
+      expect(result.current.formData.fullName).toEqual('John Doe');
     });
 
-    it('should update roles array', () => {
+    it('should update nationalId', () => {
       const { result } = renderHook(() => useSignupWizard(), { wrapper });
 
       act(() => {
-        result.current.updateField('roles', ['Admin', 'Viewer']);
+        result.current.updateField('nationalId', '12345678');
       });
 
-      expect(result.current.formData.roles).toEqual(['Admin', 'Viewer']);
+      expect(result.current.formData.nationalId).toEqual('12345678');
     });
 
-    it('should update linkedWallets array', () => {
+    it('should update location', () => {
       const { result } = renderHook(() => useSignupWizard(), { wrapper });
 
       act(() => {
-        result.current.updateField('linkedWallets', ['0x123', '0x456']);
+        result.current.updateField('location', 'Nairobi, Kenya');
       });
 
-      expect(result.current.formData.linkedWallets).toEqual(['0x123', '0x456']);
+      expect(result.current.formData.location).toEqual('Nairobi, Kenya');
     });
 
     it('should preserve other fields when updating one field', () => {
@@ -183,15 +185,17 @@ describe('useSignupWizard', () => {
 
       act(() => {
         result.current.updateField('actorType', ActorType.Business);
-        result.current.updateField('workspaceIds', ['ws-1']);
-        result.current.updateField('roles', ['Role1']);
+        result.current.updateField('fullName', 'John Doe');
+        result.current.updateField('nationalId', '12345678');
       });
 
       expect(result.current.formData).toEqual({
         actorType: ActorType.Business,
-        workspaceIds: ['ws-1'],
-        roles: ['Role1'],
-        linkedWallets: [],
+        fullName: 'John Doe',
+        nationalId: '12345678',
+        location: '',
+        businessName: '',
+        saccoId: '',
       });
     });
   });
@@ -316,8 +320,8 @@ describe('useSignupWizard', () => {
 
       await act(async () => {
         await result.current.initSession(ActorType.Rider);
-        result.current.updateField('workspaceIds', ['ws-456']);
-        result.current.updateField('roles', ['Manager']);
+        result.current.updateField('fullName', 'Jane Doe');
+        result.current.updateField('nationalId', '87654321');
         result.current.goToStep(1);
       });
 
@@ -326,10 +330,12 @@ describe('useSignupWizard', () => {
       });
 
       expect(mockUpdateStep).toHaveBeenCalledWith('session-123', {
-        stepName: 'workspace',
-        workspaceIds: ['ws-456'],
-        roles: ['Manager'],
-        linkedWallets: undefined,
+        stepName: 'personal-details',
+        fullName: 'Jane Doe',
+        nationalId: '87654321',
+        location: undefined,
+        businessName: undefined,
+        saccoId: undefined,
       });
     });
   });
@@ -386,7 +392,7 @@ describe('useSignupWizard', () => {
 
       await act(async () => {
         await result.current.initSession(ActorType.Rider);
-        result.current.updateField('workspaceIds', ['ws-1']);
+        result.current.updateField('fullName', 'Test User');
         result.current.nextStep();
       });
 
@@ -412,10 +418,12 @@ describe('useSignupWizard', () => {
         sessionId: 'stored-session-id',
         status: SignUpSessionStatus.PARTIAL,
         actorType: ActorType.Business,
-        workspaceIds: ['recovered-ws'],
-        roles: ['Admin'],
-        linkedWallets: ['0xabc'],
-        completedSteps: ['account-type', 'workspace'],
+        fullName: 'Recovered User',
+        nationalId: '12345678',
+        location: 'Nairobi',
+        businessName: 'Test Business',
+        saccoId: null,
+        completedSteps: ['account-type', 'personal-details'],
         expiresAt: '2024-01-02T00:00:00Z',
         createdAt: '2024-01-01T00:00:00Z',
         updatedAt: '2024-01-01T12:00:00Z',
@@ -428,10 +436,11 @@ describe('useSignupWizard', () => {
       });
 
       expect(result.current.formData.actorType).toBe(ActorType.Business);
-      expect(result.current.formData.workspaceIds).toEqual(['recovered-ws']);
-      expect(result.current.formData.roles).toEqual(['Admin']);
-      expect(result.current.formData.linkedWallets).toEqual(['0xabc']);
-      expect(result.current.completedSteps).toEqual(['account-type', 'workspace']);
+      expect(result.current.formData.fullName).toEqual('Recovered User');
+      expect(result.current.formData.nationalId).toEqual('12345678');
+      expect(result.current.formData.location).toEqual('Nairobi');
+      expect(result.current.formData.businessName).toEqual('Test Business');
+      expect(result.current.completedSteps).toEqual(['account-type', 'personal-details']);
       expect(result.current.currentStep).toBe(2);
     });
 

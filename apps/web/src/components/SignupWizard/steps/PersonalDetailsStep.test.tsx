@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PersonalDetailsStep } from './PersonalDetailsStep';
@@ -125,7 +124,7 @@ describe('PersonalDetailsStep', () => {
       );
 
       // Re-render
-      const { rerender } = render(<PersonalDetailsStep />);
+      render(<PersonalDetailsStep />);
 
       // Validation error should be gone
       expect(screen.queryByText('Full name is required')).not.toBeInTheDocument();

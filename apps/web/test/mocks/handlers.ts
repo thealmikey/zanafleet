@@ -26,9 +26,11 @@ function createMockSession(
     sessionId,
     status: SignUpSessionStatus.INITIATED,
     actorType,
-    workspaceId: null,
-    roles: [],
-    linkedWallets: [],
+    fullName: null,
+    nationalId: null,
+    location: null,
+    saccoId: null,
+    businessName: null,
     completedSteps: [],
     expiresAt: expiresAt.toISOString(),
     createdAt: now.toISOString(),
@@ -108,20 +110,28 @@ export const handlers = [
 
     const body = (await request.json()) as {
       stepName?: string;
-      workspaceId?: string;
-      roles?: string[];
-      linkedWallets?: string[];
+      fullName?: string;
+      nationalId?: string;
+      location?: string;
+      businessName?: string;
+      saccoId?: string;
     };
 
     // Update session fields
-    if (body.workspaceId !== undefined) {
-      session.workspaceId = body.workspaceId;
+    if (body.fullName !== undefined) {
+      session.fullName = body.fullName;
     }
-    if (body.roles !== undefined) {
-      session.roles = body.roles;
+    if (body.nationalId !== undefined) {
+      session.nationalId = body.nationalId;
     }
-    if (body.linkedWallets !== undefined) {
-      session.linkedWallets = body.linkedWallets;
+    if (body.location !== undefined) {
+      session.location = body.location;
+    }
+    if (body.businessName !== undefined) {
+      session.businessName = body.businessName;
+    }
+    if (body.saccoId !== undefined) {
+      session.saccoId = body.saccoId;
     }
 
     // Track completed steps
@@ -155,10 +165,10 @@ export const handlers = [
       return HttpResponse.json({ message: 'Session not found', statusCode: 404 }, { status: 404 });
     }
 
-    // Validate workspaceId is set (required for finalization)
-    if (!session.workspaceId) {
+    // Validate required fields are set
+    if (!session.fullName || !session.nationalId || !session.location) {
       return HttpResponse.json(
-        { message: 'workspaceId is required for finalization', statusCode: 400 },
+        { message: 'fullName, nationalId, and location are required for finalization', statusCode: 400 },
         { status: 400 }
       );
     }
@@ -168,7 +178,7 @@ export const handlers = [
 
     const response: FinalizeSignupResponse = {
       actorId: crypto.randomUUID(),
-      workspaceId: session.workspaceId,
+      workspaceId: crypto.randomUUID(),
     };
 
     return HttpResponse.json(response);
