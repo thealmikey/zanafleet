@@ -61,6 +61,9 @@ export interface UpdateStepRequest {
   location?: string;
   saccoName?: string;
   businessName?: string;
+  email?: string;
+  phone?: string;
+  password?: string;
 }
 
 /**
@@ -89,6 +92,8 @@ export interface SignupSession {
   location: string | null;
   saccoName: string | null;
   businessName: string | null;
+  email: string | null;
+  phone: string | null;
 }
 
 /**

@@ -36,6 +36,9 @@ export interface WizardFormData {
   location: string;
   businessName: string;
   saccoName: string;
+  email: string;
+  phone: string;
+  password: string;
 }
 
 export interface SignupWizardState {
@@ -77,6 +80,9 @@ const initialFormData: WizardFormData = {
   location: '',
   businessName: '',
   saccoName: '',
+  email: '',
+  phone: '',
+  password: '',
 };
 
 const initialState: SignupWizardState = {
@@ -116,6 +122,9 @@ function reducer(state: SignupWizardState, action: Action): SignupWizardState {
           location: action.payload.location ?? '',
           businessName: action.payload.businessName ?? '',
           saccoName: action.payload.saccoName ?? '',
+          email: action.payload.email ?? '',
+          phone: action.payload.phone ?? '',
+          password: '', // Never restored from server
         },
         completedSteps: action.payload.completedSteps,
         currentStep: Math.max(0, action.payload.completedSteps.length),
@@ -233,6 +242,9 @@ export function SignupWizardProvider({ children }: SignupWizardProviderProps): R
         location: state.formData.location || undefined,
         businessName: state.formData.businessName || undefined,
         saccoName: state.formData.saccoName || undefined,
+        email: state.formData.email || undefined,
+        phone: state.formData.phone || undefined,
+        password: state.formData.password || undefined,
       });
       dispatch({ type: 'SET_COMPLETED_STEPS', payload: response.completedSteps });
     } catch (err) {
