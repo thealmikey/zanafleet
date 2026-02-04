@@ -11,6 +11,7 @@ import { NotificationPreferenceEntity } from './entities/preference.entity';
 import { SendNotificationCommandHandler } from './handlers/send-notification.handler';
 import { TemplateService } from './services/template.service';
 import { PreferenceService } from './services/preference.service';
+import { MessageBuilderService } from './services/message-builder.service';
 import { CommunicationSubscriber } from './subscribers/communication.subscriber';
 import { NotificationSubscriber } from './subscribers/notification.subscriber';
 import { NotificationNeo4jProjection } from './projections/notification-neo4j.projection';
@@ -34,6 +35,7 @@ import { NotificationNeo4jProjection } from './projections/notification-neo4j.pr
     SendNotificationCommandHandler,
     TemplateService,
     PreferenceService,
+    MessageBuilderService,
     CommunicationSubscriber,
     NotificationNeo4jProjection,
     NotificationSubscriber,
