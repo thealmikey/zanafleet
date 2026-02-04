@@ -10,12 +10,6 @@ import {
 import { useSignupWizard } from '../../../hooks/useSignupWizard';
 import { ActorType } from '../../../types';
 
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-function isValidUuid(value: string): boolean {
-  return UUID_REGEX.test(value);
-}
-
 export function PersonalDetailsStep(): React.ReactElement {
   const { formData, updateField, isLoading } = useSignupWizard();
   const [touched, setTouched] = useState({
@@ -23,7 +17,7 @@ export function PersonalDetailsStep(): React.ReactElement {
     nationalId: false,
     location: false,
     businessName: false,
-    saccoId: false,
+    saccoName: false,
   });
 
   const validationErrors = useMemo(
@@ -47,19 +41,13 @@ export function PersonalDetailsStep(): React.ReactElement {
             ? 'Business name is required'
             : null
           : null,
-      saccoId:
-        formData.actorType === ActorType.Rider &&
-        touched.saccoId &&
-        formData.saccoId.trim() !== '' &&
-        !isValidUuid(formData.saccoId)
-          ? 'Please enter a valid UUID format'
-          : null,
+      saccoName: null,
     }),
     [formData, touched],
   );
 
   const handleFieldChange = useCallback(
-    (field: keyof typeof touched) =>
+    (field: 'fullName' | 'nationalId' | 'location' | 'businessName' | 'saccoName') =>
       (event: React.ChangeEvent<HTMLInputElement>): void => {
         const value = event.target.value;
         updateField(field, value);
@@ -68,7 +56,7 @@ export function PersonalDetailsStep(): React.ReactElement {
   );
 
   const handleFieldBlur = useCallback(
-    (field: keyof typeof touched) =>
+    (field: 'fullName' | 'nationalId' | 'location' | 'businessName' | 'saccoName') =>
       (): void => {
         setTouched((prev) => ({ ...prev, [field]: true }));
       },
@@ -183,26 +171,23 @@ export function PersonalDetailsStep(): React.ReactElement {
           </FormControl>
         )}
 
-        {/* SACCO ID (conditional for Riders) */}
+        {/* SACCO Name (conditional for Riders) */}
         {formData.actorType === ActorType.Rider && (
-          <FormControl fullWidth error={!!validationErrors.saccoId}>
-            <FormLabel sx={{ mb: 1 }}>SACCO ID</FormLabel>
+          <FormControl fullWidth error={!!validationErrors.saccoName}>
+            <FormLabel sx={{ mb: 1 }}>SACCO Name</FormLabel>
             <TextField
-              name="saccoId"
-              value={formData.saccoId}
-              onChange={handleFieldChange('saccoId')}
-              onBlur={handleFieldBlur('saccoId')}
-              placeholder="a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+              name="saccoName"
+              value={formData.saccoName}
+              onChange={handleFieldChange('saccoName')}
+              onBlur={handleFieldBlur('saccoName')}
+              placeholder="Enter your SACCO name"
               disabled={isLoading}
-              error={!!validationErrors.saccoId}
-              helperText={
-                validationErrors.saccoId ||
-                'Enter the UUID of your SACCO. This is optional.'
-              }
+              error={!!validationErrors.saccoName}
+              helperText="Enter the name of your SACCO (optional)"
               fullWidth
               variant="outlined"
               inputProps={{
-                'aria-label': 'SACCO ID',
+                'aria-label': 'SACCO Name',
               }}
             />
           </FormControl>

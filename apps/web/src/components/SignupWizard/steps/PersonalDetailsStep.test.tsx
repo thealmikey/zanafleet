@@ -20,7 +20,7 @@ function createMockWizardState(overrides = {}): ReturnType<typeof useSignupWizar
       nationalId: '',
       location: '',
       businessName: '',
-      saccoId: '',
+      saccoName: '',
     },
     completedSteps: [],
     isLoading: false,
@@ -197,7 +197,7 @@ describe('PersonalDetailsStep', () => {
       expect(screen.queryByLabelText(/Business Name/i)).not.toBeInTheDocument();
     });
 
-    it('should show saccoId field when actorType is Rider', () => {
+    it('should show saccoName field when actorType is Rider', () => {
       mockUseSignupWizard.mockReturnValue(
         createMockWizardState({
           formData: {
@@ -206,17 +206,17 @@ describe('PersonalDetailsStep', () => {
             nationalId: '',
             location: '',
             businessName: '',
-            saccoId: '',
+            saccoName: '',
           },
         })
       );
 
       render(<PersonalDetailsStep />);
 
-      expect(screen.getByLabelText(/SACCO ID/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/SACCO Name/i)).toBeInTheDocument();
     });
 
-    it('should NOT show saccoId field when actorType is Business', () => {
+    it('should NOT show saccoName field when actorType is Business', () => {
       mockUseSignupWizard.mockReturnValue(
         createMockWizardState({
           formData: {
@@ -225,22 +225,22 @@ describe('PersonalDetailsStep', () => {
             nationalId: '',
             location: '',
             businessName: '',
-            saccoId: '',
+            saccoName: '',
           },
         })
       );
 
       render(<PersonalDetailsStep />);
 
-      expect(screen.queryByLabelText(/SACCO ID/i)).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/SACCO Name/i)).not.toBeInTheDocument();
     });
 
-    it('should NOT show saccoId field when actorType is null', () => {
+    it('should NOT show saccoName field when actorType is null', () => {
       mockUseSignupWizard.mockReturnValue(createMockWizardState());
 
       render(<PersonalDetailsStep />);
 
-      expect(screen.queryByLabelText(/SACCO ID/i)).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/SACCO Name/i)).not.toBeInTheDocument();
     });
 
     it('should show businessName as required for Business actor type', () => {
@@ -346,7 +346,7 @@ describe('PersonalDetailsStep', () => {
       expect(mockUpdateField).toHaveBeenCalledWith('businessName', 'ABC Transporters');
     });
 
-    it('should call updateField when saccoId changes for Rider actor', async () => {
+    it('should call updateField when saccoName changes for Rider actor', async () => {
       const user = userEvent.setup();
       mockUseSignupWizard.mockReturnValue(
         createMockWizardState({
@@ -356,20 +356,20 @@ describe('PersonalDetailsStep', () => {
             nationalId: '',
             location: '',
             businessName: '',
-            saccoId: '',
+            saccoName: '',
           },
         })
       );
 
       render(<PersonalDetailsStep />);
 
-      const saccoIdInput = screen.getByLabelText(/SACCO ID/i);
+      const saccoNameInput = screen.getByLabelText(/SACCO Name/i);
 
-      await user.type(saccoIdInput, 'a1b2c3d4-e5f6-7890-abcd-ef1234567890');
+      await user.type(saccoNameInput, 'My SACCO');
 
       expect(mockUpdateField).toHaveBeenCalledWith(
-        'saccoId',
-        'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
+        'saccoName',
+        'My SACCO'
       );
     });
   });
@@ -400,7 +400,7 @@ describe('PersonalDetailsStep', () => {
             nationalId: '12345678',
             location: 'Nairobi, Kenya',
             businessName: '',
-            saccoId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+            saccoName: 'My SACCO',
           },
         })
       );
@@ -410,12 +410,12 @@ describe('PersonalDetailsStep', () => {
       expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
       expect(screen.getByDisplayValue('12345678')).toBeInTheDocument();
       expect(screen.getByDisplayValue('Nairobi, Kenya')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('a1b2c3d4-e5f6-7890-abcd-ef1234567890')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('My SACCO')).toBeInTheDocument();
     });
   });
 
-  describe('SACCO ID validation', () => {
-    it('should show UUID format error for invalid saccoId', async () => {
+  describe('SACCO Name field', () => {
+    it('should accept any text for saccoName field', async () => {
       const user = userEvent.setup();
       mockUseSignupWizard.mockReturnValue(
         createMockWizardState({
@@ -425,23 +425,20 @@ describe('PersonalDetailsStep', () => {
             nationalId: '',
             location: '',
             businessName: '',
-            saccoId: 'invalid-uuid',
+            saccoName: '',
           },
         })
       );
 
       render(<PersonalDetailsStep />);
 
-      const saccoIdInput = screen.getByLabelText(/SACCO ID/i);
-      await user.click(saccoIdInput);
-      saccoIdInput.blur();
+      const saccoNameInput = screen.getByLabelText(/SACCO Name/i);
+      await user.type(saccoNameInput, 'Any Text Here');
 
-      await waitFor(() => {
-        expect(screen.getByText('Please enter a valid UUID format')).toBeInTheDocument();
-      });
+      expect(mockUpdateField).toHaveBeenCalledWith('saccoName', 'Any Text Here');
     });
 
-    it('should not show error for empty optional saccoId', () => {
+    it('should not show error for empty optional saccoName', () => {
       mockUseSignupWizard.mockReturnValue(
         createMockWizardState({
           formData: {
@@ -450,14 +447,14 @@ describe('PersonalDetailsStep', () => {
             nationalId: '',
             location: '',
             businessName: '',
-            saccoId: '',
+            saccoName: '',
           },
         })
       );
 
       render(<PersonalDetailsStep />);
 
-      expect(screen.queryByText('Please enter a valid UUID format')).not.toBeInTheDocument();
+      expect(screen.queryByText(/error/i)).not.toBeInTheDocument();
     });
   });
 });

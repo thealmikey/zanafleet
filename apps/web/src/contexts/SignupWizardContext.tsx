@@ -35,7 +35,7 @@ export interface WizardFormData {
   nationalId: string;
   location: string;
   businessName: string;
-  saccoId: string;
+  saccoName: string;
 }
 
 export interface SignupWizardState {
@@ -76,7 +76,7 @@ const initialFormData: WizardFormData = {
   nationalId: '',
   location: '',
   businessName: '',
-  saccoId: '',
+  saccoName: '',
 };
 
 const initialState: SignupWizardState = {
@@ -115,7 +115,7 @@ function reducer(state: SignupWizardState, action: Action): SignupWizardState {
           nationalId: action.payload.nationalId ?? '',
           location: action.payload.location ?? '',
           businessName: action.payload.businessName ?? '',
-          saccoId: action.payload.saccoId ?? '',
+          saccoName: action.payload.saccoName ?? '',
         },
         completedSteps: action.payload.completedSteps,
         currentStep: Math.max(0, action.payload.completedSteps.length),
@@ -232,7 +232,7 @@ export function SignupWizardProvider({ children }: SignupWizardProviderProps): R
         nationalId: state.formData.nationalId || undefined,
         location: state.formData.location || undefined,
         businessName: state.formData.businessName || undefined,
-        saccoId: state.formData.saccoId || undefined,
+        saccoName: state.formData.saccoName || undefined,
       });
       dispatch({ type: 'SET_COMPLETED_STEPS', payload: response.completedSteps });
     } catch (err) {

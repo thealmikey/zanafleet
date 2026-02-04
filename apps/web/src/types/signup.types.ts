@@ -59,7 +59,7 @@ export interface UpdateStepRequest {
   fullName?: string;
   nationalId?: string;
   location?: string;
-  saccoId?: string;
+  saccoName?: string;
   businessName?: string;
 }
 
@@ -87,7 +87,7 @@ export interface SignupSession {
   fullName: string | null;
   nationalId: string | null;
   location: string | null;
-  saccoId: string | null;
+  saccoName: string | null;
   businessName: string | null;
 }
 

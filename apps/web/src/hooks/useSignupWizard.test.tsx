@@ -58,7 +58,7 @@ describe('useSignupWizard', () => {
         nationalId: '',
         location: '',
         businessName: '',
-        saccoId: '',
+        saccoName: '',
       });
       expect(result.current.completedSteps).toEqual([]);
       expect(result.current.isLoading).toBe(false);
@@ -302,7 +302,7 @@ describe('useSignupWizard', () => {
         nationalId: undefined,
         location: undefined,
         businessName: undefined,
-        saccoId: undefined,
+        saccoName: undefined,
       });
       expect(result.current.completedSteps).toEqual(['account-type']);
     });
@@ -337,7 +337,7 @@ describe('useSignupWizard', () => {
         nationalId: '87654321',
         location: undefined,
         businessName: undefined,
-        saccoId: undefined,
+        saccoName: undefined,
       });
     });
   });
@@ -424,7 +424,7 @@ describe('useSignupWizard', () => {
         nationalId: '12345678',
         location: 'Nairobi',
         businessName: 'Test Business',
-        saccoId: null,
+        saccoName: null,
         completedSteps: ['account-type', 'personal-details'],
         expiresAt: '2024-01-02T00:00:00Z',
         createdAt: '2024-01-01T00:00:00Z',

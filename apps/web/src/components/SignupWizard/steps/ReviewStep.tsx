@@ -86,9 +86,9 @@ export function ReviewStep({ onComplete }: ReviewStepProps): React.ReactElement 
 
   if (formData.actorType === ActorType.Rider) {
     fieldSummaries.push({
-      label: 'SACCO ID',
-      value: formData.saccoId || null,
-      isFilled: formData.saccoId.trim() !== '',
+      label: 'SACCO Name',
+      value: formData.saccoName || null,
+      isFilled: formData.saccoName.trim() !== '',
       isRequired: false,
       icon: <GroupsIcon />,
     });
