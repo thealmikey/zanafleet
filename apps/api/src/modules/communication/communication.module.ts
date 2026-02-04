@@ -7,8 +7,10 @@ import { MessagingModule } from '../../core/messaging/messaging.module';
 
 import { NotificationEntity } from './entities/notification.entity';
 import { TemplateEntity } from './entities/template.entity';
+import { NotificationPreferenceEntity } from './entities/preference.entity';
 import { SendNotificationCommandHandler } from './handlers/send-notification.handler';
 import { TemplateService } from './services/template.service';
+import { PreferenceService } from './services/preference.service';
 import { CommunicationSubscriber } from './subscribers/communication.subscriber';
 import { NotificationSubscriber } from './subscribers/notification.subscriber';
 import { NotificationNeo4jProjection } from './projections/notification-neo4j.projection';
@@ -26,15 +28,16 @@ import { NotificationNeo4jProjection } from './projections/notification-neo4j.pr
     CqrsModule,
     MessagingModule,
     EventBusModule.forFeature(),
-    TypeOrmModule.forFeature([NotificationEntity, TemplateEntity]),
+    TypeOrmModule.forFeature([NotificationEntity, TemplateEntity, NotificationPreferenceEntity]),
   ],
   providers: [
     SendNotificationCommandHandler,
     TemplateService,
+    PreferenceService,
     CommunicationSubscriber,
     NotificationNeo4jProjection,
     NotificationSubscriber,
   ],
-  exports: [TemplateService],
+  exports: [TemplateService, PreferenceService],
 })
 export class CommunicationModule {}

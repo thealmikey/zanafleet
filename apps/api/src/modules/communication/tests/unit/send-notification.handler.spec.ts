@@ -12,6 +12,8 @@ import {
 } from '../../dto/notification.enums';
 import { NotificationSentEventV1 } from '../../events/notification-sent.event';
 import { NotificationFailedEventV1 } from '../../events/notification-failed.event';
+import { NotificationSkippedEventV1 } from '../../events/notification-skipped.event';
+import { PreferenceService } from '../../services/preference.service';
 
 describe('SendNotificationCommandHandler', () => {
   let handler: SendNotificationCommandHandler;
@@ -27,6 +29,10 @@ describe('SendNotificationCommandHandler', () => {
 
   const mockEventBus = {
     publish: jest.fn(),
+  };
+
+  const mockPreferenceService = {
+    isEnabled: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -47,12 +53,19 @@ describe('SendNotificationCommandHandler', () => {
           provide: EventBus,
           useValue: mockEventBus,
         },
+        {
+          provide: PreferenceService,
+          useValue: mockPreferenceService,
+        },
       ],
     }).compile();
 
     handler = module.get<SendNotificationCommandHandler>(
       SendNotificationCommandHandler,
     );
+
+    // Default all preference checks to enabled
+    mockPreferenceService.isEnabled.mockResolvedValue(true);
   });
 
   describe('execute', () => {
@@ -430,6 +443,114 @@ describe('SendNotificationCommandHandler', () => {
       await handler.execute(command);
 
       expect(mockNotificationRepository.create).toHaveBeenCalled();
+    });
+
+    it('should check preferences before sending', async () => {
+      const command = new SendNotificationCommand(
+        'recipient-id-123',
+        RecipientType.ACTOR,
+        NotificationChannel.EMAIL,
+        'template-123',
+        {},
+        'workspace-id-123',
+        'corr-id-123',
+      );
+
+      const mockNotification = {
+        id: 'notification-id-123',
+        channel: NotificationChannel.EMAIL,
+        recipientId: 'recipient-id-123',
+        recipientType: RecipientType.ACTOR,
+        status: NotificationStatus.PENDING,
+        templateId: 'template-123',
+        renderedSubject: 'Test',
+        renderedBody: 'Test body',
+        workspaceId: 'workspace-id-123',
+        correlationId: 'corr-id-123',
+        attempts: 1,
+      };
+
+      mockNotificationRepository.create.mockReturnValue(mockNotification);
+      mockMessagingService.send.mockResolvedValue({
+        success: true,
+        messageId: 'msg-123',
+      });
+
+      await handler.execute(command);
+
+      expect(mockPreferenceService.isEnabled).toHaveBeenCalledWith(
+        'recipient-id-123',
+        RecipientType.ACTOR,
+        NotificationChannel.EMAIL,
+        'workspace-id-123',
+      );
+    });
+
+    it('should skip notification and emit NotificationSkippedEventV1 when preferences disabled', async () => {
+      mockPreferenceService.isEnabled.mockResolvedValue(false);
+
+      const command = new SendNotificationCommand(
+        'recipient-id-123',
+        RecipientType.ACTOR,
+        NotificationChannel.EMAIL,
+        'template-123',
+        {},
+        'workspace-id-123',
+        'corr-id-123',
+      );
+
+      const result = await handler.execute(command);
+
+      expect(mockMessagingService.send).not.toHaveBeenCalled();
+      expect(mockEventBus.publish).toHaveBeenCalledWith(
+        expect.any(NotificationSkippedEventV1),
+      );
+
+      const publishedEvent = mockEventBus.publish.mock.calls[0][0];
+      expect(publishedEvent.eventType).toBe('NotificationSkippedEvent-V1');
+      expect(publishedEvent.reason).toBe('PREFERENCE_DISABLED');
+      expect(publishedEvent.recipientId).toBe('recipient-id-123');
+      expect(publishedEvent.correlationId).toBe('corr-id-123');
+      expect(result).toEqual({ notificationId: expect.any(String) });
+    });
+
+    it('should proceed with sending when preferences enabled', async () => {
+      mockPreferenceService.isEnabled.mockResolvedValue(true);
+
+      const command = new SendNotificationCommand(
+        'recipient-id-123',
+        RecipientType.RIDER,
+        NotificationChannel.SMS,
+        'otp-template',
+        { code: '123456' },
+        'workspace-id-123',
+      );
+
+      const mockNotification = {
+        id: 'notification-id-123',
+        channel: NotificationChannel.SMS,
+        recipientId: 'recipient-id-123',
+        recipientType: RecipientType.RIDER,
+        status: NotificationStatus.PENDING,
+        templateId: 'otp-template',
+        renderedSubject: null,
+        renderedBody: 'Your OTP is 123456',
+        workspaceId: 'workspace-id-123',
+        attempts: 1,
+      };
+
+      mockNotificationRepository.create.mockReturnValue(mockNotification);
+      mockMessagingService.send.mockResolvedValue({
+        success: true,
+        messageId: 'sms_msg_123',
+      });
+
+      await handler.execute(command);
+
+      expect(mockMessagingService.send).toHaveBeenCalled();
+      expect(mockEventBus.publish).toHaveBeenCalledWith(
+        expect.any(NotificationSentEventV1),
+      );
     });
   });
 });

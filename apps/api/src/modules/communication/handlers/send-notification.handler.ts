@@ -9,6 +9,8 @@ import { NotificationEntity } from '../entities/notification.entity';
 import { NotificationStatus } from '../dto/notification.enums';
 import { NotificationSentEventV1 } from '../events/notification-sent.event';
 import { NotificationFailedEventV1 } from '../events/notification-failed.event';
+import { NotificationSkippedEventV1 } from '../events/notification-skipped.event';
+import { PreferenceService } from '../services/preference.service';
 
 /**
  * SendNotificationCommandHandler
@@ -25,6 +27,7 @@ export class SendNotificationCommandHandler implements ICommandHandler<SendNotif
     private readonly notificationRepository: Repository<NotificationEntity>,
     private readonly messagingService: MessagingService,
     private readonly eventBus: EventBus,
+    private readonly preferenceService: PreferenceService,
   ) {}
 
   async execute(command: SendNotificationCommand): Promise<{ notificationId: string }> {
@@ -34,6 +37,36 @@ export class SendNotificationCommandHandler implements ICommandHandler<SendNotif
     this.logger.log(
       `Processing notification command for recipient ${command.recipientId} via ${command.channel}`,
     );
+
+    // Check if notifications are enabled for this recipient and channel
+    const isEnabled = await this.preferenceService.isEnabled(
+      command.recipientId,
+      command.recipientType,
+      command.channel,
+      command.workspaceId,
+    );
+
+    if (!isEnabled) {
+      const skippedEvent = new NotificationSkippedEventV1({
+        eventId,
+        notificationId,
+        recipientId: command.recipientId,
+        recipientType: command.recipientType,
+        channel: command.channel,
+        templateId: command.templateId,
+        reason: 'PREFERENCE_DISABLED',
+        workspaceId: command.workspaceId,
+        correlationId: command.correlationId,
+        causationId: command.causationId,
+      });
+
+      this.eventBus.publish(skippedEvent);
+      this.logger.log(
+        `Notification ${notificationId} skipped for recipient ${command.recipientId}: preferences disabled`,
+      );
+
+      return { notificationId };
+    }
 
     try {
       const notification = this.notificationRepository.create({
