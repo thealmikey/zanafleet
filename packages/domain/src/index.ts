@@ -101,6 +101,126 @@ export class Money {
   }
 }
 
+export class LocationId {
+  private readonly value: string;
+
+  private constructor(value: string) {
+    this.value = value;
+  }
+
+  static create(): LocationId {
+    return new LocationId(uuidv4());
+  }
+
+  static from(value: string): LocationId {
+    if (!value || typeof value !== 'string') {
+      throw new Error('LocationId must be a non-empty string');
+    }
+    return new LocationId(value);
+  }
+
+  toString(): string {
+    return this.value;
+  }
+
+  equals(other: LocationId): boolean {
+    return this.value === other.value;
+  }
+}
+
+export class Location {
+  private constructor(
+    public readonly latitude: number,
+    public readonly longitude: number,
+    public readonly humanReadableName: string,
+    public readonly administrativeArea: string,
+    public readonly country: string,
+  ) {}
+
+  static create(data: {
+    latitude: number;
+    longitude: number;
+    humanReadableName: string;
+    administrativeArea: string;
+    country?: string;
+  }): Location {
+    // Validate latitude
+    if (typeof data.latitude !== 'number' || isNaN(data.latitude)) {
+      throw new Error('Latitude must be a valid number');
+    }
+    if (data.latitude < -90 || data.latitude > 90) {
+      throw new Error('Latitude must be between -90 and 90');
+    }
+
+    // Validate longitude
+    if (typeof data.longitude !== 'number' || isNaN(data.longitude)) {
+      throw new Error('Longitude must be a valid number');
+    }
+    if (data.longitude < -180 || data.longitude > 180) {
+      throw new Error('Longitude must be between -180 and 180');
+    }
+
+    // Validate humanReadableName
+    const humanReadableName = data.humanReadableName?.trim();
+    if (!humanReadableName) {
+      throw new Error('Human readable name is required and cannot be empty');
+    }
+
+    // Validate administrativeArea
+    const administrativeArea = data.administrativeArea?.trim();
+    if (!administrativeArea) {
+      throw new Error('Administrative area is required and cannot be empty');
+    }
+
+    // Country defaults to 'Kenya'
+    const country = data.country?.trim() || 'Kenya';
+
+    return new Location(
+      data.latitude,
+      data.longitude,
+      humanReadableName,
+      administrativeArea,
+      country,
+    );
+  }
+
+  equals(other: Location): boolean {
+    return (
+      this.latitude === other.latitude &&
+      this.longitude === other.longitude &&
+      this.humanReadableName === other.humanReadableName &&
+      this.administrativeArea === other.administrativeArea &&
+      this.country === other.country
+    );
+  }
+
+  toJSON(): {
+    latitude: number;
+    longitude: number;
+    humanReadableName: string;
+    administrativeArea: string;
+    country: string;
+  } {
+    return {
+      latitude: this.latitude,
+      longitude: this.longitude,
+      humanReadableName: this.humanReadableName,
+      administrativeArea: this.administrativeArea,
+      country: this.country,
+    };
+  }
+
+  static fromJSON(data: {
+    latitude: number;
+    longitude: number;
+    humanReadableName: string;
+    administrativeArea: string;
+    country?: string;
+  }): Location {
+    return Location.create(data);
+  }
+}
+
 // ============================================================================
 // Domain Event Base
 // ============================================================================
@@ -155,6 +275,7 @@ export type {
   ValidatedUser,
   CreateActorInput,
   SignUpSessionResponse,
+  LocationData,
 } from '@zanafleet/contracts';
 
 export {

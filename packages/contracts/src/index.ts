@@ -153,6 +153,26 @@ export interface SignUpSessionResponse {
 }
 
 // ============================================================================
+// Location Contracts
+// ============================================================================
+
+export interface LocationData {
+  latitude: number;
+  longitude: number;
+  humanReadableName: string;
+  administrativeArea: string;
+  country: string;
+}
+
+export interface CreateLocationInput {
+  latitude?: number;
+  longitude?: number;
+  humanReadableName: string;
+  administrativeArea: string;
+  country?: string;
+}
+
+// ============================================================================
 // Sacco Contracts
 // ============================================================================
 
