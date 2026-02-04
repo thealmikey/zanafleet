@@ -21,6 +21,9 @@ function createMockWizardState(overrides = {}): ReturnType<typeof useSignupWizar
       location: '',
       businessName: '',
       saccoName: '',
+      email: '',
+      phone: '',
+      password: '',
     },
     completedSteps: [],
     isLoading: false,
@@ -119,6 +122,9 @@ describe('PersonalDetailsStep', () => {
             location: '',
             businessName: '',
             saccoId: '',
+            email: '',
+            phone: '',
+            password: '',
           },
         })
       );
@@ -142,6 +148,9 @@ describe('PersonalDetailsStep', () => {
             location: '',
             businessName: '',
             saccoId: '',
+            email: '',
+            phone: '',
+            password: '',
           },
         })
       );
@@ -161,6 +170,9 @@ describe('PersonalDetailsStep', () => {
             location: '',
             businessName: '',
             saccoId: '',
+            email: '',
+            phone: '',
+            password: '',
           },
         })
       );
@@ -180,6 +192,9 @@ describe('PersonalDetailsStep', () => {
             location: '',
             businessName: '',
             saccoId: '',
+            email: '',
+            phone: '',
+            password: '',
           },
         })
       );
@@ -207,6 +222,9 @@ describe('PersonalDetailsStep', () => {
             location: '',
             businessName: '',
             saccoName: '',
+            email: '',
+            phone: '',
+            password: '',
           },
         })
       );
@@ -226,6 +244,9 @@ describe('PersonalDetailsStep', () => {
             location: '',
             businessName: '',
             saccoName: '',
+            email: '',
+            phone: '',
+            password: '',
           },
         })
       );
@@ -253,6 +274,9 @@ describe('PersonalDetailsStep', () => {
             location: '',
             businessName: '',
             saccoId: '',
+            email: '',
+            phone: '',
+            password: '',
           },
         })
       );
@@ -275,6 +299,9 @@ describe('PersonalDetailsStep', () => {
             location: '',
             businessName: '',
             saccoId: '',
+            email: '',
+            phone: '',
+            password: '',
           },
         })
       );
@@ -333,6 +360,9 @@ describe('PersonalDetailsStep', () => {
             location: '',
             businessName: '',
             saccoId: '',
+            email: '',
+            phone: '',
+            password: '',
           },
         })
       );
@@ -357,6 +387,9 @@ describe('PersonalDetailsStep', () => {
             location: '',
             businessName: '',
             saccoName: '',
+            email: '',
+            phone: '',
+            password: '',
           },
         })
       );
@@ -401,6 +434,9 @@ describe('PersonalDetailsStep', () => {
             location: 'Nairobi, Kenya',
             businessName: '',
             saccoName: 'My SACCO',
+            email: '',
+            phone: '',
+            password: '',
           },
         })
       );
@@ -426,6 +462,9 @@ describe('PersonalDetailsStep', () => {
             location: '',
             businessName: '',
             saccoName: '',
+            email: '',
+            phone: '',
+            password: '',
           },
         })
       );
@@ -448,6 +487,9 @@ describe('PersonalDetailsStep', () => {
             location: '',
             businessName: '',
             saccoName: '',
+            email: '',
+            phone: '',
+            password: '',
           },
         })
       );
