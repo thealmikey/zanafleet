@@ -59,6 +59,9 @@ describe('useSignupWizard', () => {
         location: '',
         businessName: '',
         saccoName: '',
+        email: '',
+        phone: '',
+        password: '',
       });
       expect(result.current.completedSteps).toEqual([]);
       expect(result.current.isLoading).toBe(false);
@@ -195,7 +198,10 @@ describe('useSignupWizard', () => {
         nationalId: '12345678',
         location: '',
         businessName: '',
-        saccoId: '',
+        saccoName: '',
+        email: '',
+        phone: '',
+        password: '',
       });
     });
   });
@@ -425,6 +431,8 @@ describe('useSignupWizard', () => {
         location: 'Nairobi',
         businessName: 'Test Business',
         saccoName: null,
+        email: null,
+        phone: null,
         completedSteps: ['account-type', 'personal-details'],
         expiresAt: '2024-01-02T00:00:00Z',
         createdAt: '2024-01-01T00:00:00Z',
