@@ -30,7 +30,7 @@ function createTestSession(overrides: Partial<SignupSession> = {}): SignupSessio
     sessionId: 'test-session-123',
     status: SignUpSessionStatus.PARTIAL,
     actorType: ActorType.Rider,
-    workspaceId: null,
+    workspaceIds: [],
     roles: [],
     linkedWallets: [],
     completedSteps: ['account-type'],
@@ -41,7 +41,6 @@ function createTestSession(overrides: Partial<SignupSession> = {}): SignupSessio
   };
 }
 
-const VALID_WORKSPACE_ID = '123e4567-e89b-12d3-a456-426614174000';
 const VALID_WALLET_ADDRESS = '0x1234567890123456789012345678901234567890';
 
 describe('SignupWizard Integration Tests', () => {
@@ -62,23 +61,11 @@ describe('SignupWizard Integration Tests', () => {
         expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
       });
 
-      // Click Next to proceed to Workspace step
+      // Click Next to proceed to Roles step
       const nextButton = screen.getByRole('button', { name: /next/i });
       await user.click(nextButton);
 
-      // Step 2: Workspace Configuration
-      await waitFor(() => {
-        expect(screen.getByText('Workspace Configuration')).toBeInTheDocument();
-      });
-
-      // Enter valid workspace ID
-      const workspaceInput = screen.getByRole('textbox', { name: /workspace id/i });
-      await user.type(workspaceInput, VALID_WORKSPACE_ID);
-
-      // Click Next to proceed to Roles step
-      await user.click(screen.getByRole('button', { name: /next/i }));
-
-      // Step 3: Roles Assignment
+      // Step 2: Roles Assignment
       await waitFor(() => {
         expect(screen.getByText('Assign Roles')).toBeInTheDocument();
       });
@@ -86,7 +73,7 @@ describe('SignupWizard Integration Tests', () => {
       // Add a role (optional step, just proceed)
       await user.click(screen.getByRole('button', { name: /next/i }));
 
-      // Step 4: Wallets
+      // Step 3: Wallets
       await waitFor(() => {
         expect(screen.getByText('Link Wallets')).toBeInTheDocument();
       });
@@ -94,14 +81,13 @@ describe('SignupWizard Integration Tests', () => {
       // Skip wallets (optional step)
       await user.click(screen.getByRole('button', { name: /next/i }));
 
-      // Step 5: Review
+      // Step 4: Review
       await waitFor(() => {
         expect(screen.getByText('Review & Confirm')).toBeInTheDocument();
       });
 
       // Verify summary shows our selections
       expect(screen.getByText('Rider')).toBeInTheDocument();
-      expect(screen.getByText(VALID_WORKSPACE_ID)).toBeInTheDocument();
 
       // Click Finalize
       const finalizeButton = screen.getByRole('button', { name: /finalize account/i });
@@ -117,7 +103,7 @@ describe('SignupWizard Integration Tests', () => {
       expect(onComplete).toHaveBeenCalledWith(
         expect.objectContaining({
           actorId: expect.any(String),
-          workspaceId: VALID_WORKSPACE_ID,
+          workspaceId: expect.any(String),
         }),
       );
     });
@@ -130,16 +116,6 @@ describe('SignupWizard Integration Tests', () => {
       await waitFor(() => {
         expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
       });
-      await user.click(screen.getByRole('button', { name: /next/i }));
-
-      // Complete workspace step
-      await waitFor(() => {
-        expect(screen.getByText('Workspace Configuration')).toBeInTheDocument();
-      });
-      await user.type(
-        screen.getByRole('textbox', { name: /workspace id/i }),
-        VALID_WORKSPACE_ID,
-      );
       await user.click(screen.getByRole('button', { name: /next/i }));
 
       // Add roles
@@ -179,9 +155,8 @@ describe('SignupWizard Integration Tests', () => {
       const existingSession = createTestSession({
         sessionId: 'recovered-session-456',
         actorType: ActorType.SaccoAdmin,
-        workspaceId: VALID_WORKSPACE_ID,
         roles: ['Manager'],
-        completedSteps: ['account-type', 'workspace', 'roles'],
+        completedSteps: ['account-type', 'roles'],
       });
       seedMockSession(existingSession);
 
@@ -192,7 +167,7 @@ describe('SignupWizard Integration Tests', () => {
 
       // Wait for session to be loaded
       await waitFor(() => {
-        // Should be on step 4 (index 3) since 3 steps were completed
+        // Should be on step 3 (index 2) since 2 steps were completed
         expect(screen.getByText('Link Wallets')).toBeInTheDocument();
       });
 
@@ -205,7 +180,6 @@ describe('SignupWizard Integration Tests', () => {
 
       // Verify restored data is displayed
       expect(screen.getByText('SaccoAdmin')).toBeInTheDocument();
-      expect(screen.getByText(VALID_WORKSPACE_ID)).toBeInTheDocument();
       expect(screen.getByText('Manager')).toBeInTheDocument();
     });
 
@@ -228,14 +202,14 @@ describe('SignupWizard Integration Tests', () => {
       const existingSession = createTestSession({
         sessionId: 'wallet-session-789',
         linkedWallets: [VALID_WALLET_ADDRESS, '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd'],
-        completedSteps: ['account-type', 'workspace', 'roles', 'wallets'],
+        completedSteps: ['account-type', 'roles', 'wallets'],
       });
       seedMockSession(existingSession);
       localStorage.setItem('zanafleet_signup_session_id', existingSession.sessionId);
 
       renderWithProvider(<SignupWizard />);
 
-      // Should land on review step (index 4)
+      // Should land on review step (index 3)
       await waitFor(() => {
         expect(screen.getByText('Review & Confirm')).toBeInTheDocument();
       });
@@ -246,49 +220,6 @@ describe('SignupWizard Integration Tests', () => {
   });
 
   describe('3. Partial Progress Saving via PATCH Endpoint', () => {
-    it('saves workspace ID via PATCH when saveProgress is called', async () => {
-      const { user } = renderWithProvider(<SignupWizard />);
-
-      // Start session
-      await user.click(screen.getByLabelText('Internal'));
-      await waitFor(() => {
-        expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
-      });
-
-      // Get the session ID from localStorage
-      const sessionId = localStorage.getItem('zanafleet_signup_session_id');
-      expect(sessionId).not.toBeNull();
-
-      // Go to workspace step
-      await user.click(screen.getByRole('button', { name: /next/i }));
-      await waitFor(() => {
-        expect(screen.getByText('Workspace Configuration')).toBeInTheDocument();
-      });
-
-      // Enter workspace ID
-      await user.type(
-        screen.getByRole('textbox', { name: /workspace id/i }),
-        VALID_WORKSPACE_ID,
-      );
-
-      // Continue through the flow (this exercises the state updates)
-      await user.click(screen.getByRole('button', { name: /next/i }));
-
-      // Verify the session has the workspace ID in state
-      await waitFor(() => {
-        expect(screen.getByText('Assign Roles')).toBeInTheDocument();
-      });
-
-      // The form data should contain the workspace ID
-      // Navigate to review to verify
-      await user.click(screen.getByRole('button', { name: /next/i }));
-      await user.click(screen.getByRole('button', { name: /next/i }));
-
-      await waitFor(() => {
-        expect(screen.getByText(VALID_WORKSPACE_ID)).toBeInTheDocument();
-      });
-    });
-
     it('updates session with roles via state management', async () => {
       const { user } = renderWithProvider(<SignupWizard />);
 
@@ -297,15 +228,6 @@ describe('SignupWizard Integration Tests', () => {
       await waitFor(() => {
         expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
       });
-      await user.click(screen.getByRole('button', { name: /next/i }));
-
-      await waitFor(() => {
-        expect(screen.getByText('Workspace Configuration')).toBeInTheDocument();
-      });
-      await user.type(
-        screen.getByRole('textbox', { name: /workspace id/i }),
-        VALID_WORKSPACE_ID,
-      );
       await user.click(screen.getByRole('button', { name: /next/i }));
 
       // Add multiple roles
@@ -349,63 +271,6 @@ describe('SignupWizard Integration Tests', () => {
   });
 
   describe('4. Validation Prevents Finalize Without Required Fields', () => {
-    it('disables finalize button when workspaceId is missing', async () => {
-      const { user } = renderWithProvider(<SignupWizard />);
-
-      // Select account type
-      await user.click(screen.getByLabelText('Business'));
-      await waitFor(() => {
-        expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
-      });
-
-      // Skip to review without entering workspace ID
-      await user.click(screen.getByRole('button', { name: /next/i }));
-      await waitFor(() => {
-        expect(screen.getByText('Workspace Configuration')).toBeInTheDocument();
-      });
-
-      // Don't enter workspace ID, try to proceed
-      // The Next button should be disabled
-      const nextButton = screen.getByRole('button', { name: /next/i });
-      expect(nextButton).toBeDisabled();
-    });
-
-    it('shows warning for missing required fields on review step', async () => {
-      // Seed a session with incomplete data
-      const incompleteSession = createTestSession({
-        sessionId: 'incomplete-session',
-        actorType: ActorType.Rider,
-        workspaceId: null, // Missing required field
-        completedSteps: ['account-type'],
-      });
-      seedMockSession(incompleteSession);
-      localStorage.setItem('zanafleet_signup_session_id', incompleteSession.sessionId);
-
-      renderWithProvider(<SignupWizard />);
-
-      // Wait for recovery and navigate to review
-      await waitFor(() => {
-        expect(screen.getByText('Workspace Configuration')).toBeInTheDocument();
-      });
-
-      // Enter workspace to proceed
-      await userEvent.type(
-        screen.getByRole('textbox', { name: /workspace id/i }),
-        VALID_WORKSPACE_ID,
-      );
-      await userEvent.click(screen.getByRole('button', { name: /next/i }));
-      await userEvent.click(screen.getByRole('button', { name: /next/i }));
-      await userEvent.click(screen.getByRole('button', { name: /next/i }));
-
-      await waitFor(() => {
-        expect(screen.getByText('Review & Confirm')).toBeInTheDocument();
-      });
-
-      // Finalize button should now be enabled since we added workspace
-      const finalizeButton = screen.getByRole('button', { name: /finalize account/i });
-      expect(finalizeButton).toBeEnabled();
-    });
-
     it('prevents proceeding from account type step without selection', async () => {
       renderWithProvider(<SignupWizard />);
 
@@ -416,59 +281,27 @@ describe('SignupWizard Integration Tests', () => {
       expect(nextButton).toBeDisabled();
     });
 
-    it('validates workspace ID format before allowing progression', async () => {
+    it('enables finalize button when actor type is selected', async () => {
       const { user } = renderWithProvider(<SignupWizard />);
 
-      // Complete account type step
-      await user.click(screen.getByLabelText('Rider'));
+      // Select account type
+      await user.click(screen.getByLabelText('Business'));
       await waitFor(() => {
         expect(screen.queryByText(/loading/i)).not.toBeInTheDocument();
       });
+
+      // Navigate through steps to review
+      await user.click(screen.getByRole('button', { name: /next/i }));
+      await user.click(screen.getByRole('button', { name: /next/i }));
       await user.click(screen.getByRole('button', { name: /next/i }));
 
-      await waitFor(() => {
-        expect(screen.getByText('Workspace Configuration')).toBeInTheDocument();
-      });
-
-      // Enter invalid workspace ID
-      const workspaceInput = screen.getByRole('textbox', { name: /workspace id/i });
-      await user.type(workspaceInput, 'invalid-not-uuid');
-      await user.tab(); // Trigger blur for validation
-
-      // Should show validation error
-      await waitFor(() => {
-        expect(screen.getByText(/valid UUID format/i)).toBeInTheDocument();
-      });
-
-      // Next button should be disabled (canProceed checks non-empty, but UI validates format)
-      // Actually the canProceed only checks non-null/non-empty, but user sees the error
-    });
-
-    it('shows required field warnings in review summary', async () => {
-      // Create a session where user is on review but missing workspace
-      const partialSession = createTestSession({
-        sessionId: 'partial-review-session',
-        actorType: ActorType.Business,
-        workspaceId: null,
-        completedSteps: ['account-type', 'workspace', 'roles', 'wallets'],
-      });
-      seedMockSession(partialSession);
-      localStorage.setItem('zanafleet_signup_session_id', partialSession.sessionId);
-
-      renderWithProvider(<SignupWizard />);
-
-      // Should land on review
       await waitFor(() => {
         expect(screen.getByText('Review & Confirm')).toBeInTheDocument();
       });
 
-      // Should show warning about missing required field
-      expect(screen.getByText(/complete the following required fields/i)).toBeInTheDocument();
-      expect(screen.getByText('Workspace ID')).toBeInTheDocument();
-
-      // Finalize button should be disabled
+      // Finalize button should be enabled with valid actor type
       const finalizeButton = screen.getByRole('button', { name: /finalize account/i });
-      expect(finalizeButton).toBeDisabled();
+      expect(finalizeButton).toBeEnabled();
     });
   });
 

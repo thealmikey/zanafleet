@@ -23,7 +23,6 @@ const STORAGE_KEY = 'zanafleet_signup_session_id';
 
 export const WIZARD_STEPS = [
   'account-type',
-  'workspace',
   'roles',
   'wallets',
   'review',
@@ -33,7 +32,6 @@ export type WizardStepName = (typeof WIZARD_STEPS)[number];
 
 export interface WizardFormData {
   actorType: ActorType | null;
-  workspaceIds: string[];
   roles: string[];
   linkedWallets: string[];
 }
@@ -72,7 +70,6 @@ type Action =
 
 const initialFormData: WizardFormData = {
   actorType: null,
-  workspaceIds: [],
   roles: [],
   linkedWallets: [],
 };
@@ -109,7 +106,6 @@ function reducer(state: SignupWizardState, action: Action): SignupWizardState {
         sessionId: action.payload.sessionId,
         formData: {
           actorType: action.payload.actorType,
-          workspaceIds: action.payload.workspaceIds ?? [],
           roles: action.payload.roles,
           linkedWallets: action.payload.linkedWallets,
         },
@@ -224,7 +220,6 @@ export function SignupWizardProvider({ children }: SignupWizardProviderProps): R
     try {
       const response = await updateStep(state.sessionId, {
         stepName: currentStepName,
-        workspaceIds: state.formData.workspaceIds.length > 0 ? state.formData.workspaceIds : undefined,
         roles: state.formData.roles.length > 0 ? state.formData.roles : undefined,
         linkedWallets: state.formData.linkedWallets.length > 0 ? state.formData.linkedWallets : undefined,
       });

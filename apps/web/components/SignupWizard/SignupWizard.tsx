@@ -14,11 +14,10 @@ import {
 import { useSignupWizard } from '../../hooks/useSignupWizard';
 import { WIZARD_STEPS, WizardStepName } from '../../contexts/SignupWizardContext';
 import { FinalizeSignupResponse } from '../../types';
-import { AccountTypeStep, WorkspaceStep, RolesStep, WalletsStep, ReviewStep } from './steps';
+import { AccountTypeStep, RolesStep, WalletsStep, ReviewStep } from './steps';
 
 const STEP_LABELS: Record<WizardStepName, string> = {
   'account-type': 'Account Type',
-  workspace: 'Workspace',
   roles: 'Roles',
   wallets: 'Wallets',
   review: 'Review',
@@ -47,13 +46,11 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
     switch (stepName) {
       case 'account-type':
         return formData.actorType !== null;
-      case 'workspace':
-        return formData.workspaceIds.length > 0;
       case 'roles':
       case 'wallets':
         return true;
       case 'review':
-        return formData.actorType !== null && formData.workspaceIds.length > 0;
+        return formData.actorType !== null;
       default:
         return false;
     }
@@ -84,8 +81,6 @@ export function SignupWizard({ onComplete }: SignupWizardProps): React.ReactElem
     switch (stepName) {
       case 'account-type':
         return <AccountTypeStep />;
-      case 'workspace':
-        return <WorkspaceStep />;
       case 'roles':
         return <RolesStep />;
       case 'wallets':

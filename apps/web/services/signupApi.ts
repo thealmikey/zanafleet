@@ -5,7 +5,6 @@ import {
   UpdateStepResponse,
   SignupSession,
   FinalizeSignupResponse,
-  Workspace,
 } from '../types';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
@@ -99,58 +98,4 @@ export async function finalizeSignup(sessionId: string): Promise<FinalizeSignupR
     },
   });
   return handleResponse<FinalizeSignupResponse>(response);
-}
-
-/**
- * List available workspaces, optionally filtered by type
- * GET /workspaces
- */
-export async function listWorkspaces(type?: string): Promise<Workspace[]> {
-  const url = type
-    ? `${API_BASE_URL}/workspaces?type=${encodeURIComponent(type)}`
-    : `${API_BASE_URL}/workspaces`;
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  return handleResponse<Workspace[]>(response);
-}
-
-/**
- * Get allowed workspace types for an actor type from the backend
- * GET /workspaces/allowed-types?actorType=...
- */
-export async function getAllowedWorkspaceTypes(actorType: ActorType): Promise<string[]> {
-  const response = await fetch(
-    `${API_BASE_URL}/workspaces/allowed-types?actorType=${encodeURIComponent(actorType)}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-  return handleResponse<string[]>(response);
-}
-
-/**
- * Maps an ActorType to the corresponding WorkspaceType(s)
- * Used to filter workspaces relevant to a specific actor type during signup
- */
-export function getWorkspaceTypesForActor(actorType: ActorType | null): string[] {
-  switch (actorType) {
-    case ActorType.SaccoAdmin:
-    case ActorType.Rider:
-      return ['SACCO'];
-    case ActorType.Business:
-    case ActorType.BusinessOwner:
-      return ['BUSINESS'];
-    case ActorType.Internal:
-    case ActorType.AIService:
-      return ['OPS'];
-    default:
-      return [];
-  }
 }
