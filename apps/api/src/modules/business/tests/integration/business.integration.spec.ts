@@ -1,14 +1,15 @@
+import { EventBusModule } from '@api/core/event-bus';
+import { Neo4jModule, Neo4jService } from '@api/core/neo4j';
 import { ConflictException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { BusinessType } from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Neo4jModule, Neo4jService } from '@api/core/neo4j';
-import { EventBusModule } from '@api/core/event-bus';
-import { BusinessType } from '@zanafleet/contracts';
-import { CreateBusinessCommand } from '../../commands/create-business.command';
+
 import { BusinessModule } from '../../business.module';
+import { CreateBusinessCommand } from '../../commands/create-business.command';
 
 /**
  * Integration tests require real Postgres and Neo4j databases.

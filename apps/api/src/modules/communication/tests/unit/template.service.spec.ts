@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { NotificationChannel } from '../../dto/notification.enums';
 import { TemplateEntity } from '../../entities/template.entity';
 import { TemplateService } from '../../services/template.service';
-import { NotificationChannel } from '../../dto/notification.enums';
 
 describe('TemplateService', () => {
   let service: TemplateService;

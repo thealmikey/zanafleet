@@ -2,12 +2,12 @@ import { ConflictException } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-
 import { BusinessType } from '@zanafleet/contracts';
+
 import { CreateBusinessCommand } from '../../commands/create-business.command';
 import { BusinessEntity } from '../../entities/business.entity';
-import { CreateBusinessCommandHandler } from '../../handlers/create-business.handler';
 import { BusinessOnboardedEventV1 } from '../../events/business-onboarded.event';
+import { CreateBusinessCommandHandler } from '../../handlers/create-business.handler';
 
 describe('CreateBusinessCommandHandler', () => {
   let handler: CreateBusinessCommandHandler;

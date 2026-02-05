@@ -1,5 +1,5 @@
-import { CommunicationSubscriber } from '../../subscribers/communication.subscriber';
 import { NotificationChannel, RecipientType } from '../../dto/notification.enums';
+import { CommunicationSubscriber } from '../../subscribers/communication.subscriber';
 
 describe('CommunicationSubscriber - Order/Delivery reactions', () => {
   let subscriber: CommunicationSubscriber;

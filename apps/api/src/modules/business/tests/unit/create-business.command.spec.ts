@@ -1,6 +1,6 @@
+import { BusinessType } from '@zanafleet/contracts';
 import { ZodError } from 'zod';
 
-import { BusinessType } from '@zanafleet/contracts';
 import { CreateBusinessCommand } from '../../commands/create-business.command';
 
 describe('CreateBusinessCommand', () => {

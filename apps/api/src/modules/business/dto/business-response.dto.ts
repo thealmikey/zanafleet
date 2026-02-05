@@ -1,7 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-
-import { BusinessType } from '@zanafleet/contracts';
 import { LocationResponseDto } from '@api/core/location';
+import { ApiProperty } from '@nestjs/swagger';
+import { BusinessType } from '@zanafleet/contracts';
 
 /**
  * BusinessResponseDto

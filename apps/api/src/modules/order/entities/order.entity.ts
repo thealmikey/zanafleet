@@ -1,6 +1,6 @@
+import { OrderStatus } from '@zanafleet/contracts';
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
-import { OrderStatus } from '@zanafleet/contracts';
 
 @Entity('orders')
 @Index(['businessId'])

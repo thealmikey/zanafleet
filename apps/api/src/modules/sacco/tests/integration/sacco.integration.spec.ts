@@ -1,11 +1,12 @@
+import { EventBusModule } from '@api/core/event-bus';
+import { Neo4jModule, Neo4jService } from '@api/core/neo4j';
 import { ConflictException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Neo4jModule, Neo4jService } from '@api/core/neo4j';
-import { EventBusModule } from '@api/core/event-bus';
+
 import { CreateSaccoCommand } from '../../commands/create-sacco.command';
 import { SaccoModule } from '../../sacco.module';
 

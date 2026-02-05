@@ -1,3 +1,4 @@
+import { LocationData } from '@zanafleet/contracts';
 import {
   Entity,
   PrimaryColumn,
@@ -6,7 +7,6 @@ import {
   UpdateDateColumn,
   Unique,
 } from 'typeorm';
-import { LocationData } from '@zanafleet/contracts';
 
 /**
  * Sacco Entity

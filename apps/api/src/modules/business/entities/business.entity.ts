@@ -1,3 +1,4 @@
+import { BusinessType, LocationData } from '@zanafleet/contracts';
 import {
   Entity,
   PrimaryColumn,
@@ -8,7 +9,6 @@ import {
   Unique,
 } from 'typeorm';
 
-import { BusinessType, LocationData } from '@zanafleet/contracts';
 
 /**
  * Business Entity

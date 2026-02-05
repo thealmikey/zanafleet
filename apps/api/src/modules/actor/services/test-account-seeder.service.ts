@@ -1,10 +1,11 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { TEST_ACCOUNTS, TEST_PASSWORD, TestAccount } from '@zanafleet/contracts';
 import { hashPassword } from '@zanafleet/utils';
-import { ActorEntity } from '../entities/actor.entity';
+import { Repository } from 'typeorm';
+
 import { ActorType } from '../dto/actor.enums';
+import { ActorEntity } from '../entities/actor.entity';
 
 /**
  * Seeds test accounts on application startup in dev/test mode.

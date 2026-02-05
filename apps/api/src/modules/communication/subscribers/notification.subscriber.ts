@@ -5,10 +5,10 @@ import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
 import { BaseEvent, SerializedEvent } from '../../../core/event-bus/interfaces/base-event.interface';
 import { EventLoggerService } from '../../../core/event-bus/services/event-logger.service';
 import { IdempotencyService } from '../../../core/event-bus/services/idempotency.service';
-import { NotificationNeo4jProjection } from '../projections/notification-neo4j.projection';
-import { NotificationSentEventV1 } from '../events/notification-sent.event';
 import { NotificationFailedEventV1 } from '../events/notification-failed.event';
+import { NotificationSentEventV1 } from '../events/notification-sent.event';
 import { NotificationSkippedEventV1 } from '../events/notification-skipped.event';
+import { NotificationNeo4jProjection } from '../projections/notification-neo4j.projection';
 
 /**
  * NotificationSubscriber

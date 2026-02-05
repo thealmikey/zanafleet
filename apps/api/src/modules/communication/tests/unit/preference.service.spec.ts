@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { PreferenceService } from '../../services/preference.service';
-import { NotificationPreferenceEntity } from '../../entities/preference.entity';
+
 import { NotificationChannel, RecipientType } from '../../dto/notification.enums';
+import { NotificationPreferenceEntity } from '../../entities/preference.entity';
+import { PreferenceService } from '../../services/preference.service';
 
 describe('PreferenceService', () => {
   let service: PreferenceService;

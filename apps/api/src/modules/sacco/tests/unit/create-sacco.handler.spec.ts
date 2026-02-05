@@ -3,10 +3,11 @@ import { EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { CreateSaccoCommand } from '../../commands/create-sacco.command';
 import { SaccoEntity } from '../../entities/sacco.entity';
-import { CreateSaccoCommandHandler } from '../../handlers/create-sacco.handler';
 import { SaccoCreatedEventV1 } from '../../events/sacco-created.event';
+import { CreateSaccoCommandHandler } from '../../handlers/create-sacco.handler';
 
 describe('CreateSaccoCommandHandler', () => {
   let handler: CreateSaccoCommandHandler;

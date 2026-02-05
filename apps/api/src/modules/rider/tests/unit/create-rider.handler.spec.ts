@@ -2,14 +2,14 @@ import { ConflictException, NotFoundException } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { VehicleType, LocationData } from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
 
-import { VehicleType, LocationData } from '@zanafleet/contracts';
 import { SaccoEntity } from '../../../sacco/entities/sacco.entity';
 import { CreateRiderCommand } from '../../commands/create-rider.command';
 import { RiderEntity } from '../../entities/rider.entity';
-import { CreateRiderCommandHandler } from '../../handlers/create-rider.handler';
 import { RiderOnboardedEventV1 } from '../../events/rider-onboarded.event';
+import { CreateRiderCommandHandler } from '../../handlers/create-rider.handler';
 
 describe('CreateRiderCommandHandler', () => {
   let handler: CreateRiderCommandHandler;

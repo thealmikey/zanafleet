@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call */
-import { Test, TestingModule } from '@nestjs/testing';
 import { EventBus } from '@nestjs/cqrs';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { OrderStatus } from '@zanafleet/contracts';
+import { Repository } from 'typeorm';
 
 import { CreateOrderCommand } from '../../commands/create-order.command';
-import { CreateOrderCommandHandler } from '../../handlers/create-order.handler';
 import { OrderEntity } from '../../entities/order.entity';
+import { CreateOrderCommandHandler } from '../../handlers/create-order.handler';
 
 jest.mock('uuid', () => ({
   v4: jest.fn(),

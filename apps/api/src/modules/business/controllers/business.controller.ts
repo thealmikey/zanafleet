@@ -4,8 +4,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { CreateBusinessCommand } from '../commands/create-business.command';
-import { CreateBusinessDto } from '../dto/create-business.dto';
 import { BusinessResponseDto } from '../dto/business-response.dto';
+import { CreateBusinessDto } from '../dto/create-business.dto';
 
 /**
  * BusinessController

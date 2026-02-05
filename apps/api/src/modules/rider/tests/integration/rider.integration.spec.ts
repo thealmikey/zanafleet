@@ -1,17 +1,18 @@
+import { EventBusModule } from '@api/core/event-bus';
+import { Neo4jModule, Neo4jService } from '@api/core/neo4j';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { VehicleType } from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Neo4jModule, Neo4jService } from '@api/core/neo4j';
-import { EventBusModule } from '@api/core/event-bus';
-import { VehicleType } from '@zanafleet/contracts';
+
+import { CreateSaccoCommand } from '../../../sacco/commands/create-sacco.command';
+import { SaccoModule } from '../../../sacco/sacco.module';
 import { CreateRiderCommand } from '../../commands/create-rider.command';
 import { RiderEntity } from '../../entities/rider.entity';
 import { RiderModule } from '../../rider.module';
-import { SaccoModule } from '../../../sacco/sacco.module';
-import { CreateSaccoCommand } from '../../../sacco/commands/create-sacco.command';
 
 /**
  * Integration tests require real Postgres and Neo4j databases.

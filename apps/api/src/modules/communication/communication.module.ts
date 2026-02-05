@@ -6,15 +6,15 @@ import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { MessagingModule } from '../../core/messaging/messaging.module';
 
 import { NotificationEntity } from './entities/notification.entity';
-import { TemplateEntity } from './entities/template.entity';
 import { NotificationPreferenceEntity } from './entities/preference.entity';
+import { TemplateEntity } from './entities/template.entity';
 import { SendNotificationCommandHandler } from './handlers/send-notification.handler';
-import { TemplateService } from './services/template.service';
-import { PreferenceService } from './services/preference.service';
+import { NotificationNeo4jProjection } from './projections/notification-neo4j.projection';
 import { MessageBuilderService } from './services/message-builder.service';
+import { PreferenceService } from './services/preference.service';
+import { TemplateService } from './services/template.service';
 import { CommunicationSubscriber } from './subscribers/communication.subscriber';
 import { NotificationSubscriber } from './subscribers/notification.subscriber';
-import { NotificationNeo4jProjection } from './projections/notification-neo4j.projection';
 
 /**
  * CommunicationModule

@@ -1,7 +1,6 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-
-import { VehicleType } from '@zanafleet/contracts';
 import { CreateLocationDto } from '@api/core/location';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { VehicleType } from '@zanafleet/contracts';
 
 /**
  * CreateRiderDto

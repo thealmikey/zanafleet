@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { TestAccountSeederService } from './test-account-seeder.service';
-import { ActorEntity } from '../entities/actor.entity';
 import { TEST_ACCOUNTS, TEST_PASSWORD } from '@zanafleet/contracts';
+
+import { ActorEntity } from '../entities/actor.entity';
+
+import { TestAccountSeederService } from './test-account-seeder.service';
 
 describe('TestAccountSeederService', () => {
   let service: TestAccountSeederService;

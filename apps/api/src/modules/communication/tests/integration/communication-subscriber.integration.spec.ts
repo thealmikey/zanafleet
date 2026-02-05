@@ -1,14 +1,13 @@
+import { EventBusModule , IdempotencyService } from '@api/core/event-bus';
+import { Neo4jModule, Neo4jService } from '@api/core/neo4j';
+import { CommandBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CommandBus } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Neo4jModule, Neo4jService } from '@api/core/neo4j';
-import { EventBusModule } from '@api/core/event-bus';
-import { IdempotencyService } from '@api/core/event-bus';
-import { CommunicationModule } from '../../communication.module';
-import { ActorOnboardedEventV1 } from '../../../actor/events/actor-onboarded.event';
 import { ActorType } from '../../../actor/dto/actor.enums';
+import { ActorOnboardedEventV1 } from '../../../actor/events/actor-onboarded.event';
+import { CommunicationModule } from '../../communication.module';
 
 const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
 

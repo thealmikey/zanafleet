@@ -1,4 +1,5 @@
 import { OrderStatus } from '@zanafleet/contracts';
+
 import { OrderCreatedEventV1 } from '../../events/order-created.event';
 
 describe('OrderCreatedEventV1', () => {

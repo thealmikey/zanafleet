@@ -1,3 +1,4 @@
+import { VehicleType, LocationData } from '@zanafleet/contracts';
 import {
   Entity,
   PrimaryColumn,
@@ -10,7 +11,6 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { VehicleType, LocationData } from '@zanafleet/contracts';
 import { SaccoEntity } from '../../sacco/entities/sacco.entity';
 
 /**

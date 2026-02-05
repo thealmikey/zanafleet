@@ -1,18 +1,19 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { EventBus } from '@nestjs/cqrs';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { SendNotificationCommandHandler } from '../../handlers/send-notification.handler';
-import { SendNotificationCommand } from '../../commands/send-notification.command';
-import { NotificationEntity } from '../../entities/notification.entity';
+
 import { MessagingService } from '../../../../core/messaging/services/messaging.service';
+import { SendNotificationCommand } from '../../commands/send-notification.command';
 import {
   NotificationChannel,
   NotificationStatus,
   RecipientType,
 } from '../../dto/notification.enums';
-import { NotificationSentEventV1 } from '../../events/notification-sent.event';
+import { NotificationEntity } from '../../entities/notification.entity';
 import { NotificationFailedEventV1 } from '../../events/notification-failed.event';
+import { NotificationSentEventV1 } from '../../events/notification-sent.event';
 import { NotificationSkippedEventV1 } from '../../events/notification-skipped.event';
+import { SendNotificationCommandHandler } from '../../handlers/send-notification.handler';
 import { PreferenceService } from '../../services/preference.service';
 
 describe('SendNotificationCommandHandler', () => {

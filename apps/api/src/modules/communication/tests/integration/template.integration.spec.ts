@@ -1,14 +1,15 @@
+import { EventBusModule } from '@api/core/event-bus';
+import { Neo4jModule } from '@api/core/neo4j';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Neo4jModule } from '@api/core/neo4j';
-import { EventBusModule } from '@api/core/event-bus';
+
 import { CommunicationModule } from '../../communication.module';
-import { TemplateService } from '../../services/template.service';
-import { TemplateEntity } from '../../entities/template.entity';
 import { NotificationChannel } from '../../dto/notification.enums';
+import { TemplateEntity } from '../../entities/template.entity';
+import { TemplateService } from '../../services/template.service';
 
 const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
 

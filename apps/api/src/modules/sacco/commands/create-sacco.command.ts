@@ -1,5 +1,5 @@
-import { z } from 'zod';
 import { LocationSchema, LocationInput } from '@api/core/location';
+import { z } from 'zod';
 
 /**
  * Zod validation schema for CreateSaccoCommand

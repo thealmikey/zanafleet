@@ -1,14 +1,14 @@
+import { EventBusModule } from '@api/core/event-bus';
+import { Neo4jModule } from '@api/core/neo4j';
+import { CommandBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CommandBus } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Neo4jModule } from '@api/core/neo4j';
-import { EventBusModule } from '@api/core/event-bus';
-import { CommunicationModule } from '../../communication.module';
 import { SendNotificationCommand } from '../../commands/send-notification.command';
-import { PreferenceService } from '../../services/preference.service';
+import { CommunicationModule } from '../../communication.module';
 import { NotificationChannel, RecipientType } from '../../dto/notification.enums';
+import { PreferenceService } from '../../services/preference.service';
 
 const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
 

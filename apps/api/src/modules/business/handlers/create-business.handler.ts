@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-assignment */
+import { EventBusService } from '@api/core/event-bus';
 import { ConflictException, Injectable, Logger, Optional } from '@nestjs/common';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService } from '@api/core/event-bus';
 import { CreateBusinessCommand } from '../commands/create-business.command';
 import { BusinessEntity } from '../entities/business.entity';
 import { BusinessOnboardedEventV1 } from '../events/business-onboarded.event';

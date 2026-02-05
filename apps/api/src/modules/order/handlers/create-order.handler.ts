@@ -1,14 +1,15 @@
+import { EventBusService } from '@api/core/event-bus';
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
+import { OrderStatus } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService } from '@api/core/event-bus';
-import { OrderStatus } from '@zanafleet/contracts';
+
+import { CreateOrderCommand } from '../commands/create-order.command';
 import { OrderEntity } from '../entities/order.entity';
 import { OrderCreatedEventV1 } from '../events/order-created.event';
-import { CreateOrderCommand } from '../commands/create-order.command';
 
 /**
  * CreateOrderCommandHandler

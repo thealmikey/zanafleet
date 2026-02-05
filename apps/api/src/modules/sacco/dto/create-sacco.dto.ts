@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { CreateLocationDto } from '@api/core/location';
+import { ApiProperty } from '@nestjs/swagger';
 
 /**
  * CreateSaccoDto

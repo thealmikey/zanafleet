@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { SaccoEntity } from '../sacco/entities/sacco.entity';
+
 import { RiderController } from './controllers/rider.controller';
 import { RiderEntity } from './entities/rider.entity';
 import { CreateRiderCommandHandler } from './handlers/create-rider.handler';

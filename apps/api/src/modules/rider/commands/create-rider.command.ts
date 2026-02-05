@@ -1,7 +1,7 @@
+import { LocationSchema, LocationInput } from '@api/core/location';
+import { VehicleType } from '@zanafleet/contracts';
 import { z } from 'zod';
 
-import { VehicleType } from '@zanafleet/contracts';
-import { LocationSchema, LocationInput } from '@api/core/location';
 
 /**
  * Zod validation schema for CreateRiderCommand

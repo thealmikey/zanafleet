@@ -1,6 +1,6 @@
+import { VehicleType } from '@zanafleet/contracts';
 import { ZodError } from 'zod';
 
-import { VehicleType } from '@zanafleet/contracts';
 import { CreateRiderCommand } from '../../commands/create-rider.command';
 
 describe('CreateRiderCommand', () => {

@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   Index,
 } from 'typeorm';
+
 import { NotificationChannel, NotificationStatus, RecipientType } from '../dto/notification.enums';
 
 /**

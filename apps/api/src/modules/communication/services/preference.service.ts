@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { NotificationPreferenceEntity } from '../entities/preference.entity';
 import { NotificationChannel, RecipientType } from '../dto/notification.enums';
+import { NotificationPreferenceEntity } from '../entities/preference.entity';
 
 /**
  * PreferenceService
