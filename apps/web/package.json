@@ -4,8 +4,10 @@
   "description": "ZanaFleet React frontend with MUI",
   "private": true,
   "scripts": {
+    "prestart": "npm --workspace @zanafleet/contracts run build",
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "pretype-check": "npm --workspace @zanafleet/contracts run build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "lint": "eslint src --ext .ts,.tsx",
