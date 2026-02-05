@@ -27,7 +27,9 @@
       "@services/*": ["src/services/*"],
       "@hooks/*": ["src/hooks/*"],
       "@types/*": ["src/types/*"],
-      "@contexts/*": ["src/contexts/*"]
+      "@contexts/*": ["src/contexts/*"],
+      "@zanafleet/contracts": ["../../packages/contracts/src/index.ts"],
+      "@zanafleet/contracts/*": ["../../packages/contracts/src/*"]
     }
   },
   "include": ["src"],
