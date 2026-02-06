@@ -21,6 +21,7 @@
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
+    "@faker-js/faker": "^10.2.0",
     "@mui/icons-material": "^5.15.0",
     "@mui/material": "^5.15.0",
     "@zanafleet/contracts": "file:../../packages/contracts",
