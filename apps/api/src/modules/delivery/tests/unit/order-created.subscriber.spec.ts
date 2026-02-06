@@ -1,10 +1,11 @@
 import { Test } from '@nestjs/testing'
+
+import { DeliveryStatus } from '../../../../../../../packages/contracts/src'
+import { EventBusService } from '../../../../core/event-bus'
+import { NatsSubjects } from '../../../../core/event-bus/event-bus.constants'
+import { DeliveryScheduledEventV1 } from '../../events/delivery-scheduled.event'
 import { DeliveryService } from '../../services/delivery.service'
 import { OrderCreatedSubscriber } from '../../subscribers/order-created.subscriber'
-import { NatsSubjects } from '../../../../core/event-bus/event-bus.constants'
-import { EventBusService } from '../../../../core/event-bus'
-import { DeliveryScheduledEventV1 } from '../../events/delivery-scheduled.event'
-import { DeliveryStatus } from '../../../../../../../packages/contracts/src'
 
 describe('OrderCreatedSubscriber', () => {
   let subscriber: OrderCreatedSubscriber

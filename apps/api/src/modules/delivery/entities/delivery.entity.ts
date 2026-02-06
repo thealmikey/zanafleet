@@ -1,4 +1,3 @@
-import { DeliveryStatus } from '../../../../../../packages/contracts/src'
 import {
   Entity,
   PrimaryColumn,
@@ -7,6 +6,8 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm'
+
+import { DeliveryStatus } from '../../../../../../packages/contracts/src'
 
 @Entity({ name: 'deliveries' })
 export class DeliveryEntity {

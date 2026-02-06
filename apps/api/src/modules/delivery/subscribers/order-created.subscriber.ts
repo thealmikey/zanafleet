@@ -1,10 +1,12 @@
 import { randomUUID } from 'node:crypto'
+
 import { Controller, Logger } from '@nestjs/common'
 import { Ctx, MessagePattern, NatsContext, Payload } from '@nestjs/microservices'
-import { NatsSubjects } from '../../../core/event-bus/event-bus.constants'
-import { DeliveryService } from '../services/delivery.service'
-import { DeliveryScheduledEventV1 } from '../events/delivery-scheduled.event'
+
 import { EventBusService } from '../../../core/event-bus'
+import { NatsSubjects } from '../../../core/event-bus/event-bus.constants'
+import { DeliveryScheduledEventV1 } from '../events/delivery-scheduled.event'
+import { DeliveryService } from '../services/delivery.service'
 
 /**
  * Subscribes to Order.Created events and bootstraps Delivery records (opt-in via policy).

@@ -3,13 +3,13 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
-import { MarkDeliveryPickedUpCommand } from '../commands/mark-delivery-picked-up.command'
-import { DeliveryEntity } from '../entities/delivery.entity'
-import { DeliveryService } from '../services/delivery.service'
+import { DeliveryStatus } from '../../../../../../packages/contracts/src'
 import { EventBusService } from '../../../core/event-bus'
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants'
-import { DeliveryStatus } from '../../../../../../packages/contracts/src'
+import { MarkDeliveryPickedUpCommand } from '../commands/mark-delivery-picked-up.command'
+import { DeliveryEntity } from '../entities/delivery.entity'
 import { DeliveryPickedUpEventV1 } from '../events/delivery-picked-up.event'
+import { DeliveryService } from '../services/delivery.service'
 
 @CommandHandler(MarkDeliveryPickedUpCommand)
 export class MarkDeliveryPickedUpHandler implements ICommandHandler<MarkDeliveryPickedUpCommand> {

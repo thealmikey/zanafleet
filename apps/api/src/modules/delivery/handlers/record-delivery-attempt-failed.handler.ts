@@ -3,12 +3,12 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
-import { RecordDeliveryAttemptFailedCommand } from '../commands/record-delivery-attempt-failed.command'
-import { DeliveryEntity } from '../entities/delivery.entity'
-import { DeliveryService } from '../services/delivery.service'
 import { EventBusService } from '../../../core/event-bus'
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants'
+import { RecordDeliveryAttemptFailedCommand } from '../commands/record-delivery-attempt-failed.command'
+import { DeliveryEntity } from '../entities/delivery.entity'
 import { DeliveryFailedEventV1 } from '../events/delivery-failed.event'
+import { DeliveryService } from '../services/delivery.service'
 
 @CommandHandler(RecordDeliveryAttemptFailedCommand)
 export class RecordDeliveryAttemptFailedHandler

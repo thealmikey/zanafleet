@@ -1,9 +1,10 @@
 import { Test } from '@nestjs/testing'
 import { getRepositoryToken, getDataSourceToken } from '@nestjs/typeorm'
 import { Repository, EntityManager } from 'typeorm'
-import { DeliveryService } from '../../services/delivery.service'
-import { DeliveryEntity } from '../../entities/delivery.entity'
+
 import { DeliveryStatus } from '../../../../../../../packages/contracts/src'
+import { DeliveryEntity } from '../../entities/delivery.entity'
+import { DeliveryService } from '../../services/delivery.service'
 
 describe('DeliveryService', () => {
   let service: DeliveryService

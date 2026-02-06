@@ -3,13 +3,13 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
-import { MarkDeliveryDeliveredCommand } from '../commands/mark-delivery-delivered.command'
-import { DeliveryEntity } from '../entities/delivery.entity'
-import { DeliveryService } from '../services/delivery.service'
+import { DeliveryStatus } from '../../../../../../packages/contracts/src'
 import { EventBusService } from '../../../core/event-bus'
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants'
-import { DeliveryStatus } from '../../../../../../packages/contracts/src'
+import { MarkDeliveryDeliveredCommand } from '../commands/mark-delivery-delivered.command'
+import { DeliveryEntity } from '../entities/delivery.entity'
 import { DeliveryDeliveredEventV1 } from '../events/delivery-delivered.event'
+import { DeliveryService } from '../services/delivery.service'
 
 @CommandHandler(MarkDeliveryDeliveredCommand)
 export class MarkDeliveryDeliveredHandler implements ICommandHandler<MarkDeliveryDeliveredCommand> {

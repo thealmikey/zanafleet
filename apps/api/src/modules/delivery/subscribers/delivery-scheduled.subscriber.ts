@@ -1,16 +1,16 @@
 import { Controller, Logger } from '@nestjs/common'
+import { CommandBus } from '@nestjs/cqrs'
 import { Ctx, MessagePattern, NatsContext, Payload } from '@nestjs/microservices'
 import { InjectRepository } from '@nestjs/typeorm'
-import { CommandBus } from '@nestjs/cqrs'
 import { Repository } from 'typeorm'
 
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants'
-import { DeliveryEntity } from '../entities/delivery.entity'
-import { CandidateSelectionService } from '../services/candidate-selection.service'
-import { AssignmentRulesService } from '../services/assignment-rules.service'
 import { LocationResolverService } from '../../../core/location/location-resolver.service'
 import { SendNotificationCommand } from '../../communication/commands/send-notification.command'
 import { RecipientType } from '../../communication/dto/notification.enums'
+import { DeliveryEntity } from '../entities/delivery.entity'
+import { AssignmentRulesService } from '../services/assignment-rules.service'
+import { CandidateSelectionService } from '../services/candidate-selection.service'
 
 @Controller()
 export class DeliveryScheduledSubscriber {

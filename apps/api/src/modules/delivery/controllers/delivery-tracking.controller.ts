@@ -10,8 +10,9 @@ import {
 } from '@nestjs/swagger'
 import { InjectDataSource } from '@nestjs/typeorm'
 import { DataSource } from 'typeorm'
-import { DeliveryService } from '../services/delivery.service'
+
 import { DeliveryStatus } from '../../../../../../packages/contracts/src'
+import { DeliveryService } from '../services/delivery.service'
 
 class DeliveryTrackingStopDto {
   @ApiProperty({ description: 'Stop sequence number starting from 0', example: 0 })

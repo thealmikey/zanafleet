@@ -3,13 +3,13 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
-import { AssignRiderToDeliveryCommand } from '../commands/assign-rider-to-delivery.command'
-import { DeliveryEntity } from '../entities/delivery.entity'
-import { DeliveryService } from '../services/delivery.service'
+import { DeliveryStatus } from '../../../../../../packages/contracts/src'
 import { EventBusService } from '../../../core/event-bus'
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants'
-import { DeliveryStatus } from '../../../../../../packages/contracts/src'
+import { AssignRiderToDeliveryCommand } from '../commands/assign-rider-to-delivery.command'
+import { DeliveryEntity } from '../entities/delivery.entity'
 import { DeliveryAssignedEventV1 } from '../events/delivery-assigned.event'
+import { DeliveryService } from '../services/delivery.service'
 
 @CommandHandler(AssignRiderToDeliveryCommand)
 export class AssignRiderToDeliveryHandler implements ICommandHandler<AssignRiderToDeliveryCommand> {

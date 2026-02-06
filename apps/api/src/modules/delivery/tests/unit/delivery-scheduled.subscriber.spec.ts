@@ -1,14 +1,14 @@
+import { CommandBus } from '@nestjs/cqrs'
 import { Test } from '@nestjs/testing'
 import { getRepositoryToken } from '@nestjs/typeorm'
-import { CommandBus } from '@nestjs/cqrs'
 import { Repository } from 'typeorm'
 
-import { DeliveryScheduledSubscriber } from '../../subscribers/delivery-scheduled.subscriber'
-import { DeliveryEntity } from '../../entities/delivery.entity'
-import { CandidateSelectionService } from '../../services/candidate-selection.service'
-import { AssignmentRulesService } from '../../services/assignment-rules.service'
 import { LocationResolverService } from '../../../../core/location/location-resolver.service'
 import { SendNotificationCommand } from '../../../communication/commands/send-notification.command'
+import { DeliveryEntity } from '../../entities/delivery.entity'
+import { AssignmentRulesService } from '../../services/assignment-rules.service'
+import { CandidateSelectionService } from '../../services/candidate-selection.service'
+import { DeliveryScheduledSubscriber } from '../../subscribers/delivery-scheduled.subscriber'
 
 describe('DeliveryScheduledSubscriber', () => {
   let subscriber: DeliveryScheduledSubscriber
