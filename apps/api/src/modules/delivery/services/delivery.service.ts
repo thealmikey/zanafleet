@@ -7,8 +7,8 @@ import { DeliveryResponse, DeliveryStatus } from '../../../../../../packages/con
 
 export interface CreateScheduledDeliveryInput {
   businessId: string
-  pickupLocationId: string
-  dropoffLocationId: string
+  pickupLocationId?: string | null
+  dropoffLocationId?: string | null
   scheduledPickupTime: Date
   scheduledDropoffTime?: Date | null
   visibilityToken?: string
@@ -16,8 +16,8 @@ export interface CreateScheduledDeliveryInput {
 
 export interface CreateOnDemandDeliveryInput {
   businessId: string
-  pickupLocationId: string
-  dropoffLocationId: string
+  pickupLocationId?: string | null
+  dropoffLocationId?: string | null
   visibilityToken?: string
 }
 
@@ -53,8 +53,8 @@ export class DeliveryService {
     const entity: DeliveryEntity = Object.assign(new DeliveryEntity(), {
       id: randomUUID(),
       businessId: input.businessId,
-      pickupLocationId: input.pickupLocationId,
-      dropoffLocationId: input.dropoffLocationId,
+      pickupLocationId: input.pickupLocationId ?? null,
+      dropoffLocationId: input.dropoffLocationId ?? null,
       status: DeliveryStatus.Requested,
       scheduledPickupTime: input.scheduledPickupTime,
       scheduledDropoffTime: input.scheduledDropoffTime ?? null,
@@ -85,8 +85,8 @@ export class DeliveryService {
     const entity: DeliveryEntity = Object.assign(new DeliveryEntity(), {
       id: randomUUID(),
       businessId: input.businessId,
-      pickupLocationId: input.pickupLocationId,
-      dropoffLocationId: input.dropoffLocationId,
+      pickupLocationId: input.pickupLocationId ?? null,
+      dropoffLocationId: input.dropoffLocationId ?? null,
       status: DeliveryStatus.Requested,
       scheduledPickupTime: null,
       scheduledDropoffTime: null,
