@@ -17,9 +17,16 @@ const renderApp = (): void => {
   );
 };
 
+/**
+ * MSW toggle:
+ * - Default: enabled in development (NODE_ENV === 'development').
+ * - Override: set REACT_APP_USE_MSW to 'true' or 'false' to force enable/disable
+ *   (useful for preview deployments). CRA exposes only REACT_APP_* vars.
+ */
 const enableMSW =
-  process.env.NODE_ENV === 'development' ||
-  process.env.REACT_APP_USE_MSW === 'true';
+  typeof process.env.REACT_APP_USE_MSW !== 'undefined'
+    ? process.env.REACT_APP_USE_MSW === 'true'
+    : process.env.NODE_ENV === 'development';
 
 if (enableMSW) {
   import('./mocks/browser')
