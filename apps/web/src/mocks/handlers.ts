@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw';
 import type { HttpHandler } from 'msw';
+import { TEST_ACCOUNTS, TEST_PASSWORD } from '@zanafleet/contracts';
 
 import {
   ActorType,
@@ -31,6 +32,13 @@ const SESSION_TTL_MINUTES = 60 * 24;
 
 // In-memory session store
 const sessions = new Map<string, SignupSession>();
+
+// Lookup helper for test accounts
+function getTestAccountByEmail(email: string): (typeof TEST_ACCOUNTS)[number] | null {
+  const search = email?.trim().toLowerCase() ?? '';
+  const acc = TEST_ACCOUNTS.find((a) => a.email.toLowerCase() === search);
+  return acc ?? null;
+}
 
 // Simple in-memory auth token and user
 let currentToken: string | null = null;
@@ -191,11 +199,24 @@ export const handlers: HttpHandler[] = [
   // POST /api/auth/login
   http.post('/api/auth/login', async ({ request }) => {
     const body = (await request.json()) as { email?: string; password?: string };
-    const email = body.email ?? 'test@example.com';
+    const email = body.email?.trim() ?? '';
+    const password = body.password ?? '';
+    const shouldValidatePassword = typeof body.password !== 'undefined';
+
+    const account = getTestAccountByEmail(email);
+    if (!account) {
+      return HttpResponse.json({ message: 'Invalid credentials' }, { status: 401 });
+    }
+
+    if (shouldValidatePassword && password !== TEST_PASSWORD) {
+      return HttpResponse.json({ message: 'Invalid credentials' }, { status: 401 });
+    }
 
     currentUser = {
-      ...currentUser,
-      email,
+      id: account.id,
+      email: account.email,
+      name: account.username,
+      roles: [...account.roles],
     };
     currentToken = createId('token');
 
