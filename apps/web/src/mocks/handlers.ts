@@ -236,17 +236,15 @@ export const handlers: HttpHandler[] = [
   }),
 
   // GET /api/auth/me
-  http.get('/api/auth/me', ({ request }) => {
+  http.get('/api/auth/me', () => {
     // Return current user regardless of token by default (can be tightened to 401 if needed)
     // Keeping this permissive avoids unnecessary auth coupling in tests.
-    const _authHeader = request.headers.get('Authorization') ?? request.headers.get('authorization');
     // Optionally, could validate token here against currentToken
     return HttpResponse.json(currentUser, { status: 200 });
   }),
 
   // POST /api/auth/keycloak/token
-  http.post('/api/auth/keycloak/token', async ({ request }) => {
-    const _body = (await request.json()) as { accessToken?: string };
+  http.post('/api/auth/keycloak/token', () => {
     currentToken = createId('token');
 
     const resp: LoginResponse = {
