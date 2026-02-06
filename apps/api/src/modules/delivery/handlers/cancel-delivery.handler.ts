@@ -1,0 +1,51 @@
+import { Logger } from '@nestjs/common'
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
+
+import { CancelDeliveryCommand } from '../commands/cancel-delivery.command'
+import { DeliveryEntity } from '../entities/delivery.entity'
+import { DeliveryService } from '../services/delivery.service'
+import { EventBusService } from '../../../core/event-bus'
+import { NatsSubjects } from '../../../core/event-bus/event-bus.constants'
+import { DeliveryStatus } from '../../../../../../packages/contracts/src'
+import { DeliveryCancelledEventV1 } from '../events/delivery-cancelled.event'
+
+@CommandHandler(CancelDeliveryCommand)
+export class CancelDeliveryHandler implements ICommandHandler<CancelDeliveryCommand> {
+  private readonly logger = new Logger(CancelDeliveryHandler.name)
+
+  constructor(
+    @InjectRepository(DeliveryEntity)
+    private readonly deliveryRepo: Repository<DeliveryEntity>,
+    private readonly deliveryService: DeliveryService,
+    private readonly eventBus: EventBusService,
+  ) {}
+
+  async execute(command: CancelDeliveryCommand): Promise<string> {
+    const { deliveryId, reason, correlationId, causationId } = command
+    const existing = await this.deliveryRepo.findOneByOrFail({ id: deliveryId })
+
+    if (existing.status === DeliveryStatus.Cancelled || existing.status === DeliveryStatus.Delivered) {
+      this.logger.debug(`Idempotent skip for cancel: deliveryId=${deliveryId}`)
+      return deliveryId
+    }
+
+    const cancelledAt = new Date()
+    await this.deliveryService.updateStatus(deliveryId, DeliveryStatus.Cancelled, { cancelledAt })
+
+    const after = await this.deliveryRepo.findOneByOrFail({ id: deliveryId })
+
+    const event = new DeliveryCancelledEventV1({
+      deliveryId,
+      businessId: after.businessId,
+      cancelledAt,
+      reason,
+      correlationId,
+      causationId,
+    })
+
+    await this.eventBus.publish(NatsSubjects.Delivery.CANCELLED_V1, event)
+    return deliveryId
+  }
+}

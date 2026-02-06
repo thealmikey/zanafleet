@@ -10,6 +10,14 @@ import { CandidateSelectionService } from './services/candidate-selection.servic
 import { AssignmentRulesService } from './services/assignment-rules.service'
 import { LocationResolverService } from '../../core/location/location-resolver.service'
 
+import { AssignRiderToDeliveryHandler } from './handlers/assign-rider-to-delivery.handler'
+import { AcceptDeliveryAssignmentHandler } from './handlers/accept-delivery-assignment.handler'
+import { MarkDeliveryPickedUpHandler } from './handlers/mark-delivery-picked-up.handler'
+import { MarkDeliveryInTransitHandler } from './handlers/mark-delivery-in-transit.handler'
+import { MarkDeliveryDeliveredHandler } from './handlers/mark-delivery-delivered.handler'
+import { CancelDeliveryHandler } from './handlers/cancel-delivery.handler'
+import { RecordDeliveryAttemptFailedHandler } from './handlers/record-delivery-attempt-failed.handler'
+
 @Module({
   imports: [TypeOrmModule.forFeature([DeliveryEntity]), CqrsModule],
   providers: [
@@ -19,6 +27,14 @@ import { LocationResolverService } from '../../core/location/location-resolver.s
     CandidateSelectionService,
     AssignmentRulesService,
     LocationResolverService,
+    // Command Handlers
+    AssignRiderToDeliveryHandler,
+    AcceptDeliveryAssignmentHandler,
+    MarkDeliveryPickedUpHandler,
+    MarkDeliveryInTransitHandler,
+    MarkDeliveryDeliveredHandler,
+    CancelDeliveryHandler,
+    RecordDeliveryAttemptFailedHandler,
   ],
   exports: [DeliveryService],
 })
