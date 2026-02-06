@@ -24,7 +24,7 @@
     "@faker-js/faker": "^10.2.0",
     "@mui/icons-material": "^5.15.0",
     "@mui/material": "^5.15.0",
-    "@zanafleet/contracts": "file:../../packages/contracts",
+    "@zanafleet/contracts": "0.0.1",
     "keycloak-js": "^26.2.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

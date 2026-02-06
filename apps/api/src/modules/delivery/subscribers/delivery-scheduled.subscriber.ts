@@ -7,7 +7,7 @@ import { Repository } from 'typeorm'
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants'
 import { LocationResolverService } from '../../../core/location/location-resolver.service'
 import { SendNotificationCommand } from '../../communication/commands/send-notification.command'
-import { RecipientType } from '../../communication/dto/notification.enums'
+import { NotificationChannel, RecipientType } from '../../communication/dto/notification.enums'
 import { DeliveryEntity } from '../entities/delivery.entity'
 import { AssignmentRulesService } from '../services/assignment-rules.service'
 import { CandidateSelectionService } from '../services/candidate-selection.service'
@@ -108,7 +108,7 @@ export class DeliveryScheduledSubscriber {
         const cmd = new SendNotificationCommand(
           candidate.riderId,
           RecipientType.RIDER,
-          'IN_APP' as any,
+          NotificationChannel.IN_APP,
           'delivery.early-assignment.candidate',
           variables,
           businessId,

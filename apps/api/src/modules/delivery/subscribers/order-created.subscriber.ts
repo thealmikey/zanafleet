@@ -32,7 +32,7 @@ export class OrderCreatedSubscriber {
       const deliveryIdFromOrder = (data['deliveryId'] ?? null) as string | null
       const itemSummary = (data['itemSummary'] ?? null) as string | null
       const scheduledTimeRaw = (data['scheduledTime'] ?? null) as string | Date | null
-      const dropoffLocationId = (data as any).dropoffLocationId as string | undefined
+      const dropoffLocationId = (data['dropoffLocationId'] ?? undefined) as string | undefined
       const correlationId = (data['correlationId'] ?? undefined) as string | undefined
       const causationId = (data['causationId'] ?? undefined) as string | undefined
 
@@ -44,7 +44,7 @@ export class OrderCreatedSubscriber {
 
       // Policy: only bootstrap when scheduledTime is present
       const scheduledPickupTime =
-        scheduledTimeRaw != null ? new Date(scheduledTimeRaw as any) : null
+        scheduledTimeRaw != null ? new Date(String(scheduledTimeRaw)) : null
 
       if (!scheduledPickupTime) {
         this.logger.debug(`Order ${orderId} has no scheduledTime; skipping delivery bootstrap`)
