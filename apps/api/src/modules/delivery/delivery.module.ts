@@ -9,6 +9,7 @@ import { DeliveryScheduledSubscriber } from './subscribers/delivery-scheduled.su
 import { CandidateSelectionService } from './services/candidate-selection.service'
 import { AssignmentRulesService } from './services/assignment-rules.service'
 import { LocationResolverService } from '../../core/location/location-resolver.service'
+import { DeliveryTrackingController } from './controllers/delivery-tracking.controller'
 
 import { AssignRiderToDeliveryHandler } from './handlers/assign-rider-to-delivery.handler'
 import { AcceptDeliveryAssignmentHandler } from './handlers/accept-delivery-assignment.handler'
@@ -20,6 +21,7 @@ import { RecordDeliveryAttemptFailedHandler } from './handlers/record-delivery-a
 
 @Module({
   imports: [TypeOrmModule.forFeature([DeliveryEntity]), CqrsModule],
+  controllers: [DeliveryTrackingController],
   providers: [
     DeliveryService,
     OrderCreatedSubscriber,
