@@ -1,4 +1,4 @@
-import { DeliveryStatus } from 'packages/contracts/src'
+import { DeliveryStatus } from '../../../../../../packages/contracts/src'
 import {
   Entity,
   PrimaryColumn,
