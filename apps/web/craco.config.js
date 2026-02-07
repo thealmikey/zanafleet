@@ -1,3 +1,4 @@
+// CRACO config requires CommonJS syntax - do not convert to ESM
 const path = require('path');
 
 module.exports = {
