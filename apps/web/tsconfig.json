@@ -23,8 +23,8 @@
     "noImplicitReturns": true,
     "baseUrl": ".",
     "paths": {
-      "@zanafleet/contracts": ["../../packages/contracts/dist"],
-      "@zanafleet/contracts/*": ["../../packages/contracts/dist/*"],
+      "@zanafleet/contracts": ["../../packages/contracts/src"],
+      "@zanafleet/contracts/*": ["../../packages/contracts/src/*"],
       "@components/*": ["src/components/*"],
       "@services/*": ["src/services/*"],
       "@hooks/*": ["src/hooks/*"],
