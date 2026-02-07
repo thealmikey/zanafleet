@@ -39,6 +39,7 @@
     "postinstall": "npm --workspace @zanafleet/contracts run build"
   },
   "dependencies": {
+    "@craco/craco": "^7.1.0",
     "@faker-js/faker": "^10.2.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.0",
