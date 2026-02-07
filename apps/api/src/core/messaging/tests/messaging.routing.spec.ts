@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { NotificationChannel } from '../../../modules/communication/dto/notification.enums';
 import { MessagePayload } from '../interfaces/message-payload.interface';
 import { EmailProvider } from '../providers/email.provider';
 import { PushProvider } from '../providers/push.provider';
@@ -30,7 +31,7 @@ describe('MessagingService - Routing Logic', () => {
       const pushSpy = jest.spyOn(pushProvider, 'send');
 
       const message: MessagePayload = {
-        channel: 'email',
+        channel: NotificationChannel.EMAIL,
         recipient: 'test@example.com',
         subject: 'Test',
         body: 'Test',
@@ -49,7 +50,7 @@ describe('MessagingService - Routing Logic', () => {
       const pushSpy = jest.spyOn(pushProvider, 'send');
 
       const message: MessagePayload = {
-        channel: 'sms',
+        channel: NotificationChannel.SMS,
         recipient: '+1234567890',
         subject: 'Test',
         body: 'Test',
@@ -68,7 +69,7 @@ describe('MessagingService - Routing Logic', () => {
       const pushSpy = jest.spyOn(pushProvider, 'send');
 
       const message: MessagePayload = {
-        channel: 'push',
+        channel: NotificationChannel.PUSH,
         recipient: 'device_token',
         subject: 'Test',
         body: 'Test',
@@ -83,21 +84,21 @@ describe('MessagingService - Routing Logic', () => {
 
     it('should return different messageId formats per channel', async () => {
       const emailResult = await service.send({
-        channel: 'email',
+        channel: NotificationChannel.EMAIL,
         recipient: 'test@example.com',
         subject: 'Test',
         body: 'Test',
       });
 
       const smsResult = await service.send({
-        channel: 'sms',
+        channel: NotificationChannel.SMS,
         recipient: '+1234567890',
         subject: 'Test',
         body: 'Test',
       });
 
       const pushResult = await service.send({
-        channel: 'push',
+        channel: NotificationChannel.PUSH,
         recipient: 'device_token',
         subject: 'Test',
         body: 'Test',
@@ -114,7 +115,7 @@ describe('MessagingService - Routing Logic', () => {
       const spy = jest.spyOn(emailProvider, 'send');
 
       const message: MessagePayload = {
-        channel: 'email',
+        channel: NotificationChannel.EMAIL,
         recipient: 'user@example.com',
         subject: 'Welcome',
         body: 'Welcome to our service',
@@ -131,7 +132,7 @@ describe('MessagingService - Routing Logic', () => {
 
     it('should return success result from provider', async () => {
       const message: MessagePayload = {
-        channel: 'sms',
+        channel: NotificationChannel.SMS,
         recipient: '+9876543210',
         subject: 'Code',
         body: '456789',

@@ -1,5 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { NotificationChannel } from '../../../modules/communication/dto/notification.enums';
+import { MessagePayload } from '../interfaces/message-payload.interface';
 import { EmailProvider } from '../providers/email.provider';
 import { PushProvider } from '../providers/push.provider';
 import { SmsProvider } from '../providers/sms.provider';
@@ -30,8 +32,8 @@ describe('MessagingService', () => {
     it('should route email messages to EmailProvider', async () => {
       const spy = jest.spyOn(emailProvider, 'send');
 
-      const message = {
-        channel: 'email' as const,
+      const message: MessagePayload = {
+        channel: NotificationChannel.EMAIL,
         recipient: 'test@example.com',
         subject: 'Test Email',
         body: 'This is a test email',
@@ -48,8 +50,8 @@ describe('MessagingService', () => {
     it('should route SMS messages to SmsProvider', async () => {
       const spy = jest.spyOn(smsProvider, 'send');
 
-      const message = {
-        channel: 'sms' as const,
+      const message: MessagePayload = {
+        channel: NotificationChannel.SMS,
         recipient: '+1234567890',
         subject: 'OTP',
         body: 'Your OTP is 123456',
@@ -66,8 +68,8 @@ describe('MessagingService', () => {
     it('should route push messages to PushProvider', async () => {
       const spy = jest.spyOn(pushProvider, 'send');
 
-      const message = {
-        channel: 'push' as const,
+      const message: MessagePayload = {
+        channel: NotificationChannel.PUSH,
         recipient: 'device_token_123',
         subject: 'Notification Title',
         body: 'This is a push notification',
@@ -84,8 +86,8 @@ describe('MessagingService', () => {
     it('should include metadata when provided', async () => {
       const spy = jest.spyOn(emailProvider, 'send');
 
-      const message = {
-        channel: 'email' as const,
+      const message: MessagePayload = {
+        channel: NotificationChannel.EMAIL,
         recipient: 'test@example.com',
         subject: 'Test',
         body: 'Test body',
