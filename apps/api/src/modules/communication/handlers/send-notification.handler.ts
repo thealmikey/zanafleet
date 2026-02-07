@@ -4,9 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
+import { MessageChannel } from '../../../core/messaging/interfaces/message-payload.interface';
 import { MessagingService } from '../../../core/messaging/services/messaging.service';
 import { SendNotificationCommand } from '../commands/send-notification.command';
-import { NotificationStatus } from '../dto/notification.enums';
+import { NotificationChannel, NotificationStatus } from '../dto/notification.enums';
 import { NotificationEntity } from '../entities/notification.entity';
 import { NotificationFailedEventV1 } from '../events/notification-failed.event';
 import { NotificationSentEventV1 } from '../events/notification-sent.event';
@@ -85,8 +86,39 @@ export class SendNotificationCommandHandler implements ICommandHandler<SendNotif
         attempts: 1,
       });
 
+      // Handle IN_APP notifications separately (no external messaging provider)
+      if (command.channel === NotificationChannel.IN_APP) {
+        notification.status = NotificationStatus.SENT;
+        notification.sentAt = new Date();
+
+        await this.notificationRepository.save(notification);
+
+        const sentEvent = new NotificationSentEventV1({
+          eventId,
+          notificationId,
+          recipientId: command.recipientId,
+          recipientType: command.recipientType,
+          channel: command.channel,
+          templateId: command.templateId,
+          messageId: notificationId,
+          workspaceId: command.workspaceId,
+          correlationId: command.correlationId,
+          causationId: command.causationId,
+        });
+
+        this.eventBus.publish(sentEvent);
+        this.logger.log(
+          `In-app notification ${notificationId} saved for recipient ${command.recipientId}`,
+        );
+
+        return { notificationId };
+      }
+
+      // For external channels (EMAIL, SMS, PUSH), send via messaging service
+      const externalChannel: MessageChannel = command.channel;
+
       const sendResult = await this.messagingService.send({
-        channel: command.channel,
+        channel: externalChannel,
         recipient: command.recipientId,
         subject: notification.renderedSubject || '',
         body: notification.renderedBody,
