@@ -6,5 +6,11 @@ module.exports = {
     alias: {
       '@zanafleet/contracts': path.resolve(__dirname, '../../packages/contracts/src'),
     },
+    configure: (webpackConfig) => {
+      webpackConfig.resolve.plugins = webpackConfig.resolve.plugins.filter(
+        (plugin) => plugin.constructor.name !== 'ModuleScopePlugin'
+      );
+      return webpackConfig;
+    },
   },
 };
