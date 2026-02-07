@@ -1,3 +1,4 @@
+import { DeliveryStatus } from '@zanafleet/contracts'
 import {
   Entity,
   PrimaryColumn,
@@ -7,7 +8,6 @@ import {
   Index,
 } from 'typeorm'
 
-import { DeliveryStatus } from '@zanafleet/contracts'
 
 @Entity({ name: 'deliveries' })
 export class DeliveryEntity {

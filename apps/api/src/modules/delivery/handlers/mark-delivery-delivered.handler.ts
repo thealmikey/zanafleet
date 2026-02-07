@@ -1,9 +1,9 @@
 import { Logger } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { InjectRepository } from '@nestjs/typeorm'
+import { DeliveryStatus } from '@zanafleet/contracts'
 import { Repository } from 'typeorm'
 
-import { DeliveryStatus } from '@zanafleet/contracts'
 import { EventBusService } from '../../../core/event-bus'
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants'
 import { MarkDeliveryDeliveredCommand } from '../commands/mark-delivery-delivered.command'

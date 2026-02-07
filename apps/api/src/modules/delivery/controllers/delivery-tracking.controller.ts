@@ -9,9 +9,9 @@ import {
   ApiTags,
 } from '@nestjs/swagger'
 import { InjectDataSource } from '@nestjs/typeorm'
+import { DeliveryStatus } from '@zanafleet/contracts'
 import { DataSource } from 'typeorm'
 
-import { DeliveryStatus } from '@zanafleet/contracts'
 import { DeliveryService } from '../services/delivery.service'
 
 class DeliveryTrackingStopDto {

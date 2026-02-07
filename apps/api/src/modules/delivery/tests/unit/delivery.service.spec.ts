@@ -1,8 +1,8 @@
 import { Test } from '@nestjs/testing'
 import { getRepositoryToken, getDataSourceToken } from '@nestjs/typeorm'
+import { DeliveryStatus } from '@zanafleet/contracts'
 import { Repository, EntityManager } from 'typeorm'
 
-import { DeliveryStatus } from '@zanafleet/contracts'
 import { DeliveryEntity } from '../../entities/delivery.entity'
 import { DeliveryService } from '../../services/delivery.service'
 

@@ -1,4 +1,6 @@
-export type MessageChannel = 'email' | 'sms' | 'push';
+import { NotificationChannel } from '../../../modules/communication/dto/notification.enums';
+
+export type MessageChannel = Exclude<NotificationChannel, NotificationChannel.IN_APP>;
 
 export interface MessagePayload {
   channel: MessageChannel;
