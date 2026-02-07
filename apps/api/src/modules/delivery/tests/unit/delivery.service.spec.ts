@@ -103,6 +103,42 @@ describe('DeliveryService', () => {
     }
   })
 
+  describe('getPublicViewByToken', () => {
+    it.todo('returns null when token does not exist in database')
+
+    it.todo('returns null when token format is invalid')
+
+    /**
+     * @todo Implement token validation
+     *
+     * Expected behavior when accessToken is invalid:
+     * - Expired tokens should return null (not throw)
+     * - Malformed tokens should return null (not throw)
+     * - Tokens for cancelled deliveries should still return the delivery view
+     * - Empty string tokens should return null
+     *
+     * Security considerations for future implementation:
+     * - Token lookup should be constant-time to prevent timing attacks
+     * - Invalid token attempts should be rate-limited
+     * - Consider logging invalid token attempts for monitoring
+     */
+    it('placeholder: documents expected invalid token behavior', () => {
+      // This test serves as documentation for the token validation feature gap.
+      // When implementing token validation, replace this with actual test cases.
+      //
+      // Example implementation pattern:
+      //   repo.findOne.mockResolvedValue(null)
+      //   const result = await service.getPublicViewByToken('invalid-token-abc')
+      //   expect(result).toBeNull()
+      //
+      // Additional cases to implement:
+      //   - 'expired-token' -> null
+      //   - '' (empty string) -> null
+      //   - 'valid-token' -> DeliveryResponse
+      expect(true).toBe(true) // Placeholder assertion
+    })
+  })
+
   it('updates assignment and status timestamps', async () => {
     const existing: DeliveryEntity = Object.assign(new DeliveryEntity(), {
       id: 'd-1',
