@@ -118,29 +118,52 @@ run_build() {
   fi
 }
 
+run_verify_contracts() {
+  print_header "Verifying @zanafleet/contracts"
+  npm run verify:contracts
+  print_success "Contracts verification passed!"
+}
+
+run_build_web() {
+  print_header "Building Web Application"
+  
+  # Build web app to verify TypeScript/webpack resolution of @zanafleet/contracts
+  cd apps/web
+  npm run build
+  cd ../..
+  
+  print_success "Web build successful!"
+}
+
 run_ci_all() {
   print_header "Running Full CI Pipeline"
   
   # Step 1: Format check
-  print_info "Step 1/4: Code Quality - Prettier Check"
+  print_info "Step 1/5: Code Quality - Prettier Check"
   npm run format:check || exit 1
   print_success "Prettier check passed"
   echo ""
   
   # Step 2: Lint check
-  print_info "Step 2/4: Code Quality - ESLint Check"
+  print_info "Step 2/5: Code Quality - ESLint Check"
   npm run lint:check || exit 1
   print_success "ESLint check passed"
   echo ""
   
-  # Step 3: Unit tests
-  print_info "Step 3/4: Unit Tests"
+  # Step 3: Verify contracts resolution
+  print_info "Step 3/5: Contracts Verification"
+  npm run verify:contracts || exit 1
+  print_success "Contracts verification passed"
+  echo ""
+  
+  # Step 4: Unit tests
+  print_info "Step 4/5: Unit Tests"
   npm run test:unit -- --coverage || exit 1
   print_success "Unit tests passed"
   echo ""
   
-  # Step 4: Build
-  print_info "Step 4/4: Build"
+  # Step 5: Build
+  print_info "Step 5/5: Build"
   npm run build || exit 1
   print_success "Build successful"
   echo ""
@@ -177,6 +200,8 @@ ${BLUE}Commands:${NC}
   test:unit         Run unit tests only
   test:integration  Run integration tests only
   build             Build TypeScript application
+  build:web         Build web application (verifies contracts resolution)
+  verify:contracts  Verify @zanafleet/contracts can be imported
   all               Run full CI pipeline (no integration tests)
   help              Show this help message
 
@@ -230,6 +255,12 @@ main() {
       ;;
     build)
       run_build
+      ;;
+    build:web)
+      run_build_web
+      ;;
+    verify:contracts)
+      run_verify_contracts
       ;;
     all)
       run_ci_all

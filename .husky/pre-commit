@@ -10,4 +10,13 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
+echo "🔗 Verifying @zanafleet/contracts resolution..."
+
+npm run verify:contracts --silent
+
+if [ $? -ne 0 ]; then
+  echo "❌ Commit blocked — contracts package verification failed"
+  exit 1
+fi
+
 echo "✅ Code formatted & clean — committing"
