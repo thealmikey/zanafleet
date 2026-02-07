@@ -4,9 +4,9 @@
   "description": "ZanaFleet React frontend with MUI",
   "private": true,
   "scripts": {
-    "prestart": "npm run build --prefix ../../packages/contracts",
-    "prebuild": "npm run build --prefix ../../packages/contracts",
-    "pretest": "npm run build --prefix ../../packages/contracts",
+    "prestart": "npm --workspace @zanafleet/contracts run build",
+    "prebuild": "npm --workspace @zanafleet/contracts run build",
+    "pretest": "npm --workspace @zanafleet/contracts run build",
     "start": "craco start",
     "build": "craco build",
     "pretype-check": "npm --workspace @zanafleet/contracts run build",
