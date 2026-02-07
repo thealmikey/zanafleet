@@ -99,4 +99,47 @@ describe('OrderCreatedSubscriber', () => {
     expect(json.businessId).toBe('b-1')
     expect(json.scheduledPickupTime).toBe(scheduledAt.toISOString())
   })
+
+  it('preserves Date objects directly without re-parsing', async () => {
+    const scheduledAt = new Date('2025-02-01T10:00:00.000Z')
+    deliveryService.createScheduled.mockResolvedValue({
+      deliveryId: 'd-2',
+      businessId: 'b-2',
+      pickupLocationId: null,
+      dropoffLocationId: null,
+      assignedRiderId: null,
+      status: DeliveryStatus.Requested,
+      scheduledPickupTime: scheduledAt,
+      scheduledDropoffTime: null,
+      isScheduled: true,
+      createdAt: new Date('2025-02-01T09:00:00.000Z'),
+      updatedAt: new Date('2025-02-01T09:00:00.000Z'),
+    })
+
+    const eventPayload = {
+      eventId: 'e-2',
+      eventType: 'Order.Order.CreatedV1',
+      eventVersion: '1.0.0',
+      occurredAt: new Date('2025-02-01T09:00:00.000Z').toISOString(),
+      aggregateId: 'o-2',
+      aggregateType: 'Order',
+      orderId: 'o-2',
+      businessId: 'b-2',
+      deliveryId: null,
+      itemSummary: null,
+      scheduledTime: scheduledAt, // Pass Date object directly
+      status: 'Pending',
+      createdAt: new Date('2025-02-01T09:00:00.000Z').toISOString(),
+    }
+
+    await subscriber.handleOrderCreated(eventPayload as any, {} as any)
+
+    // Verify the exact Date object is preserved (not re-parsed from string)
+    expect(deliveryService.createScheduled).toHaveBeenCalledWith(
+      expect.objectContaining({
+        businessId: 'b-2',
+        scheduledPickupTime: scheduledAt,
+      }),
+    )
+  })
 })

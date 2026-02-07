@@ -44,7 +44,11 @@ export class OrderCreatedSubscriber {
 
       // Policy: only bootstrap when scheduledTime is present
       const scheduledPickupTime =
-        scheduledTimeRaw != null ? new Date(String(scheduledTimeRaw)) : null
+        scheduledTimeRaw != null
+          ? scheduledTimeRaw instanceof Date
+            ? scheduledTimeRaw
+            : new Date(scheduledTimeRaw)
+          : null
 
       if (!scheduledPickupTime) {
         this.logger.debug(`Order ${orderId} has no scheduledTime; skipping delivery bootstrap`)
