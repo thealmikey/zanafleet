@@ -4,7 +4,7 @@ const path = require('path');
 module.exports = {
   webpack: {
     alias: {
-      '@zanafleet/contracts': path.resolve(__dirname, '../../packages/contracts/src'),
+      '@zanafleet/contracts': path.resolve(__dirname, '../../packages/contracts/dist'),
     },
     configure: (webpackConfig) => {
       webpackConfig.resolve.plugins = webpackConfig.resolve.plugins.filter(
