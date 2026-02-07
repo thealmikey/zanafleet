@@ -3,7 +3,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 
-import { DeliveryStatus } from '../../../../../../packages/contracts/src'
+import { DeliveryStatus } from '@zanafleet/contracts'
 import { EventBusService } from '../../../core/event-bus'
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants'
 import { AcceptDeliveryAssignmentCommand } from '../commands/accept-delivery-assignment.command'

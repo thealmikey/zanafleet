@@ -7,7 +7,7 @@ import {
   Index,
 } from 'typeorm'
 
-import { DeliveryStatus } from '../../../../../../packages/contracts/src'
+import { DeliveryStatus } from '@zanafleet/contracts'
 
 @Entity({ name: 'deliveries' })
 export class DeliveryEntity {

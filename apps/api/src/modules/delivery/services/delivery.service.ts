@@ -4,7 +4,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm'
 import { DataSource, EntityManager, Repository } from 'typeorm'
 
-import { DeliveryResponse, DeliveryStatus } from '../../../../../../packages/contracts/src'
+import { DeliveryResponse, DeliveryStatus } from '@zanafleet/contracts'
 import { DeliveryEntity } from '../entities/delivery.entity'
 
 export interface CreateScheduledDeliveryInput {

@@ -11,7 +11,7 @@ import {
 import { InjectDataSource } from '@nestjs/typeorm'
 import { DataSource } from 'typeorm'
 
-import { DeliveryStatus } from '../../../../../../packages/contracts/src'
+import { DeliveryStatus } from '@zanafleet/contracts'
 import { DeliveryService } from '../services/delivery.service'
 
 class DeliveryTrackingStopDto {
