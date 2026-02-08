@@ -1,27 +1,24 @@
-import { PolicyEffect, PolicyScope, PolicyTrigger } from './policy.enums';
+import {
+  PolicyEffect,
+  PolicyScope,
+  PolicyTrigger,
+  PolicyCondition,
+  PolicyDecision,
+} from '@zanafleet/contracts';
 
 /**
- * PolicyCondition Interface
- * Represents a JSON Logic-style condition for policy evaluation.
- * Supports nested conditions with AND/OR logic.
+ * Re-export shared types from @zanafleet/contracts
+ * These are defined in contracts to ensure consistency across packages.
  */
-export interface PolicyCondition {
-  /** The field path to evaluate (e.g., 'delivery.status', 'rider.vehicleType') */
-  field: string;
-  /** The comparison operator (e.g., 'eq', 'ne', 'gt', 'lt', 'in', 'contains') */
-  operator: string;
-  /** The value to compare against */
-  value: unknown;
-  /** Logical operator for combining with sibling conditions */
-  logic?: 'AND' | 'OR';
-  /** Nested conditions for complex expressions */
-  children?: PolicyCondition[];
-}
+export type { PolicyCondition, PolicyDecision } from '@zanafleet/contracts';
 
 /**
  * EvaluationContext Interface
  * Contains all contextual data needed to evaluate policies.
  * Passed to the policy engine when a trigger event occurs.
+ *
+ * Note: This interface is local to the API module as it contains
+ * implementation-specific details not needed by consuming packages.
  */
 export interface EvaluationContext {
   /** The event that triggered policy evaluation */
@@ -50,27 +47,11 @@ export interface EvaluationContext {
 }
 
 /**
- * PolicyDecision Interface
- * Represents the outcome of a single policy evaluation.
- */
-export interface PolicyDecision {
-  /** The effect to apply */
-  effect: PolicyEffect;
-  /** ID of the policy that produced this decision */
-  policyId: string;
-  /** Human-readable name of the policy */
-  policyName: string;
-  /** Explanation of why this decision was made */
-  reason: string;
-  /** Field modifications to apply (when effect is MODIFY) */
-  modifications?: Record<string, unknown>;
-  /** Actor IDs required to approve (when effect is REQUIRE_APPROVAL) */
-  requiresApprovalFrom?: string[];
-}
-
-/**
  * EvaluatedPolicy Interface
  * Represents a policy that was considered during evaluation.
+ *
+ * Note: This interface is local to the API module as it contains
+ * implementation-specific details not needed by consuming packages.
  */
 export interface EvaluatedPolicy {
   /** ID of the evaluated policy */
@@ -86,6 +67,9 @@ export interface EvaluatedPolicy {
 /**
  * EvaluationResult Interface
  * Contains the complete result of a policy evaluation run.
+ *
+ * Note: This interface is local to the API module as it contains
+ * implementation-specific details not needed by consuming packages.
  */
 export interface EvaluationResult {
   /** The final decision after considering all matching policies */

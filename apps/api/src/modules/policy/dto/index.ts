@@ -1,6 +1,9 @@
 /**
  * Policy Module DTO Barrel Export
  * Re-exports all enums and types for the Policy & Control Engine.
+ *
+ * Shared types (enums, PolicyCondition, PolicyDecision) are re-exported
+ * from @zanafleet/contracts to ensure consistency across packages.
  */
 
 export {
@@ -12,8 +15,11 @@ export {
 
 export type {
   PolicyCondition,
-  EvaluationContext,
   PolicyDecision,
+} from './policy.types';
+
+export type {
+  EvaluationContext,
   EvaluatedPolicy,
   EvaluationResult,
 } from './policy.types';
