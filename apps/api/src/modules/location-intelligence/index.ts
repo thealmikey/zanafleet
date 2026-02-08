@@ -6,4 +6,5 @@ export * from './handlers';
 export * from './providers';
 export * from './repositories';
 export * from './services';
+export * from './subscribers';
 export * from './types';

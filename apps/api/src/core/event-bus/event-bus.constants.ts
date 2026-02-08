@@ -90,6 +90,9 @@ export const NatsSubjects = {
     ALL: 'delivery.events.*',
   },
   Location: {
+    /** Inbound telemetry from rider mobile apps */
+    RIDER_TELEMETRY_V1: 'location.rider.telemetry',
+    /** Outbound event when rider location is updated */
     RIDER_LOCATION_UPDATED_V1: 'location.events.rider-location-updated-v1',
     ALL: 'location.events.*',
   },

@@ -9,6 +9,7 @@ import { H3Service } from './services/h3.service';
 import { RiderLocationRepository } from './repositories/rider-location.repository';
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { UpdateRiderLocationHandler } from './handlers/update-rider-location.handler';
+import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscriber';
 
 /**
  * Location Intelligence Module
@@ -33,6 +34,7 @@ import { UpdateRiderLocationHandler } from './handlers/update-rider-location.han
     H3Service,
     RiderLocationRepository,
     UpdateRiderLocationHandler,
+    RiderTelemetrySubscriber,
   ],
   exports: [
     TypeOrmModule,
@@ -41,6 +43,7 @@ import { UpdateRiderLocationHandler } from './handlers/update-rider-location.han
     H3Service,
     RiderLocationRepository,
     UpdateRiderLocationHandler,
+    RiderTelemetrySubscriber,
   ],
 })
 export class LocationIntelligenceModule implements OnModuleInit {
