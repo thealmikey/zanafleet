@@ -1,22 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 import { GeoProviderRegistry } from '../../providers/geo-provider-registry.service';
 import { NoOpGeoProvider } from '../../providers/noop-geo.provider';
 import { H3Service } from '../../services/h3.service';
-import { RiderLocationSnapshotEntity } from '../../entities/rider-location-snapshot.entity';
-import { RiderLocationHistoryEntity } from '../../entities/rider-location-history.entity';
+import { RiderLocationRepository } from '../../repositories/rider-location.repository';
 
 describe('LocationIntelligenceModule', () => {
   let module: TestingModule;
   let registry: GeoProviderRegistry;
   let noOpProvider: NoOpGeoProvider;
   let h3Service: H3Service;
+  let riderLocationRepository: RiderLocationRepository;
 
-  const mockRepository = {
-    find: jest.fn(),
-    findOne: jest.fn(),
-    save: jest.fn(),
-    create: jest.fn(),
+  const mockDataSource = {
+    query: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -25,13 +22,10 @@ describe('LocationIntelligenceModule', () => {
         GeoProviderRegistry,
         NoOpGeoProvider,
         H3Service,
+        RiderLocationRepository,
         {
-          provide: getRepositoryToken(RiderLocationSnapshotEntity),
-          useValue: mockRepository,
-        },
-        {
-          provide: getRepositoryToken(RiderLocationHistoryEntity),
-          useValue: mockRepository,
+          provide: DataSource,
+          useValue: mockDataSource,
         },
       ],
     }).compile();
@@ -41,6 +35,7 @@ describe('LocationIntelligenceModule', () => {
     registry = module.get<GeoProviderRegistry>(GeoProviderRegistry);
     noOpProvider = module.get<NoOpGeoProvider>(NoOpGeoProvider);
     h3Service = module.get<H3Service>(H3Service);
+    riderLocationRepository = module.get<RiderLocationRepository>(RiderLocationRepository);
 
     // Manually trigger registration as we're not using the full module
     registry.register(noOpProvider, true);
@@ -69,6 +64,11 @@ describe('LocationIntelligenceModule', () => {
     expect(h3Service).toBeInstanceOf(H3Service);
   });
 
+  it('should provide RiderLocationRepository', () => {
+    expect(riderLocationRepository).toBeDefined();
+    expect(riderLocationRepository).toBeInstanceOf(RiderLocationRepository);
+  });
+
   it('should register NoOpGeoProvider as default on init', () => {
     expect(registry.has('noop')).toBe(true);
     expect(registry.getDefaultId()).toBe('noop');
@@ -83,5 +83,10 @@ describe('LocationIntelligenceModule', () => {
   it('should export NoOpGeoProvider', () => {
     const exported = module.get<NoOpGeoProvider>(NoOpGeoProvider);
     expect(exported).toBe(noOpProvider);
+  });
+
+  it('should export RiderLocationRepository', () => {
+    const exported = module.get<RiderLocationRepository>(RiderLocationRepository);
+    expect(exported).toBe(riderLocationRepository);
   });
 });

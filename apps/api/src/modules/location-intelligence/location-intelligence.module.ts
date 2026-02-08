@@ -5,6 +5,7 @@ import { RiderLocationHistoryEntity } from './entities/rider-location-history.en
 import { GeoProviderRegistry } from './providers/geo-provider-registry.service';
 import { NoOpGeoProvider } from './providers/noop-geo.provider';
 import { H3Service } from './services/h3.service';
+import { RiderLocationRepository } from './repositories/rider-location.repository';
 
 /**
  * Location Intelligence Module
@@ -21,12 +22,13 @@ import { H3Service } from './services/h3.service';
   imports: [
     TypeOrmModule.forFeature([RiderLocationSnapshotEntity, RiderLocationHistoryEntity]),
   ],
-  providers: [GeoProviderRegistry, NoOpGeoProvider, H3Service],
+  providers: [GeoProviderRegistry, NoOpGeoProvider, H3Service, RiderLocationRepository],
   exports: [
     TypeOrmModule,
     GeoProviderRegistry,
     NoOpGeoProvider,
     H3Service,
+    RiderLocationRepository,
   ],
 })
 export class LocationIntelligenceModule implements OnModuleInit {
