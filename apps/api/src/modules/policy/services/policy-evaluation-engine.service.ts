@@ -13,6 +13,7 @@ import {
 } from '../dto';
 import { PolicyEntity } from '../entities/policy.entity';
 import { PolicyEvaluatedEventV1 } from '../events/policy-evaluated.event';
+import { PolicyViolationDetectedEventV1 } from '../events/policy-violation-detected.event';
 import { PolicyDecisionLogRepository } from '../repositories/policy-decision-log.repository';
 import { PolicyRepository } from '../repositories/policy.repository';
 
@@ -347,6 +348,47 @@ export class PolicyEvaluationEngineService {
     this.eventBus.publishEvent(event).catch((err) => {
       this.logger.error(
         `Failed to publish policy event: ${err instanceof Error ? err.message : String(err)}`
+      );
+    });
+
+    if (
+      result.finalDecision.effect === PolicyEffect.BLOCK ||
+      result.finalDecision.effect === PolicyEffect.REQUIRE_APPROVAL
+    ) {
+      this.publishViolationEventAsync(context, result, subjectType, subjectId, correlationId);
+    }
+  }
+
+  /**
+   * Publish a violation event asynchronously when policy results in BLOCK or REQUIRE_APPROVAL.
+   */
+  private publishViolationEventAsync(
+    context: EvaluationContext,
+    result: EvaluationResult,
+    subjectType: string,
+    subjectId: string,
+    correlationId?: string
+  ): void {
+    const violationType =
+      result.finalDecision.effect === PolicyEffect.BLOCK ? 'BLOCKED' : 'REQUIRES_APPROVAL';
+
+    const violationEvent = new PolicyViolationDetectedEventV1({
+      eventId: randomUUID(),
+      policyId: result.finalDecision.policyId,
+      policyName: result.finalDecision.policyName,
+      violationType,
+      trigger: context.trigger,
+      workspaceId: context.workspaceId,
+      subjectType,
+      subjectId,
+      reason: result.finalDecision.reason,
+      effect: result.finalDecision.effect,
+      correlationId,
+    });
+
+    this.eventBus.publishEvent(violationEvent).catch((err) => {
+      this.logger.error(
+        `Failed to publish policy violation event: ${err instanceof Error ? err.message : String(err)}`
       );
     });
   }

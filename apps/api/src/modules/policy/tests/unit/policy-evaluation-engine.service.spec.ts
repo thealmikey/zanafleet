@@ -650,6 +650,178 @@ describe('PolicyEvaluationEngineService', () => {
     });
   });
 
+  describe('violation event publishing', () => {
+    it('should publish PolicyViolationDetectedEventV1 when effect is BLOCK', async () => {
+      const blockPolicy = createMockPolicy({
+        policyId: 'block-policy-001',
+        name: 'Block Policy',
+        effect: PolicyEffect.BLOCK,
+      });
+      policyRepository.findActivePoliciesForTrigger.mockResolvedValue([blockPolicy]);
+
+      const context = createContext({ deliveryId: 'delivery-violation-test' });
+      await service.evaluate(context);
+      await new Promise(resolve => setImmediate(resolve));
+
+      expect(eventBus.publishEvent).toHaveBeenCalledTimes(2);
+      expect(eventBus.publishEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'PolicyViolationDetectedEvent-V1',
+          policyId: 'block-policy-001',
+          policyName: 'Block Policy',
+          violationType: 'BLOCKED',
+          effect: PolicyEffect.BLOCK,
+        })
+      );
+    });
+
+    it('should publish PolicyViolationDetectedEventV1 when effect is REQUIRE_APPROVAL', async () => {
+      const approvalPolicy = createMockPolicy({
+        policyId: 'approval-policy-001',
+        name: 'Approval Policy',
+        effect: PolicyEffect.REQUIRE_APPROVAL,
+        approvalRoles: ['manager'],
+      });
+      policyRepository.findActivePoliciesForTrigger.mockResolvedValue([approvalPolicy]);
+
+      const context = createContext({ deliveryId: 'delivery-approval-test' });
+      await service.evaluate(context);
+      await new Promise(resolve => setImmediate(resolve));
+
+      expect(eventBus.publishEvent).toHaveBeenCalledTimes(2);
+      expect(eventBus.publishEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'PolicyViolationDetectedEvent-V1',
+          policyId: 'approval-policy-001',
+          policyName: 'Approval Policy',
+          violationType: 'REQUIRES_APPROVAL',
+          effect: PolicyEffect.REQUIRE_APPROVAL,
+        })
+      );
+    });
+
+    it('should NOT publish PolicyViolationDetectedEventV1 when effect is ALLOW', async () => {
+      const allowPolicy = createMockPolicy({
+        policyId: 'allow-policy-001',
+        name: 'Allow Policy',
+        effect: PolicyEffect.ALLOW,
+      });
+      policyRepository.findActivePoliciesForTrigger.mockResolvedValue([allowPolicy]);
+
+      await service.evaluate(createContext());
+      await new Promise(resolve => setImmediate(resolve));
+
+      expect(eventBus.publishEvent).toHaveBeenCalledTimes(1);
+      expect(eventBus.publishEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'PolicyEvaluatedEvent-V1',
+        })
+      );
+      expect(eventBus.publishEvent).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'PolicyViolationDetectedEvent-V1',
+        })
+      );
+    });
+
+    it('should NOT publish PolicyViolationDetectedEventV1 when effect is MODIFY', async () => {
+      const modifyPolicy = createMockPolicy({
+        policyId: 'modify-policy-001',
+        name: 'Modify Policy',
+        effect: PolicyEffect.MODIFY,
+        modifications: { slaExtension: 30 },
+      });
+      policyRepository.findActivePoliciesForTrigger.mockResolvedValue([modifyPolicy]);
+
+      await service.evaluate(createContext());
+      await new Promise(resolve => setImmediate(resolve));
+
+      expect(eventBus.publishEvent).toHaveBeenCalledTimes(1);
+      expect(eventBus.publishEvent).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'PolicyViolationDetectedEvent-V1',
+        })
+      );
+    });
+
+    it('should NOT publish PolicyViolationDetectedEventV1 when no policies match (default ALLOW)', async () => {
+      policyRepository.findActivePoliciesForTrigger.mockResolvedValue([]);
+
+      await service.evaluate(createContext());
+      await new Promise(resolve => setImmediate(resolve));
+
+      expect(eventBus.publishEvent).toHaveBeenCalledTimes(1);
+      expect(eventBus.publishEvent).not.toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'PolicyViolationDetectedEvent-V1',
+        })
+      );
+    });
+
+    it('should include correct subject info in violation event', async () => {
+      const blockPolicy = createMockPolicy({
+        policyId: 'block-policy-002',
+        name: 'Block Policy',
+        effect: PolicyEffect.BLOCK,
+      });
+      policyRepository.findActivePoliciesForTrigger.mockResolvedValue([blockPolicy]);
+
+      const context = createContext({
+        deliveryId: 'delivery-subject-test',
+        riderId: 'rider-456',
+      });
+      await service.evaluate(context);
+      await new Promise(resolve => setImmediate(resolve));
+
+      expect(eventBus.publishEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'PolicyViolationDetectedEvent-V1',
+          subjectType: 'Delivery',
+          subjectId: 'delivery-subject-test',
+          workspaceId: 'workspace-123',
+          trigger: PolicyTrigger.DELIVERY_CREATION,
+        })
+      );
+    });
+
+    it('should pass correlationId to violation event', async () => {
+      const blockPolicy = createMockPolicy({
+        policyId: 'block-policy-corr',
+        effect: PolicyEffect.BLOCK,
+      });
+      policyRepository.findActivePoliciesForTrigger.mockResolvedValue([blockPolicy]);
+
+      await service.evaluate(createContext(), { correlationId: 'corr-violation-123' });
+      await new Promise(resolve => setImmediate(resolve));
+
+      expect(eventBus.publishEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'PolicyViolationDetectedEvent-V1',
+          correlationId: 'corr-violation-123',
+        })
+      );
+    });
+
+    it('should include reason in violation event', async () => {
+      const blockPolicy = createMockPolicy({
+        policyId: 'block-policy-reason',
+        name: 'Block With Reason',
+        effect: PolicyEffect.BLOCK,
+      });
+      policyRepository.findActivePoliciesForTrigger.mockResolvedValue([blockPolicy]);
+
+      await service.evaluate(createContext());
+      await new Promise(resolve => setImmediate(resolve));
+
+      expect(eventBus.publishEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          eventType: 'PolicyViolationDetectedEvent-V1',
+          reason: expect.any(String),
+        })
+      );
+    });
+  });
+
   describe('scope target ID collection', () => {
     it('should pass scope target IDs to repository', async () => {
       policyRepository.findActivePoliciesForTrigger.mockResolvedValue([]);
