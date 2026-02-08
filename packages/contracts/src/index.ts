@@ -552,4 +552,227 @@ export interface PolicyCondition {
 }
 
 export { TEST_ACCOUNTS, TEST_PASSWORD, TEST_WORKSPACE_ID } from './test-accounts';
+// ============================================================================
+// Calendar Contracts
+// ============================================================================
+
+/**
+ * Calendar Scope Enum
+ * Defines the hierarchical scope levels for calendars.
+ * Mirrors PolicyScope hierarchy for consistency.
+ * Hierarchy: GLOBAL < NATIONAL < SACCO < BUSINESS < RIDER
+ */
+export enum CalendarScope {
+  GLOBAL = 'GLOBAL',
+  NATIONAL = 'NATIONAL',
+  SACCO = 'SACCO',
+  BUSINESS = 'BUSINESS',
+  RIDER = 'RIDER',
+}
+
+/**
+ * Calendar Rule Type Enum
+ * Defines the types of rules that can be applied to calendars.
+ */
+export enum CalendarRuleType {
+  WORKING_HOURS = 'WORKING_HOURS',
+  WEEKEND = 'WEEKEND',
+  HOLIDAY = 'HOLIDAY',
+  CLOSURE = 'CLOSURE',
+  BLACKOUT = 'BLACKOUT',
+}
+
+/**
+ * Calendar Event Type Enum
+ * Defines the types of events that can be recorded in calendars.
+ */
+export enum CalendarEventType {
+  PUBLIC_HOLIDAY = 'PUBLIC_HOLIDAY',
+  BUSINESS_CLOSURE = 'BUSINESS_CLOSURE',
+  NATIONAL_EVENT = 'NATIONAL_EVENT',
+  WEATHER_DISRUPTION = 'WEATHER_DISRUPTION',
+  STRIKE_ADVISORY = 'STRIKE_ADVISORY',
+  PROMOTIONAL_CAMPAIGN = 'PROMOTIONAL_CAMPAIGN',
+}
+
+/**
+ * Recurrence Pattern Enum
+ * Defines patterns for recurring calendar events and time windows.
+ */
+export enum RecurrencePattern {
+  NONE = 'NONE',
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
+  MONTHLY = 'MONTHLY',
+  YEARLY = 'YEARLY',
+  CUSTOM = 'CUSTOM',
+}
+
+/**
+ * Binding Target Type Enum
+ * Defines the entity types that can be bound to a calendar.
+ */
+export enum BindingTargetType {
+  BUSINESS = 'BUSINESS',
+  SACCO = 'SACCO',
+  RIDER = 'RIDER',
+  WORKSPACE = 'WORKSPACE',
+}
+
+/**
+ * CalendarResponse Interface
+ * Represents a calendar definition returned from the API.
+ */
+export interface CalendarResponse {
+  calendarId: string;
+  name: string;
+  timezone: string;
+  locale: string;
+  ownerScope: CalendarScope;
+  ownerScopeId: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * TimeWindowResponse Interface
+ * Represents a time window (operating hours) within a calendar.
+ */
+export interface TimeWindowResponse {
+  timeWindowId: string;
+  calendarId: string;
+  startTime: string;
+  endTime: string;
+  dayOfWeek: number | null;
+  recurrenceRule: string | null;
+  isActive: boolean;
+}
+
+/**
+ * CalendarRuleResponse Interface
+ * Represents a rule that modifies calendar behavior.
+ */
+export interface CalendarRuleResponse {
+  ruleId: string;
+  calendarId: string;
+  ruleType: CalendarRuleType;
+  scope: CalendarScope;
+  priority: number;
+  conditions: Record<string, unknown>;
+  isActive: boolean;
+}
+
+/**
+ * CalendarEventResponse Interface
+ * Represents a calendar event (holiday, closure, etc.).
+ */
+export interface CalendarEventResponse {
+  eventId: string;
+  eventType: CalendarEventType;
+  title: string;
+  description: string | null;
+  startTime: Date;
+  endTime: Date;
+  regionScope: CalendarScope;
+  recurrencePattern: RecurrencePattern;
+  isActive: boolean;
+}
+
+/**
+ * CalendarBindingResponse Interface
+ * Represents a binding between a calendar and a target entity.
+ */
+export interface CalendarBindingResponse {
+  bindingId: string;
+  calendarId: string;
+  targetType: BindingTargetType;
+  targetId: string;
+  priority: number;
+  inheritParent: boolean;
+}
+
+/**
+ * CalendarOverrideResponse Interface
+ * Represents an exception/override to normal calendar rules.
+ */
+export interface CalendarOverrideResponse {
+  overrideId: string;
+  targetScope: CalendarScope;
+  targetScopeId: string | null;
+  exceptionType: string;
+  reason: string | null;
+  validFrom: Date;
+  validUntil: Date;
+  isActive: boolean;
+}
+
+/**
+ * CreateCalendarInput Interface
+ * Input for creating a new calendar.
+ */
+export interface CreateCalendarInput {
+  name: string;
+  timezone: string;
+  locale?: string;
+  ownerScope: CalendarScope;
+  ownerScopeId?: string | null;
+  isActive?: boolean;
+}
+
+/**
+ * CreateTimeWindowInput Interface
+ * Input for creating a time window within a calendar.
+ */
+export interface CreateTimeWindowInput {
+  calendarId: string;
+  startTime: string;
+  endTime: string;
+  dayOfWeek?: number | null;
+  recurrenceRule?: string | null;
+  isActive?: boolean;
+}
+
+/**
+ * CreateCalendarEventInput Interface
+ * Input for creating a calendar event.
+ */
+export interface CreateCalendarEventInput {
+  eventType: CalendarEventType;
+  title: string;
+  description?: string | null;
+  startTime: Date;
+  endTime: Date;
+  regionScope: CalendarScope;
+  recurrencePattern?: RecurrencePattern;
+  isActive?: boolean;
+}
+
+/**
+ * CreateCalendarBindingInput Interface
+ * Input for binding a calendar to a target entity.
+ */
+export interface CreateCalendarBindingInput {
+  calendarId: string;
+  targetType: BindingTargetType;
+  targetId: string;
+  priority?: number;
+  inheritParent?: boolean;
+}
+
+/**
+ * CreateCalendarOverrideInput Interface
+ * Input for creating a calendar override/exception.
+ */
+export interface CreateCalendarOverrideInput {
+  targetScope: CalendarScope;
+  targetScopeId?: string | null;
+  exceptionType: string;
+  reason?: string | null;
+  validFrom: Date;
+  validUntil: Date;
+  isActive?: boolean;
+}
+
+export { TEST_ACCOUNTS, TEST_PASSWORD, TEST_WORKSPACE_ID } from './test-accounts';
 export type { TestAccount } from './test-accounts';
