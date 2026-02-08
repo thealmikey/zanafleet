@@ -14,7 +14,6 @@ import { LocationIntelligenceService } from '../../services/location-intelligenc
 
 /**
  * Mock EventLoggerService for testing.
- * The actual service path is not directly importable, so we define a mock class.
  */
 class MockEventLoggerService {
   logEvent = jest.fn().mockResolvedValue(undefined);
@@ -23,7 +22,6 @@ class MockEventLoggerService {
 
 /**
  * Mock RetryService for testing.
- * The actual service path is not directly importable, so we define a mock class.
  */
 class MockRetryService {
   scheduleRetry = jest.fn().mockResolvedValue(undefined);
@@ -38,137 +36,90 @@ class MockRetryService {
  * Run with: npm run test:integration
  * Ensure docker-compose.test.yml services are running.
  *
- * These tests will be skipped gracefully if the database is not available.
+ * Tests are automatically skipped if TEST_DB_HOST is not configured.
  */
-describe('LocationIntelligenceModule Integration', () => {
-  let module: TestingModule | undefined;
-  let dbAvailable = false;
+
+const isDbAvailable = Boolean(process.env.TEST_DB_HOST || process.env.CI);
+const describeWithDb = isDbAvailable ? describe : describe.skip;
+
+describeWithDb('LocationIntelligenceModule Integration', () => {
+  let module: TestingModule;
 
   beforeAll(async () => {
-    try {
-      module = await Test.createTestingModule({
-        imports: [
-          ConfigModule.forRoot({
-            isGlobal: true,
-          }),
-          TypeOrmModule.forRoot({
-            type: 'postgres',
-            host: process.env.TEST_DB_HOST || 'localhost',
-            port: parseInt(process.env.TEST_DB_PORT || '5432', 10),
-            username: process.env.TEST_DB_USER || 'postgres',
-            password: process.env.TEST_DB_PASSWORD || 'postgres',
-            database: process.env.TEST_DB_NAME || 'zanafleet_test',
-            entities: [RiderLocationSnapshotEntity, RiderLocationHistoryEntity],
-            synchronize: false,
-          }),
-          LocationIntelligenceModule,
-        ],
+    module = await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+        }),
+        TypeOrmModule.forRoot({
+          type: 'postgres',
+          host: process.env.TEST_DB_HOST || 'localhost',
+          port: parseInt(process.env.TEST_DB_PORT || '5432', 10),
+          username: process.env.TEST_DB_USER || 'postgres',
+          password: process.env.TEST_DB_PASSWORD || 'postgres',
+          database: process.env.TEST_DB_NAME || 'zanafleet_test',
+          entities: [RiderLocationSnapshotEntity, RiderLocationHistoryEntity],
+          synchronize: false,
+        }),
+        LocationIntelligenceModule,
+      ],
+    })
+      .overrideProvider('NATS_CLIENT')
+      .useValue({
+        emit: jest.fn().mockReturnValue({ subscribe: jest.fn() }),
+        send: jest.fn().mockReturnValue({ subscribe: jest.fn() }),
       })
-        .overrideProvider('NATS_CLIENT')
-        .useValue({
-          emit: jest.fn().mockReturnValue({ subscribe: jest.fn() }),
-          send: jest.fn().mockReturnValue({ subscribe: jest.fn() }),
-        })
-        .overrideProvider('EventLoggerService')
-        .useValue(new MockEventLoggerService())
-        .overrideProvider('RetryService')
-        .useValue(new MockRetryService())
-        .compile();
+      .overrideProvider('EventLoggerService')
+      .useValue(new MockEventLoggerService())
+      .overrideProvider('RetryService')
+      .useValue(new MockRetryService())
+      .compile();
 
-      await module.init();
-      dbAvailable = true;
-    } catch (error) {
-      console.warn(
-        'Skipping LocationIntelligenceModule integration tests: database not available.',
-        error instanceof Error ? error.message : error,
-      );
-      dbAvailable = false;
-    }
+    await module.init();
   });
 
   afterAll(async () => {
-    if (module) {
-      try {
-        await module.close();
-      } catch {
-        // Ignore close errors during teardown
-      }
-    }
+    await module.close();
   });
 
   describe('module bootstrap', () => {
-    it('should resolve LocationIntelligenceService from the DI container', async () => {
-      if (!dbAvailable || !module) {
-        console.warn('Test skipped: database not available');
-        return;
-      }
-
+    it('should resolve LocationIntelligenceService from the DI container', () => {
       const service = module.get(LocationIntelligenceService);
       expect(service).toBeDefined();
       expect(service).toBeInstanceOf(LocationIntelligenceService);
     });
 
-    it('should resolve H3Service from the DI container', async () => {
-      if (!dbAvailable || !module) {
-        console.warn('Test skipped: database not available');
-        return;
-      }
-
+    it('should resolve H3Service from the DI container', () => {
       const service = module.get(H3Service);
       expect(service).toBeDefined();
       expect(service).toBeInstanceOf(H3Service);
     });
 
-    it('should resolve HeatmapService from the DI container', async () => {
-      if (!dbAvailable || !module) {
-        console.warn('Test skipped: database not available');
-        return;
-      }
-
+    it('should resolve HeatmapService from the DI container', () => {
       const service = module.get(HeatmapService);
       expect(service).toBeDefined();
       expect(service).toBeInstanceOf(HeatmapService);
     });
 
-    it('should resolve RiderLocationRepository from the DI container', async () => {
-      if (!dbAvailable || !module) {
-        console.warn('Test skipped: database not available');
-        return;
-      }
-
+    it('should resolve RiderLocationRepository from the DI container', () => {
       const repository = module.get(RiderLocationRepository);
       expect(repository).toBeDefined();
       expect(repository).toBeInstanceOf(RiderLocationRepository);
     });
 
-    it('should resolve Neo4jRiderCandidateRepository from the DI container', async () => {
-      if (!dbAvailable || !module) {
-        console.warn('Test skipped: database not available');
-        return;
-      }
-
+    it('should resolve Neo4jRiderCandidateRepository from the DI container', () => {
       const repository = module.get(Neo4jRiderCandidateRepository);
       expect(repository).toBeDefined();
       expect(repository).toBeInstanceOf(Neo4jRiderCandidateRepository);
     });
 
-    it('should resolve GeoProviderRegistry from the DI container', async () => {
-      if (!dbAvailable || !module) {
-        console.warn('Test skipped: database not available');
-        return;
-      }
-
+    it('should resolve GeoProviderRegistry from the DI container', () => {
       const registry = module.get(GeoProviderRegistry);
       expect(registry).toBeDefined();
       expect(registry).toBeInstanceOf(GeoProviderRegistry);
     });
 
-    it('should have NoOpGeoProvider registered as default', async () => {
-      if (!dbAvailable || !module) {
-        console.warn('Test skipped: database not available');
-        return;
-      }
-
+    it('should have NoOpGeoProvider registered as default', () => {
       const registry = module.get(GeoProviderRegistry);
       expect(registry.getDefaultId()).toBe('noop');
       expect(registry.has('noop')).toBe(true);
@@ -176,16 +127,9 @@ describe('LocationIntelligenceModule Integration', () => {
   });
 
   describe('service dependencies', () => {
-    it('should have LocationIntelligenceService with all required dependencies injected', async () => {
-      if (!dbAvailable || !module) {
-        console.warn('Test skipped: database not available');
-        return;
-      }
-
+    it('should have LocationIntelligenceService with all required dependencies injected', () => {
       const service = module.get(LocationIntelligenceService);
 
-      // Verify the service can perform basic operations without throwing
-      // due to missing dependencies (actual functionality requires full infrastructure)
       expect(service).toBeDefined();
       expect(typeof service.updateRiderLocation).toBe('function');
       expect(typeof service.findNearbyRiders).toBe('function');

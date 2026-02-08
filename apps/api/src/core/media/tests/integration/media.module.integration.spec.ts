@@ -11,11 +11,13 @@ import {
   OwnerEntityType,
 } from '@zanafleet/contracts';
 
-describe('MediaModule Integration', () => {
+const isDbAvailable = Boolean(process.env.TEST_DB_HOST || process.env.CI);
+const describeWithDb = isDbAvailable ? describe : describe.skip;
+
+describeWithDb('MediaModule Integration', () => {
   let module: TestingModule | null = null;
   let mediaService: MediaService;
   let storageRegistry: StorageProviderRegistry;
-  let isDbAvailable = false;
 
   beforeAll(async () => {
     try {
@@ -44,13 +46,12 @@ describe('MediaModule Integration', () => {
 
       mediaService = module.get<MediaService>(MediaService);
       storageRegistry = module.get<StorageProviderRegistry>(StorageProviderRegistry);
-      isDbAvailable = true;
     } catch (error) {
       console.warn(
-        'Skipping MediaModule integration tests: database not available.',
+        'MediaModule integration test setup failed:',
         (error as Error).message,
       );
-      isDbAvailable = false;
+      throw error;
     }
   });
 
@@ -62,9 +63,6 @@ describe('MediaModule Integration', () => {
 
   describe('module initialization', () => {
     it('should initialize with NoOp provider as default', () => {
-      if (!isDbAvailable) {
-        return;
-      }
       expect(storageRegistry.getDefaultId()).toBe('noop');
       expect(storageRegistry.getDefault()).toBeDefined();
     });
@@ -75,9 +73,6 @@ describe('MediaModule Integration', () => {
     const testOwnerId = '11111111-1111-1111-1111-111111111111';
 
     it('should create a media asset', async () => {
-      if (!isDbAvailable) {
-        return;
-      }
       const input: CreateMediaAssetInput = {
         filename: 'integration-test.jpg',
         mimeType: 'image/jpeg',
@@ -107,9 +102,6 @@ describe('MediaModule Integration', () => {
     });
 
     it('should retrieve the created media asset', async () => {
-      if (!isDbAvailable) {
-        return;
-      }
       const result = await mediaService.getMediaAsset(createdAssetId);
 
       expect(result).not.toBeNull();
@@ -119,9 +111,6 @@ describe('MediaModule Integration', () => {
     });
 
     it('should generate a signed download URL', async () => {
-      if (!isDbAvailable) {
-        return;
-      }
       const result = await mediaService.generateSignedDownloadUrl(createdAssetId, 1800);
 
       expect(result).toBeDefined();
@@ -132,9 +121,6 @@ describe('MediaModule Integration', () => {
     });
 
     it('should generate a signed upload URL', async () => {
-      if (!isDbAvailable) {
-        return;
-      }
       const result = await mediaService.generateSignedUploadUrl(createdAssetId, 600);
 
       expect(result).toBeDefined();
@@ -144,9 +130,6 @@ describe('MediaModule Integration', () => {
     });
 
     it('should archive the media asset', async () => {
-      if (!isDbAvailable) {
-        return;
-      }
       await mediaService.archiveMediaAsset(createdAssetId);
 
       const result = await mediaService.getMediaAsset(createdAssetId);
@@ -155,18 +138,12 @@ describe('MediaModule Integration', () => {
     });
 
     it('should not allow download URL for archived asset', async () => {
-      if (!isDbAvailable) {
-        return;
-      }
       await expect(mediaService.generateSignedDownloadUrl(createdAssetId)).rejects.toThrow(
         'is not active',
       );
     });
 
     it('should soft delete the media asset', async () => {
-      if (!isDbAvailable) {
-        return;
-      }
       const anotherInput: CreateMediaAssetInput = {
         filename: 'to-be-deleted.txt',
         mimeType: 'text/plain',
@@ -184,9 +161,6 @@ describe('MediaModule Integration', () => {
     });
 
     it('should permanently delete the media asset', async () => {
-      if (!isDbAvailable) {
-        return;
-      }
       const permanentInput: CreateMediaAssetInput = {
         filename: 'permanent-delete.txt',
         mimeType: 'text/plain',
@@ -209,35 +183,23 @@ describe('MediaModule Integration', () => {
 
   describe('error handling', () => {
     it('should return null for non-existent asset', async () => {
-      if (!isDbAvailable) {
-        return;
-      }
       const result = await mediaService.getMediaAsset('00000000-0000-0000-0000-000000000000');
       expect(result).toBeNull();
     });
 
     it('should throw NotFoundException for signed URL of non-existent asset', async () => {
-      if (!isDbAvailable) {
-        return;
-      }
       await expect(
         mediaService.generateSignedDownloadUrl('00000000-0000-0000-0000-000000000000'),
       ).rejects.toThrow('not found');
     });
 
     it('should throw NotFoundException when deleting non-existent asset', async () => {
-      if (!isDbAvailable) {
-        return;
-      }
       await expect(
         mediaService.deleteMediaAsset('00000000-0000-0000-0000-000000000000'),
       ).rejects.toThrow('not found');
     });
 
     it('should throw NotFoundException when archiving non-existent asset', async () => {
-      if (!isDbAvailable) {
-        return;
-      }
       await expect(
         mediaService.archiveMediaAsset('00000000-0000-0000-0000-000000000000'),
       ).rejects.toThrow('not found');

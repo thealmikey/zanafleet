@@ -17,14 +17,17 @@ import { H3Service } from '../../services/h3.service';
  * Run with: npm run test:integration
  * Ensure docker-compose.test.yml services are running.
  *
- * These tests will be skipped gracefully if the database is not available.
+ * Tests are automatically skipped if TEST_DB_HOST is not configured.
  */
-describe('RiderLocationRepository Integration', () => {
-  let module: TestingModule | undefined;
-  let repository: RiderLocationRepository | undefined;
-  let dataSource: DataSource | undefined;
-  let h3Service: H3Service | undefined;
-  let dbAvailable = false;
+
+const isDbAvailable = Boolean(process.env.TEST_DB_HOST || process.env.CI);
+const describeWithDb = isDbAvailable ? describe : describe.skip;
+
+describeWithDb('RiderLocationRepository Integration', () => {
+  let module: TestingModule;
+  let repository: RiderLocationRepository;
+  let dataSource: DataSource;
+  let h3Service: H3Service;
 
   /**
    * Test center point: Nairobi, Kenya
@@ -52,7 +55,7 @@ describe('RiderLocationRepository Integration', () => {
     {
       id: uuidv4(),
       name: 'rider-100m-north',
-      latitude: -1.2912, // ~100m north (+0.0009° lat)
+      latitude: -1.2912,
       longitude: 36.8219,
       expectedDistanceApprox: 100,
     },
@@ -60,103 +63,73 @@ describe('RiderLocationRepository Integration', () => {
       id: uuidv4(),
       name: 'rider-500m-east',
       latitude: -1.2921,
-      longitude: 36.8264, // ~500m east (+0.0045° lng)
+      longitude: 36.8264,
       expectedDistanceApprox: 500,
     },
     {
       id: uuidv4(),
       name: 'rider-1km-south',
-      latitude: -1.3011, // ~1000m south (-0.009° lat)
+      latitude: -1.3011,
       longitude: 36.8219,
       expectedDistanceApprox: 1000,
     },
     {
       id: uuidv4(),
       name: 'rider-2km-southwest',
-      latitude: -1.3048, // ~1.4km south
-      longitude: 36.8091, // ~1.4km west (diagonal ~2km)
+      latitude: -1.3048,
+      longitude: 36.8091,
       expectedDistanceApprox: 2000,
     },
     {
       id: uuidv4(),
       name: 'rider-5km-north',
-      latitude: -1.2471, // ~5km north (+0.045° lat)
+      latitude: -1.2471,
       longitude: 36.8219,
       expectedDistanceApprox: 5000,
     },
   ];
 
   beforeAll(async () => {
-    try {
-      module = await Test.createTestingModule({
-        imports: [
-          TypeOrmModule.forRoot({
-            type: 'postgres',
-            host: process.env.TEST_DB_HOST || 'localhost',
-            port: parseInt(process.env.TEST_DB_PORT || '5432', 10),
-            username: process.env.TEST_DB_USER || 'postgres',
-            password: process.env.TEST_DB_PASSWORD || 'postgres',
-            database: process.env.TEST_DB_NAME || 'zanafleet_test',
-            entities: [RiderLocationSnapshotEntity, RiderLocationHistoryEntity],
-            synchronize: false,
-          }),
-          TypeOrmModule.forFeature([RiderLocationSnapshotEntity, RiderLocationHistoryEntity]),
-        ],
-        providers: [RiderLocationRepository, H3Service],
-      }).compile();
+    module = await Test.createTestingModule({
+      imports: [
+        TypeOrmModule.forRoot({
+          type: 'postgres',
+          host: process.env.TEST_DB_HOST || 'localhost',
+          port: parseInt(process.env.TEST_DB_PORT || '5432', 10),
+          username: process.env.TEST_DB_USER || 'postgres',
+          password: process.env.TEST_DB_PASSWORD || 'postgres',
+          database: process.env.TEST_DB_NAME || 'zanafleet_test',
+          entities: [RiderLocationSnapshotEntity, RiderLocationHistoryEntity],
+          synchronize: false,
+        }),
+        TypeOrmModule.forFeature([RiderLocationSnapshotEntity, RiderLocationHistoryEntity]),
+      ],
+      providers: [RiderLocationRepository, H3Service],
+    }).compile();
 
-      repository = module.get<RiderLocationRepository>(RiderLocationRepository);
-      dataSource = module.get<DataSource>(DataSource);
-      h3Service = module.get<H3Service>(H3Service);
+    repository = module.get<RiderLocationRepository>(RiderLocationRepository);
+    dataSource = module.get<DataSource>(DataSource);
+    h3Service = module.get<H3Service>(H3Service);
 
-      await ensurePostGISEnabled();
-      await ensureTablesExist();
-      dbAvailable = true;
-    } catch (error) {
-      console.warn(
-        'Skipping RiderLocationRepository integration tests: database not available.',
-        error instanceof Error ? error.message : error,
-      );
-      dbAvailable = false;
-    }
+    await ensurePostGISEnabled();
+    await ensureTablesExist();
   });
 
   afterAll(async () => {
-    if (dataSource && dbAvailable) {
-      try {
-        await cleanupTestData();
-      } catch {
-        // Ignore cleanup errors during teardown
-      }
-    }
-    if (module) {
-      try {
-        await module.close();
-      } catch {
-        // Ignore close errors during teardown
-      }
-    }
+    await cleanupTestData();
+    await module.close();
   });
 
   beforeEach(async () => {
-    if (!dbAvailable || !dataSource) {
-      return;
-    }
     await cleanupTestData();
     await insertTestRiders();
   });
 
   async function ensurePostGISEnabled(): Promise<void> {
-    if (!dataSource || !dbAvailable) {
-      return;
-    }
     await dataSource.query('CREATE EXTENSION IF NOT EXISTS postgis');
   }
 
   async function ensureTablesExist(): Promise<void> {
-    if (!dataSource || !dbAvailable) {
-      return;
-    }
     await dataSource.query(`
       CREATE TABLE IF NOT EXISTS rider_location_snapshots (
         rider_id uuid NOT NULL PRIMARY KEY,
@@ -197,9 +170,6 @@ describe('RiderLocationRepository Integration', () => {
   }
 
   async function cleanupTestData(): Promise<void> {
-    if (!dataSource || !dbAvailable) {
-      return;
-    }
     const riderIds = TEST_RIDERS.map((r) => r.id);
     await dataSource.query(
       'DELETE FROM rider_location_history WHERE rider_id = ANY($1)',
@@ -212,9 +182,6 @@ describe('RiderLocationRepository Integration', () => {
   }
 
   async function insertTestRiders(): Promise<void> {
-    if (!dataSource || !h3Service || !dbAvailable) {
-      return;
-    }
     for (const rider of TEST_RIDERS) {
       const h3Indices = h3Service.pointToMultiResolution({
         latitude: rider.latitude,
@@ -251,9 +218,6 @@ describe('RiderLocationRepository Integration', () => {
 
   describe('findNearbyRiders', () => {
     it('should find rider at exact center point within 100m radius', async () => {
-      if (!dbAvailable || !repository) {
-        return;
-      }
       const results = await repository.findNearbyRiders({
         point: CENTER_POINT,
         radiusMeters: 100,
@@ -266,7 +230,6 @@ describe('RiderLocationRepository Integration', () => {
     });
 
     it('should find riders within 200m radius (center + 100m rider)', async () => {
-      if (!dbAvailable || !repository) return;
       const results = await repository.findNearbyRiders({
         point: CENTER_POINT,
         radiusMeters: 200,
@@ -279,7 +242,6 @@ describe('RiderLocationRepository Integration', () => {
     });
 
     it('should find riders within 600m radius (center + 100m + 500m riders)', async () => {
-      if (!dbAvailable || !repository) return;
       const results = await repository.findNearbyRiders({
         point: CENTER_POINT,
         radiusMeters: 600,
@@ -293,7 +255,6 @@ describe('RiderLocationRepository Integration', () => {
     });
 
     it('should find riders within 1500m radius (includes 1km rider)', async () => {
-      if (!dbAvailable || !repository) return;
       const results = await repository.findNearbyRiders({
         point: CENTER_POINT,
         radiusMeters: 1500,
@@ -305,7 +266,6 @@ describe('RiderLocationRepository Integration', () => {
     });
 
     it('should find all riders within 6000m radius', async () => {
-      if (!dbAvailable || !repository) return;
       const results = await repository.findNearbyRiders({
         point: CENTER_POINT,
         radiusMeters: 6000,
@@ -315,21 +275,19 @@ describe('RiderLocationRepository Integration', () => {
     });
 
     it('should exclude riders outside the specified radius', async () => {
-      if (!dbAvailable || !repository) return;
       const results = await repository.findNearbyRiders({
         point: CENTER_POINT,
         radiusMeters: 300,
       });
 
       const riderIds = results.map((r) => r.riderId);
-      expect(riderIds).not.toContain(TEST_RIDERS[2].id); // 500m rider
-      expect(riderIds).not.toContain(TEST_RIDERS[3].id); // 1km rider
-      expect(riderIds).not.toContain(TEST_RIDERS[4].id); // 2km rider
-      expect(riderIds).not.toContain(TEST_RIDERS[5].id); // 5km rider
+      expect(riderIds).not.toContain(TEST_RIDERS[2].id);
+      expect(riderIds).not.toContain(TEST_RIDERS[3].id);
+      expect(riderIds).not.toContain(TEST_RIDERS[4].id);
+      expect(riderIds).not.toContain(TEST_RIDERS[5].id);
     });
 
     it('should return results sorted by distance ascending', async () => {
-      if (!dbAvailable || !repository) return;
       const results = await repository.findNearbyRiders({
         point: CENTER_POINT,
         radiusMeters: 6000,
@@ -343,7 +301,6 @@ describe('RiderLocationRepository Integration', () => {
     });
 
     it('should respect the limit parameter', async () => {
-      if (!dbAvailable || !repository) return;
       const results = await repository.findNearbyRiders({
         point: CENTER_POINT,
         radiusMeters: 6000,
@@ -355,7 +312,6 @@ describe('RiderLocationRepository Integration', () => {
     });
 
     it('should calculate accurate distances using haversine formula', async () => {
-      if (!dbAvailable || !repository) return;
       const results = await repository.findNearbyRiders({
         point: CENTER_POINT,
         radiusMeters: 6000,
@@ -372,7 +328,6 @@ describe('RiderLocationRepository Integration', () => {
     });
 
     it('should return empty array when no riders in radius', async () => {
-      if (!dbAvailable || !repository) return;
       const farPoint: GeoPoint = {
         latitude: 0,
         longitude: 0,
@@ -387,7 +342,6 @@ describe('RiderLocationRepository Integration', () => {
     });
 
     it('should include all snapshot fields in results', async () => {
-      if (!dbAvailable || !repository) return;
       const results = await repository.findNearbyRiders({
         point: CENTER_POINT,
         radiusMeters: 100,
@@ -412,7 +366,6 @@ describe('RiderLocationRepository Integration', () => {
 
   describe('findRidersInH3Cells', () => {
     it('should find riders in specified H3 cells', async () => {
-      if (!dbAvailable || !repository || !h3Service) return;
       const centerH3 = h3Service.pointToH3(CENTER_POINT, 9);
       const neighbors = h3Service.getNeighbors(centerH3, 1);
 
@@ -424,7 +377,6 @@ describe('RiderLocationRepository Integration', () => {
     });
 
     it('should return empty array for cells with no riders', async () => {
-      if (!dbAvailable || !repository || !h3Service) return;
       const emptyH3 = h3Service.pointToH3({ latitude: 0, longitude: 0 }, 9);
       const results = await repository.findRidersInH3Cells([emptyH3]);
 
@@ -434,7 +386,6 @@ describe('RiderLocationRepository Integration', () => {
 
   describe('findRidersInPolygon', () => {
     it('should find riders within a polygon around center', async () => {
-      if (!dbAvailable || !repository) return;
       const polygon: GeoPoint[] = [
         { latitude: -1.290, longitude: 36.820 },
         { latitude: -1.290, longitude: 36.825 },
@@ -450,7 +401,6 @@ describe('RiderLocationRepository Integration', () => {
     });
 
     it('should exclude riders outside the polygon', async () => {
-      if (!dbAvailable || !repository) return;
       const smallPolygon: GeoPoint[] = [
         { latitude: -1.2920, longitude: 36.8218 },
         { latitude: -1.2920, longitude: 36.8220 },
@@ -468,7 +418,6 @@ describe('RiderLocationRepository Integration', () => {
 
   describe('upsertSnapshot and appendHistory', () => {
     it('should insert a new snapshot and update on conflict', async () => {
-      if (!dbAvailable || !repository || !dataSource) return;
       const testRiderId = uuidv4();
       const locationData = {
         riderId: testRiderId,
@@ -511,7 +460,6 @@ describe('RiderLocationRepository Integration', () => {
     });
 
     it('should append history records', async () => {
-      if (!dbAvailable || !repository || !dataSource) return;
       const testRiderId = uuidv4();
       const baseTime = new Date('2024-01-15T10:00:00Z');
 
@@ -545,7 +493,6 @@ describe('RiderLocationRepository Integration', () => {
 
   describe('getRiderPath', () => {
     it('should return path points ordered by time ascending', async () => {
-      if (!dbAvailable || !repository || !dataSource) return;
       const testRiderId = uuidv4();
       const baseTime = new Date('2024-01-15T10:00:00Z');
 
@@ -581,7 +528,6 @@ describe('RiderLocationRepository Integration', () => {
     });
 
     it('should filter by time range', async () => {
-      if (!dbAvailable || !repository || !dataSource) return;
       const testRiderId = uuidv4();
 
       await repository.appendHistory({
