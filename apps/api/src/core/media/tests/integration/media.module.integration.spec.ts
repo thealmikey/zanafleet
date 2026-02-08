@@ -347,7 +347,7 @@ describeWithDb('MediaModule Integration', () => {
       expect(fulfilled.length).toBeGreaterThanOrEqual(1);
 
       for (const result of rejected) {
-        expect(result.reason.message).toMatch(/not found/i);
+        expect(result.reason.message).toMatch(/not found|was modified by another request/i);
       }
 
       const finalAsset = await mediaService.getMediaAsset(assetId);
@@ -385,7 +385,7 @@ describeWithDb('MediaModule Integration', () => {
       expect(fulfilled.length).toBeGreaterThanOrEqual(1);
 
       for (const result of rejected) {
-        expect(result.reason.message).toMatch(/not found/i);
+        expect(result.reason.message).toMatch(/not found|was modified by another request/i);
       }
 
       const finalAsset = await mediaService.getMediaAsset(assetId);
@@ -413,8 +413,15 @@ describeWithDb('MediaModule Integration', () => {
       ]);
 
       const fulfilled = results.filter((r) => r.status === 'fulfilled');
+      const rejected = results.filter(
+        (r): r is PromiseRejectedResult => r.status === 'rejected',
+      );
 
       expect(fulfilled.length).toBeGreaterThanOrEqual(1);
+
+      for (const result of rejected) {
+        expect(result.reason.message).toMatch(/was modified by another request/i);
+      }
 
       const finalAsset = await mediaService.getMediaAsset(assetId);
       expect(finalAsset).not.toBeNull();

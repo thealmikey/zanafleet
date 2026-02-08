@@ -1,6 +1,6 @@
-import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, OptimisticLockVersionMismatchError } from 'typeorm';
 import { createHash } from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -233,10 +233,25 @@ export class MediaService {
       await this.mediaAssetRepository.remove(entity);
       this.logger.log(`Permanently deleted media asset ${mediaAssetId}`);
     } else {
+      if (entity.status === MediaAssetStatus.Deleted) {
+        this.logger.log(`Media asset ${mediaAssetId} is already deleted`);
+        return;
+      }
+
       entity.status = MediaAssetStatus.Deleted;
       entity.deletedAt = new Date();
-      await this.mediaAssetRepository.save(entity);
-      this.logger.log(`Soft deleted media asset ${mediaAssetId}`);
+
+      try {
+        await this.mediaAssetRepository.save(entity);
+        this.logger.log(`Soft deleted media asset ${mediaAssetId}`);
+      } catch (error) {
+        if (error instanceof OptimisticLockVersionMismatchError) {
+          throw new ConflictException(
+            `Media asset ${mediaAssetId} was modified by another request. Please retry.`,
+          );
+        }
+        throw error;
+      }
     }
   }
 
@@ -249,11 +264,29 @@ export class MediaService {
       throw new NotFoundException(`Media asset ${mediaAssetId} not found`);
     }
 
+    if (entity.status === MediaAssetStatus.Deleted) {
+      throw new ConflictException(`Media asset ${mediaAssetId} has been deleted and cannot be archived`);
+    }
+
+    if (entity.status === MediaAssetStatus.Archived) {
+      this.logger.log(`Media asset ${mediaAssetId} is already archived`);
+      return;
+    }
+
     entity.status = MediaAssetStatus.Archived;
     entity.archivedAt = new Date();
-    await this.mediaAssetRepository.save(entity);
 
-    this.logger.log(`Archived media asset ${mediaAssetId}`);
+    try {
+      await this.mediaAssetRepository.save(entity);
+      this.logger.log(`Archived media asset ${mediaAssetId}`);
+    } catch (error) {
+      if (error instanceof OptimisticLockVersionMismatchError) {
+        throw new ConflictException(
+          `Media asset ${mediaAssetId} was modified by another request. Please retry.`,
+        );
+      }
+      throw error;
+    }
   }
 
   private generateStorageKey(

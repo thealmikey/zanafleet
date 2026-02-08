@@ -23,6 +23,7 @@ export class MediaAssetsTable1760300000000 implements MigrationInterface {
           { name: 'deletedAt', type: 'timestamp with time zone', isNullable: true },
           { name: 'createdAt', type: 'timestamp with time zone', default: 'now()' },
           { name: 'updatedAt', type: 'timestamp with time zone', default: 'now()' },
+          { name: 'version', type: 'integer', default: 1, isNullable: false },
         ],
       }),
       true,

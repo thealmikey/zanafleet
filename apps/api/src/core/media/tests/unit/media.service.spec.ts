@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { Repository, OptimisticLockVersionMismatchError } from 'typeorm';
+import { NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { MediaService } from '../../services/media.service';
 import { MediaAssetEntity } from '../../entities/media-asset.entity';
 import { StorageProviderRegistry } from '../../providers/storage-provider-registry.service';
@@ -505,6 +505,42 @@ describe('MediaService', () => {
       );
       expect(repository.remove).not.toHaveBeenCalled();
     });
+
+    it('should throw ConflictException when optimistic lock fails during soft delete', async () => {
+      const entity = new MediaAssetEntity();
+      entity.id = mockMediaAssetId;
+      entity.status = MediaAssetStatus.Active;
+      entity.storageKey = 'test-key';
+
+      repository.findOne.mockResolvedValue(entity);
+      repository.save.mockRejectedValue(
+        new OptimisticLockVersionMismatchError('MediaAssetEntity', 1, 2),
+      );
+
+      let thrownError: Error | undefined;
+      try {
+        await service.deleteMediaAsset(mockMediaAssetId);
+      } catch (error) {
+        thrownError = error as Error;
+      }
+
+      expect(thrownError).toBeInstanceOf(ConflictException);
+      expect(thrownError?.message).toMatch(/was modified by another request/);
+    });
+
+    it('should be idempotent when asset is already soft deleted', async () => {
+      const entity = new MediaAssetEntity();
+      entity.id = mockMediaAssetId;
+      entity.status = MediaAssetStatus.Deleted;
+      entity.deletedAt = new Date();
+      entity.storageKey = 'test-key';
+
+      repository.findOne.mockResolvedValue(entity);
+
+      await service.deleteMediaAsset(mockMediaAssetId);
+
+      expect(repository.save).not.toHaveBeenCalled();
+    });
   });
 
   describe('archiveMediaAsset', () => {
@@ -530,6 +566,59 @@ describe('MediaService', () => {
       repository.findOne.mockResolvedValue(null);
 
       await expect(service.archiveMediaAsset('non-existent')).rejects.toThrow(NotFoundException);
+    });
+
+    it('should throw ConflictException when optimistic lock fails', async () => {
+      const entity = new MediaAssetEntity();
+      entity.id = mockMediaAssetId;
+      entity.status = MediaAssetStatus.Active;
+
+      repository.findOne.mockResolvedValue(entity);
+      repository.save.mockRejectedValue(
+        new OptimisticLockVersionMismatchError('MediaAssetEntity', 1, 2),
+      );
+
+      let thrownError: Error | undefined;
+      try {
+        await service.archiveMediaAsset(mockMediaAssetId);
+      } catch (error) {
+        thrownError = error as Error;
+      }
+
+      expect(thrownError).toBeInstanceOf(ConflictException);
+      expect(thrownError?.message).toMatch(/was modified by another request/);
+    });
+
+    it('should be idempotent when asset is already archived', async () => {
+      const entity = new MediaAssetEntity();
+      entity.id = mockMediaAssetId;
+      entity.status = MediaAssetStatus.Archived;
+      entity.archivedAt = new Date();
+
+      repository.findOne.mockResolvedValue(entity);
+
+      await service.archiveMediaAsset(mockMediaAssetId);
+
+      expect(repository.save).not.toHaveBeenCalled();
+    });
+
+    it('should throw ConflictException when trying to archive a deleted asset', async () => {
+      const entity = new MediaAssetEntity();
+      entity.id = mockMediaAssetId;
+      entity.status = MediaAssetStatus.Deleted;
+      entity.deletedAt = new Date();
+
+      repository.findOne.mockResolvedValue(entity);
+
+      let thrownError: Error | undefined;
+      try {
+        await service.archiveMediaAsset(mockMediaAssetId);
+      } catch (error) {
+        thrownError = error as Error;
+      }
+
+      expect(thrownError).toBeInstanceOf(ConflictException);
+      expect(thrownError?.message).toMatch(/has been deleted and cannot be archived/);
     });
   });
 });

@@ -5,6 +5,7 @@ import {
   Index,
   PrimaryColumn,
   UpdateDateColumn,
+  VersionColumn,
 } from 'typeorm';
 import {
   MediaAssetMetadata,
@@ -78,6 +79,9 @@ export class MediaAssetEntity {
   @UpdateDateColumn({ type: 'timestamp with time zone' })
   updatedAt!: Date;
 
+  @VersionColumn()
+  version!: number;
+
   toDomain(): {
     mediaAssetId: string;
     filename: string;
@@ -94,6 +98,7 @@ export class MediaAssetEntity {
     deletedAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
+    version: number;
   } {
     return {
       mediaAssetId: this.id,
@@ -111,6 +116,7 @@ export class MediaAssetEntity {
       deletedAt: this.deletedAt,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
+      version: this.version,
     };
   }
 
@@ -129,6 +135,7 @@ export class MediaAssetEntity {
     archivedAt?: Date | null;
     deletedAt?: Date | null;
     createdAt: Date;
+    version?: number;
   }): MediaAssetEntity {
     const entity = new MediaAssetEntity();
     entity.id = data.mediaAssetId;
@@ -145,6 +152,7 @@ export class MediaAssetEntity {
     entity.archivedAt = data.archivedAt ?? null;
     entity.deletedAt = data.deletedAt ?? null;
     entity.createdAt = data.createdAt;
+    entity.version = data.version ?? 1;
     return entity;
   }
 }
