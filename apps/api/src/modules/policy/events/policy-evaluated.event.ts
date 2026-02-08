@@ -1,3 +1,4 @@
+import { BaseEvent } from '../../../core/event-bus/interfaces/base-event.interface';
 import { PolicyEffect, PolicyTrigger } from '../dto';
 
 /**
@@ -6,7 +7,7 @@ import { PolicyEffect, PolicyTrigger } from '../dto';
  * Event emitted after every policy evaluation for observability and audit trail.
  * Published to the event bus for downstream consumers (analytics, monitoring, etc.).
  */
-export class PolicyEvaluatedEventV1 {
+export class PolicyEvaluatedEventV1 implements BaseEvent {
   readonly eventId: string;
   readonly eventType: 'PolicyEvaluatedEvent-V1' = 'PolicyEvaluatedEvent-V1';
   readonly eventVersion: '1.0.0' = '1.0.0';
