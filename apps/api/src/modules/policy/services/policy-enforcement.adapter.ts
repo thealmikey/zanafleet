@@ -17,6 +17,7 @@ import { RankedCandidate, GeoPoint } from '../../delivery/services/candidate-sel
 export interface FilterCandidatesResult {
   allowed: RankedCandidate[];
   blocked: Array<{ candidate: RankedCandidate; reason: string }>;
+  requiresApproval: Array<{ candidate: RankedCandidate; reason: string; approvalRoles?: string[] }>;
 }
 
 /**
@@ -95,6 +96,7 @@ export class PolicyEnforcementAdapter {
   ): Promise<FilterCandidatesResult> {
     const allowed: RankedCandidate[] = [];
     const blocked: Array<{ candidate: RankedCandidate; reason: string }> = [];
+    const requiresApproval: Array<{ candidate: RankedCandidate; reason: string; approvalRoles?: string[] }> = [];
     const timestamp = context.scheduledTime ?? new Date();
 
     for (const candidate of candidates) {
@@ -111,18 +113,25 @@ export class PolicyEnforcementAdapter {
       };
 
       const result = await this.engine.evaluate(evalContext);
+      const effect = result.finalDecision.effect;
 
-      if (result.finalDecision.effect === PolicyEffect.BLOCK) {
+      if (effect === PolicyEffect.BLOCK) {
         blocked.push({
           candidate,
           reason: result.finalDecision.reason,
+        });
+      } else if (effect === PolicyEffect.REQUIRE_APPROVAL) {
+        requiresApproval.push({
+          candidate,
+          reason: result.finalDecision.reason,
+          approvalRoles: result.finalDecision.requiresApprovalFrom,
         });
       } else {
         allowed.push(candidate);
       }
     }
 
-    return { allowed, blocked };
+    return { allowed, blocked, requiresApproval };
   }
 
   /**

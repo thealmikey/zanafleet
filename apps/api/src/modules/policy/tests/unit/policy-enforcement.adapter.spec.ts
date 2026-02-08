@@ -104,6 +104,7 @@ describe('PolicyEnforcementAdapter', () => {
       expect(result.allowed).toHaveLength(1);
       expect(result.allowed[0]).toBe(candidate);
       expect(result.blocked).toHaveLength(0);
+      expect(result.requiresApproval).toHaveLength(0);
     });
 
     it('should move candidate to blocked array when effect is BLOCK', async () => {
@@ -119,6 +120,7 @@ describe('PolicyEnforcementAdapter', () => {
       expect(result.blocked).toHaveLength(1);
       expect(result.blocked[0].candidate).toBe(candidate);
       expect(result.blocked[0].reason).toBe('Rider is restricted in this area');
+      expect(result.requiresApproval).toHaveLength(0);
     });
 
     it('should handle multiple candidates with mixed results', async () => {
@@ -149,6 +151,7 @@ describe('PolicyEnforcementAdapter', () => {
       expect(result.allowed).toContain(candidate3);
       expect(result.blocked).toHaveLength(1);
       expect(result.blocked[0].candidate).toBe(candidate2);
+      expect(result.requiresApproval).toHaveLength(0);
     });
 
     it('should build correct EvaluationContext for each candidate', async () => {
@@ -206,17 +209,61 @@ describe('PolicyEnforcementAdapter', () => {
 
       expect(result.allowed).toHaveLength(1);
       expect(result.blocked).toHaveLength(0);
+      expect(result.requiresApproval).toHaveLength(0);
     });
 
-    it('should allow candidate when effect is REQUIRE_APPROVAL', async () => {
+    it('should put candidate in requiresApproval array when effect is REQUIRE_APPROVAL', async () => {
       const candidate = createMockCandidate('rider-1');
-      const decision = createMockDecision(PolicyEffect.REQUIRE_APPROVAL);
+      const approvalRoles = ['manager', 'supervisor'];
+      const decision = createMockDecision(PolicyEffect.REQUIRE_APPROVAL, {
+        requiresApprovalFrom: approvalRoles,
+      });
       mockEngine.evaluate.mockResolvedValue(createMockEvaluationResult(decision));
 
       const result = await adapter.filterCandidatesByPolicy([candidate], baseContext);
 
-      expect(result.allowed).toHaveLength(1);
+      expect(result.allowed).toHaveLength(0);
       expect(result.blocked).toHaveLength(0);
+      expect(result.requiresApproval).toHaveLength(1);
+      expect(result.requiresApproval[0].candidate).toBe(candidate);
+      expect(result.requiresApproval[0].approvalRoles).toEqual(approvalRoles);
+    });
+
+    it('should handle multiple candidates with all three result categories', async () => {
+      const candidate1 = createMockCandidate('rider-1');
+      const candidate2 = createMockCandidate('rider-2');
+      const candidate3 = createMockCandidate('rider-3');
+
+      mockEngine.evaluate
+        .mockResolvedValueOnce(
+          createMockEvaluationResult(createMockDecision(PolicyEffect.ALLOW))
+        )
+        .mockResolvedValueOnce(
+          createMockEvaluationResult(
+            createMockDecision(PolicyEffect.BLOCK, { reason: 'Blocked rider 2' })
+          )
+        )
+        .mockResolvedValueOnce(
+          createMockEvaluationResult(
+            createMockDecision(PolicyEffect.REQUIRE_APPROVAL, {
+              reason: 'Requires approval',
+              requiresApprovalFrom: ['manager'],
+            })
+          )
+        );
+
+      const result = await adapter.filterCandidatesByPolicy(
+        [candidate1, candidate2, candidate3],
+        baseContext
+      );
+
+      expect(result.allowed).toHaveLength(1);
+      expect(result.allowed).toContain(candidate1);
+      expect(result.blocked).toHaveLength(1);
+      expect(result.blocked[0].candidate).toBe(candidate2);
+      expect(result.requiresApproval).toHaveLength(1);
+      expect(result.requiresApproval[0].candidate).toBe(candidate3);
+      expect(result.requiresApproval[0].approvalRoles).toEqual(['manager']);
     });
   });
 
