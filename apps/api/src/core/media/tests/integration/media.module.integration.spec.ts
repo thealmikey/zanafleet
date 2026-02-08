@@ -318,7 +318,11 @@ describeWithDb('MediaModule Integration', () => {
   });
 
   describe('concurrent operations', () => {
-    const testOwnerId = '33333333-3333-3333-3333-333333333333';
+    let testOwnerId: string;
+
+    beforeEach(() => {
+      testOwnerId = uuidv4();
+    });
 
     it('should handle concurrent archiveMediaAsset and deleteMediaAsset calls consistently', async () => {
       const input: CreateMediaAssetInput = {
