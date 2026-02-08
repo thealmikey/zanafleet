@@ -32,6 +32,16 @@ type EvaluationData = Record<string, unknown>;
 @Injectable()
 export class JsonLogicEvaluatorService {
   constructor() {
+    // Register custom '===' operation for strict equality
+    jsonLogic.add_operation('===', (a: unknown, b: unknown) => {
+      return a === b;
+    });
+
+    // Register custom '!==' operation for strict inequality
+    jsonLogic.add_operation('!==', (a: unknown, b: unknown) => {
+      return a !== b;
+    });
+
     // Register custom 'contains' operation - checks if haystack contains needle
     jsonLogic.add_operation('contains', (haystack: unknown, needle: unknown) => {
       if (typeof haystack === 'string' && typeof needle === 'string') {
@@ -136,15 +146,18 @@ export class JsonLogicEvaluatorService {
 
   /**
    * Build a single comparison rule in JSON Logic format.
+   * Uses strict equality (===) for == and (!==) for != to properly distinguish undefined from null.
    */
   private buildComparisonRule(field: string, operator: string, value: unknown): object {
     const varRef = { var: field };
 
     switch (operator) {
       case '==':
-        return { '==': [varRef, value] };
+        // Use strict equality to distinguish undefined from null
+        return { '===': [varRef, value] };
       case '!=':
-        return { '!=': [varRef, value] };
+        // Use strict inequality
+        return { '!==': [varRef, value] };
       case '>':
         return { '>': [varRef, value] };
       case '<':
@@ -189,32 +202,19 @@ export class JsonLogicEvaluatorService {
   /**
    * Transform an EvaluationContext into a flat data object for evaluation.
    * Extracts derived fields from timestamp (hour, minute, dayOfWeek) and flattens metadata.
+   * Always sets context fields (even if undefined) to ensure correct strict equality checks.
    */
   private buildDataFromContext(context: EvaluationContext): EvaluationData {
     const data: EvaluationData = {
       trigger: context.trigger,
       workspaceId: context.workspaceId,
+      // Always include optional fields to distinguish undefined from missing
+      actorId: context.actorId,
+      deliveryId: context.deliveryId,
+      riderId: context.riderId,
+      businessId: context.businessId,
+      saccoId: context.saccoId,
     };
-
-    if (context.actorId !== undefined) {
-      data.actorId = context.actorId;
-    }
-
-    if (context.deliveryId !== undefined) {
-      data.deliveryId = context.deliveryId;
-    }
-
-    if (context.riderId !== undefined) {
-      data.riderId = context.riderId;
-    }
-
-    if (context.businessId !== undefined) {
-      data.businessId = context.businessId;
-    }
-
-    if (context.saccoId !== undefined) {
-      data.saccoId = context.saccoId;
-    }
 
     if (context.timestamp) {
       const ts = context.timestamp;

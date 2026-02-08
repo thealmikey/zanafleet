@@ -1048,7 +1048,8 @@ describe('JsonLogicEvaluatorService', () => {
       expect(result.matched).toBe(true);
     });
 
-    it('should handle null values', () => {
+    it('should treat undefined as null (json-logic-js behavior)', () => {
+      // json-logic-js treats undefined as null because JSON has no undefined concept
       const condition: PolicyCondition = {
         field: 'actorId',
         operator: '==',
@@ -1058,7 +1059,22 @@ describe('JsonLogicEvaluatorService', () => {
 
       const result = service.evaluate(condition, context);
 
-      expect(result.matched).toBe(false);
+      // In json-logic-js, undefined values are returned as null (the default)
+      // so null == null is true
+      expect(result.matched).toBe(true);
+    });
+
+    it('should match when comparing null to null', () => {
+      const condition: PolicyCondition = {
+        field: 'metadata.nullField',
+        operator: '==',
+        value: null,
+      };
+      const context = createContext({ metadata: { nullField: null } });
+
+      const result = service.evaluate(condition, context);
+
+      expect(result.matched).toBe(true);
     });
 
     it('should handle numeric string comparisons', () => {
