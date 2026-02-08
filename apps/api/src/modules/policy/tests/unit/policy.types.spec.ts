@@ -229,17 +229,17 @@ describe('Policy Types', () => {
           },
         ],
         processingTimeMs: 5,
-        failedOpen: false,
+        evaluationFailed: false,
       };
 
       expect(result.finalDecision.effect).toBe(PolicyEffect.ALLOW);
       expect(result.evaluatedPolicies).toHaveLength(2);
       expect(result.processingTimeMs).toBe(5);
-      expect(result.failedOpen).toBe(false);
+      expect(result.evaluationFailed).toBe(false);
     });
 
-    it('should support failedOpen flag for error scenarios', () => {
-      const result: EvaluationResult = {
+    it('should support evaluationFailed and failMode for error scenarios', () => {
+      const failOpenResult: EvaluationResult = {
         finalDecision: {
           effect: PolicyEffect.ALLOW,
           policyId: '',
@@ -248,11 +248,46 @@ describe('Policy Types', () => {
         },
         evaluatedPolicies: [],
         processingTimeMs: 2,
-        failedOpen: true,
+        evaluationFailed: true,
+        failMode: 'open',
       };
 
-      expect(result.failedOpen).toBe(true);
-      expect(result.evaluatedPolicies).toHaveLength(0);
+      expect(failOpenResult.evaluationFailed).toBe(true);
+      expect(failOpenResult.failMode).toBe('open');
+      expect(failOpenResult.evaluatedPolicies).toHaveLength(0);
+
+      const failClosedResult: EvaluationResult = {
+        finalDecision: {
+          effect: PolicyEffect.BLOCK,
+          policyId: '',
+          policyName: 'Fail-Closed Default',
+          reason: 'Policy evaluation failed - blocking request',
+        },
+        evaluatedPolicies: [],
+        processingTimeMs: 2,
+        evaluationFailed: true,
+        failMode: 'closed',
+      };
+
+      expect(failClosedResult.evaluationFailed).toBe(true);
+      expect(failClosedResult.failMode).toBe('closed');
+    });
+
+    it('should not have failMode when evaluation succeeds', () => {
+      const result: EvaluationResult = {
+        finalDecision: {
+          effect: PolicyEffect.ALLOW,
+          policyId: 'policy-123',
+          policyName: 'Default allow policy',
+          reason: 'No blocking policies matched',
+        },
+        evaluatedPolicies: [],
+        processingTimeMs: 5,
+        evaluationFailed: false,
+      };
+
+      expect(result.evaluationFailed).toBe(false);
+      expect(result.failMode).toBeUndefined();
     });
   });
 });

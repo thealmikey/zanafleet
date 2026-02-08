@@ -18,7 +18,7 @@ describe('PolicyEvaluatedEventV1', () => {
     evaluatedPolicyCount: 5,
     matchedPolicyCount: 2,
     processingTimeMs: 15,
-    failedOpen: false,
+    evaluationFailed: false,
     occurredAt: new Date('2024-01-15T10:00:00Z'),
     correlationId: 'corr-123',
     causationId: 'cause-456',
@@ -43,7 +43,8 @@ describe('PolicyEvaluatedEventV1', () => {
       expect(event.evaluatedPolicyCount).toBe(sampleEventData.evaluatedPolicyCount);
       expect(event.matchedPolicyCount).toBe(sampleEventData.matchedPolicyCount);
       expect(event.processingTimeMs).toBe(sampleEventData.processingTimeMs);
-      expect(event.failedOpen).toBe(sampleEventData.failedOpen);
+      expect(event.evaluationFailed).toBe(sampleEventData.evaluationFailed);
+      expect(event.failMode).toBeUndefined();
       expect(event.occurredAt).toEqual(sampleEventData.occurredAt);
       expect(event.correlationId).toBe(sampleEventData.correlationId);
       expect(event.causationId).toBe(sampleEventData.causationId);
@@ -70,15 +71,32 @@ describe('PolicyEvaluatedEventV1', () => {
       expect(event.finalPolicyId).toBeNull();
     });
 
-    it('should handle failedOpen true scenario', () => {
+    it('should handle evaluationFailed true with failMode open', () => {
       const event = new PolicyEvaluatedEventV1({
         ...sampleEventData,
-        failedOpen: true,
+        evaluationFailed: true,
+        failMode: 'open',
         finalPolicyId: null,
         finalReason: 'Policy evaluation failed - defaulting to ALLOW',
       });
 
-      expect(event.failedOpen).toBe(true);
+      expect(event.evaluationFailed).toBe(true);
+      expect(event.failMode).toBe('open');
+      expect(event.finalPolicyId).toBeNull();
+    });
+
+    it('should handle evaluationFailed true with failMode closed', () => {
+      const event = new PolicyEvaluatedEventV1({
+        ...sampleEventData,
+        evaluationFailed: true,
+        failMode: 'closed',
+        finalEffect: PolicyEffect.BLOCK,
+        finalPolicyId: null,
+        finalReason: 'Policy evaluation failed - blocking request',
+      });
+
+      expect(event.evaluationFailed).toBe(true);
+      expect(event.failMode).toBe('closed');
       expect(event.finalPolicyId).toBeNull();
     });
   });
@@ -104,7 +122,8 @@ describe('PolicyEvaluatedEventV1', () => {
       expect(json.evaluatedPolicyCount).toBe(sampleEventData.evaluatedPolicyCount);
       expect(json.matchedPolicyCount).toBe(sampleEventData.matchedPolicyCount);
       expect(json.processingTimeMs).toBe(sampleEventData.processingTimeMs);
-      expect(json.failedOpen).toBe(sampleEventData.failedOpen);
+      expect(json.evaluationFailed).toBe(sampleEventData.evaluationFailed);
+      expect(json.failMode).toBeUndefined();
       expect(json.correlationId).toBe(sampleEventData.correlationId);
       expect(json.causationId).toBe(sampleEventData.causationId);
     });
@@ -141,7 +160,7 @@ describe('PolicyEvaluatedEventV1', () => {
         evaluatedPolicyCount: sampleEventData.evaluatedPolicyCount,
         matchedPolicyCount: sampleEventData.matchedPolicyCount,
         processingTimeMs: sampleEventData.processingTimeMs,
-        failedOpen: sampleEventData.failedOpen,
+        evaluationFailed: sampleEventData.evaluationFailed,
         correlationId: sampleEventData.correlationId,
         causationId: sampleEventData.causationId,
       };
@@ -178,7 +197,8 @@ describe('PolicyEvaluatedEventV1', () => {
       expect(restored.evaluatedPolicyCount).toBe(original.evaluatedPolicyCount);
       expect(restored.matchedPolicyCount).toBe(original.matchedPolicyCount);
       expect(restored.processingTimeMs).toBe(original.processingTimeMs);
-      expect(restored.failedOpen).toBe(original.failedOpen);
+      expect(restored.evaluationFailed).toBe(original.evaluationFailed);
+      expect(restored.failMode).toBe(original.failMode);
       expect(restored.correlationId).toBe(original.correlationId);
       expect(restored.causationId).toBe(original.causationId);
     });

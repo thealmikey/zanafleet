@@ -114,7 +114,7 @@ export class PolicyEvaluationEngineService {
         finalDecision,
         evaluatedPolicies,
         processingTimeMs,
-        failedOpen: false,
+        evaluationFailed: false,
       };
 
       this.logDecisionAsync(
@@ -226,7 +226,7 @@ export class PolicyEvaluationEngineService {
   }
 
   /**
-   * Create a fail-open result (ALLOW with failedOpen flag).
+   * Create a fail-open result (ALLOW when evaluation fails).
    */
   private createFailOpenResult(processingTimeMs: number, errorMessage: string): EvaluationResult {
     return {
@@ -238,12 +238,13 @@ export class PolicyEvaluationEngineService {
       },
       evaluatedPolicies: [],
       processingTimeMs,
-      failedOpen: true,
+      evaluationFailed: true,
+      failMode: 'open',
     };
   }
 
   /**
-   * Create a fail-closed result (BLOCK with failedOpen flag).
+   * Create a fail-closed result (BLOCK when evaluation fails).
    */
   private createFailClosedResult(processingTimeMs: number, errorMessage: string): EvaluationResult {
     return {
@@ -255,7 +256,8 @@ export class PolicyEvaluationEngineService {
       },
       evaluatedPolicies: [],
       processingTimeMs,
-      failedOpen: true,
+      evaluationFailed: true,
+      failMode: 'closed',
     };
   }
 
@@ -302,7 +304,8 @@ export class PolicyEvaluationEngineService {
       finalReason: result.finalDecision.reason,
       modifications: result.finalDecision.modifications ?? null,
       processingTimeMs: result.processingTimeMs,
-      failedOpen: result.failedOpen,
+      evaluationFailed: result.evaluationFailed,
+      failMode: result.failMode ?? null,
       createdAt: new Date(),
     };
 
@@ -335,7 +338,8 @@ export class PolicyEvaluationEngineService {
       evaluatedPolicyCount: result.evaluatedPolicies.length,
       matchedPolicyCount: result.evaluatedPolicies.filter((p) => p.matched).length,
       processingTimeMs: result.processingTimeMs,
-      failedOpen: result.failedOpen,
+      evaluationFailed: result.evaluationFailed,
+      failMode: result.failMode,
       correlationId,
     });
 

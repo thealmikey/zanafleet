@@ -186,7 +186,7 @@ describe('PolicyEvaluationEngineService (Integration)', () => {
       expect(result.finalDecision.effect).toBe(PolicyEffect.ALLOW);
       expect(result.finalDecision.policyName).toBe('Integration Test Policy');
       expect(result.evaluatedPolicies).toHaveLength(1);
-      expect(result.failedOpen).toBe(false);
+      expect(result.evaluationFailed).toBe(false);
 
       await new Promise((resolve) => setTimeout(resolve, 100));
 
@@ -339,7 +339,7 @@ describe('PolicyEvaluationEngineService (Integration)', () => {
 
       const logs = await decisionLogRepo.find();
       expect(logs).toHaveLength(1);
-      expect(logs[0].failedOpen).toBe(false);
+      expect(logs[0].evaluationFailed).toBe(false);
     });
   });
 

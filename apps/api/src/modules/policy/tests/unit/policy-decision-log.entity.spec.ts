@@ -59,7 +59,8 @@ describe('PolicyDecisionLogEntity', () => {
     finalReason: 'Default allow - no restrictions',
     modifications: null,
     processingTimeMs: 5,
-    failedOpen: false,
+    evaluationFailed: false,
+    failMode: null,
     createdAt: new Date('2024-01-15T10:00:00Z'),
   };
 
@@ -81,7 +82,8 @@ describe('PolicyDecisionLogEntity', () => {
       expect(entity.finalReason).toBe(sampleDomainData.finalReason);
       expect(entity.modifications).toBeNull();
       expect(entity.processingTimeMs).toBe(sampleDomainData.processingTimeMs);
-      expect(entity.failedOpen).toBe(false);
+      expect(entity.evaluationFailed).toBe(false);
+      expect(entity.failMode).toBeNull();
       expect(entity.createdAt).toEqual(sampleDomainData.createdAt);
     });
 
@@ -110,7 +112,8 @@ describe('PolicyDecisionLogEntity', () => {
       expect(entity.actorId).toBeNull();
       expect(entity.finalPolicyId).toBeNull();
       expect(entity.modifications).toBeNull();
-      expect(entity.failedOpen).toBe(false);
+      expect(entity.evaluationFailed).toBe(false);
+      expect(entity.failMode).toBeNull();
     });
 
     it('should handle BLOCK effect with finalPolicyId', () => {
@@ -146,16 +149,33 @@ describe('PolicyDecisionLogEntity', () => {
       });
     });
 
-    it('should handle failedOpen = true', () => {
-      const failedOpenData = {
+    it('should handle evaluationFailed = true with failMode open', () => {
+      const failOpenData = {
         ...sampleDomainData,
-        failedOpen: true,
+        evaluationFailed: true,
+        failMode: 'open' as const,
         finalReason: 'Policy evaluation failed - defaulting to ALLOW',
       };
 
-      const entity = PolicyDecisionLogEntity.fromDomain(failedOpenData);
+      const entity = PolicyDecisionLogEntity.fromDomain(failOpenData);
 
-      expect(entity.failedOpen).toBe(true);
+      expect(entity.evaluationFailed).toBe(true);
+      expect(entity.failMode).toBe('open');
+    });
+
+    it('should handle evaluationFailed = true with failMode closed', () => {
+      const failClosedData = {
+        ...sampleDomainData,
+        evaluationFailed: true,
+        failMode: 'closed' as const,
+        finalEffect: PolicyEffect.BLOCK,
+        finalReason: 'Policy evaluation failed - blocking request',
+      };
+
+      const entity = PolicyDecisionLogEntity.fromDomain(failClosedData);
+
+      expect(entity.evaluationFailed).toBe(true);
+      expect(entity.failMode).toBe('closed');
     });
   });
 
@@ -178,7 +198,8 @@ describe('PolicyDecisionLogEntity', () => {
       expect(domain.finalReason).toBe(sampleDomainData.finalReason);
       expect(domain.modifications).toBeNull();
       expect(domain.processingTimeMs).toBe(sampleDomainData.processingTimeMs);
-      expect(domain.failedOpen).toBe(sampleDomainData.failedOpen);
+      expect(domain.evaluationFailed).toBe(sampleDomainData.evaluationFailed);
+      expect(domain.failMode).toBe(sampleDomainData.failMode);
       expect(domain.createdAt).toEqual(sampleDomainData.createdAt);
     });
   });
@@ -202,7 +223,8 @@ describe('PolicyDecisionLogEntity', () => {
       expect(domain.finalReason).toBe(sampleDomainData.finalReason);
       expect(domain.modifications).toBe(sampleDomainData.modifications);
       expect(domain.processingTimeMs).toBe(sampleDomainData.processingTimeMs);
-      expect(domain.failedOpen).toBe(sampleDomainData.failedOpen);
+      expect(domain.evaluationFailed).toBe(sampleDomainData.evaluationFailed);
+      expect(domain.failMode).toBe(sampleDomainData.failMode);
       expect(domain.createdAt).toEqual(sampleDomainData.createdAt);
     });
 

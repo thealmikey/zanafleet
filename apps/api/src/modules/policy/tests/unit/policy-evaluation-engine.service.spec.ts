@@ -108,7 +108,7 @@ describe('PolicyEvaluationEngineService', () => {
       expect(result.finalDecision.policyName).toBe('Default Allow');
       expect(result.finalDecision.reason).toContain('No applicable policies matched');
       expect(result.evaluatedPolicies).toHaveLength(0);
-      expect(result.failedOpen).toBe(false);
+      expect(result.evaluationFailed).toBe(false);
     });
 
     it('should evaluate a single matching policy', async () => {
@@ -128,7 +128,7 @@ describe('PolicyEvaluationEngineService', () => {
       expect(result.finalDecision.policyName).toBe('Allow Deliveries');
       expect(result.evaluatedPolicies).toHaveLength(1);
       expect(result.evaluatedPolicies[0].matched).toBe(true);
-      expect(result.failedOpen).toBe(false);
+      expect(result.evaluationFailed).toBe(false);
     });
 
     it('should filter out non-matching policies', async () => {
@@ -170,7 +170,7 @@ describe('PolicyEvaluationEngineService', () => {
           trigger: PolicyTrigger.DELIVERY_CREATION,
           workspaceId: 'workspace-123',
           finalEffect: PolicyEffect.ALLOW,
-          failedOpen: false,
+          evaluationFailed: false,
         })
       );
     });
@@ -190,7 +190,7 @@ describe('PolicyEvaluationEngineService', () => {
           trigger: PolicyTrigger.DELIVERY_CREATION,
           workspaceId: 'workspace-123',
           finalEffect: PolicyEffect.ALLOW,
-          failedOpen: false,
+          evaluationFailed: false,
         })
       );
     });
@@ -461,7 +461,8 @@ describe('PolicyEvaluationEngineService', () => {
       expect(result.finalDecision.effect).toBe(PolicyEffect.ALLOW);
       expect(result.finalDecision.policyName).toBe('Fail-Open Default');
       expect(result.finalDecision.reason).toContain('Database connection failed');
-      expect(result.failedOpen).toBe(true);
+      expect(result.evaluationFailed).toBe(true);
+      expect(result.failMode).toBe('open');
       expect(result.evaluatedPolicies).toHaveLength(0);
     });
 
@@ -471,7 +472,8 @@ describe('PolicyEvaluationEngineService', () => {
       const result = await service.evaluate(createContext());
 
       expect(result.finalDecision.effect).toBe(PolicyEffect.ALLOW);
-      expect(result.failedOpen).toBe(true);
+      expect(result.evaluationFailed).toBe(true);
+      expect(result.failMode).toBe('open');
     });
 
     it('should still log decision on fail-open', async () => {
@@ -482,7 +484,8 @@ describe('PolicyEvaluationEngineService', () => {
 
       expect(decisionLogRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          failedOpen: true,
+          evaluationFailed: true,
+          failMode: 'open',
           finalEffect: PolicyEffect.ALLOW,
         })
       );
@@ -496,7 +499,8 @@ describe('PolicyEvaluationEngineService', () => {
 
       expect(eventBus.publishEvent).toHaveBeenCalledWith(
         expect.objectContaining({
-          failedOpen: true,
+          evaluationFailed: true,
+          failMode: 'open',
           finalEffect: PolicyEffect.ALLOW,
         })
       );
@@ -512,7 +516,8 @@ describe('PolicyEvaluationEngineService', () => {
       expect(result.finalDecision.effect).toBe(PolicyEffect.BLOCK);
       expect(result.finalDecision.policyName).toBe('Fail-Closed Default');
       expect(result.finalDecision.reason).toContain('Database connection failed');
-      expect(result.failedOpen).toBe(true);
+      expect(result.evaluationFailed).toBe(true);
+      expect(result.failMode).toBe('closed');
       expect(result.evaluatedPolicies).toHaveLength(0);
     });
 
@@ -524,7 +529,8 @@ describe('PolicyEvaluationEngineService', () => {
 
       expect(decisionLogRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          failedOpen: true,
+          evaluationFailed: true,
+          failMode: 'closed',
           finalEffect: PolicyEffect.BLOCK,
         })
       );
@@ -538,7 +544,8 @@ describe('PolicyEvaluationEngineService', () => {
 
       expect(eventBus.publishEvent).toHaveBeenCalledWith(
         expect.objectContaining({
-          failedOpen: true,
+          evaluationFailed: true,
+          failMode: 'closed',
           finalEffect: PolicyEffect.BLOCK,
         })
       );
@@ -553,7 +560,7 @@ describe('PolicyEvaluationEngineService', () => {
       const result = await service.evaluate(createContext());
 
       expect(result.finalDecision.effect).toBe(PolicyEffect.ALLOW);
-      expect(result.failedOpen).toBe(false);
+      expect(result.evaluationFailed).toBe(false);
     });
 
     it('should not throw when event publishing fails', async () => {
@@ -563,7 +570,7 @@ describe('PolicyEvaluationEngineService', () => {
       const result = await service.evaluate(createContext());
 
       expect(result.finalDecision.effect).toBe(PolicyEffect.ALLOW);
-      expect(result.failedOpen).toBe(false);
+      expect(result.evaluationFailed).toBe(false);
     });
 
     it('should handle non-Error exceptions gracefully', async () => {
@@ -572,7 +579,8 @@ describe('PolicyEvaluationEngineService', () => {
       const result = await service.evaluate(createContext());
 
       expect(result.finalDecision.effect).toBe(PolicyEffect.ALLOW);
-      expect(result.failedOpen).toBe(true);
+      expect(result.evaluationFailed).toBe(true);
+      expect(result.failMode).toBe('open');
       expect(result.finalDecision.reason).toContain('string error');
     });
   });

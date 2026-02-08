@@ -25,7 +25,8 @@ export class PolicyEvaluatedEventV1 implements BaseEvent {
   readonly evaluatedPolicyCount: number;
   readonly matchedPolicyCount: number;
   readonly processingTimeMs: number;
-  readonly failedOpen: boolean;
+  readonly evaluationFailed: boolean;
+  readonly failMode?: 'open' | 'closed';
 
   readonly correlationId?: string;
   readonly causationId?: string;
@@ -42,7 +43,8 @@ export class PolicyEvaluatedEventV1 implements BaseEvent {
     evaluatedPolicyCount: number;
     matchedPolicyCount: number;
     processingTimeMs: number;
-    failedOpen: boolean;
+    evaluationFailed: boolean;
+    failMode?: 'open' | 'closed';
     occurredAt?: Date;
     correlationId?: string;
     causationId?: string;
@@ -58,7 +60,8 @@ export class PolicyEvaluatedEventV1 implements BaseEvent {
     this.evaluatedPolicyCount = data.evaluatedPolicyCount;
     this.matchedPolicyCount = data.matchedPolicyCount;
     this.processingTimeMs = data.processingTimeMs;
-    this.failedOpen = data.failedOpen;
+    this.evaluationFailed = data.evaluationFailed;
+    this.failMode = data.failMode;
     this.occurredAt = data.occurredAt ?? new Date();
     this.aggregateId = data.subjectId;
     this.correlationId = data.correlationId;
@@ -82,7 +85,8 @@ export class PolicyEvaluatedEventV1 implements BaseEvent {
     evaluatedPolicyCount: number;
     matchedPolicyCount: number;
     processingTimeMs: number;
-    failedOpen: boolean;
+    evaluationFailed: boolean;
+    failMode?: 'open' | 'closed';
     correlationId?: string;
     causationId?: string;
   } {
@@ -103,7 +107,8 @@ export class PolicyEvaluatedEventV1 implements BaseEvent {
       evaluatedPolicyCount: this.evaluatedPolicyCount,
       matchedPolicyCount: this.matchedPolicyCount,
       processingTimeMs: this.processingTimeMs,
-      failedOpen: this.failedOpen,
+      evaluationFailed: this.evaluationFailed,
+      failMode: this.failMode,
       correlationId: this.correlationId,
       causationId: this.causationId,
     };
@@ -126,7 +131,8 @@ export class PolicyEvaluatedEventV1 implements BaseEvent {
     evaluatedPolicyCount: number;
     matchedPolicyCount: number;
     processingTimeMs: number;
-    failedOpen: boolean;
+    evaluationFailed: boolean;
+    failMode?: 'open' | 'closed';
     correlationId?: string;
     causationId?: string;
   }): PolicyEvaluatedEventV1 {
@@ -142,7 +148,8 @@ export class PolicyEvaluatedEventV1 implements BaseEvent {
       evaluatedPolicyCount: data.evaluatedPolicyCount,
       matchedPolicyCount: data.matchedPolicyCount,
       processingTimeMs: data.processingTimeMs,
-      failedOpen: data.failedOpen,
+      evaluationFailed: data.evaluationFailed,
+      failMode: data.failMode,
       occurredAt: new Date(data.occurredAt),
       correlationId: data.correlationId,
       causationId: data.causationId,

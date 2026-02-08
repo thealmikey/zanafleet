@@ -88,7 +88,10 @@ export class PolicyDecisionLogEntity {
   processingTimeMs!: number;
 
   @Column('boolean', { default: false })
-  failedOpen!: boolean;
+  evaluationFailed!: boolean;
+
+  @Column('varchar', { length: 10, nullable: true })
+  failMode!: 'open' | 'closed' | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;
@@ -111,7 +114,8 @@ export class PolicyDecisionLogEntity {
     finalReason: string;
     modifications: Record<string, unknown> | null;
     processingTimeMs: number;
-    failedOpen: boolean;
+    evaluationFailed: boolean;
+    failMode: 'open' | 'closed' | null;
     createdAt: Date;
   } {
     return {
@@ -129,7 +133,8 @@ export class PolicyDecisionLogEntity {
       finalReason: this.finalReason,
       modifications: this.modifications,
       processingTimeMs: this.processingTimeMs,
-      failedOpen: this.failedOpen,
+      evaluationFailed: this.evaluationFailed,
+      failMode: this.failMode,
       createdAt: this.createdAt,
     };
   }
@@ -153,7 +158,8 @@ export class PolicyDecisionLogEntity {
     finalReason: string;
     modifications?: Record<string, unknown> | null;
     processingTimeMs: number;
-    failedOpen?: boolean;
+    evaluationFailed?: boolean;
+    failMode?: 'open' | 'closed' | null;
     createdAt: Date;
   }): PolicyDecisionLogEntity {
     const entity = new PolicyDecisionLogEntity();
@@ -171,7 +177,8 @@ export class PolicyDecisionLogEntity {
     entity.finalReason = data.finalReason;
     entity.modifications = data.modifications ?? null;
     entity.processingTimeMs = data.processingTimeMs;
-    entity.failedOpen = data.failedOpen ?? false;
+    entity.evaluationFailed = data.evaluationFailed ?? false;
+    entity.failMode = data.failMode ?? null;
     entity.createdAt = data.createdAt;
     return entity;
   }

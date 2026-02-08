@@ -42,7 +42,7 @@ function createMockEvaluationResult(decision: PolicyDecision): EvaluationResult 
       },
     ],
     processingTimeMs: 5,
-    failedOpen: false,
+    evaluationFailed: false,
   };
 }
 

@@ -80,6 +80,8 @@ export interface EvaluationResult {
   evaluatedPolicies: EvaluatedPolicy[];
   /** Time taken to evaluate all policies in milliseconds */
   processingTimeMs: number;
-  /** Whether the decision was made via fail-open due to an error */
-  failedOpen: boolean;
+  /** Whether an error occurred during policy evaluation */
+  evaluationFailed: boolean;
+  /** The failure mode when evaluationFailed is true: 'open' (ALLOW) or 'closed' (BLOCK). Only present when evaluationFailed is true. */
+  failMode?: 'open' | 'closed';
 }
