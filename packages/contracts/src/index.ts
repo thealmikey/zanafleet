@@ -309,4 +309,5 @@ export interface OrderResponse {
   updatedAt: Date;
 }
 
-export { TEST_ACCOUNTS, TEST_PASSWORD, TEST_WORKSPACE_ID, TestAccount } from './test-accounts';
+export { TEST_ACCOUNTS, TEST_PASSWORD, TEST_WORKSPACE_ID } from './test-accounts';
+export type { TestAccount } from './test-accounts';
