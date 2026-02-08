@@ -1,10 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { VehicleType } from '@zanafleet/contracts';
+import { haversineDistanceMeters, GeoPoint } from '../../../core/utils/geo.utils';
 
-export interface GeoPoint {
-  latitude: number;
-  longitude: number;
-}
+export type { GeoPoint };
 
 export interface TimeWindow {
   start: Date;
@@ -53,31 +51,8 @@ export interface RiderCandidateRepository {
   }): Promise<RiderCandidate[]>;
 }
 
-const EARTH_RADIUS_METERS = 6371000;
 const DEFAULT_RADIUS_METERS = 3000; // 3 km
 const DEFAULT_WINDOW_MINUTES = 30;
-
-function toRadians(deg: number): number {
-  return (deg * Math.PI) / 180;
-}
-
-/**
- * Haversine distance in meters between two lat/lon points.
- */
-export function haversineDistanceMeters(a: GeoPoint, b: GeoPoint): number {
-  const dLat = toRadians(b.latitude - a.latitude);
-  const dLon = toRadians(b.longitude - a.longitude);
-  const lat1 = toRadians(a.latitude);
-  const lat2 = toRadians(b.latitude);
-
-  const sinDlat = Math.sin(dLat / 2);
-  const sinDlon = Math.sin(dLon / 2);
-
-  const aa = sinDlat * sinDlat + Math.cos(lat1) * Math.cos(lat2) * sinDlon * sinDlon;
-  const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
-
-  return EARTH_RADIUS_METERS * c;
-}
 
 function overlaps(a: TimeWindow, b: TimeWindow): boolean {
   return a.start.getTime() < b.end.getTime() && a.end.getTime() > b.start.getTime();

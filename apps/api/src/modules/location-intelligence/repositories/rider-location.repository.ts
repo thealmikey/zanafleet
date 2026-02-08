@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { DataSource, EntityManager } from 'typeorm';
 import { H3Service } from '../services/h3.service';
 import { GeoPoint } from '../providers/geo-provider.interface';
+import { haversineDistanceMeters } from '../../../core/utils/geo.utils';
 import {
   RiderLocationData,
   RiderLocationSnapshot,
@@ -9,29 +10,8 @@ import {
   FindNearbyRidersParams,
 } from '../types/rider-location.types';
 
-const EARTH_RADIUS_METERS = 6371000;
-
-/**
- * Calculate the haversine distance between two geographic points.
- * @param from - Starting point
- * @param to - Ending point
- * @returns Distance in meters
- */
-export function haversineDistanceMeters(from: GeoPoint, to: GeoPoint): number {
-  const toRadians = (deg: number): number => (deg * Math.PI) / 180;
-
-  const lat1 = toRadians(from.latitude);
-  const lat2 = toRadians(to.latitude);
-  const deltaLat = toRadians(to.latitude - from.latitude);
-  const deltaLng = toRadians(to.longitude - from.longitude);
-
-  const a =
-    Math.sin(deltaLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLng / 2) ** 2;
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-  return EARTH_RADIUS_METERS * c;
-}
+// Re-export for backwards compatibility with existing imports
+export { haversineDistanceMeters } from '../../../core/utils/geo.utils';
 
 /**
  * Repository for rider location spatial queries.
