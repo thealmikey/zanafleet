@@ -181,6 +181,44 @@ describeWithDb('MediaModule Integration', () => {
     });
   });
 
+  describe('size validation', () => {
+    const testOwnerId = '22222222-2222-2222-2222-222222222222';
+
+    it('should reject asset creation when input.size does not match body.length', async () => {
+      const input: CreateMediaAssetInput = {
+        filename: 'size-mismatch.txt',
+        mimeType: 'text/plain',
+        size: 100,
+        checksum: 'test-checksum',
+        ownerId: testOwnerId,
+        ownerType: OwnerEntityType.Rider,
+      };
+      const body = Buffer.from('short');
+
+      await expect(mediaService.createMediaAsset(input, body)).rejects.toThrow(
+        'Size mismatch',
+      );
+    });
+
+    it('should accept asset creation when input.size matches body.length', async () => {
+      const content = 'exact length content';
+      const input: CreateMediaAssetInput = {
+        filename: 'size-match.txt',
+        mimeType: 'text/plain',
+        size: content.length,
+        checksum: 'valid-checksum',
+        ownerId: testOwnerId,
+        ownerType: OwnerEntityType.Business,
+      };
+      const body = Buffer.from(content);
+
+      const result = await mediaService.createMediaAsset(input, body);
+
+      expect(result).toBeDefined();
+      expect(result.size).toBe(content.length);
+    });
+  });
+
   describe('error handling', () => {
     it('should return null for non-existent asset', async () => {
       const result = await mediaService.getMediaAsset('00000000-0000-0000-0000-000000000000');

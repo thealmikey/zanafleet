@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { createHash } from 'crypto';
@@ -35,6 +35,12 @@ export class MediaService {
       mediaAssetId,
       input.filename,
     );
+
+    if (input.size !== body.length) {
+      throw new BadRequestException(
+        `Size mismatch: declared size (${input.size}) does not match actual body length (${body.length})`,
+      );
+    }
 
     const checksum = input.checksum || this.calculateChecksum(body);
 

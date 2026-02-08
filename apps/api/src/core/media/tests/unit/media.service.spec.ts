@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { MediaService } from '../../services/media.service';
 import { MediaAssetEntity } from '../../entities/media-asset.entity';
 import { StorageProviderRegistry } from '../../providers/storage-provider-registry.service';
@@ -75,15 +75,15 @@ describe('MediaService', () => {
 
   describe('createMediaAsset', () => {
     it('should create a media asset and upload to storage', async () => {
+      const body = Buffer.from('test content');
       const input: CreateMediaAssetInput = {
         filename: 'test-image.jpg',
         mimeType: 'image/jpeg',
-        size: 1024,
+        size: body.length,
         checksum: 'provided-checksum',
         ownerId: mockOwnerId,
         ownerType: OwnerEntityType.Business,
       };
-      const body = Buffer.from('test content');
 
       repository.save.mockImplementation(async (entity) => {
         const typedEntity = entity as MediaAssetEntity;
@@ -127,15 +127,15 @@ describe('MediaService', () => {
     });
 
     it('should generate correct storage key pattern', async () => {
+      const body = Buffer.from('pdf content');
       const input: CreateMediaAssetInput = {
         filename: 'document.pdf',
         mimeType: 'application/pdf',
-        size: 5000,
+        size: body.length,
         checksum: 'abc123',
         ownerId: mockOwnerId,
         ownerType: OwnerEntityType.Delivery,
       };
-      const body = Buffer.from('pdf content');
 
       repository.save.mockImplementation(async (entity) => {
         const typedEntity = entity as MediaAssetEntity;
@@ -154,17 +154,37 @@ describe('MediaService', () => {
     it('should throw if no storage provider is configured', async () => {
       storageRegistry.getDefault.mockReturnValue(undefined);
 
+      const body = Buffer.from('');
       const input: CreateMediaAssetInput = {
         filename: 'test.txt',
         mimeType: 'text/plain',
-        size: 100,
+        size: body.length,
         checksum: 'test',
         ownerId: mockOwnerId,
         ownerType: OwnerEntityType.Business,
       };
 
-      await expect(service.createMediaAsset(input, Buffer.from(''))).rejects.toThrow(
+      await expect(service.createMediaAsset(input, body)).rejects.toThrow(
         'No storage provider configured',
+      );
+    });
+
+    it('should throw BadRequestException when input.size does not match body.length', async () => {
+      const input: CreateMediaAssetInput = {
+        filename: 'size-mismatch.txt',
+        mimeType: 'text/plain',
+        size: 100,
+        checksum: 'test-checksum',
+        ownerId: mockOwnerId,
+        ownerType: OwnerEntityType.Business,
+      };
+      const body = Buffer.from('short');
+
+      await expect(service.createMediaAsset(input, body)).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(service.createMediaAsset(input, body)).rejects.toThrow(
+        'Size mismatch',
       );
     });
   });
