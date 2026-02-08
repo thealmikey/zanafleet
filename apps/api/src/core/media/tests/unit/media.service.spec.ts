@@ -187,6 +187,30 @@ describe('MediaService', () => {
         'Size mismatch',
       );
     });
+
+    it('should cleanup uploaded file when database save fails', async () => {
+      const body = Buffer.from('upload content');
+      const input: CreateMediaAssetInput = {
+        filename: 'cleanup-test.jpg',
+        mimeType: 'image/jpeg',
+        size: body.length,
+        checksum: 'cleanup-checksum',
+        ownerId: mockOwnerId,
+        ownerType: OwnerEntityType.Business,
+      };
+
+      const saveError = new Error('Database connection lost');
+      repository.save.mockRejectedValue(saveError);
+
+      await expect(service.createMediaAsset(input, body)).rejects.toThrow(saveError);
+
+      expect(mockProvider.upload).toHaveBeenCalled();
+      expect(mockProvider.delete).toHaveBeenCalledWith(
+        expect.stringMatching(
+          new RegExp(`^${OwnerEntityType.Business}/${mockOwnerId}/[a-f0-9-]+/cleanup-test\\.jpg$`),
+        ),
+      );
+    });
   });
 
   describe('getMediaAsset', () => {
