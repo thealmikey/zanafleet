@@ -1,4 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import { UpdateRiderLocationHandler } from '../../handlers/update-rider-location.handler';
 import { UpdateRiderLocationCommand } from '../../commands/update-rider-location.command';
 import { RiderLocationRepository } from '../../repositories/rider-location.repository';
@@ -13,6 +14,7 @@ describe('UpdateRiderLocationHandler', () => {
   let mockH3Service: jest.Mocked<H3Service>;
   let mockEventBus: jest.Mocked<EventBusService>;
   let mockRedisService: jest.Mocked<RedisService>;
+  let mockDataSource: jest.Mocked<DataSource>;
 
   const validTelemetry: RiderTelemetryData = {
     riderId: 'rider-123',
@@ -63,11 +65,18 @@ describe('UpdateRiderLocationHandler', () => {
       onModuleDestroy: jest.fn(),
     } as unknown as jest.Mocked<RedisService>;
 
+    mockDataSource = {
+      transaction: jest.fn().mockImplementation(async (cb) => {
+        return cb({} as any);
+      }),
+    } as unknown as jest.Mocked<DataSource>;
+
     handler = new UpdateRiderLocationHandler(
       mockRepository,
       mockH3Service,
       mockEventBus,
       mockRedisService,
+      mockDataSource,
     );
   });
 
@@ -147,36 +156,42 @@ describe('UpdateRiderLocationHandler', () => {
       });
     });
 
-    it('should upsert snapshot via repository', async () => {
+    it('should upsert snapshot via repository within transaction', async () => {
       const command = new UpdateRiderLocationCommand(validTelemetry);
 
       await handler.execute(command);
 
-      expect(mockRepository.upsertSnapshot).toHaveBeenCalledWith({
-        riderId: validTelemetry.riderId,
-        latitude: validTelemetry.latitude,
-        longitude: validTelemetry.longitude,
-        heading: validTelemetry.heading,
-        speed: validTelemetry.speed,
-        accuracy: validTelemetry.accuracy,
-        recordedAt: validTelemetry.timestamp,
-      });
+      expect(mockRepository.upsertSnapshot).toHaveBeenCalledWith(
+        {
+          riderId: validTelemetry.riderId,
+          latitude: validTelemetry.latitude,
+          longitude: validTelemetry.longitude,
+          heading: validTelemetry.heading,
+          speed: validTelemetry.speed,
+          accuracy: validTelemetry.accuracy,
+          recordedAt: validTelemetry.timestamp,
+        },
+        expect.anything(),
+      );
     });
 
-    it('should append to history via repository', async () => {
+    it('should append to history via repository within transaction', async () => {
       const command = new UpdateRiderLocationCommand(validTelemetry);
 
       await handler.execute(command);
 
-      expect(mockRepository.appendHistory).toHaveBeenCalledWith({
-        riderId: validTelemetry.riderId,
-        latitude: validTelemetry.latitude,
-        longitude: validTelemetry.longitude,
-        heading: validTelemetry.heading,
-        speed: validTelemetry.speed,
-        accuracy: validTelemetry.accuracy,
-        recordedAt: validTelemetry.timestamp,
-      });
+      expect(mockRepository.appendHistory).toHaveBeenCalledWith(
+        {
+          riderId: validTelemetry.riderId,
+          latitude: validTelemetry.latitude,
+          longitude: validTelemetry.longitude,
+          heading: validTelemetry.heading,
+          speed: validTelemetry.speed,
+          accuracy: validTelemetry.accuracy,
+          recordedAt: validTelemetry.timestamp,
+        },
+        expect.anything(),
+      );
     });
 
     it('should publish RiderLocationUpdatedEventV1 after successful update', async () => {
@@ -237,6 +252,7 @@ describe('UpdateRiderLocationHandler', () => {
           speed: null,
           accuracy: null,
         }),
+        expect.anything(),
       );
     });
   });
@@ -311,6 +327,37 @@ describe('UpdateRiderLocationHandler', () => {
       const command = new UpdateRiderLocationCommand(validTelemetry);
 
       await expect(handler.execute(command)).rejects.toThrow();
+      expect(mockEventBus.publishEvent).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('transactional behavior', () => {
+    it('should execute upsertSnapshot and appendHistory within a transaction', async () => {
+      const command = new UpdateRiderLocationCommand(validTelemetry);
+
+      await handler.execute(command);
+
+      expect(mockDataSource.transaction).toHaveBeenCalledTimes(1);
+      expect(mockRepository.upsertSnapshot).toHaveBeenCalled();
+      expect(mockRepository.appendHistory).toHaveBeenCalled();
+    });
+
+    it('should not publish event if transaction fails', async () => {
+      mockDataSource.transaction.mockRejectedValue(new Error('Transaction failed'));
+      const command = new UpdateRiderLocationCommand(validTelemetry);
+
+      await expect(handler.execute(command)).rejects.toThrow('Transaction failed');
+      expect(mockEventBus.publishEvent).not.toHaveBeenCalled();
+    });
+
+    it('should rollback upsertSnapshot if appendHistory fails within transaction', async () => {
+      mockDataSource.transaction.mockImplementation(async (cb: any) => {
+        await cb({} as any);
+        throw new Error('appendHistory failed');
+      });
+      const command = new UpdateRiderLocationCommand(validTelemetry);
+
+      await expect(handler.execute(command)).rejects.toThrow('appendHistory failed');
       expect(mockEventBus.publishEvent).not.toHaveBeenCalled();
     });
   });

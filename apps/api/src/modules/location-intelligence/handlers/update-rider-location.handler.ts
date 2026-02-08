@@ -1,5 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Logger, BadRequestException } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import { UpdateRiderLocationCommand } from '../commands/update-rider-location.command';
 import { RiderLocationRepository } from '../repositories/rider-location.repository';
 import { H3Service } from '../services/h3.service';
@@ -44,6 +45,7 @@ export class UpdateRiderLocationHandler
     private readonly h3Service: H3Service,
     private readonly eventBusService: EventBusService,
     private readonly redisService: RedisService,
+    private readonly dataSource: DataSource,
   ) {
     this.rateLimitMs = parseInt(process.env.RIDER_LOCATION_RATE_LIMIT_MS ?? '3000', 10);
   }
@@ -79,13 +81,13 @@ export class UpdateRiderLocationHandler
       recordedAt: timestamp,
     };
 
-    // 5. Upsert current location snapshot
-    await this.riderLocationRepository.upsertSnapshot(locationData);
+    // 5. Persist location data atomically (snapshot + history)
+    await this.dataSource.transaction(async (manager) => {
+      await this.riderLocationRepository.upsertSnapshot(locationData, manager);
+      await this.riderLocationRepository.appendHistory(locationData, manager);
+    });
 
-    // 6. Append to location history
-    await this.riderLocationRepository.appendHistory(locationData);
-
-    // 7. Publish event
+    // 6. Publish event
     const event = createRiderLocationUpdatedEvent({
       riderId,
       latitude,

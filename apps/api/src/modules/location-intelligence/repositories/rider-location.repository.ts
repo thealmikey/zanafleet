@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { DataSource, EntityManager } from 'typeorm';
 import { H3Service } from '../services/h3.service';
 import { GeoPoint } from '../providers/geo-provider.interface';
 import {
@@ -52,14 +52,18 @@ export class RiderLocationRepository {
   /**
    * Insert or update the current location snapshot for a rider.
    * Uses PostgreSQL upsert (ON CONFLICT) for atomic operation.
+   * @param data - Location data to persist
+   * @param manager - Optional EntityManager for transaction support
    */
-  async upsertSnapshot(data: RiderLocationData): Promise<void> {
+  async upsertSnapshot(data: RiderLocationData, manager?: EntityManager): Promise<void> {
     const h3Indices = this.h3Service.pointToMultiResolution({
       latitude: data.latitude,
       longitude: data.longitude,
     });
 
-    await this.dataSource.query(
+    const queryRunner = manager ?? this.dataSource;
+
+    await queryRunner.query(
       `
       INSERT INTO rider_location_snapshots (
         rider_id, latitude, longitude, point,
@@ -99,14 +103,18 @@ export class RiderLocationRepository {
 
   /**
    * Append a location record to the time-series history table.
+   * @param data - Location data to persist
+   * @param manager - Optional EntityManager for transaction support
    */
-  async appendHistory(data: RiderLocationData): Promise<void> {
+  async appendHistory(data: RiderLocationData, manager?: EntityManager): Promise<void> {
     const h3Indices = this.h3Service.pointToMultiResolution({
       latitude: data.latitude,
       longitude: data.longitude,
     });
 
-    await this.dataSource.query(
+    const queryRunner = manager ?? this.dataSource;
+
+    await queryRunner.query(
       `
       INSERT INTO rider_location_history (
         rider_id, latitude, longitude, point,
