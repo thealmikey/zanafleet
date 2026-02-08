@@ -285,13 +285,14 @@ export class PolicyEvaluationEngineService {
     result: EvaluationResult,
     evaluatedPolicyLogs: EvaluatedPolicyLogEntry[],
     requestId: string,
-    _correlationId?: string
+    correlationId?: string
   ): void {
     const { subjectType, subjectId } = this.determineSubject(context);
 
     const logData = {
       logId: randomUUID(),
       requestId,
+      correlationId: correlationId ?? null,
       trigger: context.trigger,
       workspaceId: context.workspaceId,
       actorId: context.actorId ?? null,

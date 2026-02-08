@@ -47,6 +47,7 @@ describe('PolicyDecisionLogEntity', () => {
   const sampleDomainData = {
     logId: '223e4567-e89b-12d3-a456-426614174001',
     requestId: '323e4567-e89b-12d3-a456-426614174002',
+    correlationId: 'corr-123',
     trigger: PolicyTrigger.DELIVERY_CREATION,
     workspaceId: '123e4567-e89b-12d3-a456-426614174000',
     actorId: 'actor-123',
@@ -70,6 +71,7 @@ describe('PolicyDecisionLogEntity', () => {
 
       expect(entity.id).toBe(sampleDomainData.logId);
       expect(entity.requestId).toBe(sampleDomainData.requestId);
+      expect(entity.correlationId).toBe(sampleDomainData.correlationId);
       expect(entity.trigger).toBe(sampleDomainData.trigger);
       expect(entity.workspaceId).toBe(sampleDomainData.workspaceId);
       expect(entity.actorId).toBe(sampleDomainData.actorId);
@@ -109,6 +111,7 @@ describe('PolicyDecisionLogEntity', () => {
 
       const entity = PolicyDecisionLogEntity.fromDomain(minimalData);
 
+      expect(entity.correlationId).toBeNull();
       expect(entity.actorId).toBeNull();
       expect(entity.finalPolicyId).toBeNull();
       expect(entity.modifications).toBeNull();
@@ -186,6 +189,7 @@ describe('PolicyDecisionLogEntity', () => {
 
       expect(domain.logId).toBe(sampleDomainData.logId);
       expect(domain.requestId).toBe(sampleDomainData.requestId);
+      expect(domain.correlationId).toBe(sampleDomainData.correlationId);
       expect(domain.trigger).toBe(sampleDomainData.trigger);
       expect(domain.workspaceId).toBe(sampleDomainData.workspaceId);
       expect(domain.actorId).toBe(sampleDomainData.actorId);
@@ -211,6 +215,7 @@ describe('PolicyDecisionLogEntity', () => {
 
       expect(domain.logId).toBe(sampleDomainData.logId);
       expect(domain.requestId).toBe(sampleDomainData.requestId);
+      expect(domain.correlationId).toBe(sampleDomainData.correlationId);
       expect(domain.trigger).toBe(sampleDomainData.trigger);
       expect(domain.workspaceId).toBe(sampleDomainData.workspaceId);
       expect(domain.actorId).toBe(sampleDomainData.actorId);
@@ -226,6 +231,17 @@ describe('PolicyDecisionLogEntity', () => {
       expect(domain.evaluationFailed).toBe(sampleDomainData.evaluationFailed);
       expect(domain.failMode).toBe(sampleDomainData.failMode);
       expect(domain.createdAt).toEqual(sampleDomainData.createdAt);
+    });
+
+    it('should handle null correlationId through round-trip', () => {
+      const dataWithNullCorrelationId = {
+        ...sampleDomainData,
+        correlationId: null,
+      };
+      const entity = PolicyDecisionLogEntity.fromDomain(dataWithNullCorrelationId);
+      const domain = entity.toDomain();
+
+      expect(domain.correlationId).toBeNull();
     });
 
     it('should preserve complex contextSnapshot through round-trip', () => {

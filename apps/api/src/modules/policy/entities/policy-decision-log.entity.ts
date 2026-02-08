@@ -51,6 +51,9 @@ export class PolicyDecisionLogEntity {
   @Column('uuid')
   requestId!: string;
 
+  @Column('varchar', { length: 255, nullable: true })
+  correlationId!: string | null;
+
   @Column('enum', { enum: PolicyTrigger })
   trigger!: PolicyTrigger;
 
@@ -102,6 +105,7 @@ export class PolicyDecisionLogEntity {
   toDomain(): {
     logId: string;
     requestId: string;
+    correlationId: string | null;
     trigger: PolicyTrigger;
     workspaceId: string;
     actorId: string | null;
@@ -121,6 +125,7 @@ export class PolicyDecisionLogEntity {
     return {
       logId: this.id,
       requestId: this.requestId,
+      correlationId: this.correlationId,
       trigger: this.trigger,
       workspaceId: this.workspaceId,
       actorId: this.actorId,
@@ -146,6 +151,7 @@ export class PolicyDecisionLogEntity {
   static fromDomain(data: {
     logId: string;
     requestId: string;
+    correlationId?: string | null;
     trigger: PolicyTrigger;
     workspaceId: string;
     actorId?: string | null;
@@ -165,6 +171,7 @@ export class PolicyDecisionLogEntity {
     const entity = new PolicyDecisionLogEntity();
     entity.id = data.logId;
     entity.requestId = data.requestId;
+    entity.correlationId = data.correlationId ?? null;
     entity.trigger = data.trigger;
     entity.workspaceId = data.workspaceId;
     entity.actorId = data.actorId ?? null;

@@ -160,7 +160,7 @@ describe('PolicyEvaluationEngineService', () => {
       policyRepository.findActivePoliciesForTrigger.mockResolvedValue([]);
       const context = createContext();
 
-      await service.evaluate(context);
+      await service.evaluate(context, { correlationId: 'test-corr-id' });
 
       await new Promise(resolve => setImmediate(resolve));
 
@@ -171,6 +171,7 @@ describe('PolicyEvaluationEngineService', () => {
           workspaceId: 'workspace-123',
           finalEffect: PolicyEffect.ALLOW,
           evaluationFailed: false,
+          correlationId: 'test-corr-id',
         })
       );
     });
@@ -479,7 +480,7 @@ describe('PolicyEvaluationEngineService', () => {
     it('should still log decision on fail-open', async () => {
       policyRepository.findActivePoliciesForTrigger.mockRejectedValue(new Error('DB error'));
 
-      await service.evaluate(createContext(), { failOpen: true });
+      await service.evaluate(createContext(), { failOpen: true, correlationId: 'fail-open-corr' });
       await new Promise(resolve => setImmediate(resolve));
 
       expect(decisionLogRepository.create).toHaveBeenCalledWith(
@@ -487,6 +488,7 @@ describe('PolicyEvaluationEngineService', () => {
           evaluationFailed: true,
           failMode: 'open',
           finalEffect: PolicyEffect.ALLOW,
+          correlationId: 'fail-open-corr',
         })
       );
     });
@@ -524,7 +526,7 @@ describe('PolicyEvaluationEngineService', () => {
     it('should still log decision on fail-closed', async () => {
       policyRepository.findActivePoliciesForTrigger.mockRejectedValue(new Error('DB error'));
 
-      await service.evaluate(createContext(), { failOpen: false });
+      await service.evaluate(createContext(), { failOpen: false, correlationId: 'fail-closed-corr' });
       await new Promise(resolve => setImmediate(resolve));
 
       expect(decisionLogRepository.create).toHaveBeenCalledWith(
@@ -532,6 +534,7 @@ describe('PolicyEvaluationEngineService', () => {
           evaluationFailed: true,
           failMode: 'closed',
           finalEffect: PolicyEffect.BLOCK,
+          correlationId: 'fail-closed-corr',
         })
       );
     });

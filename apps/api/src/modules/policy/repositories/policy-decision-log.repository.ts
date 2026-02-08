@@ -15,6 +15,7 @@ import { PolicyEffect, PolicyTrigger, EvaluationContext } from '../dto';
 export interface PolicyDecisionLogData {
   logId: string;
   requestId: string;
+  correlationId?: string | null;
   trigger: PolicyTrigger;
   workspaceId: string;
   actorId?: string | null;
@@ -27,7 +28,8 @@ export interface PolicyDecisionLogData {
   finalReason: string;
   modifications?: Record<string, unknown> | null;
   processingTimeMs: number;
-  failedOpen?: boolean;
+  evaluationFailed?: boolean;
+  failMode?: 'open' | 'closed' | null;
   createdAt: Date;
 }
 
