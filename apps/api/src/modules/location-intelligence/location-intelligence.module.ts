@@ -1,6 +1,7 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { GeoProviderRegistry } from './providers/geo-provider-registry.service';
 import { NoOpGeoProvider } from './providers/noop-geo.provider';
+import { H3Service } from './services/h3.service';
 
 /**
  * Location Intelligence Module
@@ -13,8 +14,8 @@ import { NoOpGeoProvider } from './providers/noop-geo.provider';
  * at runtime via the GeoProviderRegistry.
  */
 @Module({
-  providers: [GeoProviderRegistry, NoOpGeoProvider],
-  exports: [GeoProviderRegistry, NoOpGeoProvider],
+  providers: [GeoProviderRegistry, NoOpGeoProvider, H3Service],
+  exports: [GeoProviderRegistry, NoOpGeoProvider, H3Service],
 })
 export class LocationIntelligenceModule implements OnModuleInit {
   constructor(
