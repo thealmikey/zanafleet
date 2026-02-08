@@ -243,4 +243,109 @@ describeWithDb('MediaModule Integration', () => {
       ).rejects.toThrow('not found');
     });
   });
+
+  describe('concurrent operations', () => {
+    const testOwnerId = '33333333-3333-3333-3333-333333333333';
+
+    it('should handle concurrent archiveMediaAsset and deleteMediaAsset calls consistently', async () => {
+      const input: CreateMediaAssetInput = {
+        filename: 'concurrent-test.txt',
+        mimeType: 'text/plain',
+        size: 20,
+        checksum: 'concurrent-test-checksum',
+        ownerId: testOwnerId,
+        ownerType: OwnerEntityType.Business,
+      };
+      const body = Buffer.from('concurrent test data');
+
+      const created = await mediaService.createMediaAsset(input, body);
+      const assetId = created.mediaAssetId;
+
+      const results = await Promise.allSettled([
+        mediaService.archiveMediaAsset(assetId),
+        mediaService.deleteMediaAsset(assetId),
+      ]);
+
+      const fulfilled = results.filter((r) => r.status === 'fulfilled');
+      const rejected = results.filter(
+        (r): r is PromiseRejectedResult => r.status === 'rejected',
+      );
+
+      expect(fulfilled.length).toBeGreaterThanOrEqual(1);
+
+      for (const result of rejected) {
+        expect(result.reason.message).toMatch(/not found/i);
+      }
+
+      const finalAsset = await mediaService.getMediaAsset(assetId);
+
+      if (finalAsset !== null) {
+        expect(finalAsset.status).toBe(MediaAssetStatus.Archived);
+      }
+    });
+
+    it('should handle multiple concurrent deleteMediaAsset calls without double-deletion errors', async () => {
+      const input: CreateMediaAssetInput = {
+        filename: 'multi-delete-test.txt',
+        mimeType: 'text/plain',
+        size: 25,
+        checksum: 'multi-delete-checksum',
+        ownerId: testOwnerId,
+        ownerType: OwnerEntityType.Rider,
+      };
+      const body = Buffer.from('multi delete test content');
+
+      const created = await mediaService.createMediaAsset(input, body);
+      const assetId = created.mediaAssetId;
+
+      const results = await Promise.allSettled([
+        mediaService.deleteMediaAsset(assetId),
+        mediaService.deleteMediaAsset(assetId),
+        mediaService.deleteMediaAsset(assetId),
+      ]);
+
+      const fulfilled = results.filter((r) => r.status === 'fulfilled');
+      const rejected = results.filter(
+        (r): r is PromiseRejectedResult => r.status === 'rejected',
+      );
+
+      expect(fulfilled.length).toBeGreaterThanOrEqual(1);
+
+      for (const result of rejected) {
+        expect(result.reason.message).toMatch(/not found/i);
+      }
+
+      const finalAsset = await mediaService.getMediaAsset(assetId);
+      expect(finalAsset).toBeNull();
+    });
+
+    it('should handle concurrent archiveMediaAsset calls consistently', async () => {
+      const input: CreateMediaAssetInput = {
+        filename: 'multi-archive-test.txt',
+        mimeType: 'text/plain',
+        size: 26,
+        checksum: 'multi-archive-checksum',
+        ownerId: testOwnerId,
+        ownerType: OwnerEntityType.Delivery,
+      };
+      const body = Buffer.from('multi archive test content');
+
+      const created = await mediaService.createMediaAsset(input, body);
+      const assetId = created.mediaAssetId;
+
+      const results = await Promise.allSettled([
+        mediaService.archiveMediaAsset(assetId),
+        mediaService.archiveMediaAsset(assetId),
+        mediaService.archiveMediaAsset(assetId),
+      ]);
+
+      const fulfilled = results.filter((r) => r.status === 'fulfilled');
+
+      expect(fulfilled.length).toBeGreaterThanOrEqual(1);
+
+      const finalAsset = await mediaService.getMediaAsset(assetId);
+      expect(finalAsset).not.toBeNull();
+      expect(finalAsset!.status).toBe(MediaAssetStatus.Archived);
+    });
+  });
 });
