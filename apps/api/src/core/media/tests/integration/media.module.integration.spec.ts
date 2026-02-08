@@ -317,6 +317,41 @@ describeWithDb('MediaModule Integration', () => {
     });
   });
 
+  describe('idempotent operations', () => {
+    const testOwnerId = '55555555-5555-5555-5555-555555555555';
+
+    it('should be idempotent when archiving an already archived asset', async () => {
+      const body = Buffer.from('archive twice test');
+      const input: CreateMediaAssetInput = {
+        filename: 'archive-twice.txt',
+        mimeType: 'text/plain',
+        size: body.length,
+        checksum: 'archive-twice-checksum',
+        ownerId: testOwnerId,
+        ownerType: OwnerEntityType.Business,
+      };
+
+      const created = await mediaService.createMediaAsset(input, body);
+      const assetId = created.mediaAssetId;
+
+      // First archive - should succeed
+      await mediaService.archiveMediaAsset(assetId);
+
+      const afterFirstArchive = await mediaService.getMediaAsset(assetId);
+      expect(afterFirstArchive).not.toBeNull();
+      expect(afterFirstArchive!.status).toBe(MediaAssetStatus.Archived);
+
+      // Second archive - should be idempotent (succeed silently)
+      await expect(mediaService.archiveMediaAsset(assetId)).resolves.toBeUndefined();
+
+      // Verify state is unchanged
+      const afterSecondArchive = await mediaService.getMediaAsset(assetId);
+      expect(afterSecondArchive).not.toBeNull();
+      expect(afterSecondArchive!.status).toBe(MediaAssetStatus.Archived);
+      expect(afterSecondArchive!.mediaAssetId).toBe(assetId);
+    });
+  });
+
   describe('concurrent operations', () => {
     let testOwnerId: string;
 
