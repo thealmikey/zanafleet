@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { MediaModule } from '../../media.module';
 import { MediaService } from '../../services/media.service';
 import { StorageProviderRegistry } from '../../providers/storage-provider-registry.service';
@@ -18,6 +20,7 @@ describeWithDb('MediaModule Integration', () => {
   let module: TestingModule | null = null;
   let mediaService: MediaService;
   let storageRegistry: StorageProviderRegistry;
+  let mediaAssetRepository: Repository<MediaAssetEntity>;
 
   beforeAll(async () => {
     try {
@@ -46,6 +49,9 @@ describeWithDb('MediaModule Integration', () => {
 
       mediaService = module.get<MediaService>(MediaService);
       storageRegistry = module.get<StorageProviderRegistry>(StorageProviderRegistry);
+      mediaAssetRepository = module.get<Repository<MediaAssetEntity>>(
+        getRepositoryToken(MediaAssetEntity),
+      );
     } catch (error) {
       console.warn(
         'MediaModule integration test setup failed:',
@@ -118,15 +124,6 @@ describeWithDb('MediaModule Integration', () => {
       expect(result.method).toBe('GET');
       expect(result.expiresAt).toBeInstanceOf(Date);
       expect(result.expiresAt.getTime()).toBeGreaterThan(Date.now());
-    });
-
-    it('should generate a signed upload URL', async () => {
-      const result = await mediaService.generateSignedUploadUrl(createdAssetId, 600);
-
-      expect(result).toBeDefined();
-      expect(result.url).toContain('noop.local');
-      expect(result.method).toBe('PUT');
-      expect(result.expiresAt).toBeInstanceOf(Date);
     });
 
     it('should archive the media asset', async () => {
@@ -218,6 +215,80 @@ describeWithDb('MediaModule Integration', () => {
 
       expect(result).toBeDefined();
       expect(result.size).toBe(content.length);
+    });
+  });
+
+  describe('signed upload URL generation', () => {
+    const testOwnerId = '44444444-4444-4444-4444-444444444444';
+
+    it('should generate a signed upload URL for Pending asset', async () => {
+      const assetId = uuidv4();
+      const entity = MediaAssetEntity.fromDomain({
+        mediaAssetId: assetId,
+        filename: 'pending-upload.jpg',
+        mimeType: 'image/jpeg',
+        size: 1024,
+        checksum: 'pending-checksum',
+        ownerId: testOwnerId,
+        ownerType: OwnerEntityType.Business,
+        status: MediaAssetStatus.Pending,
+        storageKey: `Business/${testOwnerId}/${assetId}/pending-upload.jpg`,
+        storageProviderId: 'noop',
+        createdAt: new Date(),
+      });
+
+      await mediaAssetRepository.save(entity);
+
+      const result = await mediaService.generateSignedUploadUrl(assetId, 600);
+
+      expect(result).toBeDefined();
+      expect(result.url).toContain('noop.local');
+      expect(result.method).toBe('PUT');
+      expect(result.expiresAt).toBeInstanceOf(Date);
+      expect(result.expiresAt.getTime()).toBeGreaterThan(Date.now());
+    });
+
+    it('should generate a signed upload URL for Uploading asset', async () => {
+      const assetId = uuidv4();
+      const entity = MediaAssetEntity.fromDomain({
+        mediaAssetId: assetId,
+        filename: 'uploading-file.mp4',
+        mimeType: 'video/mp4',
+        size: 5000000,
+        checksum: 'uploading-checksum',
+        ownerId: testOwnerId,
+        ownerType: OwnerEntityType.Rider,
+        status: MediaAssetStatus.Uploading,
+        storageKey: `Rider/${testOwnerId}/${assetId}/uploading-file.mp4`,
+        storageProviderId: 'noop',
+        createdAt: new Date(),
+      });
+
+      await mediaAssetRepository.save(entity);
+
+      const result = await mediaService.generateSignedUploadUrl(assetId);
+
+      expect(result).toBeDefined();
+      expect(result.url).toContain('noop.local');
+      expect(result.method).toBe('PUT');
+    });
+
+    it('should reject signed upload URL for Active asset', async () => {
+      const body = Buffer.from('active content');
+      const input: CreateMediaAssetInput = {
+        filename: 'active-asset.txt',
+        mimeType: 'text/plain',
+        size: body.length,
+        checksum: 'active-checksum',
+        ownerId: testOwnerId,
+        ownerType: OwnerEntityType.Business,
+      };
+
+      const created = await mediaService.createMediaAsset(input, body);
+
+      await expect(
+        mediaService.generateSignedUploadUrl(created.mediaAssetId),
+      ).rejects.toThrow('is not in an uploadable state');
     });
   });
 
