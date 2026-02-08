@@ -81,11 +81,11 @@ export class Neo4jRiderCandidateRepository implements RiderCandidateRepository {
 
   /**
    * Retrieve rider metadata from Neo4j including vehicle type and busy windows.
-   * Busy windows are derived from active delivery assignments.
+   * Busy windows are derived from active delivery assignments that overlap with the current time.
    */
   private async getRiderMetadata(
     riderIds: string[],
-    _now: Date,
+    now: Date,
   ): Promise<Map<string, RiderMetadata>> {
     const session = this.neo4jService.getReadSession();
     const metadata = new Map<string, RiderMetadata>();
@@ -97,6 +97,8 @@ export class Neo4jRiderCandidateRepository implements RiderCandidateRepository {
         WHERE r.id IN $riderIds
         OPTIONAL MATCH (r)-[:ASSIGNED_TO]->(d:Delivery)
         WHERE d.status IN ['Assigned', 'PickedUp', 'InTransit']
+          AND d.scheduledPickupTime <= $now
+          AND d.scheduledDropoffTime >= $now
         RETURN 
           r.id AS riderId,
           r.vehicleType AS vehicleType,
@@ -106,7 +108,7 @@ export class Neo4jRiderCandidateRepository implements RiderCandidateRepository {
             ELSE NULL END
           ) AS busyWindows
         `,
-        { riderIds },
+        { riderIds, now: now.toISOString() },
       );
 
       for (const record of result.records) {
