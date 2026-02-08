@@ -98,6 +98,7 @@ export const NatsSubjects = {
   },
   Policy: {
     EVALUATED_V1: 'policy.events.evaluated-v1',
+    VIOLATION_DETECTED_V1: 'policy.events.violation-detected-v1',
     ALL: 'policy.events.*',
   },
 } as const;
