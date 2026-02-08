@@ -12,6 +12,16 @@ import {
   OwnerEntityType,
 } from '@zanafleet/contracts';
 
+/**
+ * TypeORM transformer for bigint columns.
+ * PostgreSQL bigint can exceed JavaScript's Number.MAX_SAFE_INTEGER,
+ * but TypeORM returns them as strings. This transformer handles the conversion.
+ */
+const BigIntTransformer = {
+  to: (value: number): string => String(value),
+  from: (value: string): number => parseInt(value, 10),
+};
+
 @Entity('media_assets')
 @Index('IDX_media_assets_created_at', ['createdAt'])
 export class MediaAssetEntity {
@@ -24,8 +34,13 @@ export class MediaAssetEntity {
   @Column('varchar', { length: 127 })
   mimeType!: string;
 
-  @Column('bigint')
-  size!: string;
+  /**
+   * File size in bytes.
+   * Stored as bigint in Postgres, TypeORM returns as string.
+   * The BigIntTransformer automatically converts to/from number.
+   */
+  @Column('bigint', { transformer: BigIntTransformer })
+  size!: number;
 
   @Column('varchar', { length: 64 })
   checksum!: string;
@@ -84,7 +99,7 @@ export class MediaAssetEntity {
       mediaAssetId: this.id,
       filename: this.filename,
       mimeType: this.mimeType,
-      size: typeof this.size === 'string' ? parseInt(this.size, 10) : Number(this.size),
+      size: this.size,
       checksum: this.checksum,
       ownerId: this.ownerId,
       ownerType: this.ownerType,
@@ -119,7 +134,7 @@ export class MediaAssetEntity {
     entity.id = data.mediaAssetId;
     entity.filename = data.filename;
     entity.mimeType = data.mimeType;
-    entity.size = String(data.size);
+    entity.size = data.size;
     entity.checksum = data.checksum;
     entity.ownerId = data.ownerId;
     entity.ownerType = data.ownerType;
