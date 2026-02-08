@@ -703,6 +703,7 @@ export interface CalendarOverrideResponse {
   reason: string | null;
   validFrom: Date;
   validUntil: Date;
+  priority: number;
   isActive: boolean;
 }
 
@@ -770,6 +771,8 @@ export interface CreateCalendarOverrideInput {
   reason?: string | null;
   validFrom: Date;
   validUntil: Date;
+  priority?: number;
+  metadata?: Record<string, unknown> | null;
   isActive?: boolean;
 }
 

@@ -7,10 +7,13 @@ import {
   TimeWindowEntity,
   CalendarRuleEntity,
   CalendarEventEntity,
+  CalendarBindingEntity,
+  CalendarOverrideEntity,
 } from './entities';
 import { CalendarRepository } from './repositories/calendar.repository';
 import { CalendarEventRepository } from './repositories/calendar-event.repository';
 import { CalendarService } from './services/calendar.service';
+import { CalendarBindingService } from './services/calendar-binding.service';
 
 @Module({
   imports: [
@@ -19,12 +22,24 @@ import { CalendarService } from './services/calendar.service';
       TimeWindowEntity,
       CalendarRuleEntity,
       CalendarEventEntity,
+      CalendarBindingEntity,
+      CalendarOverrideEntity,
     ]),
     CqrsModule,
     EventBusModule,
   ],
-  providers: [CalendarRepository, CalendarEventRepository, CalendarService],
-  exports: [CalendarService, CalendarRepository, CalendarEventRepository],
+  providers: [
+    CalendarRepository,
+    CalendarEventRepository,
+    CalendarService,
+    CalendarBindingService,
+  ],
+  exports: [
+    CalendarService,
+    CalendarBindingService,
+    CalendarRepository,
+    CalendarEventRepository,
+  ],
 })
 export class CalendarModule implements OnModuleInit {
   private readonly logger = new Logger(CalendarModule.name);

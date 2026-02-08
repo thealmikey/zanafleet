@@ -1,8 +1,10 @@
-import { CalendarScope, CalendarRuleType, CalendarEventType, RecurrencePattern } from '@zanafleet/contracts';
+import { CalendarScope, CalendarRuleType, CalendarEventType, RecurrencePattern, BindingTargetType } from '@zanafleet/contracts';
 import { CalendarEntity } from '../../entities/calendar.entity';
 import { TimeWindowEntity } from '../../entities/time-window.entity';
 import { CalendarRuleEntity } from '../../entities/calendar-rule.entity';
 import { CalendarEventEntity } from '../../entities/calendar-event.entity';
+import { CalendarBindingEntity } from '../../entities/calendar-binding.entity';
+import { CalendarOverrideEntity } from '../../entities/calendar-override.entity';
 
 describe('Calendar Entities', () => {
   describe('CalendarEntity', () => {
@@ -572,6 +574,292 @@ describe('Calendar Entities', () => {
           administrativeArea: 'Nairobi',
           locality: 'Westlands',
         });
+      });
+    });
+  });
+
+  describe('CalendarBindingEntity', () => {
+    const now = new Date();
+
+    describe('toDomain', () => {
+      it('should convert entity to domain object with all fields', () => {
+        const entity = new CalendarBindingEntity();
+        entity.id = '823e4567-e89b-12d3-a456-426614174007';
+        entity.calendarId = '123e4567-e89b-12d3-a456-426614174000';
+        entity.targetType = BindingTargetType.BUSINESS;
+        entity.targetId = '923e4567-e89b-12d3-a456-426614174008';
+        entity.priority = 10;
+        entity.inheritParent = true;
+        entity.isActive = true;
+        entity.createdAt = now;
+        entity.updatedAt = now;
+
+        const domain = entity.toDomain();
+
+        expect(domain.bindingId).toBe(entity.id);
+        expect(domain.calendarId).toBe(entity.calendarId);
+        expect(domain.targetType).toBe(BindingTargetType.BUSINESS);
+        expect(domain.targetId).toBe('923e4567-e89b-12d3-a456-426614174008');
+        expect(domain.priority).toBe(10);
+        expect(domain.inheritParent).toBe(true);
+        expect(domain.isActive).toBe(true);
+        expect(domain.createdAt).toBe(now);
+        expect(domain.updatedAt).toBe(now);
+      });
+
+      it('should support all BindingTargetType values', () => {
+        const targetTypes = [
+          BindingTargetType.BUSINESS,
+          BindingTargetType.SACCO,
+          BindingTargetType.RIDER,
+          BindingTargetType.WORKSPACE,
+        ];
+
+        targetTypes.forEach((targetType) => {
+          const entity = new CalendarBindingEntity();
+          entity.id = '823e4567-e89b-12d3-a456-426614174007';
+          entity.calendarId = '123e4567-e89b-12d3-a456-426614174000';
+          entity.targetType = targetType;
+          entity.targetId = '923e4567-e89b-12d3-a456-426614174008';
+          entity.priority = 0;
+          entity.inheritParent = true;
+          entity.isActive = true;
+          entity.createdAt = now;
+          entity.updatedAt = now;
+
+          const domain = entity.toDomain();
+          expect(domain.targetType).toBe(targetType);
+        });
+      });
+    });
+
+    describe('fromDomain', () => {
+      it('should create entity from domain data with all fields', () => {
+        const domainData = {
+          bindingId: '823e4567-e89b-12d3-a456-426614174007',
+          calendarId: '123e4567-e89b-12d3-a456-426614174000',
+          targetType: BindingTargetType.RIDER,
+          targetId: '923e4567-e89b-12d3-a456-426614174008',
+          priority: 50,
+          inheritParent: false,
+          isActive: true,
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        const entity = CalendarBindingEntity.fromDomain(domainData);
+
+        expect(entity.id).toBe(domainData.bindingId);
+        expect(entity.calendarId).toBe(domainData.calendarId);
+        expect(entity.targetType).toBe(domainData.targetType);
+        expect(entity.targetId).toBe(domainData.targetId);
+        expect(entity.priority).toBe(50);
+        expect(entity.inheritParent).toBe(false);
+        expect(entity.isActive).toBe(true);
+        expect(entity.createdAt).toBe(now);
+        expect(entity.updatedAt).toBe(now);
+      });
+
+      it('should apply default values for optional fields', () => {
+        const domainData = {
+          bindingId: '823e4567-e89b-12d3-a456-426614174007',
+          calendarId: '123e4567-e89b-12d3-a456-426614174000',
+          targetType: BindingTargetType.SACCO,
+          targetId: '923e4567-e89b-12d3-a456-426614174008',
+          createdAt: now,
+        };
+
+        const entity = CalendarBindingEntity.fromDomain(domainData);
+
+        expect(entity.priority).toBe(0);
+        expect(entity.inheritParent).toBe(true);
+        expect(entity.isActive).toBe(true);
+        expect(entity.updatedAt).toBe(now);
+      });
+
+      it('should round-trip through toDomain and fromDomain', () => {
+        const original = {
+          bindingId: '823e4567-e89b-12d3-a456-426614174007',
+          calendarId: '123e4567-e89b-12d3-a456-426614174000',
+          targetType: BindingTargetType.BUSINESS,
+          targetId: '923e4567-e89b-12d3-a456-426614174008',
+          priority: 25,
+          inheritParent: true,
+          isActive: false,
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        const entity = CalendarBindingEntity.fromDomain(original);
+        const roundTripped = entity.toDomain();
+
+        expect(roundTripped).toEqual(original);
+      });
+    });
+  });
+
+  describe('CalendarOverrideEntity', () => {
+    const now = new Date();
+    const validFrom = new Date('2024-12-01T00:00:00Z');
+    const validUntil = new Date('2024-12-31T23:59:59Z');
+
+    describe('toDomain', () => {
+      it('should convert entity to domain object with all fields', () => {
+        const entity = new CalendarOverrideEntity();
+        entity.id = 'a23e4567-e89b-12d3-a456-426614174009';
+        entity.targetScope = CalendarScope.BUSINESS;
+        entity.targetScopeId = 'b23e4567-e89b-12d3-a456-42661417400a';
+        entity.exceptionType = 'ALLOW_ON_HOLIDAY';
+        entity.reason = 'Premium merchant - 24/7 delivery';
+        entity.validFrom = validFrom;
+        entity.validUntil = validUntil;
+        entity.priority = 100;
+        entity.metadata = { premiumTier: 'gold' };
+        entity.isActive = true;
+        entity.createdAt = now;
+        entity.updatedAt = now;
+
+        const domain = entity.toDomain();
+
+        expect(domain.overrideId).toBe(entity.id);
+        expect(domain.targetScope).toBe(CalendarScope.BUSINESS);
+        expect(domain.targetScopeId).toBe('b23e4567-e89b-12d3-a456-42661417400a');
+        expect(domain.exceptionType).toBe('ALLOW_ON_HOLIDAY');
+        expect(domain.reason).toBe('Premium merchant - 24/7 delivery');
+        expect(domain.validFrom).toBe(validFrom);
+        expect(domain.validUntil).toBe(validUntil);
+        expect(domain.priority).toBe(100);
+        expect(domain.metadata).toEqual({ premiumTier: 'gold' });
+        expect(domain.isActive).toBe(true);
+        expect(domain.createdAt).toBe(now);
+        expect(domain.updatedAt).toBe(now);
+      });
+
+      it('should handle null targetScopeId for GLOBAL scope', () => {
+        const entity = new CalendarOverrideEntity();
+        entity.id = 'a23e4567-e89b-12d3-a456-426614174009';
+        entity.targetScope = CalendarScope.GLOBAL;
+        entity.targetScopeId = null;
+        entity.exceptionType = 'EMERGENCY_OPEN';
+        entity.reason = null;
+        entity.validFrom = validFrom;
+        entity.validUntil = validUntil;
+        entity.priority = 0;
+        entity.metadata = null;
+        entity.isActive = true;
+        entity.createdAt = now;
+        entity.updatedAt = now;
+
+        const domain = entity.toDomain();
+
+        expect(domain.targetScopeId).toBeNull();
+        expect(domain.reason).toBeNull();
+        expect(domain.metadata).toBeNull();
+      });
+
+      it('should support common exception types', () => {
+        const exceptionTypes = [
+          'ALLOW_ON_HOLIDAY',
+          'EMERGENCY_OPEN',
+          'TEMPORARY_CLOSURE',
+          'EXTENDED_HOURS',
+          'REDUCED_HOURS',
+        ];
+
+        exceptionTypes.forEach((exceptionType) => {
+          const entity = new CalendarOverrideEntity();
+          entity.id = 'a23e4567-e89b-12d3-a456-426614174009';
+          entity.targetScope = CalendarScope.BUSINESS;
+          entity.targetScopeId = 'b23e4567-e89b-12d3-a456-42661417400a';
+          entity.exceptionType = exceptionType;
+          entity.reason = null;
+          entity.validFrom = validFrom;
+          entity.validUntil = validUntil;
+          entity.priority = 0;
+          entity.metadata = null;
+          entity.isActive = true;
+          entity.createdAt = now;
+          entity.updatedAt = now;
+
+          const domain = entity.toDomain();
+          expect(domain.exceptionType).toBe(exceptionType);
+        });
+      });
+    });
+
+    describe('fromDomain', () => {
+      it('should create entity from domain data with all fields', () => {
+        const domainData = {
+          overrideId: 'a23e4567-e89b-12d3-a456-426614174009',
+          targetScope: CalendarScope.RIDER,
+          targetScopeId: 'b23e4567-e89b-12d3-a456-42661417400a',
+          exceptionType: 'TEMPORARY_CLOSURE',
+          reason: 'Rider on leave',
+          validFrom,
+          validUntil,
+          priority: 50,
+          metadata: { leaveType: 'annual' },
+          isActive: true,
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        const entity = CalendarOverrideEntity.fromDomain(domainData);
+
+        expect(entity.id).toBe(domainData.overrideId);
+        expect(entity.targetScope).toBe(domainData.targetScope);
+        expect(entity.targetScopeId).toBe(domainData.targetScopeId);
+        expect(entity.exceptionType).toBe(domainData.exceptionType);
+        expect(entity.reason).toBe(domainData.reason);
+        expect(entity.validFrom).toBe(domainData.validFrom);
+        expect(entity.validUntil).toBe(domainData.validUntil);
+        expect(entity.priority).toBe(50);
+        expect(entity.metadata).toEqual(domainData.metadata);
+        expect(entity.isActive).toBe(true);
+        expect(entity.createdAt).toBe(now);
+        expect(entity.updatedAt).toBe(now);
+      });
+
+      it('should apply default values for optional fields', () => {
+        const domainData = {
+          overrideId: 'a23e4567-e89b-12d3-a456-426614174009',
+          targetScope: CalendarScope.NATIONAL,
+          exceptionType: 'EMERGENCY_OPEN',
+          validFrom,
+          validUntil,
+          createdAt: now,
+        };
+
+        const entity = CalendarOverrideEntity.fromDomain(domainData);
+
+        expect(entity.targetScopeId).toBeNull();
+        expect(entity.reason).toBeNull();
+        expect(entity.priority).toBe(0);
+        expect(entity.metadata).toBeNull();
+        expect(entity.isActive).toBe(true);
+        expect(entity.updatedAt).toBe(now);
+      });
+
+      it('should round-trip through toDomain and fromDomain', () => {
+        const original = {
+          overrideId: 'a23e4567-e89b-12d3-a456-426614174009',
+          targetScope: CalendarScope.SACCO,
+          targetScopeId: 'b23e4567-e89b-12d3-a456-42661417400a',
+          exceptionType: 'EXTENDED_HOURS',
+          reason: 'Festival season extended hours',
+          validFrom,
+          validUntil,
+          priority: 75,
+          metadata: { festival: 'Diwali' },
+          isActive: false,
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        const entity = CalendarOverrideEntity.fromDomain(original);
+        const roundTripped = entity.toDomain();
+
+        expect(roundTripped).toEqual(original);
       });
     });
   });
