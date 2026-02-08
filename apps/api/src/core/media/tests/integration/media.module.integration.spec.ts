@@ -73,10 +73,11 @@ describeWithDb('MediaModule Integration', () => {
     const testOwnerId = '11111111-1111-1111-1111-111111111111';
 
     it('should create a media asset', async () => {
+      const body = Buffer.from('integration test content');
       const input: CreateMediaAssetInput = {
         filename: 'integration-test.jpg',
         mimeType: 'image/jpeg',
-        size: 2048,
+        size: body.length,
         checksum: 'integration-test-checksum',
         ownerId: testOwnerId,
         ownerType: OwnerEntityType.Business,
@@ -85,7 +86,6 @@ describeWithDb('MediaModule Integration', () => {
           height: 600,
         },
       };
-      const body = Buffer.from('integration test content');
 
       const result = await mediaService.createMediaAsset(input, body);
 
@@ -144,16 +144,17 @@ describeWithDb('MediaModule Integration', () => {
     });
 
     it('should soft delete the media asset', async () => {
+      const deleteBody = Buffer.from('delete me');
       const anotherInput: CreateMediaAssetInput = {
         filename: 'to-be-deleted.txt',
         mimeType: 'text/plain',
-        size: 100,
+        size: deleteBody.length,
         checksum: 'delete-test-checksum',
         ownerId: testOwnerId,
         ownerType: OwnerEntityType.Rider,
       };
 
-      const created = await mediaService.createMediaAsset(anotherInput, Buffer.from('delete me'));
+      const created = await mediaService.createMediaAsset(anotherInput, deleteBody);
       await mediaService.deleteMediaAsset(created.mediaAssetId);
 
       const result = await mediaService.getMediaAsset(created.mediaAssetId);
@@ -161,10 +162,11 @@ describeWithDb('MediaModule Integration', () => {
     });
 
     it('should permanently delete the media asset', async () => {
+      const permanentBody = Buffer.from('permanent');
       const permanentInput: CreateMediaAssetInput = {
         filename: 'permanent-delete.txt',
         mimeType: 'text/plain',
-        size: 50,
+        size: permanentBody.length,
         checksum: 'permanent-delete-checksum',
         ownerId: testOwnerId,
         ownerType: OwnerEntityType.Delivery,
@@ -172,7 +174,7 @@ describeWithDb('MediaModule Integration', () => {
 
       const created = await mediaService.createMediaAsset(
         permanentInput,
-        Buffer.from('permanent'),
+        permanentBody,
       );
       await mediaService.deleteMediaAsset(created.mediaAssetId, true);
 
