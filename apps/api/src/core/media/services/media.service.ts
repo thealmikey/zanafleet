@@ -1,0 +1,244 @@
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { createHash } from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  CreateMediaAssetInput,
+  MediaAssetMetadata,
+  MediaAssetResponse,
+  MediaAssetStatus,
+  OwnerEntityType,
+  SignedUrlResponse,
+} from '@zanafleet/contracts';
+import { MediaAssetEntity } from '../entities/media-asset.entity';
+import { StorageProviderRegistry } from '../providers/storage-provider-registry.service';
+
+@Injectable()
+export class MediaService {
+  private readonly logger = new Logger(MediaService.name);
+
+  constructor(
+    private readonly storageRegistry: StorageProviderRegistry,
+    @InjectRepository(MediaAssetEntity)
+    private readonly mediaAssetRepository: Repository<MediaAssetEntity>,
+  ) {}
+
+  async createMediaAsset(
+    input: CreateMediaAssetInput,
+    body: Buffer,
+  ): Promise<MediaAssetResponse> {
+    const mediaAssetId = uuidv4();
+    const storageKey = this.generateStorageKey(
+      input.ownerType,
+      input.ownerId,
+      mediaAssetId,
+      input.filename,
+    );
+
+    const checksum = input.checksum || this.calculateChecksum(body);
+
+    const provider = this.storageRegistry.getDefault();
+    if (!provider) {
+      throw new Error('No storage provider configured');
+    }
+
+    await provider.upload(storageKey, body, input.mimeType);
+
+    const metadata = input.metadata || this.extractMetadata(body, input.mimeType);
+
+    const now = new Date();
+    const entity = MediaAssetEntity.fromDomain({
+      mediaAssetId,
+      filename: input.filename,
+      mimeType: input.mimeType,
+      size: input.size,
+      checksum,
+      ownerId: input.ownerId,
+      ownerType: input.ownerType,
+      status: MediaAssetStatus.Active,
+      storageKey,
+      storageProviderId: provider.providerId,
+      metadata,
+      createdAt: now,
+    });
+
+    const saved = await this.mediaAssetRepository.save(entity);
+    const domain = saved.toDomain();
+
+    this.logger.log(`Created media asset ${mediaAssetId} for ${input.ownerType}/${input.ownerId}`);
+
+    return {
+      mediaAssetId: domain.mediaAssetId,
+      filename: domain.filename,
+      mimeType: domain.mimeType,
+      size: domain.size,
+      checksum: domain.checksum,
+      ownerId: domain.ownerId,
+      ownerType: domain.ownerType,
+      status: domain.status,
+      storageKey: domain.storageKey,
+      metadata: domain.metadata,
+      createdAt: domain.createdAt,
+      updatedAt: domain.updatedAt,
+    };
+  }
+
+  async getMediaAsset(mediaAssetId: string): Promise<MediaAssetResponse | null> {
+    const entity = await this.mediaAssetRepository.findOne({
+      where: { id: mediaAssetId },
+    });
+
+    if (!entity || entity.status === MediaAssetStatus.Deleted) {
+      return null;
+    }
+
+    const domain = entity.toDomain();
+    return {
+      mediaAssetId: domain.mediaAssetId,
+      filename: domain.filename,
+      mimeType: domain.mimeType,
+      size: domain.size,
+      checksum: domain.checksum,
+      ownerId: domain.ownerId,
+      ownerType: domain.ownerType,
+      status: domain.status,
+      storageKey: domain.storageKey,
+      metadata: domain.metadata,
+      createdAt: domain.createdAt,
+      updatedAt: domain.updatedAt,
+    };
+  }
+
+  async generateSignedDownloadUrl(
+    mediaAssetId: string,
+    expiresInSeconds = 3600,
+  ): Promise<SignedUrlResponse> {
+    const entity = await this.mediaAssetRepository.findOne({
+      where: { id: mediaAssetId },
+    });
+
+    if (!entity) {
+      throw new NotFoundException(`Media asset ${mediaAssetId} not found`);
+    }
+
+    if (entity.status !== MediaAssetStatus.Active) {
+      throw new Error(`Media asset ${mediaAssetId} is not active (status: ${entity.status})`);
+    }
+
+    const provider = entity.storageProviderId
+      ? this.storageRegistry.get(entity.storageProviderId)
+      : this.storageRegistry.getDefault();
+
+    if (!provider) {
+      throw new Error('No storage provider available');
+    }
+
+    const url = await provider.generateSignedUrl(entity.storageKey, 'GET', {
+      expiresInSeconds,
+    });
+
+    const expiresAt = new Date(Date.now() + expiresInSeconds * 1000);
+
+    return {
+      url,
+      expiresAt,
+      method: 'GET',
+    };
+  }
+
+  async generateSignedUploadUrl(
+    mediaAssetId: string,
+    expiresInSeconds = 3600,
+  ): Promise<SignedUrlResponse> {
+    const entity = await this.mediaAssetRepository.findOne({
+      where: { id: mediaAssetId },
+    });
+
+    if (!entity) {
+      throw new NotFoundException(`Media asset ${mediaAssetId} not found`);
+    }
+
+    const provider = entity.storageProviderId
+      ? this.storageRegistry.get(entity.storageProviderId)
+      : this.storageRegistry.getDefault();
+
+    if (!provider) {
+      throw new Error('No storage provider available');
+    }
+
+    const url = await provider.generateSignedUrl(entity.storageKey, 'PUT', {
+      expiresInSeconds,
+      contentType: entity.mimeType,
+    });
+
+    const expiresAt = new Date(Date.now() + expiresInSeconds * 1000);
+
+    return {
+      url,
+      expiresAt,
+      method: 'PUT',
+    };
+  }
+
+  async deleteMediaAsset(mediaAssetId: string, permanent = false): Promise<void> {
+    const entity = await this.mediaAssetRepository.findOne({
+      where: { id: mediaAssetId },
+    });
+
+    if (!entity) {
+      throw new NotFoundException(`Media asset ${mediaAssetId} not found`);
+    }
+
+    if (permanent) {
+      const provider = entity.storageProviderId
+        ? this.storageRegistry.get(entity.storageProviderId)
+        : this.storageRegistry.getDefault();
+
+      if (provider) {
+        await provider.delete(entity.storageKey);
+      }
+
+      await this.mediaAssetRepository.remove(entity);
+      this.logger.log(`Permanently deleted media asset ${mediaAssetId}`);
+    } else {
+      entity.status = MediaAssetStatus.Deleted;
+      entity.deletedAt = new Date();
+      await this.mediaAssetRepository.save(entity);
+      this.logger.log(`Soft deleted media asset ${mediaAssetId}`);
+    }
+  }
+
+  async archiveMediaAsset(mediaAssetId: string): Promise<void> {
+    const entity = await this.mediaAssetRepository.findOne({
+      where: { id: mediaAssetId },
+    });
+
+    if (!entity) {
+      throw new NotFoundException(`Media asset ${mediaAssetId} not found`);
+    }
+
+    entity.status = MediaAssetStatus.Archived;
+    entity.archivedAt = new Date();
+    await this.mediaAssetRepository.save(entity);
+
+    this.logger.log(`Archived media asset ${mediaAssetId}`);
+  }
+
+  private generateStorageKey(
+    ownerType: OwnerEntityType,
+    ownerId: string,
+    assetId: string,
+    filename: string,
+  ): string {
+    return `${ownerType}/${ownerId}/${assetId}/${filename}`;
+  }
+
+  private calculateChecksum(body: Buffer): string {
+    return createHash('sha256').update(body).digest('hex');
+  }
+
+  private extractMetadata(_body: Buffer, _mimeType: string): MediaAssetMetadata {
+    return {};
+  }
+}
