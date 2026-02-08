@@ -229,11 +229,30 @@ describe('Policy Types', () => {
           },
         ],
         processingTimeMs: 5,
+        failedOpen: false,
       };
 
       expect(result.finalDecision.effect).toBe(PolicyEffect.ALLOW);
       expect(result.evaluatedPolicies).toHaveLength(2);
       expect(result.processingTimeMs).toBe(5);
+      expect(result.failedOpen).toBe(false);
+    });
+
+    it('should support failedOpen flag for error scenarios', () => {
+      const result: EvaluationResult = {
+        finalDecision: {
+          effect: PolicyEffect.ALLOW,
+          policyId: '',
+          policyName: 'Fail-Open Default',
+          reason: 'Policy evaluation failed - defaulting to ALLOW',
+        },
+        evaluatedPolicies: [],
+        processingTimeMs: 2,
+        failedOpen: true,
+      };
+
+      expect(result.failedOpen).toBe(true);
+      expect(result.evaluatedPolicies).toHaveLength(0);
     });
   });
 });

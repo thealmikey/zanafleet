@@ -96,6 +96,10 @@ export const NatsSubjects = {
     RIDER_LOCATION_UPDATED_V1: 'location.events.rider-location-updated-v1',
     ALL: 'location.events.*',
   },
+  Policy: {
+    EVALUATED_V1: 'policy.events.evaluated-v1',
+    ALL: 'policy.events.*',
+  },
 } as const;
 
 /**

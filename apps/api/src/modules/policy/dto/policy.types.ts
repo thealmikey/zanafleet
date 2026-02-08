@@ -94,4 +94,6 @@ export interface EvaluationResult {
   evaluatedPolicies: EvaluatedPolicy[];
   /** Time taken to evaluate all policies in milliseconds */
   processingTimeMs: number;
+  /** Whether the decision was made via fail-open due to an error */
+  failedOpen: boolean;
 }
