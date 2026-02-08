@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import jsonLogic from 'json-logic-js';
 
 import { PolicyCondition, EvaluationContext } from '../dto';
 
@@ -19,7 +20,7 @@ type EvaluationData = Record<string, unknown>;
  * JsonLogicEvaluatorService
  *
  * Pure, side-effect-free service that evaluates policy conditions against
- * an evaluation context using JSON Logic-style rules.
+ * an evaluation context using the json-logic-js library.
  *
  * Supports operators: ==, !=, >, <, >=, <=, in, contains, startsWith, endsWith, AND, OR, NOT
  *
@@ -30,6 +31,35 @@ type EvaluationData = Record<string, unknown>;
  */
 @Injectable()
 export class JsonLogicEvaluatorService {
+  constructor() {
+    // Register custom 'contains' operation - checks if haystack contains needle
+    jsonLogic.add_operation('contains', (haystack: unknown, needle: unknown) => {
+      if (typeof haystack === 'string' && typeof needle === 'string') {
+        return haystack.includes(needle);
+      }
+      if (Array.isArray(haystack)) {
+        return haystack.includes(needle);
+      }
+      return false;
+    });
+
+    // Register custom 'startsWith' operation
+    jsonLogic.add_operation('startsWith', (str: unknown, prefix: unknown) => {
+      if (typeof str === 'string' && typeof prefix === 'string') {
+        return str.startsWith(prefix);
+      }
+      return false;
+    });
+
+    // Register custom 'endsWith' operation
+    jsonLogic.add_operation('endsWith', (str: unknown, suffix: unknown) => {
+      if (typeof str === 'string' && typeof suffix === 'string') {
+        return str.endsWith(suffix);
+      }
+      return false;
+    });
+  }
+
   /**
    * Evaluate policy conditions against the provided context.
    * Pure function: no I/O, no side effects.
@@ -40,102 +70,104 @@ export class JsonLogicEvaluatorService {
    */
   evaluate(conditions: PolicyCondition, context: EvaluationContext): EvaluationOutcome {
     const data = this.buildDataFromContext(context);
-    const matched = this.evaluateCondition(conditions, data);
+    const rule = this.buildJsonLogicRule(conditions);
+
+    const matched = Boolean(jsonLogic.apply(rule, data));
     const reason = this.buildReason(conditions, data, matched);
 
     return { matched, reason };
   }
 
   /**
-   * Recursively evaluate a PolicyCondition against data.
+   * Convert a PolicyCondition tree to JSON Logic rule format.
+   *
+   * JSON Logic format examples:
+   * - {"==": [{"var": "field"}, "value"]}
+   * - {"and": [{...}, {...}]}
+   * - {"or": [{...}, {...}]}
+   * - {"!": {...}}
    */
-  private evaluateCondition(condition: PolicyCondition, data: EvaluationData): boolean {
+  private buildJsonLogicRule(condition: PolicyCondition): object {
     const { field, operator, value, logic, children } = condition;
     const upperOp = operator.toUpperCase();
 
+    // Handle logical operators
     if (upperOp === 'AND') {
-      return this.evaluateAnd(children ?? [], data);
+      const childRules = (children ?? []).map((child) => this.buildJsonLogicRule(child));
+      if (childRules.length === 0) {
+        return { '==': [true, true] }; // Empty AND is true
+      }
+      return { and: childRules };
     }
 
     if (upperOp === 'OR') {
-      return this.evaluateOr(children ?? [], data);
+      const childRules = (children ?? []).map((child) => this.buildJsonLogicRule(child));
+      if (childRules.length === 0) {
+        return { '==': [true, false] }; // Empty OR is false
+      }
+      return { or: childRules };
     }
 
     if (upperOp === 'NOT') {
       if (children && children.length > 0) {
-        return !this.evaluateCondition(children[0], data);
+        return { '!': this.buildJsonLogicRule(children[0]) };
       }
-      return !this.evaluateComparison(field, '==', value, data);
+      // NOT with no children and a field/value acts as "field != value"
+      return { '!': { '==': [{ var: field }, value] } };
     }
 
-    const comparisonResult = this.evaluateComparison(field, operator, value, data);
-
-    if (children && children.length > 0) {
-      const childResults = children.map((child) => this.evaluateCondition(child, data));
-      if (logic === 'OR') {
-        return comparisonResult || childResults.some(Boolean);
-      }
-      return comparisonResult && childResults.every(Boolean);
-    }
-
-    return comparisonResult;
-  }
-
-  /**
-   * Evaluate AND logic across children.
-   */
-  private evaluateAnd(children: PolicyCondition[], data: EvaluationData): boolean {
-    if (children.length === 0) {
-      return true;
-    }
-    return children.every((child) => this.evaluateCondition(child, data));
-  }
-
-  /**
-   * Evaluate OR logic across children.
-   */
-  private evaluateOr(children: PolicyCondition[], data: EvaluationData): boolean {
-    if (children.length === 0) {
-      return false;
-    }
-    return children.some((child) => this.evaluateCondition(child, data));
-  }
-
-  /**
-   * Evaluate a single comparison operation.
-   */
-  private evaluateComparison(
-    field: string,
-    operator: string,
-    value: unknown,
-    data: EvaluationData
-  ): boolean {
-    const actualValue = this.getValueFromData(data, field);
+    // Handle comparison operators
     const normalizedOp = this.normalizeOperator(operator);
+    const comparisonRule = this.buildComparisonRule(field, normalizedOp, value);
 
-    switch (normalizedOp) {
+    // If there are children, combine with the logic operator
+    if (children && children.length > 0) {
+      const childRules = children.map((child) => this.buildJsonLogicRule(child));
+      const allRules = [comparisonRule, ...childRules];
+
+      if (logic === 'OR') {
+        return { or: allRules };
+      }
+      return { and: allRules };
+    }
+
+    return comparisonRule;
+  }
+
+  /**
+   * Build a single comparison rule in JSON Logic format.
+   */
+  private buildComparisonRule(field: string, operator: string, value: unknown): object {
+    const varRef = { var: field };
+
+    switch (operator) {
       case '==':
-        return actualValue === value;
+        return { '==': [varRef, value] };
       case '!=':
-        return actualValue !== value;
+        return { '!=': [varRef, value] };
       case '>':
-        return this.compareNumeric(actualValue, value, (a, b) => a > b);
+        return { '>': [varRef, value] };
       case '<':
-        return this.compareNumeric(actualValue, value, (a, b) => a < b);
+        return { '<': [varRef, value] };
       case '>=':
-        return this.compareNumeric(actualValue, value, (a, b) => a >= b);
+        return { '>=': [varRef, value] };
       case '<=':
-        return this.compareNumeric(actualValue, value, (a, b) => a <= b);
+        return { '<=': [varRef, value] };
       case 'in':
-        return this.evaluateIn(actualValue, value);
+        // JSON Logic 'in' checks if first arg is in second arg (array)
+        return { in: [varRef, value] };
       case 'contains':
-        return this.evaluateContains(actualValue, value);
+        // Custom operation: contains(haystack, needle)
+        return { contains: [varRef, value] };
       case 'startsWith':
-        return this.evaluateStartsWith(actualValue, value);
+        // Custom operation: startsWith(str, prefix)
+        return { startsWith: [varRef, value] };
       case 'endsWith':
-        return this.evaluateEndsWith(actualValue, value);
+        // Custom operation: endsWith(str, suffix)
+        return { endsWith: [varRef, value] };
       default:
-        return false;
+        // Fallback to equality check for unknown operators
+        return { '==': [varRef, value] };
     }
   }
 
@@ -152,67 +184,6 @@ export class JsonLogicEvaluatorService {
       lte: '<=',
     };
     return aliases[operator] ?? operator;
-  }
-
-  /**
-   * Compare two values numerically.
-   */
-  private compareNumeric(
-    actual: unknown,
-    expected: unknown,
-    compareFn: (a: number, b: number) => boolean
-  ): boolean {
-    const actualNum = typeof actual === 'number' ? actual : Number(actual);
-    const expectedNum = typeof expected === 'number' ? expected : Number(expected);
-
-    if (Number.isNaN(actualNum) || Number.isNaN(expectedNum)) {
-      return false;
-    }
-
-    return compareFn(actualNum, expectedNum);
-  }
-
-  /**
-   * Evaluate 'in' operator - check if value is in array.
-   */
-  private evaluateIn(actualValue: unknown, expectedArray: unknown): boolean {
-    if (Array.isArray(expectedArray)) {
-      return expectedArray.includes(actualValue);
-    }
-    return false;
-  }
-
-  /**
-   * Evaluate 'contains' operator - check if string/array contains value.
-   */
-  private evaluateContains(haystack: unknown, needle: unknown): boolean {
-    if (typeof haystack === 'string' && typeof needle === 'string') {
-      return haystack.includes(needle);
-    }
-    if (Array.isArray(haystack)) {
-      return haystack.includes(needle);
-    }
-    return false;
-  }
-
-  /**
-   * Evaluate 'startsWith' operator.
-   */
-  private evaluateStartsWith(str: unknown, prefix: unknown): boolean {
-    if (typeof str === 'string' && typeof prefix === 'string') {
-      return str.startsWith(prefix);
-    }
-    return false;
-  }
-
-  /**
-   * Evaluate 'endsWith' operator.
-   */
-  private evaluateEndsWith(str: unknown, suffix: unknown): boolean {
-    if (typeof str === 'string' && typeof suffix === 'string') {
-      return str.endsWith(suffix);
-    }
-    return false;
   }
 
   /**
