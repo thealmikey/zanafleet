@@ -6,6 +6,15 @@ export interface GeoPoint {
   longitude: number;
 }
 
+/**
+ * GeoJSON Point geometry for PostGIS columns.
+ * Coordinates are [longitude, latitude] per GeoJSON spec.
+ */
+export interface GeoJsonPoint {
+  type: 'Point';
+  coordinates: [number, number];
+}
+
 const EARTH_RADIUS_METERS = 6371000;
 
 /**

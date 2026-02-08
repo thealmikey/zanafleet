@@ -5,6 +5,7 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
+import { GeoJsonPoint } from '../../../core/utils/geo.utils';
 
 /**
  * Stores the current/latest location for each rider.
@@ -25,14 +26,14 @@ export class RiderLocationSnapshotEntity {
 
   /**
    * PostGIS Point geometry (SRID 4326 - WGS84).
-   * Stored as GeoJSON-compatible object: { type: 'Point', coordinates: [lng, lat] }
+   * Stored as GeoJSON: { type: 'Point', coordinates: [lng, lat] }
    */
   @Column({
     type: 'geometry',
     spatialFeatureType: 'Point',
     srid: 4326,
   })
-  point!: object;
+  point!: GeoJsonPoint;
 
   /** H3 index at resolution 9 (~174m hexagons) */
   @Column({ type: 'varchar', length: 15 })

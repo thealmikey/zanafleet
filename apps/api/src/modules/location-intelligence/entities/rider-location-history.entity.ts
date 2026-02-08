@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   Index,
 } from 'typeorm';
+import { GeoJsonPoint } from '../../../core/utils/geo.utils';
 
 /**
  * Append-only time-series table for rider location history.
@@ -29,14 +30,14 @@ export class RiderLocationHistoryEntity {
 
   /**
    * PostGIS Point geometry (SRID 4326 - WGS84).
-   * Stored as GeoJSON-compatible object: { type: 'Point', coordinates: [lng, lat] }
+   * Stored as GeoJSON: { type: 'Point', coordinates: [lng, lat] }
    */
   @Column({
     type: 'geometry',
     spatialFeatureType: 'Point',
     srid: 4326,
   })
-  point!: object;
+  point!: GeoJsonPoint;
 
   /** H3 index at resolution 9 (~174m hexagons) */
   @Column({ type: 'varchar', length: 15 })
