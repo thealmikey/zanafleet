@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import jsonLogic from 'json-logic-js';
+import { DateTime } from 'luxon';
 
 import { PolicyCondition, EvaluationContext } from '../dto';
 
@@ -219,9 +220,16 @@ export class JsonLogicEvaluatorService {
     if (context.timestamp) {
       const ts = context.timestamp;
       data.timestamp = ts.toISOString();
-      data.hour = ts.getUTCHours();
-      data.minute = ts.getUTCMinutes();
-      data.dayOfWeek = ts.getUTCDay();
+
+      // Use luxon for timezone-aware time extraction
+      // Default to UTC for backward compatibility
+      const zone = context.timezone ?? 'UTC';
+      const dt = DateTime.fromJSDate(ts, { zone });
+
+      data.hour = dt.hour;
+      data.minute = dt.minute;
+      // Convert luxon weekday (1=Monday...7=Sunday) to JS convention (0=Sunday...6=Saturday)
+      data.dayOfWeek = dt.weekday % 7;
     }
 
     if (context.location) {

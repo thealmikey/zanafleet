@@ -812,6 +812,143 @@ describe('JsonLogicEvaluatorService', () => {
       });
       expect(service.evaluate(condition, mondayNightContext).matched).toBe(false);
     });
+
+    describe('timezone support', () => {
+      it('should use UTC by default when no timezone is specified', () => {
+        const condition: PolicyCondition = {
+          field: 'hour',
+          operator: '==',
+          value: 14,
+        };
+        const context = createContext({
+          timestamp: new Date('2024-01-15T14:30:00Z'),
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(true);
+      });
+
+      it('should convert timestamp to specified timezone for hour extraction', () => {
+        const condition: PolicyCondition = {
+          field: 'hour',
+          operator: '==',
+          value: 17,
+        };
+        // 14:30 UTC = 17:30 in Africa/Nairobi (UTC+3)
+        const context = createContext({
+          timestamp: new Date('2024-01-15T14:30:00Z'),
+          timezone: 'Africa/Nairobi',
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(true);
+      });
+
+      it('should correctly evaluate business hours in local timezone', () => {
+        const condition: PolicyCondition = {
+          field: '',
+          operator: 'AND',
+          value: null,
+          children: [
+            { field: 'hour', operator: '>=', value: 8 },
+            { field: 'hour', operator: '<', value: 18 },
+          ],
+        };
+
+        // 06:00 UTC = 09:00 in Africa/Nairobi (within business hours)
+        const withinHoursContext = createContext({
+          timestamp: new Date('2024-01-15T06:00:00Z'),
+          timezone: 'Africa/Nairobi',
+        });
+        expect(service.evaluate(condition, withinHoursContext).matched).toBe(true);
+
+        // 06:00 UTC without timezone = 06:00 (outside business hours)
+        const outsideHoursContext = createContext({
+          timestamp: new Date('2024-01-15T06:00:00Z'),
+        });
+        expect(service.evaluate(condition, outsideHoursContext).matched).toBe(false);
+      });
+
+      it('should handle dayOfWeek correctly across timezone boundaries', () => {
+        const condition: PolicyCondition = {
+          field: 'dayOfWeek',
+          operator: '==',
+          value: 2,
+        };
+
+        // 2024-01-15 23:00 UTC is Monday in UTC
+        // But 2024-01-16 02:00 in Africa/Nairobi is Tuesday
+        const context = createContext({
+          timestamp: new Date('2024-01-15T23:00:00Z'),
+          timezone: 'Africa/Nairobi',
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(true);
+      });
+
+      it('should handle negative UTC offsets correctly', () => {
+        const condition: PolicyCondition = {
+          field: 'hour',
+          operator: '==',
+          value: 9,
+        };
+        // 14:00 UTC = 09:00 in America/New_York (UTC-5 in January)
+        const context = createContext({
+          timestamp: new Date('2024-01-15T14:00:00Z'),
+          timezone: 'America/New_York',
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(true);
+      });
+
+      it('should handle weekend check with timezone that crosses day boundary', () => {
+        const condition: PolicyCondition = {
+          field: '',
+          operator: 'AND',
+          value: null,
+          children: [
+            { field: 'dayOfWeek', operator: '!=', value: 0 },
+            { field: 'dayOfWeek', operator: '!=', value: 6 },
+          ],
+        };
+
+        // 2024-01-13 is Saturday in UTC
+        // 2024-01-13 22:00 UTC = 2024-01-14 01:00 in Africa/Nairobi (Sunday)
+        const sundayInNairobiContext = createContext({
+          timestamp: new Date('2024-01-13T22:00:00Z'),
+          timezone: 'Africa/Nairobi',
+        });
+        expect(service.evaluate(condition, sundayInNairobiContext).matched).toBe(false);
+
+        // Same UTC time but evaluated in UTC is still Saturday
+        const saturdayInUtcContext = createContext({
+          timestamp: new Date('2024-01-13T22:00:00Z'),
+        });
+        expect(service.evaluate(condition, saturdayInUtcContext).matched).toBe(false);
+      });
+
+      it('should extract minute correctly in specified timezone', () => {
+        const condition: PolicyCondition = {
+          field: 'minute',
+          operator: '==',
+          value: 30,
+        };
+        const context = createContext({
+          timestamp: new Date('2024-01-15T14:30:00Z'),
+          timezone: 'Africa/Nairobi',
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(true);
+      });
+    });
   });
 
   describe('location-based conditions', () => {

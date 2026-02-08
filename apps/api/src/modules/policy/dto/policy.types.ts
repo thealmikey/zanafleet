@@ -37,6 +37,8 @@ export interface EvaluationContext {
   saccoId?: string;
   /** When the evaluation is being performed */
   timestamp: Date;
+  /** IANA timezone identifier for time-based policy evaluation (e.g., 'Africa/Nairobi', 'UTC') */
+  timezone?: string;
   /** Geographic location context (if applicable) */
   location?: {
     latitude: number;
