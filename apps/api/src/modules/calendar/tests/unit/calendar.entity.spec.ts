@@ -1,7 +1,8 @@
-import { CalendarScope, CalendarRuleType } from '@zanafleet/contracts';
+import { CalendarScope, CalendarRuleType, CalendarEventType, RecurrencePattern } from '@zanafleet/contracts';
 import { CalendarEntity } from '../../entities/calendar.entity';
 import { TimeWindowEntity } from '../../entities/time-window.entity';
 import { CalendarRuleEntity } from '../../entities/calendar-rule.entity';
+import { CalendarEventEntity } from '../../entities/calendar-event.entity';
 
 describe('Calendar Entities', () => {
   describe('CalendarEntity', () => {
@@ -319,6 +320,258 @@ describe('Calendar Entities', () => {
         const roundTripped = entity.toDomain();
 
         expect(roundTripped).toEqual(original);
+      });
+    });
+  });
+
+  describe('CalendarEventEntity', () => {
+    const now = new Date();
+    const startTime = new Date('2024-12-25T00:00:00Z');
+    const endTime = new Date('2024-12-25T23:59:59Z');
+
+    describe('toDomain', () => {
+      it('should convert entity to domain object with all fields', () => {
+        const entity = new CalendarEventEntity();
+        entity.id = '723e4567-e89b-12d3-a456-426614174006';
+        entity.eventType = CalendarEventType.PUBLIC_HOLIDAY;
+        entity.title = 'Christmas Day';
+        entity.description = 'National public holiday';
+        entity.startTime = startTime;
+        entity.endTime = endTime;
+        entity.allDay = true;
+        entity.regionScope = { country: 'Kenya' };
+        entity.recurrencePattern = RecurrencePattern.YEARLY;
+        entity.recurrenceRule = { frequency: 'YEARLY', byMonth: [12], byMonthDay: [25] };
+        entity.priority = 100;
+        entity.isActive = true;
+        entity.createdAt = now;
+        entity.updatedAt = now;
+
+        const domain = entity.toDomain();
+
+        expect(domain.eventId).toBe(entity.id);
+        expect(domain.eventType).toBe(CalendarEventType.PUBLIC_HOLIDAY);
+        expect(domain.title).toBe('Christmas Day');
+        expect(domain.description).toBe('National public holiday');
+        expect(domain.startTime).toBe(startTime);
+        expect(domain.endTime).toBe(endTime);
+        expect(domain.allDay).toBe(true);
+        expect(domain.regionScope).toEqual({ country: 'Kenya' });
+        expect(domain.recurrencePattern).toBe(RecurrencePattern.YEARLY);
+        expect(domain.recurrenceRule).toEqual({ frequency: 'YEARLY', byMonth: [12], byMonthDay: [25] });
+        expect(domain.priority).toBe(100);
+        expect(domain.isActive).toBe(true);
+        expect(domain.createdAt).toBe(now);
+        expect(domain.updatedAt).toBe(now);
+      });
+
+      it('should handle null description and recurrenceRule', () => {
+        const entity = new CalendarEventEntity();
+        entity.id = '723e4567-e89b-12d3-a456-426614174006';
+        entity.eventType = CalendarEventType.BUSINESS_CLOSURE;
+        entity.title = 'Office Renovation';
+        entity.description = null;
+        entity.startTime = startTime;
+        entity.endTime = endTime;
+        entity.allDay = false;
+        entity.regionScope = { country: 'Kenya', administrativeArea: 'Nairobi', locality: 'Westlands' };
+        entity.recurrencePattern = RecurrencePattern.NONE;
+        entity.recurrenceRule = null;
+        entity.priority = 0;
+        entity.isActive = true;
+        entity.createdAt = now;
+        entity.updatedAt = now;
+
+        const domain = entity.toDomain();
+
+        expect(domain.description).toBeNull();
+        expect(domain.recurrenceRule).toBeNull();
+        expect(domain.regionScope).toEqual({
+          country: 'Kenya',
+          administrativeArea: 'Nairobi',
+          locality: 'Westlands',
+        });
+      });
+
+      it('should support all CalendarEventType values', () => {
+        const eventTypes = [
+          CalendarEventType.PUBLIC_HOLIDAY,
+          CalendarEventType.BUSINESS_CLOSURE,
+          CalendarEventType.NATIONAL_EVENT,
+          CalendarEventType.WEATHER_DISRUPTION,
+          CalendarEventType.STRIKE_ADVISORY,
+          CalendarEventType.PROMOTIONAL_CAMPAIGN,
+        ];
+
+        eventTypes.forEach((eventType) => {
+          const entity = new CalendarEventEntity();
+          entity.id = '723e4567-e89b-12d3-a456-426614174006';
+          entity.eventType = eventType;
+          entity.title = 'Test Event';
+          entity.description = null;
+          entity.startTime = startTime;
+          entity.endTime = endTime;
+          entity.allDay = false;
+          entity.regionScope = { country: 'Kenya' };
+          entity.recurrencePattern = RecurrencePattern.NONE;
+          entity.recurrenceRule = null;
+          entity.priority = 0;
+          entity.isActive = true;
+          entity.createdAt = now;
+          entity.updatedAt = now;
+
+          const domain = entity.toDomain();
+          expect(domain.eventType).toBe(eventType);
+        });
+      });
+    });
+
+    describe('fromDomain', () => {
+      it('should create entity from domain data with all fields', () => {
+        const domainData = {
+          eventId: '723e4567-e89b-12d3-a456-426614174006',
+          eventType: CalendarEventType.NATIONAL_EVENT,
+          title: 'Independence Day',
+          description: 'Jamhuri Day celebration',
+          startTime,
+          endTime,
+          allDay: true,
+          regionScope: { country: 'Kenya' },
+          recurrencePattern: RecurrencePattern.YEARLY,
+          recurrenceRule: { frequency: 'YEARLY' as const, byMonth: [12], byMonthDay: [12] },
+          priority: 90,
+          isActive: true,
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        const entity = CalendarEventEntity.fromDomain(domainData);
+
+        expect(entity.id).toBe(domainData.eventId);
+        expect(entity.eventType).toBe(domainData.eventType);
+        expect(entity.title).toBe(domainData.title);
+        expect(entity.description).toBe(domainData.description);
+        expect(entity.startTime).toBe(domainData.startTime);
+        expect(entity.endTime).toBe(domainData.endTime);
+        expect(entity.allDay).toBe(true);
+        expect(entity.regionScope).toEqual(domainData.regionScope);
+        expect(entity.recurrencePattern).toBe(domainData.recurrencePattern);
+        expect(entity.recurrenceRule).toEqual(domainData.recurrenceRule);
+        expect(entity.priority).toBe(90);
+        expect(entity.isActive).toBe(true);
+        expect(entity.createdAt).toBe(now);
+        expect(entity.updatedAt).toBe(now);
+      });
+
+      it('should apply default values for optional fields', () => {
+        const domainData = {
+          eventId: '723e4567-e89b-12d3-a456-426614174006',
+          eventType: CalendarEventType.WEATHER_DISRUPTION,
+          title: 'Heavy Rain Warning',
+          startTime,
+          endTime,
+          regionScope: { country: 'Kenya', administrativeArea: 'Nairobi' },
+          createdAt: now,
+        };
+
+        const entity = CalendarEventEntity.fromDomain(domainData);
+
+        expect(entity.description).toBeNull();
+        expect(entity.allDay).toBe(false);
+        expect(entity.recurrencePattern).toBe(RecurrencePattern.NONE);
+        expect(entity.recurrenceRule).toBeNull();
+        expect(entity.priority).toBe(0);
+        expect(entity.isActive).toBe(true);
+        expect(entity.updatedAt).toBe(now);
+      });
+
+      it('should round-trip through toDomain and fromDomain', () => {
+        const original = {
+          eventId: '723e4567-e89b-12d3-a456-426614174006',
+          eventType: CalendarEventType.STRIKE_ADVISORY,
+          title: 'Transport Strike',
+          description: 'Matatu operators strike advisory',
+          startTime,
+          endTime,
+          allDay: false,
+          regionScope: { country: 'Kenya', administrativeArea: 'Nairobi' },
+          recurrencePattern: RecurrencePattern.NONE,
+          recurrenceRule: null,
+          priority: 80,
+          isActive: true,
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        const entity = CalendarEventEntity.fromDomain(original);
+        const roundTripped = entity.toDomain();
+
+        expect(roundTripped).toEqual(original);
+      });
+
+      it('should handle complex recurrence rules', () => {
+        const recurrenceRule = {
+          frequency: 'WEEKLY' as const,
+          interval: 2,
+          byDay: ['MO', 'WE', 'FR'],
+          count: 10,
+        };
+
+        const domainData = {
+          eventId: '723e4567-e89b-12d3-a456-426614174006',
+          eventType: CalendarEventType.PROMOTIONAL_CAMPAIGN,
+          title: 'Bi-Weekly Flash Sale',
+          startTime,
+          endTime,
+          regionScope: { country: 'Kenya' },
+          recurrencePattern: RecurrencePattern.CUSTOM,
+          recurrenceRule,
+          createdAt: now,
+        };
+
+        const entity = CalendarEventEntity.fromDomain(domainData);
+        const domain = entity.toDomain();
+
+        expect(domain.recurrencePattern).toBe(RecurrencePattern.CUSTOM);
+        expect(domain.recurrenceRule).toEqual(recurrenceRule);
+      });
+
+      it('should handle region scope with only country (national events)', () => {
+        const domainData = {
+          eventId: '723e4567-e89b-12d3-a456-426614174006',
+          eventType: CalendarEventType.PUBLIC_HOLIDAY,
+          title: 'Madaraka Day',
+          startTime,
+          endTime,
+          regionScope: { country: 'Kenya' },
+          createdAt: now,
+        };
+
+        const entity = CalendarEventEntity.fromDomain(domainData);
+        expect(entity.regionScope).toEqual({ country: 'Kenya' });
+      });
+
+      it('should handle region scope with full hierarchy (locality-specific events)', () => {
+        const domainData = {
+          eventId: '723e4567-e89b-12d3-a456-426614174006',
+          eventType: CalendarEventType.BUSINESS_CLOSURE,
+          title: 'Local Power Outage',
+          startTime,
+          endTime,
+          regionScope: {
+            country: 'Kenya',
+            administrativeArea: 'Nairobi',
+            locality: 'Westlands',
+          },
+          createdAt: now,
+        };
+
+        const entity = CalendarEventEntity.fromDomain(domainData);
+        expect(entity.regionScope).toEqual({
+          country: 'Kenya',
+          administrativeArea: 'Nairobi',
+          locality: 'Westlands',
+        });
       });
     });
   });

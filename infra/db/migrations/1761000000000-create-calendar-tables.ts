@@ -26,6 +26,30 @@ export class CreateCalendarTables1761000000000 implements MigrationInterface {
       )
     `);
 
+    // Create CalendarEventType enum type
+    await queryRunner.query(`
+      CREATE TYPE "calendar_event_type_enum" AS ENUM (
+        'PUBLIC_HOLIDAY',
+        'BUSINESS_CLOSURE',
+        'NATIONAL_EVENT',
+        'WEATHER_DISRUPTION',
+        'STRIKE_ADVISORY',
+        'PROMOTIONAL_CAMPAIGN'
+      )
+    `);
+
+    // Create RecurrencePattern enum type
+    await queryRunner.query(`
+      CREATE TYPE "recurrence_pattern_enum" AS ENUM (
+        'NONE',
+        'DAILY',
+        'WEEKLY',
+        'MONTHLY',
+        'YEARLY',
+        'CUSTOM'
+      )
+    `);
+
     // Create calendars table
     await queryRunner.query(`
       CREATE TABLE "calendars" (
@@ -111,9 +135,57 @@ export class CreateCalendarTables1761000000000 implements MigrationInterface {
     await queryRunner.query(`
       CREATE INDEX "IDX_calendar_rules_is_active" ON "calendar_rules" ("is_active")
     `);
+
+    // Create calendar_events table
+    await queryRunner.query(`
+      CREATE TABLE "calendar_events" (
+        "id" uuid NOT NULL,
+        "event_type" "calendar_event_type_enum" NOT NULL,
+        "title" varchar(255) NOT NULL,
+        "description" text,
+        "start_time" TIMESTAMP WITH TIME ZONE NOT NULL,
+        "end_time" TIMESTAMP WITH TIME ZONE NOT NULL,
+        "all_day" boolean NOT NULL DEFAULT false,
+        "region_scope" jsonb NOT NULL,
+        "recurrence_pattern" "recurrence_pattern_enum" NOT NULL,
+        "recurrence_rule" jsonb,
+        "priority" int NOT NULL DEFAULT 0,
+        "is_active" boolean NOT NULL DEFAULT true,
+        "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+        "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+        CONSTRAINT "PK_calendar_events" PRIMARY KEY ("id")
+      )
+    `);
+
+    // Create indexes on calendar_events
+    await queryRunner.query(`
+      CREATE INDEX "IDX_calendar_events_event_type" ON "calendar_events" ("event_type")
+    `);
+    await queryRunner.query(`
+      CREATE INDEX "IDX_calendar_events_start_time" ON "calendar_events" ("start_time")
+    `);
+    await queryRunner.query(`
+      CREATE INDEX "IDX_calendar_events_end_time" ON "calendar_events" ("end_time")
+    `);
+    await queryRunner.query(`
+      CREATE INDEX "IDX_calendar_events_is_active" ON "calendar_events" ("is_active")
+    `);
+
+    // Create GIN index on region_scope for JSONB queries
+    await queryRunner.query(`
+      CREATE INDEX "IDX_calendar_events_region_scope" ON "calendar_events" USING GIN ("region_scope")
+    `);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
+    // Drop calendar_events table and indexes
+    await queryRunner.query(`DROP INDEX IF EXISTS "IDX_calendar_events_region_scope"`);
+    await queryRunner.query(`DROP INDEX IF EXISTS "IDX_calendar_events_is_active"`);
+    await queryRunner.query(`DROP INDEX IF EXISTS "IDX_calendar_events_end_time"`);
+    await queryRunner.query(`DROP INDEX IF EXISTS "IDX_calendar_events_start_time"`);
+    await queryRunner.query(`DROP INDEX IF EXISTS "IDX_calendar_events_event_type"`);
+    await queryRunner.query(`DROP TABLE IF EXISTS "calendar_events"`);
+
     // Drop calendar_rules table and indexes
     await queryRunner.query(`DROP INDEX IF EXISTS "IDX_calendar_rules_is_active"`);
     await queryRunner.query(`DROP INDEX IF EXISTS "IDX_calendar_rules_priority"`);
@@ -133,6 +205,8 @@ export class CreateCalendarTables1761000000000 implements MigrationInterface {
     await queryRunner.query(`DROP TABLE IF EXISTS "calendars"`);
 
     // Drop enum types
+    await queryRunner.query(`DROP TYPE IF EXISTS "recurrence_pattern_enum"`);
+    await queryRunner.query(`DROP TYPE IF EXISTS "calendar_event_type_enum"`);
     await queryRunner.query(`DROP TYPE IF EXISTS "calendar_rule_type_enum"`);
     await queryRunner.query(`DROP TYPE IF EXISTS "calendar_scope_enum"`);
   }
