@@ -1,5 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Logger, BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { UpdateRiderLocationCommand } from '../commands/update-rider-location.command';
 import { RiderLocationRepository } from '../repositories/rider-location.repository';
@@ -46,8 +47,9 @@ export class UpdateRiderLocationHandler
     private readonly eventBusService: EventBusService,
     private readonly redisService: RedisService,
     private readonly dataSource: DataSource,
+    private readonly configService: ConfigService,
   ) {
-    this.rateLimitMs = parseInt(process.env.RIDER_LOCATION_RATE_LIMIT_MS ?? '3000', 10);
+    this.rateLimitMs = this.configService.get<number>('RIDER_LOCATION_RATE_LIMIT_MS', 3000);
   }
 
   async execute(command: UpdateRiderLocationCommand): Promise<UpdateRiderLocationResult> {

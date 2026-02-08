@@ -1,4 +1,5 @@
 import { BadRequestException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
 import { UpdateRiderLocationHandler } from '../../handlers/update-rider-location.handler';
 import { UpdateRiderLocationCommand } from '../../commands/update-rider-location.command';
@@ -15,6 +16,7 @@ describe('UpdateRiderLocationHandler', () => {
   let mockEventBus: jest.Mocked<EventBusService>;
   let mockRedisService: jest.Mocked<RedisService>;
   let mockDataSource: jest.Mocked<DataSource>;
+  let mockConfigService: jest.Mocked<ConfigService>;
 
   const validTelemetry: RiderTelemetryData = {
     riderId: 'rider-123',
@@ -71,12 +73,17 @@ describe('UpdateRiderLocationHandler', () => {
       }),
     } as unknown as jest.Mocked<DataSource>;
 
+    mockConfigService = {
+      get: jest.fn().mockReturnValue(100), // 100ms rate limit for faster tests
+    } as unknown as jest.Mocked<ConfigService>;
+
     handler = new UpdateRiderLocationHandler(
       mockRepository,
       mockH3Service,
       mockEventBus,
       mockRedisService,
       mockDataSource,
+      mockConfigService,
     );
   });
 
