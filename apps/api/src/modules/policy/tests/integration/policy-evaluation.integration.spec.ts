@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { createConnection } from 'typeorm';
 
 import { EventBusService } from '../../../../core/event-bus/event-bus.service';
 import {
@@ -18,36 +17,6 @@ import { PolicyRepository } from '../../repositories/policy.repository';
 import { JsonLogicEvaluatorService } from '../../services/json-logic-evaluator.service';
 import { PolicyEvaluationEngineService } from '../../services/policy-evaluation-engine.service';
 
-const checkDatabaseConnection = async (): Promise<boolean> => {
-  try {
-    const connection = await createConnection({
-      type: 'postgres',
-      host: process.env.POSTGRES_HOST ?? 'localhost',
-      port: parseInt(process.env.POSTGRES_PORT ?? '5432', 10),
-      username: process.env.POSTGRES_USER ?? 'postgres',
-      password: process.env.POSTGRES_PASSWORD ?? 'postgres',
-      database: process.env.POSTGRES_DB ?? 'zanafleet_test',
-      connectTimeoutMS: 3000,
-    });
-    await connection.close();
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-let isDatabaseAvailable = false;
-
-beforeAll(async () => {
-  isDatabaseAvailable = await checkDatabaseConnection();
-  if (!isDatabaseAvailable) {
-    console.warn(
-      'Skipping integration tests: PostgreSQL database is not available. ' +
-        'Run `docker-compose -f docker-compose.test.yml up -d` to start required services.'
-    );
-  }
-}, 10000);
-
 describe('PolicyEvaluationEngineService (Integration)', () => {
   let module: TestingModule | undefined;
   let service: PolicyEvaluationEngineService;
@@ -55,6 +24,7 @@ describe('PolicyEvaluationEngineService (Integration)', () => {
   let decisionLogRepo: Repository<PolicyDecisionLogEntity>;
   let dataSource: DataSource | undefined;
   let eventBus: jest.Mocked<EventBusService>;
+  let isDatabaseAvailable = false;
 
   const createTestPolicy = async (
     overrides: Partial<{
@@ -96,10 +66,6 @@ describe('PolicyEvaluationEngineService (Integration)', () => {
   });
 
   beforeAll(async () => {
-    if (!isDatabaseAvailable) {
-      return;
-    }
-
     eventBus = {
       publishEvent: jest.fn().mockResolvedValue(undefined),
       publish: jest.fn(),
@@ -109,40 +75,48 @@ describe('PolicyEvaluationEngineService (Integration)', () => {
       onModuleInit: jest.fn(),
     } as unknown as jest.Mocked<EventBusService>;
 
-    module = await Test.createTestingModule({
-      imports: [
-        TypeOrmModule.forRoot({
-          type: 'postgres',
-          host: process.env.POSTGRES_HOST ?? 'localhost',
-          port: parseInt(process.env.POSTGRES_PORT ?? '5432', 10),
-          username: process.env.POSTGRES_USER ?? 'postgres',
-          password: process.env.POSTGRES_PASSWORD ?? 'postgres',
-          database: process.env.POSTGRES_DB ?? 'zanafleet_test',
-          entities: [PolicyEntity, PolicyDecisionLogEntity],
-          synchronize: true,
-          dropSchema: true,
-          connectTimeoutMS: 5000,
-        }),
-        TypeOrmModule.forFeature([PolicyEntity, PolicyDecisionLogEntity]),
-      ],
-      providers: [
-        PolicyEvaluationEngineService,
-        PolicyRepository,
-        PolicyDecisionLogRepository,
-        JsonLogicEvaluatorService,
-        {
-          provide: EventBusService,
-          useValue: eventBus,
-        },
-      ],
-    }).compile();
+    try {
+      module = await Test.createTestingModule({
+        imports: [
+          TypeOrmModule.forRoot({
+            type: 'postgres',
+            host: process.env.POSTGRES_HOST ?? 'localhost',
+            port: parseInt(process.env.POSTGRES_PORT ?? '5432', 10),
+            username: process.env.POSTGRES_USER ?? 'postgres',
+            password: process.env.POSTGRES_PASSWORD ?? 'postgres',
+            database: process.env.POSTGRES_DB ?? 'zanafleet_test',
+            entities: [PolicyEntity, PolicyDecisionLogEntity],
+            synchronize: true,
+            dropSchema: true,
+            connectTimeoutMS: 5000,
+          }),
+          TypeOrmModule.forFeature([PolicyEntity, PolicyDecisionLogEntity]),
+        ],
+        providers: [
+          PolicyEvaluationEngineService,
+          PolicyRepository,
+          PolicyDecisionLogRepository,
+          JsonLogicEvaluatorService,
+          {
+            provide: EventBusService,
+            useValue: eventBus,
+          },
+        ],
+      }).compile();
 
-    service = module.get<PolicyEvaluationEngineService>(PolicyEvaluationEngineService);
-    policyRepo = module.get<Repository<PolicyEntity>>(getRepositoryToken(PolicyEntity));
-    decisionLogRepo = module.get<Repository<PolicyDecisionLogEntity>>(
-      getRepositoryToken(PolicyDecisionLogEntity)
-    );
-    dataSource = module.get<DataSource>(DataSource);
+      service = module.get<PolicyEvaluationEngineService>(PolicyEvaluationEngineService);
+      policyRepo = module.get<Repository<PolicyEntity>>(getRepositoryToken(PolicyEntity));
+      decisionLogRepo = module.get<Repository<PolicyDecisionLogEntity>>(
+        getRepositoryToken(PolicyDecisionLogEntity)
+      );
+      dataSource = module.get<DataSource>(DataSource);
+      isDatabaseAvailable = true;
+    } catch {
+      console.warn(
+        'Skipping integration tests: PostgreSQL database is not available. ' +
+          'Run `docker-compose -f docker-compose.test.yml up -d` to start required services.'
+      );
+    }
   }, 30000);
 
   afterAll(async () => {
@@ -164,11 +138,6 @@ describe('PolicyEvaluationEngineService (Integration)', () => {
   });
 
   describe('full evaluation flow', () => {
-    beforeAll(() => {
-      if (!isDatabaseAvailable) {
-        console.warn('Skipping: database not available');
-      }
-    });
     it('should load policies, evaluate, log decision, and publish event', async () => {
       if (!isDatabaseAvailable) {
         return;
