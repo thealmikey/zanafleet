@@ -19,3 +19,13 @@ export type {
   CalendarBindingResponse,
   CalendarOverrideResponse,
 } from '@zanafleet/contracts';
+
+export type {
+  ConstraintContext,
+  ConstraintResult,
+  OperationType,
+  BlockedByType,
+  WorkingHoursResult,
+  HolidayCheckResult,
+  BlackoutCheckResult,
+} from './constraint.types';

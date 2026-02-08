@@ -14,6 +14,7 @@ import { CalendarRepository } from './repositories/calendar.repository';
 import { CalendarEventRepository } from './repositories/calendar-event.repository';
 import { CalendarService } from './services/calendar.service';
 import { CalendarBindingService } from './services/calendar-binding.service';
+import { SchedulingConstraintService } from './services/scheduling-constraint.service';
 
 @Module({
   imports: [
@@ -33,10 +34,12 @@ import { CalendarBindingService } from './services/calendar-binding.service';
     CalendarEventRepository,
     CalendarService,
     CalendarBindingService,
+    SchedulingConstraintService,
   ],
   exports: [
     CalendarService,
     CalendarBindingService,
+    SchedulingConstraintService,
     CalendarRepository,
     CalendarEventRepository,
   ],
