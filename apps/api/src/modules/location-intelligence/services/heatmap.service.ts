@@ -16,6 +16,16 @@ import {
 } from '../types/h3.types';
 
 /**
+ * Whitelist mapping H3 resolutions to their corresponding database column names.
+ * Using a const object ensures only known-safe column names can be used in SQL queries.
+ */
+const RESOLUTION_COLUMNS: Record<H3Resolution, string> = {
+  [H3_RESOLUTION_FINE]: 'h3_index_fine',
+  [H3_RESOLUTION_MEDIUM]: 'h3_index_medium',
+  [H3_RESOLUTION_COARSE]: 'h3_index_coarse',
+};
+
+/**
  * Service for generating heatmaps from rider location data.
  * Aggregates location data by H3 cells for demand/supply density visualization.
  */
@@ -98,20 +108,16 @@ export class HeatmapService {
 
   /**
    * Map H3 resolution to the corresponding pre-computed column name.
+   * Uses a whitelist to ensure only safe column names are returned.
    * @param resolution - H3 resolution (5, 7, or 9)
    * @returns Database column name for that resolution
    */
   getH3ColumnForResolution(resolution: H3Resolution): string {
-    switch (resolution) {
-      case H3_RESOLUTION_FINE:
-        return 'h3_index_fine';
-      case H3_RESOLUTION_MEDIUM:
-        return 'h3_index_medium';
-      case H3_RESOLUTION_COARSE:
-        return 'h3_index_coarse';
-      default:
-        throw new Error(`Unsupported H3 resolution: ${resolution}`);
+    const h3Column = RESOLUTION_COLUMNS[resolution];
+    if (!h3Column) {
+      throw new Error(`Unsupported H3 resolution: ${resolution}`);
     }
+    return h3Column;
   }
 
   /**
