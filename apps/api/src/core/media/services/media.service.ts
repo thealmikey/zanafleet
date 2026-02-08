@@ -175,6 +175,12 @@ export class MediaService {
       throw new NotFoundException(`Media asset ${mediaAssetId} not found`);
     }
 
+    if (![MediaAssetStatus.Pending, MediaAssetStatus.Uploading].includes(entity.status)) {
+      throw new Error(
+        `Media asset ${mediaAssetId} is not in an uploadable state (status: ${entity.status})`,
+      );
+    }
+
     const provider = entity.storageProviderId
       ? this.storageRegistry.get(entity.storageProviderId)
       : this.storageRegistry.getDefault();

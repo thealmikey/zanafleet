@@ -329,7 +329,7 @@ describe('MediaService', () => {
   });
 
   describe('generateSignedUploadUrl', () => {
-    it('should generate signed PUT URL', async () => {
+    it('should generate signed PUT URL for Pending asset', async () => {
       const entity = new MediaAssetEntity();
       entity.id = mockMediaAssetId;
       entity.storageKey = 'test-storage-key';
@@ -350,6 +350,23 @@ describe('MediaService', () => {
       expect(result.method).toBe('PUT');
     });
 
+    it('should generate signed PUT URL for Uploading asset', async () => {
+      const entity = new MediaAssetEntity();
+      entity.id = mockMediaAssetId;
+      entity.storageKey = 'test-storage-key';
+      entity.mimeType = 'video/mp4';
+      entity.status = MediaAssetStatus.Uploading;
+      entity.storageProviderId = 'test-provider';
+
+      repository.findOne.mockResolvedValue(entity);
+      mockProvider.generateSignedUrl.mockResolvedValue('https://signed.url/upload');
+
+      const result = await service.generateSignedUploadUrl(mockMediaAssetId);
+
+      expect(result.url).toBe('https://signed.url/upload');
+      expect(result.method).toBe('PUT');
+    });
+
     it('should throw NotFoundException if asset not found', async () => {
       repository.findOne.mockResolvedValue(null);
 
@@ -358,11 +375,48 @@ describe('MediaService', () => {
       );
     });
 
+    it('should throw if asset is Active', async () => {
+      const entity = new MediaAssetEntity();
+      entity.id = mockMediaAssetId;
+      entity.status = MediaAssetStatus.Active;
+
+      repository.findOne.mockResolvedValue(entity);
+
+      await expect(service.generateSignedUploadUrl(mockMediaAssetId)).rejects.toThrow(
+        'is not in an uploadable state',
+      );
+    });
+
+    it('should throw if asset is Archived', async () => {
+      const entity = new MediaAssetEntity();
+      entity.id = mockMediaAssetId;
+      entity.status = MediaAssetStatus.Archived;
+
+      repository.findOne.mockResolvedValue(entity);
+
+      await expect(service.generateSignedUploadUrl(mockMediaAssetId)).rejects.toThrow(
+        'is not in an uploadable state',
+      );
+    });
+
+    it('should throw if asset is Deleted', async () => {
+      const entity = new MediaAssetEntity();
+      entity.id = mockMediaAssetId;
+      entity.status = MediaAssetStatus.Deleted;
+
+      repository.findOne.mockResolvedValue(entity);
+
+      await expect(service.generateSignedUploadUrl(mockMediaAssetId)).rejects.toThrow(
+        'is not in an uploadable state',
+      );
+    });
+
     it('should throw if no provider available', async () => {
       const entity = new MediaAssetEntity();
       entity.id = mockMediaAssetId;
       entity.storageKey = 'test-key';
       entity.mimeType = 'text/plain';
+      entity.status = MediaAssetStatus.Pending;
       entity.storageProviderId = null;
 
       repository.findOne.mockResolvedValue(entity);
