@@ -211,10 +211,13 @@ export class MediaService {
         ? this.storageRegistry.get(entity.storageProviderId)
         : this.storageRegistry.getDefault();
 
-      if (provider) {
-        await provider.delete(entity.storageKey);
+      if (!provider) {
+        throw new Error(
+          `Cannot permanently delete media asset ${mediaAssetId}: no storage provider available to delete file from storage`,
+        );
       }
 
+      await provider.delete(entity.storageKey);
       await this.mediaAssetRepository.remove(entity);
       this.logger.log(`Permanently deleted media asset ${mediaAssetId}`);
     } else {

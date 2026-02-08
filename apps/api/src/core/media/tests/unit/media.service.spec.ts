@@ -417,7 +417,7 @@ describe('MediaService', () => {
       await expect(service.deleteMediaAsset('non-existent')).rejects.toThrow(NotFoundException);
     });
 
-    it('should handle permanent delete when provider is unavailable', async () => {
+    it('should throw error when permanent delete has no provider available', async () => {
       const entity = new MediaAssetEntity();
       entity.id = mockMediaAssetId;
       entity.storageKey = 'orphan-key';
@@ -426,9 +426,10 @@ describe('MediaService', () => {
       repository.findOne.mockResolvedValue(entity);
       storageRegistry.getDefault.mockReturnValue(undefined);
 
-      await service.deleteMediaAsset(mockMediaAssetId, true);
-
-      expect(repository.remove).toHaveBeenCalledWith(entity);
+      await expect(service.deleteMediaAsset(mockMediaAssetId, true)).rejects.toThrow(
+        'no storage provider available',
+      );
+      expect(repository.remove).not.toHaveBeenCalled();
     });
   });
 
