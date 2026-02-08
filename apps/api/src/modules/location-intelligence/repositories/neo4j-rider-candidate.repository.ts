@@ -1,11 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { VehicleType } from '@zanafleet/contracts';
+
 import { Neo4jService } from '../../../core/neo4j/neo4j.service';
 import {
   RiderCandidate,
   RiderCandidateRepository,
   TimeWindow,
 } from '../types/rider-candidate.types';
+
 import { RiderLocationRepository } from './rider-location.repository';
 
 /**

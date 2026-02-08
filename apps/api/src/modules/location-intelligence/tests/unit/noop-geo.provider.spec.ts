@@ -1,5 +1,5 @@
-import { NoOpGeoProvider } from '../../providers/noop-geo.provider';
 import { GeoPoint } from '../../providers/geo-provider.interface';
+import { NoOpGeoProvider } from '../../providers/noop-geo.provider';
 
 describe('NoOpGeoProvider', () => {
   let provider: NoOpGeoProvider;

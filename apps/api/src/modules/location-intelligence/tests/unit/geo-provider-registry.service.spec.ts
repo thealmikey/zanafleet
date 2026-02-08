@@ -1,5 +1,5 @@
-import { GeoProvider, GeoPoint, Address } from '../../providers/geo-provider.interface';
 import { GeoProviderRegistry } from '../../providers/geo-provider-registry.service';
+import { GeoProvider, GeoPoint, Address } from '../../providers/geo-provider.interface';
 
 class MockGeoProvider implements GeoProvider {
   constructor(public readonly providerId: string) {}

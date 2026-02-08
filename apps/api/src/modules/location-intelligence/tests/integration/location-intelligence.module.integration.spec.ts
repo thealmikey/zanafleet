@@ -1,15 +1,16 @@
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { LocationIntelligenceModule } from '../../location-intelligence.module';
-import { LocationIntelligenceService } from '../../services/location-intelligence.service';
-import { RiderLocationSnapshotEntity } from '../../entities/rider-location-snapshot.entity';
+
 import { RiderLocationHistoryEntity } from '../../entities/rider-location-history.entity';
+import { RiderLocationSnapshotEntity } from '../../entities/rider-location-snapshot.entity';
+import { LocationIntelligenceModule } from '../../location-intelligence.module';
+import { GeoProviderRegistry } from '../../providers/geo-provider-registry.service';
+import { Neo4jRiderCandidateRepository } from '../../repositories/neo4j-rider-candidate.repository';
+import { RiderLocationRepository } from '../../repositories/rider-location.repository';
 import { H3Service } from '../../services/h3.service';
 import { HeatmapService } from '../../services/heatmap.service';
-import { RiderLocationRepository } from '../../repositories/rider-location.repository';
-import { Neo4jRiderCandidateRepository } from '../../repositories/neo4j-rider-candidate.repository';
-import { GeoProviderRegistry } from '../../providers/geo-provider-registry.service';
+import { LocationIntelligenceService } from '../../services/location-intelligence.service';
 
 /**
  * Mock EventLoggerService for testing.

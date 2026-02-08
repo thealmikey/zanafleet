@@ -1,5 +1,6 @@
 import { RiderLocationUpdatedEventV1 } from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
+
 import { H3MultiIndex } from '../types/h3.types';
 
 /**

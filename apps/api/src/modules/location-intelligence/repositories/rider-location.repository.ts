@@ -1,8 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DataSource, EntityManager } from 'typeorm';
-import { H3Service } from '../services/h3.service';
-import { GeoPoint } from '../providers/geo-provider.interface';
+
 import { haversineDistanceMeters } from '../../../core/utils/geo.utils';
+import { GeoPoint } from '../providers/geo-provider.interface';
+import { H3Service } from '../services/h3.service';
 import {
   RiderLocationData,
   RiderLocationSnapshot,

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { VehicleType } from '@zanafleet/contracts';
+
 import { haversineDistanceMeters, GeoPoint } from '../../../core/utils/geo.utils';
 
 export type { GeoPoint };

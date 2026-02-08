@@ -1,10 +1,11 @@
 import { DataSource } from 'typeorm';
+
 import { GeoPoint } from '../../providers/geo-provider.interface';
-import { H3Service } from '../../services/h3.service';
 import {
   RiderLocationRepository,
   haversineDistanceMeters,
 } from '../../repositories/rider-location.repository';
+import { H3Service } from '../../services/h3.service';
 
 describe('haversineDistanceMeters', () => {
   it('should return 0 for the same point', () => {

@@ -5,6 +5,7 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
+
 import { GeoJsonPoint } from '../../../core/utils/geo.utils';
 
 /**

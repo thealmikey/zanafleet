@@ -1,19 +1,21 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { CqrsModule } from '@nestjs/cqrs';
-import { RiderLocationSnapshotEntity } from './entities/rider-location-snapshot.entity';
-import { RiderLocationHistoryEntity } from './entities/rider-location-history.entity';
-import { GeoProviderRegistry } from './providers/geo-provider-registry.service';
-import { NoOpGeoProvider } from './providers/noop-geo.provider';
-import { H3Service } from './services/h3.service';
-import { HeatmapService } from './services/heatmap.service';
-import { LocationIntelligenceService } from './services/location-intelligence.service';
-import { RiderLocationRepository } from './repositories/rider-location.repository';
-import { Neo4jRiderCandidateRepository } from './repositories/neo4j-rider-candidate.repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { Neo4jModule } from '../../core/neo4j/neo4j.module';
 import { RedisModule } from '../../core/redis/redis.module';
+
+import { RiderLocationHistoryEntity } from './entities/rider-location-history.entity';
+import { RiderLocationSnapshotEntity } from './entities/rider-location-snapshot.entity';
 import { UpdateRiderLocationHandler } from './handlers/update-rider-location.handler';
+import { GeoProviderRegistry } from './providers/geo-provider-registry.service';
+import { NoOpGeoProvider } from './providers/noop-geo.provider';
+import { Neo4jRiderCandidateRepository } from './repositories/neo4j-rider-candidate.repository';
+import { RiderLocationRepository } from './repositories/rider-location.repository';
+import { H3Service } from './services/h3.service';
+import { HeatmapService } from './services/heatmap.service';
+import { LocationIntelligenceService } from './services/location-intelligence.service';
 import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscriber';
 
 /**

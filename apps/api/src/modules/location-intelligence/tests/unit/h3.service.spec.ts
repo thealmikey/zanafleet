@@ -1,11 +1,13 @@
-import { H3Service } from '../../services/h3.service';
+import * as h3 from 'h3-js';
+
 import { GeoPoint } from '../../providers/geo-provider.interface';
+import { H3Service } from '../../services/h3.service';
 import {
   H3_RESOLUTION_FINE,
   H3_RESOLUTION_MEDIUM,
   H3_RESOLUTION_COARSE,
 } from '../../types/h3.types';
-import * as h3 from 'h3-js';
+
 
 describe('H3Service', () => {
   let service: H3Service;

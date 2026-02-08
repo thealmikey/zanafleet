@@ -1,11 +1,12 @@
 import { CommandBus } from '@nestjs/cqrs';
 import { NatsContext } from '@nestjs/microservices';
 import { RiderTelemetryData } from '@zanafleet/contracts';
+
+import { UpdateRiderLocationCommand } from '../../commands/update-rider-location.command';
 import {
   RiderTelemetrySubscriber,
   BatchConfig,
 } from '../../subscribers/rider-telemetry.subscriber';
-import { UpdateRiderLocationCommand } from '../../commands/update-rider-location.command';
 
 describe('RiderTelemetrySubscriber', () => {
   let subscriber: RiderTelemetrySubscriber;

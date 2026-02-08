@@ -1,17 +1,18 @@
 import { DataSource } from 'typeorm';
-import { HeatmapService } from '../../services/heatmap.service';
-import { H3Service } from '../../services/h3.service';
+
 import { GeoPoint } from '../../providers/geo-provider.interface';
-import {
-  BoundingBox,
-  HeatmapParams,
-  HistoricalHeatmapParams,
-} from '../../types/heatmap.types';
+import { H3Service } from '../../services/h3.service';
+import { HeatmapService } from '../../services/heatmap.service';
 import {
   H3_RESOLUTION_FINE,
   H3_RESOLUTION_MEDIUM,
   H3_RESOLUTION_COARSE,
 } from '../../types/h3.types';
+import {
+  BoundingBox,
+  HeatmapParams,
+  HistoricalHeatmapParams,
+} from '../../types/heatmap.types';
 
 describe('HeatmapService', () => {
   let service: HeatmapService;

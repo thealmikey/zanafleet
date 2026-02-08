@@ -347,5 +347,122 @@ export interface OrderResponse {
   updatedAt: Date;
 }
 
+// ============================================================================
+// Media Contracts
+// ============================================================================
+
+export enum MediaType {
+  Image = 'Image',
+  Video = 'Video',
+  Document = 'Document',
+  Audio = 'Audio',
+}
+
+export enum MediaAssetStatus {
+  Pending = 'Pending',
+  Uploading = 'Uploading',
+  Active = 'Active',
+  Archived = 'Archived',
+  Deleted = 'Deleted',
+}
+
+export enum OwnerEntityType {
+  Rider = 'Rider',
+  Business = 'Business',
+  Delivery = 'Delivery',
+  Sacco = 'Sacco',
+  Order = 'Order',
+}
+
+export interface MediaAssetMetadata {
+  width?: number;
+  height?: number;
+  duration?: number;
+  contentType?: string;
+  originalFilename?: string;
+}
+
+export interface CreateMediaAssetInput {
+  filename: string;
+  mimeType: string;
+  size: number;
+  checksum: string;
+  ownerId: string;
+  ownerType: OwnerEntityType;
+  metadata?: MediaAssetMetadata;
+}
+
+export interface MediaAssetResponse {
+  mediaAssetId: string;
+  filename: string;
+  mimeType: string;
+  size: number;
+  checksum: string;
+  ownerId: string;
+  ownerType: OwnerEntityType;
+  status: MediaAssetStatus;
+  storageKey: string;
+  metadata: MediaAssetMetadata | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface SignedUrlResponse {
+  url: string;
+  expiresAt: Date;
+  method: 'GET' | 'PUT';
+}
+
+// ============================================================================
+// Media Multipart Upload Contracts
+// ============================================================================
+
+export interface InitiateMultipartUploadInput {
+  filename: string;
+  mimeType: string;
+  ownerId: string;
+  ownerType: OwnerEntityType;
+}
+
+export interface InitiateMultipartUploadResponse {
+  uploadId: string;
+  mediaAssetId: string;
+  partSize: number;
+}
+
+export interface UploadPartInput {
+  uploadId: string;
+  partNumber: number;
+  body: Buffer | Uint8Array;
+}
+
+export interface UploadPartResponse {
+  etag: string;
+  partNumber: number;
+}
+
+export interface CompleteMultipartUploadInput {
+  uploadId: string;
+  parts: Array<{ partNumber: number; etag: string }>;
+}
+
+export interface AbortMultipartUploadInput {
+  uploadId: string;
+}
+
+// ============================================================================
+// Media Lifecycle Contracts
+// ============================================================================
+
+export interface ArchiveMediaAssetInput {
+  mediaAssetId: string;
+  reason?: string;
+}
+
+export interface DeleteMediaAssetInput {
+  mediaAssetId: string;
+  permanent?: boolean;
+}
+
 export { TEST_ACCOUNTS, TEST_PASSWORD, TEST_WORKSPACE_ID } from './test-accounts';
 export type { TestAccount } from './test-accounts';

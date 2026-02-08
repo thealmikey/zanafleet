@@ -1,7 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { H3Service } from './h3.service';
+
 import { GeoPoint } from '../providers/geo-provider.interface';
+import {
+  H3_RESOLUTION_FINE,
+  H3_RESOLUTION_MEDIUM,
+  H3_RESOLUTION_COARSE,
+} from '../types/h3.types';
 import {
   HeatmapParams,
   HistoricalHeatmapParams,
@@ -9,11 +14,8 @@ import {
   BoundingBox,
   H3Resolution,
 } from '../types/heatmap.types';
-import {
-  H3_RESOLUTION_FINE,
-  H3_RESOLUTION_MEDIUM,
-  H3_RESOLUTION_COARSE,
-} from '../types/h3.types';
+
+import { H3Service } from './h3.service';
 
 /**
  * Whitelist mapping H3 resolutions to their corresponding database column names.

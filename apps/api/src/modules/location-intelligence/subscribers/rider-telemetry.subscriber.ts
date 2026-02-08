@@ -2,6 +2,7 @@ import { Controller, Logger, OnModuleDestroy } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Ctx, MessagePattern, NatsContext, Payload } from '@nestjs/microservices';
 import { RiderTelemetryData } from '@zanafleet/contracts';
+
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
 import { UpdateRiderLocationCommand } from '../commands/update-rider-location.command';
 

@@ -1,4 +1,5 @@
 import { GeoPoint } from '../providers/geo-provider.interface';
+
 import {
   H3_RESOLUTION_FINE,
   H3_RESOLUTION_MEDIUM,

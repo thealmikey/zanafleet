@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as h3 from 'h3-js';
+
 import { GeoPoint } from '../providers/geo-provider.interface';
 import {
   H3MultiIndex,

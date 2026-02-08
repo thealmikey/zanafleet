@@ -1,5 +1,6 @@
 import { Injectable, Logger, Inject, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
+
 import { REDIS_MODULE_OPTIONS, DEFAULT_REDIS_URL } from './redis.constants';
 
 export interface RedisModuleOptions {

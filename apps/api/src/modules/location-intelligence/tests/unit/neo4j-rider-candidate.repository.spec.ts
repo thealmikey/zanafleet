@@ -1,7 +1,8 @@
 import { VehicleType } from '@zanafleet/contracts';
+
+import { Neo4jService } from '../../../../core/neo4j/neo4j.service';
 import { Neo4jRiderCandidateRepository } from '../../repositories/neo4j-rider-candidate.repository';
 import { RiderLocationRepository } from '../../repositories/rider-location.repository';
-import { Neo4jService } from '../../../../core/neo4j/neo4j.service';
 import { RiderLocationSnapshot } from '../../types/rider-location.types';
 
 describe('Neo4jRiderCandidateRepository', () => {

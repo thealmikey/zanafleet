@@ -1,4 +1,5 @@
 import { VehicleType } from '@zanafleet/contracts';
+
 import { GeoPoint } from '../providers/geo-provider.interface';
 
 /**

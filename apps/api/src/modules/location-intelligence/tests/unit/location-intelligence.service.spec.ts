@@ -1,12 +1,13 @@
 import { CommandBus } from '@nestjs/cqrs';
 import { RiderTelemetryData, VehicleType } from '@zanafleet/contracts';
-import { LocationIntelligenceService } from '../../services/location-intelligence.service';
+
+import { UpdateRiderLocationCommand } from '../../commands/update-rider-location.command';
+import { Neo4jRiderCandidateRepository } from '../../repositories/neo4j-rider-candidate.repository';
 import { RiderLocationRepository } from '../../repositories/rider-location.repository';
 import { HeatmapService } from '../../services/heatmap.service';
-import { Neo4jRiderCandidateRepository } from '../../repositories/neo4j-rider-candidate.repository';
-import { UpdateRiderLocationCommand } from '../../commands/update-rider-location.command';
-import { HeatmapParams, HeatmapCell } from '../../types/heatmap.types';
+import { LocationIntelligenceService } from '../../services/location-intelligence.service';
 import { H3_RESOLUTION_MEDIUM } from '../../types/h3.types';
+import { HeatmapParams, HeatmapCell } from '../../types/heatmap.types';
 import { RiderCandidate } from '../../types/rider-candidate.types';
 import { RiderLocationHistory } from '../../types/rider-location.types';
 

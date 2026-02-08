@@ -1,13 +1,14 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Logger, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { DataSource } from 'typeorm';
-import { UpdateRiderLocationCommand } from '../commands/update-rider-location.command';
-import { RiderLocationRepository } from '../repositories/rider-location.repository';
-import { H3Service } from '../services/h3.service';
+
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { RedisService } from '../../../core/redis/redis.service';
+import { UpdateRiderLocationCommand } from '../commands/update-rider-location.command';
 import { createRiderLocationUpdatedEvent } from '../events/rider-location-updated.event';
+import { RiderLocationRepository } from '../repositories/rider-location.repository';
+import { H3Service } from '../services/h3.service';
 
 /**
  * Result of processing an UpdateRiderLocationCommand.

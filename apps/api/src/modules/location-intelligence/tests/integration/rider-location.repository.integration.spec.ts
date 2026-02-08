@@ -2,12 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+
+import { haversineDistanceMeters } from '../../../../core/utils/geo.utils';
+import { RiderLocationHistoryEntity } from '../../entities/rider-location-history.entity';
+import { RiderLocationSnapshotEntity } from '../../entities/rider-location-snapshot.entity';
+import { GeoPoint } from '../../providers/geo-provider.interface';
 import { RiderLocationRepository } from '../../repositories/rider-location.repository';
 import { H3Service } from '../../services/h3.service';
-import { RiderLocationSnapshotEntity } from '../../entities/rider-location-snapshot.entity';
-import { RiderLocationHistoryEntity } from '../../entities/rider-location-history.entity';
-import { GeoPoint } from '../../providers/geo-provider.interface';
-import { haversineDistanceMeters } from '../../../../core/utils/geo.utils';
 
 /**
  * Integration tests for RiderLocationRepository.

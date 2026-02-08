@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
+
 import { GeoProviderRegistry } from '../../providers/geo-provider-registry.service';
 import { NoOpGeoProvider } from '../../providers/noop-geo.provider';
-import { H3Service } from '../../services/h3.service';
 import { RiderLocationRepository } from '../../repositories/rider-location.repository';
+import { H3Service } from '../../services/h3.service';
 
 describe('LocationIntelligenceModule', () => {
   let module: TestingModule;

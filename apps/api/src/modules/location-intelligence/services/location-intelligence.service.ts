@@ -1,16 +1,19 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { RiderTelemetryData } from '@zanafleet/contracts';
+
 import { UpdateRiderLocationCommand } from '../commands/update-rider-location.command';
 import { GeoPoint } from '../providers/geo-provider.interface';
 import { Neo4jRiderCandidateRepository } from '../repositories/neo4j-rider-candidate.repository';
 import { RiderLocationRepository } from '../repositories/rider-location.repository';
-import { HeatmapService } from './heatmap.service';
+import { HeatmapCell, HeatmapParams } from '../types/heatmap.types';
 import {
   FindNearbyCandidatesParams,
   RiderCandidate,
 } from '../types/rider-candidate.types';
-import { HeatmapCell, HeatmapParams } from '../types/heatmap.types';
+
+import { HeatmapService } from './heatmap.service';
+
 
 /**
  * Time range for historical queries.

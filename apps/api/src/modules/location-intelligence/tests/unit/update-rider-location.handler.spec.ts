@@ -1,13 +1,14 @@
 import { BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { RiderTelemetryData, RiderLocationUpdatedEventV1 } from '@zanafleet/contracts';
 import { DataSource } from 'typeorm';
-import { UpdateRiderLocationHandler } from '../../handlers/update-rider-location.handler';
-import { UpdateRiderLocationCommand } from '../../commands/update-rider-location.command';
-import { RiderLocationRepository } from '../../repositories/rider-location.repository';
-import { H3Service } from '../../services/h3.service';
+
 import { EventBusService } from '../../../../core/event-bus/event-bus.service';
 import { RedisService } from '../../../../core/redis/redis.service';
-import { RiderTelemetryData, RiderLocationUpdatedEventV1 } from '@zanafleet/contracts';
+import { UpdateRiderLocationCommand } from '../../commands/update-rider-location.command';
+import { UpdateRiderLocationHandler } from '../../handlers/update-rider-location.handler';
+import { RiderLocationRepository } from '../../repositories/rider-location.repository';
+import { H3Service } from '../../services/h3.service';
 
 describe('UpdateRiderLocationHandler', () => {
   let handler: UpdateRiderLocationHandler;
