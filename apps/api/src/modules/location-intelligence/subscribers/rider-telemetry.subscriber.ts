@@ -1,4 +1,4 @@
-import { Controller, Logger } from '@nestjs/common';
+import { Controller, Logger, OnModuleDestroy } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Ctx, MessagePattern, NatsContext, Payload } from '@nestjs/microservices';
 import { RiderTelemetryData } from '@zanafleet/contracts';
@@ -32,7 +32,7 @@ export const DEFAULT_BATCH_CONFIG: BatchConfig = {
  * - Batch processing: messages are accumulated and processed in batches
  */
 @Controller()
-export class RiderTelemetrySubscriber {
+export class RiderTelemetrySubscriber implements OnModuleDestroy {
   private readonly logger = new Logger(RiderTelemetrySubscriber.name);
 
   private readonly batchEnabled: boolean;
@@ -202,5 +202,13 @@ export class RiderTelemetrySubscriber {
    */
   isBatchEnabled(): boolean {
     return this.batchEnabled;
+  }
+
+  /**
+   * Lifecycle hook called during graceful shutdown.
+   * Flushes any pending batch and clears the timeout to prevent leaked timers.
+   */
+  async onModuleDestroy(): Promise<void> {
+    await this.flushBatch();
   }
 }
