@@ -57,6 +57,17 @@ export const NatsSubjects = {
     GRANTED_TO_PERSONA_V1: 'capability.events.granted-to-persona-v1',
     ALL: 'capability.events.*',
   },
+  Calendar: {
+    CREATED_V1: 'calendar.events.created-v1',
+    UPDATED_V1: 'calendar.events.updated-v1',
+    DELETED_V1: 'calendar.events.deleted-v1',
+    EVENT_ADDED_V1: 'calendar.events.event-added-v1',
+    HOLIDAY_DECLARED_V1: 'calendar.events.holiday-declared-v1',
+    BUSINESS_CLOSED_V1: 'calendar.events.business-closed-v1',
+    OVERRIDE_APPLIED_V1: 'calendar.events.override-applied-v1',
+    CONSTRAINT_BLOCKED_V1: 'calendar.events.constraint-blocked-v1',
+    ALL: 'calendar.events.*',
+  },
   Formation: {
     STATUS_CHANGED_V1: 'formation.events.status-changed-v1',
     REQUIREMENT_CREATED_V1: 'formation.events.requirement-created-v1',

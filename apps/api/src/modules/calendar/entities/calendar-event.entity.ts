@@ -86,6 +86,15 @@ export class CalendarEventEntity {
   @Column('boolean', { default: true })
   isActive!: boolean;
 
+  @Column({ name: 'external_id', type: 'varchar', length: 255, nullable: true })
+  externalId!: string | null;
+
+  @Column({ name: 'external_source', type: 'varchar', length: 100, nullable: true })
+  externalSource!: string | null;
+
+  @Column({ name: 'external_metadata', type: 'jsonb', nullable: true })
+  externalMetadata!: Record<string, unknown> | null;
+
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;
 
@@ -108,6 +117,9 @@ export class CalendarEventEntity {
     recurrenceRule: RecurrenceRule | null;
     priority: number;
     isActive: boolean;
+    externalId: string | null;
+    externalSource: string | null;
+    externalMetadata: Record<string, unknown> | null;
     createdAt: Date;
     updatedAt: Date;
   } {
@@ -124,6 +136,9 @@ export class CalendarEventEntity {
       recurrenceRule: this.recurrenceRule,
       priority: this.priority,
       isActive: this.isActive,
+      externalId: this.externalId,
+      externalSource: this.externalSource,
+      externalMetadata: this.externalMetadata,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
@@ -145,6 +160,9 @@ export class CalendarEventEntity {
     recurrenceRule?: RecurrenceRule | null;
     priority?: number;
     isActive?: boolean;
+    externalId?: string | null;
+    externalSource?: string | null;
+    externalMetadata?: Record<string, unknown> | null;
     createdAt: Date;
     updatedAt?: Date;
   }): CalendarEventEntity {
@@ -161,6 +179,9 @@ export class CalendarEventEntity {
     entity.recurrenceRule = data.recurrenceRule ?? null;
     entity.priority = data.priority ?? 0;
     entity.isActive = data.isActive ?? true;
+    entity.externalId = data.externalId ?? null;
+    entity.externalSource = data.externalSource ?? null;
+    entity.externalMetadata = data.externalMetadata ?? null;
     entity.createdAt = data.createdAt;
     entity.updatedAt = data.updatedAt ?? data.createdAt;
     return entity;
