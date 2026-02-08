@@ -464,5 +464,92 @@ export interface DeleteMediaAssetInput {
   permanent?: boolean;
 }
 
+// ============================================================================
+// Policy Contracts
+// ============================================================================
+
+/**
+ * Policy Scope Enum
+ * Defines the hierarchical scope levels for policies.
+ * More specific scopes (RIDER) override more general scopes (GLOBAL).
+ * Hierarchy: GLOBAL < NATIONAL < SACCO < BUSINESS < RIDER
+ */
+export enum PolicyScope {
+  GLOBAL = 'GLOBAL',
+  NATIONAL = 'NATIONAL',
+  SACCO = 'SACCO',
+  BUSINESS = 'BUSINESS',
+  RIDER = 'RIDER',
+}
+
+/**
+ * Policy Effect Enum
+ * Defines the possible outcomes when a policy matches.
+ */
+export enum PolicyEffect {
+  ALLOW = 'ALLOW',
+  BLOCK = 'BLOCK',
+  MODIFY = 'MODIFY',
+  REQUIRE_APPROVAL = 'REQUIRE_APPROVAL',
+}
+
+/**
+ * Policy Status Enum
+ * Defines the lifecycle states of a policy.
+ */
+export enum PolicyStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  DRAFT = 'DRAFT',
+  ARCHIVED = 'ARCHIVED',
+}
+
+/**
+ * Policy Trigger Enum
+ * Defines the events that can trigger policy evaluation.
+ */
+export enum PolicyTrigger {
+  DELIVERY_CREATION = 'DELIVERY_CREATION',
+  RIDER_ASSIGNMENT = 'RIDER_ASSIGNMENT',
+  STATUS_TRANSITION = 'STATUS_TRANSITION',
+  SLA_CHECK = 'SLA_CHECK',
+}
+
+/**
+ * PolicyDecision Interface
+ * Represents the outcome of a single policy evaluation.
+ */
+export interface PolicyDecision {
+  /** The effect to apply */
+  effect: PolicyEffect;
+  /** ID of the policy that produced this decision */
+  policyId: string;
+  /** Human-readable name of the policy */
+  policyName: string;
+  /** Explanation of why this decision was made */
+  reason: string;
+  /** Field modifications to apply (when effect is MODIFY) */
+  modifications?: Record<string, unknown>;
+  /** Actor IDs required to approve (when effect is REQUIRE_APPROVAL) */
+  requiresApprovalFrom?: string[];
+}
+
+/**
+ * PolicyCondition Interface
+ * Represents a JSON Logic-style condition for policy evaluation.
+ */
+export interface PolicyCondition {
+  /** The field path to evaluate (e.g., 'delivery.status', 'rider.vehicleType') */
+  field: string;
+  /** The comparison operator (e.g., 'eq', 'ne', 'gt', 'lt', 'in', 'contains') */
+  operator: string;
+  /** The value to compare against */
+  value: unknown;
+  /** Logical operator for combining with sibling conditions */
+  logic?: 'AND' | 'OR';
+  /** Nested conditions for complex expressions */
+  children?: PolicyCondition[];
+}
+
 export { TEST_ACCOUNTS, TEST_PASSWORD, TEST_WORKSPACE_ID } from './test-accounts';
 export type { TestAccount } from './test-accounts';
