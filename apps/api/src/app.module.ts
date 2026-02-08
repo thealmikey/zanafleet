@@ -4,6 +4,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { EventBusModule } from './core/event-bus';
+import { MediaModule } from './core/media';
 import { Neo4jModule } from './core/neo4j';
 import { ActorModule } from './modules/actor/actor.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -48,6 +49,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     Neo4jModule.forRoot({
       isGlobal: true,
     }),
+    MediaModule,
     ActorModule,
     AuthModule,
     BusinessModule,
