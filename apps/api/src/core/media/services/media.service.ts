@@ -51,44 +51,44 @@ export class MediaService {
 
     await provider.upload(storageKey, body, input.mimeType);
 
-      const metadata = input.metadata || this.extractMetadata(body, input.mimeType);
+    const metadata = input.metadata || this.extractMetadata(body, input.mimeType);
 
-      const now = new Date();
-      const entity = MediaAssetEntity.fromDomain({
-        mediaAssetId,
-        filename: input.filename,
-        mimeType: input.mimeType,
-        size: input.size,
-        checksum,
-        ownerId: input.ownerId,
-        ownerType: input.ownerType,
-        status: MediaAssetStatus.Active,
-        storageKey,
-        storageProviderId: provider.providerId,
-        metadata,
-        createdAt: now,
-      });
+    const now = new Date();
+    const entity = MediaAssetEntity.fromDomain({
+      mediaAssetId,
+      filename: input.filename,
+      mimeType: input.mimeType,
+      size: input.size,
+      checksum,
+      ownerId: input.ownerId,
+      ownerType: input.ownerType,
+      status: MediaAssetStatus.Active,
+      storageKey,
+      storageProviderId: provider.providerId,
+      metadata,
+      createdAt: now,
+    });
 
-      let saved: MediaAssetEntity;
+    let saved: MediaAssetEntity;
+    try {
+      saved = await this.mediaAssetRepository.save(entity);
+    } catch (error) {
+      this.logger.warn(
+        `Database save failed for media asset ${mediaAssetId}, cleaning up uploaded file`,
+      );
       try {
-        saved = await this.mediaAssetRepository.save(entity);
-      } catch (error) {
-        this.logger.warn(
-          `Database save failed for media asset ${mediaAssetId}, cleaning up uploaded file`,
+        await provider.delete(storageKey);
+      } catch (deleteError) {
+        this.logger.error(
+          `Failed to clean up orphaned file ${storageKey}: ${(deleteError as Error).message}`,
         );
-        try {
-          await provider.delete(storageKey);
-        } catch (deleteError) {
-          this.logger.error(
-            `Failed to clean up orphaned file ${storageKey}: ${(deleteError as Error).message}`,
-          );
-        }
-        throw error;
       }
+      throw error;
+    }
 
-      const domain = saved.toDomain();
+    const domain = saved.toDomain();
 
-      this.logger.log(`Created media asset ${mediaAssetId} for ${input.ownerType}/${input.ownerId}`);
+    this.logger.log(`Created media asset ${mediaAssetId} for ${input.ownerType}/${input.ownerId}`);
 
     return {
       mediaAssetId: domain.mediaAssetId,
