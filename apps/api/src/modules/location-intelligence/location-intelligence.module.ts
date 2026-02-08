@@ -6,6 +6,7 @@ import { RiderLocationHistoryEntity } from './entities/rider-location-history.en
 import { GeoProviderRegistry } from './providers/geo-provider-registry.service';
 import { NoOpGeoProvider } from './providers/noop-geo.provider';
 import { H3Service } from './services/h3.service';
+import { HeatmapService } from './services/heatmap.service';
 import { RiderLocationRepository } from './repositories/rider-location.repository';
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { UpdateRiderLocationHandler } from './handlers/update-rider-location.handler';
@@ -32,6 +33,7 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
     GeoProviderRegistry,
     NoOpGeoProvider,
     H3Service,
+    HeatmapService,
     RiderLocationRepository,
     UpdateRiderLocationHandler,
     RiderTelemetrySubscriber,
@@ -41,6 +43,7 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
     GeoProviderRegistry,
     NoOpGeoProvider,
     H3Service,
+    HeatmapService,
     RiderLocationRepository,
     UpdateRiderLocationHandler,
     RiderTelemetrySubscriber,
