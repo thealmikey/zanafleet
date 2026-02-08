@@ -164,6 +164,44 @@ export interface LocationData {
   country: string;
 }
 
+// ============================================================================
+// Rider Telemetry Contracts
+// ============================================================================
+
+/**
+ * Raw telemetry data from rider mobile devices.
+ * Used for ingesting real-time location updates.
+ */
+export interface RiderTelemetryData {
+  riderId: string;
+  latitude: number;
+  longitude: number;
+  heading?: number | null;
+  speed?: number | null;
+  accuracy?: number | null;
+  timestamp: Date;
+}
+
+/**
+ * Event published when a rider's location is updated.
+ * Event type follows naming convention: Location.RiderLocation.UpdatedV1
+ */
+export interface RiderLocationUpdatedEventV1 extends BaseEvent {
+  readonly aggregateType: 'RiderLocation';
+  readonly payload: {
+    riderId: string;
+    latitude: number;
+    longitude: number;
+    h3IndexFine: string;
+    h3IndexMedium: string;
+    h3IndexCoarse: string;
+    heading: number | null;
+    speed: number | null;
+    accuracy: number | null;
+    timestamp: Date;
+  };
+}
+
 export interface CreateLocationInput {
   latitude?: number;
   longitude?: number;

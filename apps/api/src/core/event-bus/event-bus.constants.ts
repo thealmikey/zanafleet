@@ -89,6 +89,10 @@ export const NatsSubjects = {
     FAILED_V1: 'delivery.events.failed-v1',
     ALL: 'delivery.events.*',
   },
+  Location: {
+    RIDER_LOCATION_UPDATED_V1: 'location.events.rider-location-updated-v1',
+    ALL: 'location.events.*',
+  },
 } as const;
 
 /**

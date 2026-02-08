@@ -1,11 +1,14 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { CqrsModule } from '@nestjs/cqrs';
 import { RiderLocationSnapshotEntity } from './entities/rider-location-snapshot.entity';
 import { RiderLocationHistoryEntity } from './entities/rider-location-history.entity';
 import { GeoProviderRegistry } from './providers/geo-provider-registry.service';
 import { NoOpGeoProvider } from './providers/noop-geo.provider';
 import { H3Service } from './services/h3.service';
 import { RiderLocationRepository } from './repositories/rider-location.repository';
+import { EventBusModule } from '../../core/event-bus/event-bus.module';
+import { UpdateRiderLocationHandler } from './handlers/update-rider-location.handler';
 
 /**
  * Location Intelligence Module
@@ -21,14 +24,23 @@ import { RiderLocationRepository } from './repositories/rider-location.repositor
 @Module({
   imports: [
     TypeOrmModule.forFeature([RiderLocationSnapshotEntity, RiderLocationHistoryEntity]),
+    CqrsModule,
+    EventBusModule.forFeature(),
   ],
-  providers: [GeoProviderRegistry, NoOpGeoProvider, H3Service, RiderLocationRepository],
+  providers: [
+    GeoProviderRegistry,
+    NoOpGeoProvider,
+    H3Service,
+    RiderLocationRepository,
+    UpdateRiderLocationHandler,
+  ],
   exports: [
     TypeOrmModule,
     GeoProviderRegistry,
     NoOpGeoProvider,
     H3Service,
     RiderLocationRepository,
+    UpdateRiderLocationHandler,
   ],
 })
 export class LocationIntelligenceModule implements OnModuleInit {
