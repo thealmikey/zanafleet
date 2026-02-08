@@ -103,5 +103,10 @@
       "prettier --write",
       "eslint --fix"
     ]
+  },
+  "msw": {
+    "workerDirectory": [
+      "apps/web/public"
+    ]
   }
 }
