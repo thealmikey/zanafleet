@@ -4,6 +4,7 @@ import { UpdateRiderLocationCommand } from '../../commands/update-rider-location
 import { RiderLocationRepository } from '../../repositories/rider-location.repository';
 import { H3Service } from '../../services/h3.service';
 import { EventBusService } from '../../../../core/event-bus/event-bus.service';
+import { RedisService } from '../../../../core/redis/redis.service';
 import { RiderTelemetryData, RiderLocationUpdatedEventV1 } from '@zanafleet/contracts';
 
 describe('UpdateRiderLocationHandler', () => {
@@ -11,6 +12,7 @@ describe('UpdateRiderLocationHandler', () => {
   let mockRepository: jest.Mocked<RiderLocationRepository>;
   let mockH3Service: jest.Mocked<H3Service>;
   let mockEventBus: jest.Mocked<EventBusService>;
+  let mockRedisService: jest.Mocked<RedisService>;
 
   const validTelemetry: RiderTelemetryData = {
     riderId: 'rider-123',
@@ -54,16 +56,19 @@ describe('UpdateRiderLocationHandler', () => {
       isReady: jest.fn().mockReturnValue(true),
     } as unknown as jest.Mocked<EventBusService>;
 
+    mockRedisService = {
+      setRateLimitKey: jest.fn().mockResolvedValue(true),
+      getClient: jest.fn(),
+      onModuleInit: jest.fn(),
+      onModuleDestroy: jest.fn(),
+    } as unknown as jest.Mocked<RedisService>;
+
     handler = new UpdateRiderLocationHandler(
       mockRepository,
       mockH3Service,
       mockEventBus,
-      100,
+      mockRedisService,
     );
-  });
-
-  afterEach(() => {
-    handler.clearRateLimitCache();
   });
 
   describe('coordinate validation', () => {
@@ -240,20 +245,19 @@ describe('UpdateRiderLocationHandler', () => {
     it('should skip update if last update was too recent', async () => {
       const command = new UpdateRiderLocationCommand(validTelemetry);
 
+      mockRedisService.setRateLimitKey.mockResolvedValueOnce(true);
       const result1 = await handler.execute(command);
       expect(result1.updated).toBe(true);
 
+      mockRedisService.setRateLimitKey.mockResolvedValueOnce(false);
       const result2 = await handler.execute(command);
       expect(result2.updated).toBe(false);
       expect(result2.reason).toContain('Rate limited');
     });
 
     it('should not call repository when rate-limited', async () => {
+      mockRedisService.setRateLimitKey.mockResolvedValue(false);
       const command = new UpdateRiderLocationCommand(validTelemetry);
-
-      await handler.execute(command);
-      mockRepository.upsertSnapshot.mockClear();
-      mockRepository.appendHistory.mockClear();
 
       await handler.execute(command);
 
@@ -262,25 +266,12 @@ describe('UpdateRiderLocationHandler', () => {
     });
 
     it('should not publish event when rate-limited', async () => {
+      mockRedisService.setRateLimitKey.mockResolvedValue(false);
       const command = new UpdateRiderLocationCommand(validTelemetry);
-
-      await handler.execute(command);
-      mockEventBus.publishEvent.mockClear();
 
       await handler.execute(command);
 
       expect(mockEventBus.publishEvent).not.toHaveBeenCalled();
-    });
-
-    it('should allow update after rate limit window passes', async () => {
-      const command = new UpdateRiderLocationCommand(validTelemetry);
-
-      await handler.execute(command);
-
-      await new Promise((resolve) => setTimeout(resolve, 150));
-
-      const result = await handler.execute(command);
-      expect(result.updated).toBe(true);
     });
 
     it('should rate limit per rider independently', async () => {
@@ -290,10 +281,20 @@ describe('UpdateRiderLocationHandler', () => {
         riderId: 'rider-different',
       });
 
-      await handler.execute(command1);
+      mockRedisService.setRateLimitKey.mockResolvedValue(true);
 
+      await handler.execute(command1);
       const result = await handler.execute(command2);
+
       expect(result.updated).toBe(true);
+      expect(mockRedisService.setRateLimitKey).toHaveBeenCalledWith(
+        'rate_limit:rider:rider-123',
+        expect.any(Number),
+      );
+      expect(mockRedisService.setRateLimitKey).toHaveBeenCalledWith(
+        'rate_limit:rider:rider-different',
+        expect.any(Number),
+      );
     });
   });
 

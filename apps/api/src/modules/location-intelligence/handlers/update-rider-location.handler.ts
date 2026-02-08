@@ -4,6 +4,7 @@ import { UpdateRiderLocationCommand } from '../commands/update-rider-location.co
 import { RiderLocationRepository } from '../repositories/rider-location.repository';
 import { H3Service } from '../services/h3.service';
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
+import { RedisService } from '../../../core/redis/redis.service';
 import { createRiderLocationUpdatedEvent } from '../events/rider-location-updated.event';
 
 /**
@@ -35,9 +36,6 @@ export class UpdateRiderLocationHandler
 {
   private readonly logger = new Logger(UpdateRiderLocationHandler.name);
 
-  /** In-memory cache tracking last update time per rider for rate limiting */
-  private readonly lastUpdateTimes = new Map<string, Date>();
-
   /** Minimum interval between updates in milliseconds (default: 3 seconds) */
   private readonly rateLimitMs: number;
 
@@ -45,9 +43,9 @@ export class UpdateRiderLocationHandler
     private readonly riderLocationRepository: RiderLocationRepository,
     private readonly h3Service: H3Service,
     private readonly eventBusService: EventBusService,
-    rateLimitMs?: number,
+    private readonly redisService: RedisService,
   ) {
-    this.rateLimitMs = rateLimitMs ?? 3000;
+    this.rateLimitMs = parseInt(process.env.RIDER_LOCATION_RATE_LIMIT_MS ?? '3000', 10);
   }
 
   async execute(command: UpdateRiderLocationCommand): Promise<UpdateRiderLocationResult> {
@@ -58,7 +56,7 @@ export class UpdateRiderLocationHandler
     this.validateCoordinates(latitude, longitude);
 
     // 2. Check rate limiting
-    if (this.isRateLimited(riderId)) {
+    if (await this.isRateLimited(riderId)) {
       this.logger.debug(`Rate limited: rider ${riderId} updated too recently`);
       return {
         updated: false,
@@ -87,10 +85,7 @@ export class UpdateRiderLocationHandler
     // 6. Append to location history
     await this.riderLocationRepository.appendHistory(locationData);
 
-    // 7. Update rate limiting cache
-    this.lastUpdateTimes.set(riderId, new Date());
-
-    // 8. Publish event
+    // 7. Publish event
     const event = createRiderLocationUpdatedEvent({
       riderId,
       latitude,
@@ -132,26 +127,17 @@ export class UpdateRiderLocationHandler
   }
 
   /**
-   * Check if a rider's location update should be rate-limited.
+   * Check if a rider's location update should be rate-limited using Redis.
+   * Uses SET NX EX for atomic check-and-set with TTL.
    * Returns true if the last update was less than rateLimitMs ago.
    */
-  private isRateLimited(riderId: string): boolean {
-    const lastUpdate = this.lastUpdateTimes.get(riderId);
-    if (!lastUpdate) {
-      return false;
-    }
-    const elapsed = Date.now() - lastUpdate.getTime();
-    return elapsed < this.rateLimitMs;
-  }
+  private async isRateLimited(riderId: string): Promise<boolean> {
+    const key = `rate_limit:rider:${riderId}`;
+    const ttlSeconds = Math.ceil(this.rateLimitMs / 1000);
 
-  /**
-   * Clear rate limiting cache for a specific rider (useful for testing).
-   */
-  clearRateLimitCache(riderId?: string): void {
-    if (riderId) {
-      this.lastUpdateTimes.delete(riderId);
-    } else {
-      this.lastUpdateTimes.clear();
-    }
+    // setRateLimitKey returns true if key was set (NOT rate limited)
+    // returns false if key already exists (IS rate limited)
+    const wasSet = await this.redisService.setRateLimitKey(key, ttlSeconds);
+    return !wasSet;
   }
 }

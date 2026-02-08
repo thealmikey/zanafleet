@@ -12,6 +12,7 @@ import { RiderLocationRepository } from './repositories/rider-location.repositor
 import { Neo4jRiderCandidateRepository } from './repositories/neo4j-rider-candidate.repository';
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { Neo4jModule } from '../../core/neo4j/neo4j.module';
+import { RedisModule } from '../../core/redis/redis.module';
 import { UpdateRiderLocationHandler } from './handlers/update-rider-location.handler';
 import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscriber';
 
@@ -37,6 +38,7 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
     CqrsModule,
     EventBusModule.forFeature(),
     Neo4jModule,
+    RedisModule.forRoot(),
   ],
   providers: [
     GeoProviderRegistry,
