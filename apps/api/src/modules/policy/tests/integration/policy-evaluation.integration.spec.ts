@@ -381,4 +381,362 @@ describe('PolicyEvaluationEngineService (Integration)', () => {
       expect(duration).toBeLessThan(2000);
     });
   });
+
+  describe('concurrent evaluations', () => {
+    it('should return consistent results when evaluating the same context concurrently', async () => {
+      if (!isDatabaseAvailable) {
+        return;
+      }
+
+      await createTestPolicy({
+        name: 'Concurrent Test Policy',
+        effect: PolicyEffect.BLOCK,
+        priority: 100,
+        conditions: { field: 'trigger', operator: '==', value: 'DELIVERY_CREATION' },
+      });
+
+      const context = createContext({ deliveryId: 'delivery-concurrent-001' });
+
+      const evaluationPromises = Array.from({ length: 10 }, () =>
+        service.evaluate(context)
+      );
+
+      const results = await Promise.all(evaluationPromises);
+
+      const firstResult = results[0];
+      for (const result of results) {
+        expect(result.finalDecision.effect).toBe(firstResult.finalDecision.effect);
+        expect(result.finalDecision.policyId).toBe(firstResult.finalDecision.policyId);
+        expect(result.finalDecision.policyName).toBe(firstResult.finalDecision.policyName);
+        expect(result.evaluatedPolicies.length).toBe(firstResult.evaluatedPolicies.length);
+      }
+
+      expect(firstResult.finalDecision.effect).toBe(PolicyEffect.BLOCK);
+      expect(firstResult.finalDecision.policyName).toBe('Concurrent Test Policy');
+    });
+
+    it('should handle concurrent evaluations with different triggers correctly', async () => {
+      if (!isDatabaseAvailable) {
+        return;
+      }
+
+      await createTestPolicy({
+        name: 'Delivery Creation Policy',
+        trigger: PolicyTrigger.DELIVERY_CREATION,
+        effect: PolicyEffect.ALLOW,
+        priority: 100,
+        conditions: { field: 'trigger', operator: '==', value: 'DELIVERY_CREATION' },
+      });
+
+      await createTestPolicy({
+        name: 'Rider Assignment Policy',
+        trigger: PolicyTrigger.RIDER_ASSIGNMENT,
+        effect: PolicyEffect.BLOCK,
+        priority: 100,
+        conditions: { field: 'trigger', operator: '==', value: 'RIDER_ASSIGNMENT' },
+      });
+
+      const deliveryContexts = Array.from({ length: 5 }, (_, i) =>
+        createContext({
+          deliveryId: `delivery-concurrent-${i}`,
+          trigger: PolicyTrigger.DELIVERY_CREATION,
+        })
+      );
+
+      const riderContexts = Array.from({ length: 5 }, (_, i) =>
+        createContext({
+          riderId: `rider-concurrent-${i}`,
+          trigger: PolicyTrigger.RIDER_ASSIGNMENT,
+        })
+      );
+
+      const allPromises = [
+        ...deliveryContexts.map((ctx) => service.evaluate(ctx)),
+        ...riderContexts.map((ctx) => service.evaluate(ctx)),
+      ];
+
+      const results = await Promise.all(allPromises);
+
+      for (let i = 0; i < 5; i++) {
+        expect(results[i].finalDecision.effect).toBe(PolicyEffect.ALLOW);
+        expect(results[i].finalDecision.policyName).toBe('Delivery Creation Policy');
+      }
+
+      for (let i = 5; i < 10; i++) {
+        expect(results[i].finalDecision.effect).toBe(PolicyEffect.BLOCK);
+        expect(results[i].finalDecision.policyName).toBe('Rider Assignment Policy');
+      }
+    });
+
+    it('should produce consistent decision logs for concurrent evaluations', async () => {
+      if (!isDatabaseAvailable) {
+        return;
+      }
+
+      await createTestPolicy({
+        name: 'Logging Test Policy',
+        effect: PolicyEffect.ALLOW,
+        priority: 50,
+      });
+
+      const contexts = Array.from({ length: 5 }, (_, i) =>
+        createContext({ deliveryId: `delivery-log-concurrent-${i}` })
+      );
+
+      await Promise.all(contexts.map((ctx) => service.evaluate(ctx)));
+
+      await new Promise((resolve) => setTimeout(resolve, 200));
+
+      const logs = await decisionLogRepo.find();
+      expect(logs.length).toBe(5);
+
+      for (const log of logs) {
+        expect(log.finalEffect).toBe(PolicyEffect.ALLOW);
+        expect(log.evaluatedPolicies.length).toBe(1);
+        expect(log.evaluatedPolicies[0].policyName).toBe('Logging Test Policy');
+      }
+    });
+
+    it('should handle high concurrency without data corruption', async () => {
+      if (!isDatabaseAvailable) {
+        return;
+      }
+
+      for (let i = 0; i < 5; i++) {
+        await createTestPolicy({
+          name: `High Concurrency Policy ${i}`,
+          priority: i * 10,
+          effect: i === 4 ? PolicyEffect.BLOCK : PolicyEffect.ALLOW,
+          scope: i === 4 ? PolicyScope.BUSINESS : PolicyScope.GLOBAL,
+        });
+      }
+
+      const evaluationPromises = Array.from({ length: 50 }, (_, i) =>
+        service.evaluate(createContext({ deliveryId: `delivery-high-concurrency-${i}` }))
+      );
+
+      const results = await Promise.all(evaluationPromises);
+
+      for (const result of results) {
+        expect(result.evaluationFailed).toBe(false);
+        expect(result.finalDecision.effect).toBe(PolicyEffect.BLOCK);
+        expect(result.finalDecision.policyName).toBe('High Concurrency Policy 4');
+        expect(result.evaluatedPolicies.length).toBe(5);
+      }
+    });
+  });
+
+  describe('policy modification during evaluation', () => {
+    it('should not crash when policies are modified during concurrent evaluation', async () => {
+      if (!isDatabaseAvailable) {
+        return;
+      }
+
+      const initialPolicy = await createTestPolicy({
+        name: 'Race Condition Test Policy',
+        effect: PolicyEffect.ALLOW,
+        priority: 100,
+      });
+
+      const evaluationPromises: Promise<unknown>[] = [];
+
+      for (let i = 0; i < 10; i++) {
+        evaluationPromises.push(
+          service.evaluate(createContext({ deliveryId: `delivery-race-${i}` }))
+        );
+
+        if (i === 5) {
+          initialPolicy.effect = PolicyEffect.BLOCK;
+          await policyRepo.save(initialPolicy);
+        }
+      }
+
+      const results = (await Promise.all(evaluationPromises)) as Array<{
+        evaluationFailed: boolean;
+        finalDecision: { effect: PolicyEffect };
+      }>;
+
+      for (const result of results) {
+        expect(result.evaluationFailed).toBe(false);
+        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(
+          result.finalDecision.effect
+        );
+      }
+    });
+
+    it('should handle policy deletion during concurrent evaluations gracefully', async () => {
+      if (!isDatabaseAvailable) {
+        return;
+      }
+
+      const policy = await createTestPolicy({
+        name: 'Delete During Eval Policy',
+        effect: PolicyEffect.BLOCK,
+        priority: 100,
+      });
+
+      const evaluationPromises: Promise<unknown>[] = [];
+
+      for (let i = 0; i < 10; i++) {
+        evaluationPromises.push(
+          service.evaluate(createContext({ deliveryId: `delivery-delete-${i}` }))
+        );
+
+        if (i === 5) {
+          await policyRepo.delete({ id: policy.id });
+        }
+      }
+
+      const results = (await Promise.all(evaluationPromises)) as Array<{
+        evaluationFailed: boolean;
+        finalDecision: { effect: PolicyEffect };
+      }>;
+
+      for (const result of results) {
+        expect(result.evaluationFailed).toBe(false);
+        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(
+          result.finalDecision.effect
+        );
+      }
+    });
+
+    it('should handle new policy insertion during concurrent evaluations', async () => {
+      if (!isDatabaseAvailable) {
+        return;
+      }
+
+      await createTestPolicy({
+        name: 'Initial Low Priority Policy',
+        effect: PolicyEffect.ALLOW,
+        priority: 10,
+      });
+
+      const evaluationPromises: Promise<unknown>[] = [];
+
+      for (let i = 0; i < 10; i++) {
+        evaluationPromises.push(
+          service.evaluate(createContext({ deliveryId: `delivery-add-${i}` }))
+        );
+
+        if (i === 5) {
+          await createTestPolicy({
+            name: 'New High Priority Block Policy',
+            effect: PolicyEffect.BLOCK,
+            priority: 100,
+          });
+        }
+      }
+
+      const results = (await Promise.all(evaluationPromises)) as Array<{
+        evaluationFailed: boolean;
+        finalDecision: { effect: PolicyEffect };
+      }>;
+
+      for (const result of results) {
+        expect(result.evaluationFailed).toBe(false);
+        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(
+          result.finalDecision.effect
+        );
+      }
+    });
+
+    it('should maintain evaluation integrity with rapid policy updates', async () => {
+      if (!isDatabaseAvailable) {
+        return;
+      }
+
+      const policy = await createTestPolicy({
+        name: 'Rapid Update Policy',
+        effect: PolicyEffect.ALLOW,
+        priority: 100,
+      });
+
+      const evaluationPromises: Promise<unknown>[] = [];
+      const updatePromises: Promise<unknown>[] = [];
+
+      for (let i = 0; i < 20; i++) {
+        evaluationPromises.push(
+          service.evaluate(createContext({ deliveryId: `delivery-rapid-${i}` }))
+        );
+
+        updatePromises.push(
+          (async () => {
+            policy.effect = i % 2 === 0 ? PolicyEffect.ALLOW : PolicyEffect.BLOCK;
+            policy.priority = 100 + i;
+            await policyRepo.save(policy);
+          })()
+        );
+      }
+
+      await Promise.all(updatePromises);
+      const results = (await Promise.all(evaluationPromises)) as Array<{
+        evaluationFailed: boolean;
+        finalDecision: { effect: PolicyEffect };
+        processingTimeMs: number;
+      }>;
+
+      for (const result of results) {
+        expect(result.evaluationFailed).toBe(false);
+        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(
+          result.finalDecision.effect
+        );
+        expect(result.processingTimeMs).toBeGreaterThanOrEqual(0);
+      }
+    });
+
+    it('should handle concurrent policy scope changes without corruption', async () => {
+      if (!isDatabaseAvailable) {
+        return;
+      }
+
+      const globalPolicy = await createTestPolicy({
+        name: 'Scope Change Policy',
+        scope: PolicyScope.GLOBAL,
+        effect: PolicyEffect.ALLOW,
+        priority: 50,
+      });
+
+      const businessPolicy = await createTestPolicy({
+        name: 'Business Scope Policy',
+        scope: PolicyScope.BUSINESS,
+        effect: PolicyEffect.BLOCK,
+        priority: 100,
+      });
+
+      const evaluationPromises: Promise<unknown>[] = [];
+
+      for (let i = 0; i < 15; i++) {
+        evaluationPromises.push(
+          service.evaluate(createContext({ deliveryId: `delivery-scope-${i}` }))
+        );
+
+        if (i === 5) {
+          globalPolicy.scope = PolicyScope.RIDER;
+          globalPolicy.priority = 200;
+          await policyRepo.save(globalPolicy);
+        }
+
+        if (i === 10) {
+          await policyRepo.delete({ id: businessPolicy.id });
+        }
+      }
+
+      const results = (await Promise.all(evaluationPromises)) as Array<{
+        evaluationFailed: boolean;
+        finalDecision: { effect: PolicyEffect; policyName: string };
+        evaluatedPolicies: Array<{ matched: boolean }>;
+      }>;
+
+      for (const result of results) {
+        expect(result.evaluationFailed).toBe(false);
+        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(
+          result.finalDecision.effect
+        );
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      const logs = await decisionLogRepo.find();
+      expect(logs.length).toBe(15);
+    });
+  });
 });
