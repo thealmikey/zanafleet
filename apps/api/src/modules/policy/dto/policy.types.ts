@@ -4,6 +4,7 @@ import {
   PolicyTrigger,
   PolicyCondition,
   PolicyDecision,
+  CalendarEventType,
 } from '@zanafleet/contracts';
 
 /**
@@ -46,6 +47,23 @@ export interface EvaluationContext {
   };
   /** Additional context-specific data */
   metadata?: Record<string, unknown>;
+  /** Calendar context for time-based policy conditions */
+  calendarContext?: {
+    /** IDs of calendars that apply to this context */
+    effectiveCalendarIds: string[];
+    /** Whether the current time falls on a holiday */
+    isHoliday: boolean;
+    /** Whether the current time is within working hours */
+    isWorkingHours: boolean;
+    /** Whether the current day is a weekend (Saturday or Sunday) */
+    isWeekend: boolean;
+    /** Current day of week (0=Sunday, 6=Saturday) */
+    currentDayOfWeek: number;
+    /** Active calendar events (holidays, closures, etc.) */
+    activeEvents: Array<{ eventId: string; eventType: CalendarEventType; title: string }>;
+    /** Active calendar overrides (exceptions) */
+    activeOverrides: Array<{ overrideId: string; exceptionType: string }>;
+  };
 }
 
 /**

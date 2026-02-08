@@ -1,7 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 
+import { BindingTargetType, CalendarEventType, CalendarScope } from '@zanafleet/contracts';
+
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
+import { SchedulingConstraintService } from '../../calendar/services/scheduling-constraint.service';
+import { CalendarBindingService } from '../../calendar/services/calendar-binding.service';
+import { CalendarEventRepository, RegionFilter } from '../../calendar/repositories/calendar-event.repository';
 import {
   PolicyScope,
   PolicyEffect,
@@ -29,6 +34,8 @@ export interface EvaluationOptions {
   requestId?: string;
   /** Optional correlation ID for tracing */
   correlationId?: string;
+  /** Whether to enrich the context with calendar data before evaluation. Defaults to false. */
+  enrichCalendarContext?: boolean;
 }
 
 /**
@@ -59,7 +66,10 @@ export class PolicyEvaluationEngineService {
     private readonly policyRepository: PolicyRepository,
     private readonly evaluator: JsonLogicEvaluatorService,
     private readonly decisionLogRepository: PolicyDecisionLogRepository,
-    private readonly eventBus: EventBusService
+    private readonly eventBus: EventBusService,
+    @Optional() private readonly schedulingConstraintService?: SchedulingConstraintService,
+    @Optional() private readonly calendarBindingService?: CalendarBindingService,
+    @Optional() private readonly calendarEventRepository?: CalendarEventRepository
   ) {}
 
   /**
@@ -78,14 +88,20 @@ export class PolicyEvaluationEngineService {
     const requestId = options.requestId ?? randomUUID();
 
     try {
-      const policies = await this.loadApplicablePolicies(context);
+      // Optionally enrich with calendar context
+      let enrichedContext = context;
+      if (options.enrichCalendarContext) {
+        enrichedContext = await this.enrichWithCalendarContext(context);
+      }
+
+      const policies = await this.loadApplicablePolicies(enrichedContext);
 
       const evaluatedPolicies: EvaluatedPolicy[] = [];
       const matchedPolicies: MatchedPolicy[] = [];
       const evaluatedPolicyLogs: EvaluatedPolicyLogEntry[] = [];
 
       for (const policy of policies) {
-        const outcome = this.evaluator.evaluate(policy.conditions, context);
+        const outcome = this.evaluator.evaluate(policy.conditions, enrichedContext);
 
         evaluatedPolicies.push({
           policyId: policy.id,
@@ -119,14 +135,14 @@ export class PolicyEvaluationEngineService {
       };
 
       this.logDecisionAsync(
-        context,
+        enrichedContext,
         result,
         evaluatedPolicyLogs,
         requestId,
         options.correlationId
       );
 
-      this.publishEventAsync(context, result, options.correlationId);
+      this.publishEventAsync(enrichedContext, result, options.correlationId);
 
       return result;
     } catch (error) {
@@ -143,6 +159,147 @@ export class PolicyEvaluationEngineService {
       this.publishEventAsync(context, result, options.correlationId);
 
       return result;
+    }
+  }
+
+  /**
+   * Enrich the evaluation context with calendar data.
+   * Resolves effective calendars, working hours, holidays, and overrides.
+   *
+   * @param context - The base evaluation context
+   * @returns The enriched context with calendarContext populated
+   */
+  async enrichWithCalendarContext(context: EvaluationContext): Promise<EvaluationContext> {
+    if (!this.schedulingConstraintService || !this.calendarBindingService || !this.calendarEventRepository) {
+      this.logger.warn('Calendar services not available, skipping calendar enrichment');
+      return context;
+    }
+
+    try {
+      const { targetType, targetId } = this.determineCalendarTarget(context);
+      const timestamp = context.timestamp;
+      const timezone = context.timezone ?? 'UTC';
+
+      // Get effective calendar bindings
+      const resolvedBindings = await this.calendarBindingService.resolveEffectiveCalendars(
+        targetType,
+        targetId,
+        {
+          workspaceId: context.workspaceId,
+          businessId: context.businessId,
+          saccoId: context.saccoId,
+          riderId: context.riderId,
+        }
+      );
+
+      const effectiveCalendarIds = resolvedBindings.map((b) => b.binding.calendarId);
+
+      // Check if within working hours
+      const isWorkingHours = await this.schedulingConstraintService.isWithinWorkingHours(
+        targetType,
+        targetId,
+        timestamp,
+        timezone
+      );
+
+      // Check if holiday
+      const regionFilter: RegionFilter | undefined = context.metadata?.region
+        ? {
+            country: (context.metadata.region as Record<string, string>).country,
+            administrativeArea: (context.metadata.region as Record<string, string>).administrativeArea,
+            locality: (context.metadata.region as Record<string, string>).locality,
+          }
+        : undefined;
+
+      const isHoliday = await this.schedulingConstraintService.isHoliday(timestamp, regionFilter);
+
+      // Get current day of week (0=Sunday, 6=Saturday)
+      const dayOfWeek = timestamp.getDay();
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+
+      // Get active calendar events
+      const startOfDay = new Date(timestamp);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(timestamp);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const activeEventsEntities = await this.calendarEventRepository.findActiveEventsForDateRange(
+        startOfDay,
+        endOfDay,
+        regionFilter
+      );
+
+      const activeEvents = activeEventsEntities.map((e) => ({
+        eventId: e.id,
+        eventType: e.eventType as CalendarEventType,
+        title: e.title,
+      }));
+
+      // Get active overrides
+      const overrides = await this.calendarBindingService.getActiveOverridesWithInheritance(
+        {
+          workspaceId: context.workspaceId,
+          businessId: context.businessId,
+          saccoId: context.saccoId,
+          riderId: context.riderId,
+        },
+        timestamp
+      );
+
+      const activeOverrides = overrides.map((o) => ({
+        overrideId: o.overrideId,
+        exceptionType: o.exceptionType,
+      }));
+
+      return {
+        ...context,
+        calendarContext: {
+          effectiveCalendarIds,
+          isHoliday,
+          isWorkingHours,
+          isWeekend,
+          currentDayOfWeek: dayOfWeek,
+          activeEvents,
+          activeOverrides,
+        },
+      };
+    } catch (error) {
+      this.logger.error(
+        `Failed to enrich calendar context: ${error instanceof Error ? error.message : String(error)}`
+      );
+      return context;
+    }
+  }
+
+  /**
+   * Determine the calendar target type and ID from the evaluation context.
+   */
+  private determineCalendarTarget(context: EvaluationContext): { targetType: BindingTargetType; targetId: string } {
+    if (context.riderId) {
+      return { targetType: BindingTargetType.RIDER, targetId: context.riderId };
+    }
+    if (context.businessId) {
+      return { targetType: BindingTargetType.BUSINESS, targetId: context.businessId };
+    }
+    if (context.saccoId) {
+      return { targetType: BindingTargetType.SACCO, targetId: context.saccoId };
+    }
+    return { targetType: BindingTargetType.WORKSPACE, targetId: context.workspaceId };
+  }
+
+  /**
+   * Map subject type to CalendarScope for override lookups.
+   */
+  private mapSubjectTypeToCalendarScope(subjectType: string): CalendarScope {
+    switch (subjectType) {
+      case 'Rider':
+        return CalendarScope.RIDER;
+      case 'Business':
+        return CalendarScope.BUSINESS;
+      case 'Sacco':
+        return CalendarScope.SACCO;
+      default:
+        return CalendarScope.GLOBAL;
     }
   }
 

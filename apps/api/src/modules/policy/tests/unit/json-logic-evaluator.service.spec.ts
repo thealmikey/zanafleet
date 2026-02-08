@@ -1,3 +1,4 @@
+import { CalendarEventType } from '@zanafleet/contracts';
 import { PolicyCondition, EvaluationContext, PolicyTrigger } from '../../dto';
 import { JsonLogicEvaluatorService } from '../../services/json-logic-evaluator.service';
 
@@ -1290,6 +1291,310 @@ describe('JsonLogicEvaluatorService', () => {
       expect(service.evaluate({ field: 'riderId', operator: '==', value: 'rider-abc' }, context).matched).toBe(true);
       expect(service.evaluate({ field: 'businessId', operator: '==', value: 'business-def' }, context).matched).toBe(true);
       expect(service.evaluate({ field: 'saccoId', operator: '==', value: 'sacco-ghi' }, context).matched).toBe(true);
+    });
+  });
+
+  describe('calendar-based conditions', () => {
+    const createCalendarContext = (): NonNullable<EvaluationContext['calendarContext']> => ({
+      effectiveCalendarIds: ['cal-1', 'cal-2'],
+      isHoliday: true,
+      isWorkingHours: false,
+      isWeekend: true,
+      currentDayOfWeek: 6, // Saturday
+      activeEvents: [
+        { eventId: 'evt-1', eventType: CalendarEventType.PUBLIC_HOLIDAY, title: 'Christmas Day' },
+        { eventId: 'evt-2', eventType: CalendarEventType.BUSINESS_CLOSURE, title: 'Company Holiday' },
+      ],
+      activeOverrides: [
+        { overrideId: 'ovr-1', exceptionType: 'PREMIUM_MERCHANT' },
+        { overrideId: 'ovr-2', exceptionType: 'EMERGENCY_OPEN' },
+      ],
+    });
+
+    describe('calendar.isHoliday', () => {
+      it('should match when isHoliday is true', () => {
+        const condition: PolicyCondition = {
+          field: 'calendar.isHoliday',
+          operator: 'eq',
+          value: true,
+        };
+        const context = createContext({
+          calendarContext: createCalendarContext(),
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(true);
+      });
+
+      it('should not match when isHoliday value differs', () => {
+        const condition: PolicyCondition = {
+          field: 'calendar.isHoliday',
+          operator: 'eq',
+          value: false,
+        };
+        const context = createContext({
+          calendarContext: createCalendarContext(),
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(false);
+      });
+    });
+
+    describe('calendar.isWorkingHours', () => {
+      it('should match when isWorkingHours equals expected value', () => {
+        const condition: PolicyCondition = {
+          field: 'calendar.isWorkingHours',
+          operator: 'eq',
+          value: false,
+        };
+        const context = createContext({
+          calendarContext: createCalendarContext(),
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(true);
+      });
+    });
+
+    describe('calendar.isWeekend', () => {
+      it('should match when isWeekend is true', () => {
+        const condition: PolicyCondition = {
+          field: 'calendar.isWeekend',
+          operator: 'eq',
+          value: true,
+        };
+        const context = createContext({
+          calendarContext: createCalendarContext(),
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(true);
+      });
+    });
+
+    describe('calendar.currentDayOfWeek', () => {
+      it('should match when dayOfWeek equals expected value', () => {
+        const condition: PolicyCondition = {
+          field: 'calendar.currentDayOfWeek',
+          operator: 'eq',
+          value: 6,
+        };
+        const context = createContext({
+          calendarContext: createCalendarContext(),
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(true);
+      });
+
+      it('should support numeric comparisons for dayOfWeek', () => {
+        const condition: PolicyCondition = {
+          field: 'calendar.currentDayOfWeek',
+          operator: '>=',
+          value: 5,
+        };
+        const context = createContext({
+          calendarContext: createCalendarContext(),
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(true);
+      });
+    });
+
+    describe('hasActiveEvent operator', () => {
+      it('should match when event type exists in activeEvents', () => {
+        const condition: PolicyCondition = {
+          field: 'calendar.activeEvents',
+          operator: 'hasActiveEvent',
+          value: 'PUBLIC_HOLIDAY',
+        };
+        const context = createContext({
+          calendarContext: createCalendarContext(),
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(true);
+      });
+
+      it('should not match when event type does not exist in activeEvents', () => {
+        const condition: PolicyCondition = {
+          field: 'calendar.activeEvents',
+          operator: 'hasActiveEvent',
+          value: 'WEATHER_DISRUPTION',
+        };
+        const context = createContext({
+          calendarContext: createCalendarContext(),
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(false);
+      });
+
+      it('should handle empty activeEvents array', () => {
+        const condition: PolicyCondition = {
+          field: 'calendar.activeEvents',
+          operator: 'hasActiveEvent',
+          value: 'PUBLIC_HOLIDAY',
+        };
+        const baseCalendar = createCalendarContext();
+        const context = createContext({
+          calendarContext: {
+            effectiveCalendarIds: baseCalendar.effectiveCalendarIds,
+            isHoliday: baseCalendar.isHoliday,
+            isWorkingHours: baseCalendar.isWorkingHours,
+            isWeekend: baseCalendar.isWeekend,
+            currentDayOfWeek: baseCalendar.currentDayOfWeek,
+            activeEvents: [] as Array<{ eventId: string; eventType: CalendarEventType; title: string }>,
+            activeOverrides: baseCalendar.activeOverrides,
+          },
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(false);
+      });
+    });
+
+    describe('hasOverride operator', () => {
+      it('should match when override type exists in activeOverrides', () => {
+        const condition: PolicyCondition = {
+          field: 'calendar.activeOverrides',
+          operator: 'hasOverride',
+          value: 'PREMIUM_MERCHANT',
+        };
+        const context = createContext({
+          calendarContext: createCalendarContext(),
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(true);
+      });
+
+      it('should not match when override type does not exist', () => {
+        const condition: PolicyCondition = {
+          field: 'calendar.activeOverrides',
+          operator: 'hasOverride',
+          value: 'VIP_CUSTOMER',
+        };
+        const context = createContext({
+          calendarContext: createCalendarContext(),
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(false);
+      });
+
+      it('should handle empty activeOverrides array', () => {
+        const condition: PolicyCondition = {
+          field: 'calendar.activeOverrides',
+          operator: 'hasOverride',
+          value: 'PREMIUM_MERCHANT',
+        };
+        const baseCalendar = createCalendarContext();
+        const context = createContext({
+          calendarContext: {
+            effectiveCalendarIds: baseCalendar.effectiveCalendarIds,
+            isHoliday: baseCalendar.isHoliday,
+            isWorkingHours: baseCalendar.isWorkingHours,
+            isWeekend: baseCalendar.isWeekend,
+            currentDayOfWeek: baseCalendar.currentDayOfWeek,
+            activeEvents: baseCalendar.activeEvents,
+            activeOverrides: [] as Array<{ overrideId: string; exceptionType: string }>,
+          },
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(false);
+      });
+    });
+
+    describe('complex calendar conditions', () => {
+      it('should evaluate holiday blocking with override exception', () => {
+        const condition: PolicyCondition = {
+          field: '',
+          operator: 'AND',
+          value: null,
+          children: [
+            { field: 'calendar.isHoliday', operator: 'eq', value: true },
+            {
+              field: '',
+              operator: 'NOT',
+              value: null,
+              children: [
+                { field: 'calendar.activeOverrides', operator: 'hasOverride', value: 'PREMIUM_MERCHANT' },
+              ],
+            },
+          ],
+        };
+        
+        // Context WITH premium merchant override - should NOT match (blocked by NOT)
+        const contextWithOverride = createContext({
+          calendarContext: createCalendarContext(),
+        });
+        expect(service.evaluate(condition, contextWithOverride).matched).toBe(false);
+
+        // Context WITHOUT premium merchant override - should match
+        const baseCalendar = createCalendarContext();
+        const contextWithoutOverride = createContext({
+          calendarContext: {
+            effectiveCalendarIds: baseCalendar.effectiveCalendarIds,
+            isHoliday: baseCalendar.isHoliday,
+            isWorkingHours: baseCalendar.isWorkingHours,
+            isWeekend: baseCalendar.isWeekend,
+            currentDayOfWeek: baseCalendar.currentDayOfWeek,
+            activeEvents: baseCalendar.activeEvents,
+            activeOverrides: [{ overrideId: 'ovr-1', exceptionType: 'EMERGENCY_OPEN' }],
+          },
+        });
+        expect(service.evaluate(condition, contextWithoutOverride).matched).toBe(true);
+      });
+
+      it('should evaluate working hours with weekend check', () => {
+        const condition: PolicyCondition = {
+          field: '',
+          operator: 'OR',
+          value: null,
+          children: [
+            { field: 'calendar.isWorkingHours', operator: 'eq', value: true },
+            { field: 'calendar.isWeekend', operator: 'eq', value: true },
+          ],
+        };
+        const context = createContext({
+          calendarContext: createCalendarContext(), // isWorkingHours=false, isWeekend=true
+        });
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(true); // Matches because isWeekend is true
+      });
+    });
+
+    describe('without calendarContext', () => {
+      it('should handle missing calendarContext gracefully', () => {
+        const condition: PolicyCondition = {
+          field: 'calendar.isHoliday',
+          operator: 'eq',
+          value: true,
+        };
+        const context = createContext(); // No calendarContext
+
+        const result = service.evaluate(condition, context);
+
+        expect(result.matched).toBe(false); // undefined !== true
+      });
     });
   });
 });

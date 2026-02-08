@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
+import { CalendarModule } from '../calendar/calendar.module';
 
 import { PolicyDecisionLogEntity } from './entities/policy-decision-log.entity';
 import { PolicyEntity } from './entities/policy.entity';
@@ -27,6 +28,7 @@ import { PolicyEvaluationEngineService } from './services/policy-evaluation-engi
     TypeOrmModule.forFeature([PolicyEntity, PolicyDecisionLogEntity]),
     CqrsModule,
     EventBusModule.forFeature(),
+    CalendarModule,
   ],
   providers: [
     PolicyRepository,

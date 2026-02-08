@@ -69,6 +69,32 @@ export class JsonLogicEvaluatorService {
       }
       return false;
     });
+
+    // Register custom 'hasActiveEvent' operation - checks if eventType exists in activeEvents array
+    jsonLogic.add_operation('hasActiveEvent', (events: unknown, eventType: unknown) => {
+      if (!Array.isArray(events) || typeof eventType !== 'string') {
+        return false;
+      }
+      return events.some((event: unknown) => {
+        if (typeof event === 'object' && event !== null && 'eventType' in event) {
+          return (event as { eventType: string }).eventType === eventType;
+        }
+        return false;
+      });
+    });
+
+    // Register custom 'hasOverride' operation - checks if exceptionType exists in activeOverrides array
+    jsonLogic.add_operation('hasOverride', (overrides: unknown, exceptionType: unknown) => {
+      if (!Array.isArray(overrides) || typeof exceptionType !== 'string') {
+        return false;
+      }
+      return overrides.some((override: unknown) => {
+        if (typeof override === 'object' && override !== null && 'exceptionType' in override) {
+          return (override as { exceptionType: string }).exceptionType === exceptionType;
+        }
+        return false;
+      });
+    });
   }
 
   /**
@@ -179,6 +205,12 @@ export class JsonLogicEvaluatorService {
       case 'endsWith':
         // Custom operation: endsWith(str, suffix)
         return { endsWith: [varRef, value] };
+      case 'hasActiveEvent':
+        // Custom operation: hasActiveEvent(activeEvents, eventType)
+        return { hasActiveEvent: [{ var: 'calendar.activeEvents' }, value] };
+      case 'hasOverride':
+        // Custom operation: hasOverride(activeOverrides, exceptionType)
+        return { hasOverride: [{ var: 'calendar.activeOverrides' }, value] };
       default:
         // Fallback to equality check for unknown operators
         return { '==': [varRef, value] };
@@ -244,6 +276,22 @@ export class JsonLogicEvaluatorService {
       for (const [key, val] of Object.entries(context.metadata)) {
         data[`metadata.${key}`] = val;
       }
+    }
+
+    // Add calendar context fields if present
+    // Store as nested object so json-logic's var operation can traverse it
+    // e.g., { var: 'calendar.isHoliday' } accesses data.calendar.isHoliday
+    if (context.calendarContext) {
+      const cal = context.calendarContext;
+      data.calendar = {
+        isHoliday: cal.isHoliday,
+        isWorkingHours: cal.isWorkingHours,
+        isWeekend: cal.isWeekend,
+        currentDayOfWeek: cal.currentDayOfWeek,
+        effectiveCalendarIds: cal.effectiveCalendarIds,
+        activeEvents: cal.activeEvents,
+        activeOverrides: cal.activeOverrides,
+      };
     }
 
     return data;
