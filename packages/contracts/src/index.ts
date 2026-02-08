@@ -551,7 +551,6 @@ export interface PolicyCondition {
   children?: PolicyCondition[];
 }
 
-export { TEST_ACCOUNTS, TEST_PASSWORD, TEST_WORKSPACE_ID } from './test-accounts';
 // ============================================================================
 // Calendar Contracts
 // ============================================================================
