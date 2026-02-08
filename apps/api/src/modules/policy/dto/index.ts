@@ -17,3 +17,5 @@ export type {
   EvaluatedPolicy,
   EvaluationResult,
 } from './policy.types';
+
+export type { EvaluatedPolicyLogEntry } from '../entities/policy-decision-log.entity';
