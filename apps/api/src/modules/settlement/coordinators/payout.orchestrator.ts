@@ -455,6 +455,7 @@ export class PayoutOrchestrator {
       throw new Error('Cannot cancel a completed payout');
     }
 
+    await this.updateBatchStatus(batch.id, SettlementStatus.FAILED, reason);
     await this.emitPayoutFailedEvent(batch, `Cancelled: ${reason}`);
 
     this.clearRetryState(payoutId);
