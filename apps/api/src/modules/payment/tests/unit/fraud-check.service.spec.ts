@@ -246,7 +246,7 @@ describe('FraudCheckService', () => {
     });
 
     it('should return REVIEW when multiple high risk checks', async () => {
-      mockPaymentIntentRepo.count.mockResolvedValue(7);
+      mockPaymentIntentRepo.count.mockResolvedValue(8);
 
       const intent = createPaymentIntent({ amount: 1200 });
       const result = await service.checkPaymentIntent(intent);
