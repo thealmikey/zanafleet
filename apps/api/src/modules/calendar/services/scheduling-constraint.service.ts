@@ -499,6 +499,11 @@ export class SchedulingConstraintService {
   }
 
   private isTimeInWindow(time: string, start: string, end: string): boolean {
+    // Handle midnight crossing: if end < start, the window spans midnight
+    // e.g., 22:00 to 06:00 means "from 22:00 until midnight, then from midnight until 06:00"
+    if (end < start) {
+      return time >= start || time <= end;
+    }
     return time >= start && time <= end;
   }
 

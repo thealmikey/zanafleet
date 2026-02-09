@@ -381,6 +381,198 @@ describe('SchedulingConstraintService', () => {
     });
   });
 
+  describe('Midnight-Crossing Time Windows', () => {
+    it('should return true when time is after start (before midnight) in midnight-crossing window', async () => {
+      calendarBindingService.resolveEffectiveCalendars.mockResolvedValue([
+        {
+          binding: {
+            bindingId: 'binding-uuid',
+            calendarId: 'calendar-uuid',
+            targetType: BindingTargetType.BUSINESS,
+            targetId: 'business-uuid',
+            priority: 0,
+            inheritParent: true,
+          },
+          inheritanceLevel: 0,
+          effectivePriority: 10000,
+        },
+      ]);
+      calendarService.getEffectiveTimeWindows.mockResolvedValue([
+        {
+          timeWindowId: 'window-uuid',
+          calendarId: 'calendar-uuid',
+          startTime: '22:00:00',
+          endTime: '06:00:00',
+          dayOfWeek: null,
+          recurrenceRule: null,
+          isActive: true,
+        },
+      ]);
+
+      const testTimestamp = new Date('2024-12-26T23:00:00Z');
+      const result = await service.isWithinWorkingHours(
+        BindingTargetType.BUSINESS,
+        'business-uuid',
+        testTimestamp,
+        'UTC',
+      );
+
+      expect(result).toBe(true);
+    });
+
+    it('should return true when time is before end (after midnight) in midnight-crossing window', async () => {
+      calendarBindingService.resolveEffectiveCalendars.mockResolvedValue([
+        {
+          binding: {
+            bindingId: 'binding-uuid',
+            calendarId: 'calendar-uuid',
+            targetType: BindingTargetType.BUSINESS,
+            targetId: 'business-uuid',
+            priority: 0,
+            inheritParent: true,
+          },
+          inheritanceLevel: 0,
+          effectivePriority: 10000,
+        },
+      ]);
+      calendarService.getEffectiveTimeWindows.mockResolvedValue([
+        {
+          timeWindowId: 'window-uuid',
+          calendarId: 'calendar-uuid',
+          startTime: '22:00:00',
+          endTime: '06:00:00',
+          dayOfWeek: null,
+          recurrenceRule: null,
+          isActive: true,
+        },
+      ]);
+
+      const testTimestamp = new Date('2024-12-26T02:00:00Z');
+      const result = await service.isWithinWorkingHours(
+        BindingTargetType.BUSINESS,
+        'business-uuid',
+        testTimestamp,
+        'UTC',
+      );
+
+      expect(result).toBe(true);
+    });
+
+    it('should return false when time is outside midnight-crossing window', async () => {
+      calendarBindingService.resolveEffectiveCalendars.mockResolvedValue([
+        {
+          binding: {
+            bindingId: 'binding-uuid',
+            calendarId: 'calendar-uuid',
+            targetType: BindingTargetType.BUSINESS,
+            targetId: 'business-uuid',
+            priority: 0,
+            inheritParent: true,
+          },
+          inheritanceLevel: 0,
+          effectivePriority: 10000,
+        },
+      ]);
+      calendarService.getEffectiveTimeWindows.mockResolvedValue([
+        {
+          timeWindowId: 'window-uuid',
+          calendarId: 'calendar-uuid',
+          startTime: '22:00:00',
+          endTime: '06:00:00',
+          dayOfWeek: null,
+          recurrenceRule: null,
+          isActive: true,
+        },
+      ]);
+
+      const testTimestamp = new Date('2024-12-26T12:00:00Z');
+      const result = await service.isWithinWorkingHours(
+        BindingTargetType.BUSINESS,
+        'business-uuid',
+        testTimestamp,
+        'UTC',
+      );
+
+      expect(result).toBe(false);
+    });
+
+    it('should return true at exactly the start time of midnight-crossing window', async () => {
+      calendarBindingService.resolveEffectiveCalendars.mockResolvedValue([
+        {
+          binding: {
+            bindingId: 'binding-uuid',
+            calendarId: 'calendar-uuid',
+            targetType: BindingTargetType.BUSINESS,
+            targetId: 'business-uuid',
+            priority: 0,
+            inheritParent: true,
+          },
+          inheritanceLevel: 0,
+          effectivePriority: 10000,
+        },
+      ]);
+      calendarService.getEffectiveTimeWindows.mockResolvedValue([
+        {
+          timeWindowId: 'window-uuid',
+          calendarId: 'calendar-uuid',
+          startTime: '22:00:00',
+          endTime: '06:00:00',
+          dayOfWeek: null,
+          recurrenceRule: null,
+          isActive: true,
+        },
+      ]);
+
+      const testTimestamp = new Date('2024-12-26T22:00:00Z');
+      const result = await service.isWithinWorkingHours(
+        BindingTargetType.BUSINESS,
+        'business-uuid',
+        testTimestamp,
+        'UTC',
+      );
+
+      expect(result).toBe(true);
+    });
+
+    it('should return true at exactly the end time of midnight-crossing window', async () => {
+      calendarBindingService.resolveEffectiveCalendars.mockResolvedValue([
+        {
+          binding: {
+            bindingId: 'binding-uuid',
+            calendarId: 'calendar-uuid',
+            targetType: BindingTargetType.BUSINESS,
+            targetId: 'business-uuid',
+            priority: 0,
+            inheritParent: true,
+          },
+          inheritanceLevel: 0,
+          effectivePriority: 10000,
+        },
+      ]);
+      calendarService.getEffectiveTimeWindows.mockResolvedValue([
+        {
+          timeWindowId: 'window-uuid',
+          calendarId: 'calendar-uuid',
+          startTime: '22:00:00',
+          endTime: '06:00:00',
+          dayOfWeek: null,
+          recurrenceRule: null,
+          isActive: true,
+        },
+      ]);
+
+      const testTimestamp = new Date('2024-12-26T06:00:00Z');
+      const result = await service.isWithinWorkingHours(
+        BindingTargetType.BUSINESS,
+        'business-uuid',
+        testTimestamp,
+        'UTC',
+      );
+
+      expect(result).toBe(true);
+    });
+  });
+
   describe('isHoliday', () => {
     it('should return true when date is a holiday', async () => {
       const christmasEvent = new CalendarEventEntity();
