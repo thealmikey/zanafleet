@@ -197,7 +197,7 @@ export class BillingCalculatorService {
       });
     }
 
-    const grandTotal = this.roundToTwoDecimals(subtotal - totalDiscounts + totalDiscounts + tax);
+    const grandTotal = this.roundToTwoDecimals(subtotal + tax);
 
     this.logger.debug(
       `Calculated charges: subtotal=${subtotal}, discounts=${totalDiscounts}, tax=${tax}, grandTotal=${grandTotal}`,
