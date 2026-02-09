@@ -567,5 +567,55 @@ describe('CalendarService', () => {
         service.getEffectiveTimeWindows('non-existent', new Date()),
       ).rejects.toThrow(NotFoundException);
     });
+
+    it('should return midnight-crossing time window (22:00 to 06:00) for matching days', async () => {
+      const calendar = CalendarEntity.fromDomain({
+        calendarId: 'calendar-uuid',
+        name: 'Night Hours Calendar',
+        timezone: 'UTC',
+        ownerScope: CalendarScope.GLOBAL,
+        createdAt: now,
+      });
+
+      // Create a midnight-crossing time window (22:00 to 06:00)
+      const nightWindow = TimeWindowEntity.fromDomain({
+        timeWindowId: 'night-window',
+        calendarId: 'calendar-uuid',
+        startTime: '22:00:00',
+        endTime: '06:00:00',
+        dayOfWeek: null, // Applies to all days
+        isActive: true,
+        createdAt: now,
+      });
+
+      calendarRepository.findById.mockResolvedValue(calendar);
+      timeWindowRepo.find.mockResolvedValue([nightWindow]);
+
+      // Test at 23:00 - should return the window (time is within 22:00-06:00 on same day)
+      const at23 = new Date(2024, 0, 15, 23, 0, 0); // Jan 15, 2024 at 23:00 local time
+      const result23 = await service.getEffectiveTimeWindows('calendar-uuid', at23);
+      expect(result23).toHaveLength(1);
+      expect(result23[0].timeWindowId).toBe('night-window');
+      expect(result23[0].startTime).toBe('22:00:00');
+      expect(result23[0].endTime).toBe('06:00:00');
+
+      // Test at 02:00 - should return the window (time is within 22:00-06:00 after midnight)
+      const at02 = new Date(2024, 0, 15, 2, 0, 0); // Jan 15, 2024 at 02:00 local time
+      const result02 = await service.getEffectiveTimeWindows('calendar-uuid', at02);
+      expect(result02).toHaveLength(1);
+      expect(result02[0].timeWindowId).toBe('night-window');
+      expect(result02[0].startTime).toBe('22:00:00');
+      expect(result02[0].endTime).toBe('06:00:00');
+
+      // Test at 12:00 - window is still returned (dayOfWeek=null matches all days)
+      // The caller must check if the time falls within the window's startTime/endTime range
+      // For midnight-crossing windows, caller should check: time >= startTime OR time <= endTime
+      const at12 = new Date(2024, 0, 15, 12, 0, 0); // Jan 15, 2024 at 12:00 local time
+      const result12 = await service.getEffectiveTimeWindows('calendar-uuid', at12);
+      expect(result12).toHaveLength(1);
+      // The window is returned; caller determines if 12:00 is outside 22:00-06:00 range
+      expect(result12[0].startTime).toBe('22:00:00');
+      expect(result12[0].endTime).toBe('06:00:00');
+    });
   });
 });
