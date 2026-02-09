@@ -11,4 +11,5 @@ export * from './handlers/create-settlement-batch.handler';
 export * from './handlers/process-payout.handler';
 export * from './services/settlement-scheduler.service';
 export * from './services/payout-risk.service';
+export * from './coordinators/payout.orchestrator';
 export * from './settlement.module';
