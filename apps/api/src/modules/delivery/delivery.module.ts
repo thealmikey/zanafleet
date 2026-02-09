@@ -7,9 +7,11 @@ import { LocationResolverService } from '../../core/location/location-resolver.s
 import { BillingModule } from '../billing/billing.module';
 import { CalendarModule } from '../calendar/calendar.module';
 import { LedgerModule } from '../ledger/ledger.module';
+import { LocationIntelligenceModule } from '../location-intelligence/location-intelligence.module';
 import { PolicyModule } from '../policy/policy.module';
 
 import { DeliveryLifecycleCoordinator } from './coordinators/delivery-lifecycle.coordinator';
+import { DeliveryMatchingCoordinator } from './coordinators/delivery-matching.coordinator';
 import { DeliveryTrackingController } from './controllers/delivery-tracking.controller';
 import { DeliveryEntity } from './entities/delivery.entity';
 import { AcceptDeliveryAssignmentHandler } from './handlers/accept-delivery-assignment.handler';
@@ -34,11 +36,13 @@ import { OrderCreatedSubscriber } from './subscribers/order-created.subscriber';
     forwardRef(() => BillingModule),
     forwardRef(() => CalendarModule),
     forwardRef(() => LedgerModule),
+    forwardRef(() => LocationIntelligenceModule),
   ],
   controllers: [DeliveryTrackingController],
   providers: [
     DeliveryService,
     DeliveryLifecycleCoordinator,
+    DeliveryMatchingCoordinator,
     OrderCreatedSubscriber,
     DeliveryScheduledSubscriber,
     CandidateSelectionService,
@@ -53,6 +57,6 @@ import { OrderCreatedSubscriber } from './subscribers/order-created.subscriber';
     CancelDeliveryHandler,
     RecordDeliveryAttemptFailedHandler,
   ],
-  exports: [DeliveryService, DeliveryLifecycleCoordinator],
+  exports: [DeliveryService, DeliveryLifecycleCoordinator, DeliveryMatchingCoordinator],
 })
 export class DeliveryModule {}
