@@ -142,6 +142,13 @@ export const NatsSubjects = {
     PAYOUT_FAILED_V1: 'settlement.events.payout-failed-v1',
     ALL: 'settlement.events.*',
   },
+  Incentive: {
+    CAMPAIGN_CREATED_V1: 'incentive.events.campaign-created-v1',
+    INCENTIVE_APPLIED_V1: 'incentive.events.incentive-applied-v1',
+    SPONSORSHIP_CONSUMED_V1: 'incentive.events.sponsorship-consumed-v1',
+    BUDGET_EXHAUSTED_V1: 'incentive.events.budget-exhausted-v1',
+    ALL: 'incentive.events.*',
+  },
 } as const;
 
 /**

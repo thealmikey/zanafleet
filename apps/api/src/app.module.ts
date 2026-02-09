@@ -10,6 +10,7 @@ import { AccountModule } from './modules/account/account.module';
 import { ActorModule } from './modules/actor/actor.module';
 import { BillingModule } from './modules/billing/billing.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { IncentiveModule } from './modules/incentive/incentive.module';
 import { BusinessModule } from './modules/business/business.module';
 import { CalendarModule } from './modules/calendar/calendar.module';
 import { CapabilityModule } from './modules/capability/capability.module';
@@ -67,6 +68,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     CommunicationModule,
     EvidenceModule,
     FormationModule,
+    IncentiveModule,
     LedgerModule,
     PaymentModule,
     SettlementModule,
