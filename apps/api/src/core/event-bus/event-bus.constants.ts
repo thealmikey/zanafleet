@@ -122,6 +122,13 @@ export const NatsSubjects = {
     BALANCE_UPDATED_V1: 'ledger.events.balance-updated-v1',
     ALL: 'ledger.events.*',
   },
+  Payment: {
+    INITIATED_V1: 'payment.events.initiated-v1',
+    CAPTURED_V1: 'payment.events.captured-v1',
+    REFUNDED_V1: 'payment.events.refunded-v1',
+    WEBHOOK_RECEIVED_V1: 'payment.events.webhook-received-v1',
+    ALL: 'payment.events.*',
+  },
 } as const;
 
 /**
