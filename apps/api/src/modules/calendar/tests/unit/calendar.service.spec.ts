@@ -439,7 +439,7 @@ describe('CalendarService', () => {
         calendarId: 'calendar-uuid',
         startTime: '10:00:00',
         endTime: '16:00:00',
-        dayOfWeek: 0, // Sunday in JavaScript convention
+        dayOfWeek: 0, // Sunday in JavaScript convention (Date.getDay() returns 0 for Sunday)
         isActive: true,
         createdAt: now,
       });
@@ -447,11 +447,116 @@ describe('CalendarService', () => {
       calendarRepository.findById.mockResolvedValue(calendar);
       timeWindowRepo.find.mockResolvedValue([sundayWindow]);
 
-      const sunday = new Date('2024-01-21'); // Sunday (getDay() returns 0)
+      // Use local time constructor to avoid timezone issues with getDay()
+      const sunday = new Date(2024, 0, 21); // January 21, 2024 (Sunday) in local time
       const result = await service.getEffectiveTimeWindows('calendar-uuid', sunday);
 
       expect(result).toHaveLength(1);
       expect(result[0].dayOfWeek).toBe(0);
+    });
+
+    it('should return correct subset of windows for each day of the week', async () => {
+      const calendar = CalendarEntity.fromDomain({
+        calendarId: 'calendar-uuid',
+        name: 'Weekly Schedule',
+        timezone: 'UTC',
+        ownerScope: CalendarScope.GLOBAL,
+        createdAt: now,
+      });
+
+      // Create windows for specific days using ISO convention
+      // Monday=1, Tuesday=2, Wednesday=3, Thursday=4, Friday=5, Saturday=6, Sunday=7
+      const mondayWindow = TimeWindowEntity.fromDomain({
+        timeWindowId: 'window-mon',
+        calendarId: 'calendar-uuid',
+        startTime: '08:00:00',
+        endTime: '17:00:00',
+        dayOfWeek: 1, // Monday
+        isActive: true,
+        createdAt: now,
+      });
+
+      const wednesdayWindow = TimeWindowEntity.fromDomain({
+        timeWindowId: 'window-wed',
+        calendarId: 'calendar-uuid',
+        startTime: '09:00:00',
+        endTime: '18:00:00',
+        dayOfWeek: 3, // Wednesday
+        isActive: true,
+        createdAt: now,
+      });
+
+      const fridayWindow = TimeWindowEntity.fromDomain({
+        timeWindowId: 'window-fri',
+        calendarId: 'calendar-uuid',
+        startTime: '08:00:00',
+        endTime: '14:00:00',
+        dayOfWeek: 5, // Friday
+        isActive: true,
+        createdAt: now,
+      });
+
+      const sundayWindow = TimeWindowEntity.fromDomain({
+        timeWindowId: 'window-sun',
+        calendarId: 'calendar-uuid',
+        startTime: '10:00:00',
+        endTime: '16:00:00',
+        dayOfWeek: 0, // Sunday (JavaScript convention: Date.getDay() returns 0)
+        isActive: true,
+        createdAt: now,
+      });
+
+      const allDaysWindow = TimeWindowEntity.fromDomain({
+        timeWindowId: 'window-all',
+        calendarId: 'calendar-uuid',
+        startTime: '12:00:00',
+        endTime: '13:00:00',
+        dayOfWeek: null, // Applies to all days
+        isActive: true,
+        createdAt: now,
+      });
+
+      const allWindows = [mondayWindow, wednesdayWindow, fridayWindow, sundayWindow, allDaysWindow];
+
+      calendarRepository.findById.mockResolvedValue(calendar);
+      timeWindowRepo.find.mockResolvedValue(allWindows);
+
+      // Use local time constructor to avoid timezone issues with getDay()
+      // Test Monday (2024-01-15 is a Monday)
+      const monday = new Date(2024, 0, 15); // January 15, 2024 in local time
+      const mondayResult = await service.getEffectiveTimeWindows('calendar-uuid', monday);
+      expect(mondayResult).toHaveLength(2); // Monday window + all-days window
+      expect(mondayResult.map(w => w.timeWindowId).sort()).toEqual(['window-all', 'window-mon']);
+
+      // Test Wednesday (2024-01-17 is a Wednesday)
+      const wednesday = new Date(2024, 0, 17); // January 17, 2024 in local time
+      const wednesdayResult = await service.getEffectiveTimeWindows('calendar-uuid', wednesday);
+      expect(wednesdayResult).toHaveLength(2); // Wednesday window + all-days window
+      expect(wednesdayResult.map(w => w.timeWindowId).sort()).toEqual(['window-all', 'window-wed']);
+
+      // Test Friday (2024-01-19 is a Friday)
+      const friday = new Date(2024, 0, 19); // January 19, 2024 in local time
+      const fridayResult = await service.getEffectiveTimeWindows('calendar-uuid', friday);
+      expect(fridayResult).toHaveLength(2); // Friday window + all-days window
+      expect(fridayResult.map(w => w.timeWindowId).sort()).toEqual(['window-all', 'window-fri']);
+
+      // Test Sunday (2024-01-21 is a Sunday)
+      const sunday = new Date(2024, 0, 21); // January 21, 2024 in local time
+      const sundayResult = await service.getEffectiveTimeWindows('calendar-uuid', sunday);
+      expect(sundayResult).toHaveLength(2); // Sunday window + all-days window
+      expect(sundayResult.map(w => w.timeWindowId).sort()).toEqual(['window-all', 'window-sun']);
+
+      // Test Tuesday (2024-01-16 is a Tuesday) - should only get all-days window
+      const tuesday = new Date(2024, 0, 16); // January 16, 2024 in local time
+      const tuesdayResult = await service.getEffectiveTimeWindows('calendar-uuid', tuesday);
+      expect(tuesdayResult).toHaveLength(1); // Only all-days window
+      expect(tuesdayResult[0].timeWindowId).toBe('window-all');
+
+      // Test Saturday (2024-01-20 is a Saturday) - should only get all-days window
+      const saturday = new Date(2024, 0, 20); // January 20, 2024 in local time
+      const saturdayResult = await service.getEffectiveTimeWindows('calendar-uuid', saturday);
+      expect(saturdayResult).toHaveLength(1); // Only all-days window
+      expect(saturdayResult[0].timeWindowId).toBe('window-all');
     });
 
     it('should throw NotFoundException when calendar not found', async () => {
