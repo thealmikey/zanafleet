@@ -16,6 +16,7 @@ import { CommitmentsModule } from './modules/commitments/commitments.module';
 import { CommunicationModule } from './modules/communication/communication.module';
 import { EvidenceModule } from './modules/evidence/evidence.module';
 import { FormationModule } from './modules/formation/formation.module';
+import { LedgerModule } from './modules/ledger/ledger.module';
 import { OrganizationModule } from './modules/organization/organization.module';
 import { PersonaModule } from './modules/persona/persona.module';
 import { RiderModule } from './modules/rider/rider.module';
@@ -62,6 +63,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     CommunicationModule,
     EvidenceModule,
     FormationModule,
+    LedgerModule,
     OrganizationModule,
     PersonaModule,
     RiderModule,

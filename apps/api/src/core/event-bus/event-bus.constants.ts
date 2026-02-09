@@ -117,6 +117,11 @@ export const NatsSubjects = {
     VIOLATION_DETECTED_V1: 'policy.events.violation-detected-v1',
     ALL: 'policy.events.*',
   },
+  Ledger: {
+    ENTRY_RECORDED_V1: 'ledger.events.entry-recorded-v1',
+    BALANCE_UPDATED_V1: 'ledger.events.balance-updated-v1',
+    ALL: 'ledger.events.*',
+  },
 } as const;
 
 /**
