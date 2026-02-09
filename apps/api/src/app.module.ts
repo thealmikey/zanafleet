@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventBusModule } from './core/event-bus';
 import { MediaModule } from './core/media';
 import { Neo4jModule } from './core/neo4j';
+import { AccountModule } from './modules/account/account.module';
 import { ActorModule } from './modules/actor/actor.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BusinessModule } from './modules/business/business.module';
@@ -51,6 +52,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
       isGlobal: true,
     }),
     MediaModule,
+    AccountModule,
     ActorModule,
     AuthModule,
     BusinessModule,

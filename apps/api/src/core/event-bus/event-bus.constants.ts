@@ -19,6 +19,11 @@ export const DEFAULT_NATS_URL = 'nats://localhost:4222';
  * NATS subject patterns for different modules
  */
 export const NatsSubjects = {
+  Account: {
+    CREATED_V1: 'account.events.created-v1',
+    SUSPENDED_V1: 'account.events.suspended-v1',
+    ALL: 'account.events.*',
+  },
   Organization: {
     CREATED_V1: 'organization.events.created-v1',
     UPDATED_V1: 'organization.events.updated-v1',
