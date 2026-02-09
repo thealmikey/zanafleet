@@ -19,6 +19,7 @@ import { EvidenceModule } from './modules/evidence/evidence.module';
 import { FormationModule } from './modules/formation/formation.module';
 import { LedgerModule } from './modules/ledger/ledger.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { SettlementModule } from './modules/settlement/settlement.module';
 import { OrganizationModule } from './modules/organization/organization.module';
 import { PersonaModule } from './modules/persona/persona.module';
 import { RiderModule } from './modules/rider/rider.module';
@@ -68,6 +69,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     FormationModule,
     LedgerModule,
     PaymentModule,
+    SettlementModule,
     OrganizationModule,
     PersonaModule,
     RiderModule,

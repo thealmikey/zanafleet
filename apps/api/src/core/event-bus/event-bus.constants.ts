@@ -135,6 +135,13 @@ export const NatsSubjects = {
     INVOICE_PAID_V1: 'billing.events.invoice-paid-v1',
     ALL: 'billing.events.*',
   },
+  Settlement: {
+    BATCH_CREATED_V1: 'settlement.events.batch-created-v1',
+    PAYOUT_INITIATED_V1: 'settlement.events.payout-initiated-v1',
+    PAYOUT_COMPLETED_V1: 'settlement.events.payout-completed-v1',
+    PAYOUT_FAILED_V1: 'settlement.events.payout-failed-v1',
+    ALL: 'settlement.events.*',
+  },
 } as const;
 
 /**
