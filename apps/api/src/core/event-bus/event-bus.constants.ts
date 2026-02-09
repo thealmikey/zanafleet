@@ -123,10 +123,10 @@ export const NatsSubjects = {
     ALL: 'ledger.events.*',
   },
   Payment: {
-    INITIATED_V1: 'payment.events.initiated-v1',
-    CAPTURED_V1: 'payment.events.captured-v1',
+    INTENT_CREATED_V1: 'payment.events.intent-created-v1',
+    COMPLETED_V1: 'payment.events.completed-v1',
+    FAILED_V1: 'payment.events.failed-v1',
     REFUNDED_V1: 'payment.events.refunded-v1',
-    WEBHOOK_RECEIVED_V1: 'payment.events.webhook-received-v1',
     ALL: 'payment.events.*',
   },
 } as const;
