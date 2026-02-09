@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   CreateCalendarInput,
@@ -159,6 +159,15 @@ export class CalendarService {
       throw new NotFoundException(`Calendar not found: ${calendarId}`);
     }
 
+    let parsedRule: Record<string, unknown> | null = null;
+    if (input.recurrenceRule) {
+      try {
+        parsedRule = JSON.parse(input.recurrenceRule) as Record<string, unknown>;
+      } catch {
+        throw new BadRequestException('Invalid recurrenceRule JSON');
+      }
+    }
+
     const now = new Date();
     const entity = TimeWindowEntity.fromDomain({
       timeWindowId: uuidv4(),
@@ -166,9 +175,7 @@ export class CalendarService {
       startTime: input.startTime,
       endTime: input.endTime,
       dayOfWeek: input.dayOfWeek,
-      recurrenceRule: input.recurrenceRule
-        ? (JSON.parse(input.recurrenceRule) as Record<string, unknown>)
-        : null,
+      recurrenceRule: parsedRule,
       isActive: input.isActive,
       createdAt: now,
     });
