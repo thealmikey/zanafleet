@@ -40,13 +40,21 @@ describe('RecordLedgerEntryCommandHandler', () => {
   });
 
   beforeEach(() => {
+    const mockQueryBuilder = {
+      where: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getOne: jest.fn().mockResolvedValue(null),
+    };
+
     mockRepository = {
       findOne: jest.fn().mockResolvedValue(null),
       save: jest.fn().mockResolvedValue(undefined),
+      createQueryBuilder: jest.fn().mockReturnValue(mockQueryBuilder),
     } as unknown as jest.Mocked<Repository<LedgerEntryEntity>>;
 
     mockEntityManager = {
       getRepository: jest.fn().mockReturnValue(mockRepository),
+      query: jest.fn().mockResolvedValue(undefined),
     } as unknown as jest.Mocked<EntityManager>;
 
     mockDataSource = {
@@ -92,8 +100,14 @@ describe('RecordLedgerEntryCommandHandler', () => {
       const existingEntry = new LedgerEntryEntity();
       existingEntry.balanceAfter = '500.00';
       
-      mockRepository.findOne.mockResolvedValueOnce(existingEntry);
-      mockRepository.findOne.mockResolvedValueOnce(null);
+      const mockQueryBuilderWithExisting = {
+        where: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getOne: jest.fn()
+          .mockResolvedValueOnce(existingEntry)
+          .mockResolvedValueOnce(null),
+      };
+      mockRepository.createQueryBuilder.mockReturnValue(mockQueryBuilderWithExisting as unknown as ReturnType<Repository<LedgerEntryEntity>['createQueryBuilder']>);
 
       await handler.execute(validCommand);
 

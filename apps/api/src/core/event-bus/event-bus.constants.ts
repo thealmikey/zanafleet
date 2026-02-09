@@ -130,6 +130,8 @@ export const NatsSubjects = {
   Ledger: {
     ENTRY_RECORDED_V1: 'ledger.events.entry-recorded-v1',
     BALANCE_UPDATED_V1: 'ledger.events.balance-updated-v1',
+    REVENUE_DISTRIBUTED_V1: 'ledger.events.revenue-distributed-v1',
+    EARNINGS_ACCRUED_V1: 'ledger.events.earnings-accrued-v1',
     ALL: 'ledger.events.*',
   },
   Payment: {
