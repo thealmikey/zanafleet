@@ -139,6 +139,13 @@ export const NatsSubjects = {
     COMPLETED_V1: 'payment.events.completed-v1',
     FAILED_V1: 'payment.events.failed-v1',
     REFUNDED_V1: 'payment.events.refunded-v1',
+    DISPUTE_OPENED_V1: 'payment.events.dispute-opened-v1',
+    DISPUTE_RESOLVED_V1: 'payment.events.dispute-resolved-v1',
+    DISPUTE_ESCALATED_V1: 'payment.events.dispute-escalated-v1',
+    REFUND_REQUESTED_V1: 'payment.events.refund-requested-v1',
+    REFUND_APPROVED_V1: 'payment.events.refund-approved-v1',
+    REFUND_PROCESSED_V1: 'payment.events.refund-processed-v1',
+    REFUND_FAILED_V1: 'payment.events.refund-failed-v1',
     ALL: 'payment.events.*',
   },
   Billing: {

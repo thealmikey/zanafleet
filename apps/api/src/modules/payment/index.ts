@@ -1,6 +1,8 @@
 export * from './dto/payment.enums';
 export * from './entities/payment-intent.entity';
 export * from './entities/payment-transaction.entity';
+export * from './entities/dispute.entity';
+export * from './entities/refund.entity';
 export { PaymentIntentEntity } from './entities/payment-intent.entity';
 export * from './commands/create-payment-intent.command';
 export * from './commands/process-payment.command';
@@ -11,5 +13,6 @@ export * from './handlers/create-payment-intent.handler';
 export * from './handlers/process-payment.handler';
 export * from './services/fraud-check.service';
 export * from './coordinators/payment-flow.orchestrator';
+export * from './coordinators/refund-dispute.coordinator';
 export * from './providers';
 export * from './payment.module';
