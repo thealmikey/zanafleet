@@ -1,7 +1,7 @@
 /**
- * DeliveryCancelledEventV1
+ * DeliveryStateTransitionedEventV1
  *
- * Append-only event emitted when a delivery is cancelled.
+ * Append-only event emitted when a delivery transitions between states.
  *
  * Event Contract:
  * - Immutable: Once created, event data cannot be modified
@@ -9,20 +9,19 @@
  * - Deterministic: Same input always produces same event
  * - Versioned: V1 suffix indicates event schema version
  */
-export class DeliveryCancelledEventV1 {
+export class DeliveryStateTransitionedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'DeliveryCancelledEvent-V1' = 'DeliveryCancelledEvent-V1';
+  readonly eventType: 'DeliveryStateTransitionedEvent-V1' = 'DeliveryStateTransitionedEvent-V1';
   readonly eventVersion: '1.0.0' = '1.0.0';
   readonly occurredAt: Date;
   readonly aggregateId: string;
   readonly aggregateType: 'Delivery' = 'Delivery';
 
   readonly deliveryId: string;
-  readonly reason: string;
-  readonly cancelledBy?: string;
   readonly previousState: string;
-  readonly ledgerReservationReleased: boolean;
-  readonly cancelledAt: Date;
+  readonly newState: string;
+  readonly transitionedAt: Date;
+  readonly triggeredBy?: string;
 
   readonly correlationId?: string;
   readonly causationId?: string;
@@ -30,22 +29,20 @@ export class DeliveryCancelledEventV1 {
   constructor(data: {
     eventId: string;
     deliveryId: string;
-    reason: string;
-    cancelledBy?: string;
     previousState: string;
-    ledgerReservationReleased: boolean;
-    cancelledAt: Date;
+    newState: string;
+    transitionedAt: Date;
+    triggeredBy?: string;
     occurredAt?: Date;
     correlationId?: string;
     causationId?: string;
   }) {
     this.eventId = data.eventId;
     this.deliveryId = data.deliveryId;
-    this.reason = data.reason;
-    this.cancelledBy = data.cancelledBy;
     this.previousState = data.previousState;
-    this.ledgerReservationReleased = data.ledgerReservationReleased;
-    this.cancelledAt = data.cancelledAt;
+    this.newState = data.newState;
+    this.transitionedAt = data.transitionedAt;
+    this.triggeredBy = data.triggeredBy;
     this.occurredAt = data.occurredAt ?? new Date();
     this.aggregateId = data.deliveryId;
     this.correlationId = data.correlationId;
@@ -54,17 +51,16 @@ export class DeliveryCancelledEventV1 {
 
   toJSON(): {
     eventId: string;
-    eventType: 'DeliveryCancelledEvent-V1';
+    eventType: 'DeliveryStateTransitionedEvent-V1';
     eventVersion: '1.0.0';
     occurredAt: string;
     aggregateId: string;
     aggregateType: 'Delivery';
     deliveryId: string;
-    reason: string;
-    cancelledBy?: string;
     previousState: string;
-    ledgerReservationReleased: boolean;
-    cancelledAt: string;
+    newState: string;
+    transitionedAt: string;
+    triggeredBy?: string;
     correlationId?: string;
     causationId?: string;
   } {
@@ -76,11 +72,10 @@ export class DeliveryCancelledEventV1 {
       aggregateId: this.aggregateId,
       aggregateType: this.aggregateType,
       deliveryId: this.deliveryId,
-      reason: this.reason,
-      cancelledBy: this.cancelledBy,
       previousState: this.previousState,
-      ledgerReservationReleased: this.ledgerReservationReleased,
-      cancelledAt: this.cancelledAt.toISOString(),
+      newState: this.newState,
+      transitionedAt: this.transitionedAt.toISOString(),
+      triggeredBy: this.triggeredBy,
       correlationId: this.correlationId,
       causationId: this.causationId,
     };
@@ -89,23 +84,21 @@ export class DeliveryCancelledEventV1 {
   static fromJSON(data: {
     eventId: string;
     deliveryId: string;
-    reason: string;
-    cancelledBy?: string;
     previousState: string;
-    ledgerReservationReleased: boolean;
-    cancelledAt: string;
+    newState: string;
+    transitionedAt: string;
+    triggeredBy?: string;
     occurredAt: string;
     correlationId?: string;
     causationId?: string;
-  }): DeliveryCancelledEventV1 {
-    return new DeliveryCancelledEventV1({
+  }): DeliveryStateTransitionedEventV1 {
+    return new DeliveryStateTransitionedEventV1({
       eventId: data.eventId,
       deliveryId: data.deliveryId,
-      reason: data.reason,
-      cancelledBy: data.cancelledBy,
       previousState: data.previousState,
-      ledgerReservationReleased: data.ledgerReservationReleased,
-      cancelledAt: new Date(data.cancelledAt),
+      newState: data.newState,
+      transitionedAt: new Date(data.transitionedAt),
+      triggeredBy: data.triggeredBy,
       occurredAt: new Date(data.occurredAt),
       correlationId: data.correlationId,
       causationId: data.causationId,

@@ -96,6 +96,7 @@ export const NatsSubjects = {
     ALL: 'order.events.*',
   },
   Delivery: {
+    CREATED_V1: 'delivery.events.created-v1',
     SCHEDULED_V1: 'delivery.events.scheduled-v1',
     ASSIGNED_V1: 'delivery.events.assigned-v1',
     PICKED_UP_V1: 'delivery.events.picked-up-v1',
@@ -103,6 +104,8 @@ export const NatsSubjects = {
     DELIVERED_V1: 'delivery.events.delivered-v1',
     CANCELLED_V1: 'delivery.events.cancelled-v1',
     FAILED_V1: 'delivery.events.failed-v1',
+    STATE_TRANSITIONED_V1: 'delivery.events.state-transitioned-v1',
+    PRICING_APPLIED_V1: 'delivery.events.pricing-applied-v1',
     ALL: 'delivery.events.*',
   },
   Location: {

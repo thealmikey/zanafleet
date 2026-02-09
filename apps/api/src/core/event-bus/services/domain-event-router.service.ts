@@ -99,8 +99,8 @@ export class DomainEventRouter {
 
   constructor(
     private readonly eventBusService: EventBusService,
-    private readonly idempotencyService: IdempotencyService,
-    private readonly eventLogger: EventLoggerService
+    private readonly _idempotencyService: IdempotencyService,
+    private readonly _eventLogger: EventLoggerService
   ) {}
 
   /**
