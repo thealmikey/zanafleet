@@ -38,11 +38,23 @@ export class RecordLedgerEntryCommandHandler
     await this.dataSource.transaction(async (manager) => {
       const ledgerRepo = manager.getRepository(LedgerEntryEntity);
 
+      // Acquire advisory locks for all accounts in sorted order to prevent deadlocks
+      const uniqueAccountIds = [
+        ...new Set(command.entries.map((e) => e.accountId)),
+      ].sort();
+
+      for (const accountId of uniqueAccountIds) {
+        await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [
+          accountId,
+        ]);
+      }
+
       for (const entry of command.entries) {
-        const lastEntry = await ledgerRepo.findOne({
-          where: { accountId: entry.accountId },
-          order: { createdAt: 'DESC' },
-        });
+        const lastEntry = await ledgerRepo
+          .createQueryBuilder('entry')
+          .where('entry.accountId = :accountId', { accountId: entry.accountId })
+          .orderBy('entry.createdAt', 'DESC')
+          .getOne();
 
         const currentBalance = lastEntry ? parseFloat(lastEntry.balanceAfter) : 0;
         const balanceChange =
