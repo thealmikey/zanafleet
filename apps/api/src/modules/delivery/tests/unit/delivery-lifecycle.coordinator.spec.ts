@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { DeliveryStatus } from '@zanafleet/contracts';
+
+import { PolicyEffect } from '@zanafleet/contracts';
 
 import { EventBusService } from '@api/core/event-bus';
 import { BillingCalculatorService } from '../../../billing/services/billing-calculator.service';
@@ -10,6 +11,7 @@ import {
   CalendarConstraintError,
   CreateDeliveryInput,
   DeliveryLifecycleCoordinator,
+  DeliveryStatus,
   PolicyBlockedError,
 } from '../../coordinators/delivery-lifecycle.coordinator';
 import { DeliveryService } from '../../services/delivery.service';
@@ -65,15 +67,15 @@ describe('DeliveryLifecycleCoordinator', () => {
 
   describe('State Machine', () => {
     describe('isValidTransition', () => {
-      it('should allow Pending -> Assigned', () => {
+      it('should allow Requested -> Assigned', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Pending, DeliveryStatus.Assigned),
+          coordinator.isValidTransition(DeliveryStatus.Requested, DeliveryStatus.Assigned),
         ).toBe(true);
       });
 
-      it('should allow Pending -> Cancelled', () => {
+      it('should allow Requested -> Cancelled', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Pending, DeliveryStatus.Cancelled),
+          coordinator.isValidTransition(DeliveryStatus.Requested, DeliveryStatus.Cancelled),
         ).toBe(true);
       });
 
@@ -95,15 +97,15 @@ describe('DeliveryLifecycleCoordinator', () => {
         ).toBe(true);
       });
 
-      it('should NOT allow Pending -> Delivered (skip states)', () => {
+      it('should NOT allow Requested -> Delivered (skip states)', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Pending, DeliveryStatus.Delivered),
+          coordinator.isValidTransition(DeliveryStatus.Requested, DeliveryStatus.Delivered),
         ).toBe(false);
       });
 
       it('should NOT allow Delivered -> any state (terminal)', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Delivered, DeliveryStatus.Pending),
+          coordinator.isValidTransition(DeliveryStatus.Delivered, DeliveryStatus.Requested),
         ).toBe(false);
         expect(
           coordinator.isValidTransition(DeliveryStatus.Delivered, DeliveryStatus.Cancelled),
@@ -112,13 +114,13 @@ describe('DeliveryLifecycleCoordinator', () => {
 
       it('should NOT allow Cancelled -> any state (terminal)', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Cancelled, DeliveryStatus.Pending),
+          coordinator.isValidTransition(DeliveryStatus.Cancelled, DeliveryStatus.Requested),
         ).toBe(false);
       });
 
       it('should NOT allow backward transitions', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Assigned, DeliveryStatus.Pending),
+          coordinator.isValidTransition(DeliveryStatus.Assigned, DeliveryStatus.Requested),
         ).toBe(false);
         expect(
           coordinator.isValidTransition(DeliveryStatus.InTransit, DeliveryStatus.PickedUp),
@@ -127,8 +129,8 @@ describe('DeliveryLifecycleCoordinator', () => {
     });
 
     describe('getValidNextStates', () => {
-      it('should return valid next states for Pending', () => {
-        const states = coordinator.getValidNextStates(DeliveryStatus.Pending);
+      it('should return valid next states for Requested', () => {
+        const states = coordinator.getValidNextStates(DeliveryStatus.Requested);
         expect(states).toContain(DeliveryStatus.Assigned);
         expect(states).toContain(DeliveryStatus.Cancelled);
       });
@@ -141,7 +143,7 @@ describe('DeliveryLifecycleCoordinator', () => {
 
     describe('canCancel', () => {
       it('should allow cancellation from pre-delivery states', () => {
-        expect(coordinator.canCancel(DeliveryStatus.Pending)).toBe(true);
+        expect(coordinator.canCancel(DeliveryStatus.Requested)).toBe(true);
         expect(coordinator.canCancel(DeliveryStatus.Assigned)).toBe(true);
         expect(coordinator.canCancel(DeliveryStatus.PickedUp)).toBe(true);
         expect(coordinator.canCancel(DeliveryStatus.InTransit)).toBe(true);
@@ -167,7 +169,12 @@ describe('DeliveryLifecycleCoordinator', () => {
 
     beforeEach(() => {
       mockPolicyEngine.evaluate.mockResolvedValue({
-        finalDecision: 'ALLOW',
+        finalDecision: {
+          effect: PolicyEffect.ALLOW,
+          policyId: '',
+          policyName: '',
+          reason: 'Allowed',
+        },
         evaluatedPolicies: [],
         processingTimeMs: 10,
         evaluationFailed: false,
@@ -195,7 +202,7 @@ describe('DeliveryLifecycleCoordinator', () => {
 
       mockDeliveryService.createOnDemand.mockResolvedValue({
         deliveryId: 'delivery-123',
-        status: DeliveryStatus.Pending,
+        status: DeliveryStatus.Requested,
       } as never);
     });
 
@@ -209,7 +216,12 @@ describe('DeliveryLifecycleCoordinator', () => {
 
     it('should throw PolicyBlockedError when policy denies', async () => {
       mockPolicyEngine.evaluate.mockResolvedValue({
-        finalDecision: 'DENY',
+        finalDecision: {
+          effect: PolicyEffect.BLOCK,
+          policyId: 'policy-123',
+          policyName: 'Test Policy',
+          reason: 'Blocked by policy',
+        },
         evaluatedPolicies: [
           { policyId: 'policy-123', matched: true, priority: 1, scope: 'Workspace' },
         ],
@@ -235,7 +247,7 @@ describe('DeliveryLifecycleCoordinator', () => {
     it('should create scheduled delivery when isScheduled is true', async () => {
       mockDeliveryService.createScheduled.mockResolvedValue({
         deliveryId: 'scheduled-delivery-123',
-        status: DeliveryStatus.Pending,
+        status: DeliveryStatus.Requested,
       } as never);
 
       const scheduledInput: CreateDeliveryInput = {
@@ -270,7 +282,7 @@ describe('DeliveryLifecycleCoordinator', () => {
     it('should transition state and emit event', async () => {
       mockDeliveryService.updateStatus.mockResolvedValue({
         deliveryId: 'delivery-123',
-        status: DeliveryStatus.Pending,
+        status: DeliveryStatus.Requested,
       } as never);
 
       const result = await coordinator.transitionState(
@@ -296,7 +308,7 @@ describe('DeliveryLifecycleCoordinator', () => {
     it('should cancel delivery and emit event', async () => {
       mockDeliveryService.updateStatus.mockResolvedValue({
         deliveryId: 'delivery-123',
-        status: DeliveryStatus.Pending,
+        status: DeliveryStatus.Requested,
       } as never);
 
       const result = await coordinator.cancelDelivery(

@@ -5,9 +5,6 @@ import { buildSubjectFromEventType } from '../event-bus.constants';
 import { EventBusService } from '../event-bus.service';
 import { BaseEvent } from '../interfaces/base-event.interface';
 
-import { EventLoggerService } from './event-logger.service';
-import { IdempotencyService } from './idempotency.service';
-
 /**
  * Event filter for matching events by aggregate type and/or event type
  */
@@ -97,11 +94,7 @@ export class DomainEventRouter {
   private readonly logger = new Logger(DomainEventRouter.name);
   private readonly subscribers: Map<string, RegisteredSubscriber> = new Map();
 
-  constructor(
-    private readonly eventBusService: EventBusService,
-    private readonly _idempotencyService: IdempotencyService,
-    private readonly _eventLogger: EventLoggerService
-  ) {}
+  constructor(private readonly eventBusService: EventBusService) {}
 
   /**
    * Register a subscriber for events matching the filter

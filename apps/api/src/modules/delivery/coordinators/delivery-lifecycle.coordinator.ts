@@ -1,5 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { DeliveryStatus, PolicyDecision, PolicyTrigger } from '@zanafleet/contracts';
+import {
+  BindingTargetType,
+  DeliveryStatus,
+  PolicyEffect,
+  PolicyTrigger,
+} from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
 
 import { EventBusService, NatsSubjects } from '@api/core/event-bus';
@@ -18,7 +23,7 @@ import { DeliveryService } from '../services/delivery.service';
  * Maps each state to its valid next states.
  */
 const VALID_TRANSITIONS: Record<string, string[]> = {
-  [DeliveryStatus.Pending]: [DeliveryStatus.Assigned, DeliveryStatus.Cancelled],
+  [DeliveryStatus.Requested]: [DeliveryStatus.Assigned, DeliveryStatus.Cancelled],
   [DeliveryStatus.Assigned]: [DeliveryStatus.PickedUp, DeliveryStatus.Cancelled],
   [DeliveryStatus.PickedUp]: [DeliveryStatus.InTransit, DeliveryStatus.Cancelled],
   [DeliveryStatus.InTransit]: [DeliveryStatus.Delivered],
@@ -30,7 +35,7 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
  * States from which a delivery can be cancelled.
  */
 const CANCELLABLE_STATES = [
-  DeliveryStatus.Pending,
+  DeliveryStatus.Requested,
   DeliveryStatus.Assigned,
   DeliveryStatus.PickedUp,
   DeliveryStatus.InTransit,
@@ -119,7 +124,7 @@ export class DeliveryLifecycleCoordinator {
     private readonly billingCalculator: BillingCalculatorService,
     private readonly schedulingConstraint: SchedulingConstraintService,
     private readonly eventBus: EventBusService,
-    private readonly _ledgerService: LedgerService,
+    _ledgerService: LedgerService,
   ) {}
 
   /**
@@ -160,14 +165,14 @@ export class DeliveryLifecycleCoordinator {
     this.logger.log(`Creating delivery for business ${input.businessId}`);
 
     const policyResult = await this.policyEngine.evaluate({
-      trigger: PolicyTrigger.DELIVERY_REQUESTED,
+      trigger: PolicyTrigger.DELIVERY_CREATION,
       actorId: input.actorId,
       workspaceId: input.workspaceId,
       businessId: input.businessId,
       timestamp: new Date(),
     });
 
-    if (policyResult.finalDecision === PolicyDecision.DENY) {
+    if (policyResult.finalDecision.effect === PolicyEffect.BLOCK) {
       throw new PolicyBlockedError(
         'Delivery creation denied by policy',
         policyResult.evaluatedPolicies.find((p) => p.matched)?.policyId,
@@ -175,22 +180,22 @@ export class DeliveryLifecycleCoordinator {
     }
 
     const constraintResult = await this.schedulingConstraint.evaluate({
-      targetType: 'BUSINESS',
+      targetType: BindingTargetType.BUSINESS,
       targetId: input.businessId,
       timestamp: input.scheduledPickupTime || new Date(),
       timezone: 'UTC',
+      operationType: 'DELIVERY_CREATION',
     });
 
     if (!constraintResult.allowed) {
       throw new CalendarConstraintError(
         constraintResult.reason || 'Schedule not available',
-        constraintResult.suggestedTime,
       );
     }
 
     const pricingResult = await this.billingCalculator.calculateDeliveryChargesWithSignals({
       distanceKm: input.distanceKm || 5,
-      baseFeeTier: 'STANDARD',
+      currency: 'KES',
     });
 
     const deliveryResult = input.isScheduled
@@ -272,18 +277,20 @@ export class DeliveryLifecycleCoordinator {
 
     const pricingResult = await this.billingCalculator.calculateDeliveryChargesWithSignals({
       distanceKm,
-      baseFeeTier: 'STANDARD',
+      currency: 'KES',
     });
 
     const surgeMultiplier = pricingResult.pricingSignals?.surgeMultiplier || 1.0;
+    const subtotal = pricingResult.subtotal || 0;
+    const totalTax = pricingResult.totalTax || 0;
 
     const event = new DeliveryPricingAppliedEventV1({
       eventId: uuidv4(),
       deliveryId,
-      baseFee: pricingResult.baseFee,
-      distanceFee: pricingResult.distanceFee,
-      serviceFee: pricingResult.serviceFee,
-      tax: pricingResult.tax,
+      baseFee: subtotal * 0.25,
+      distanceFee: subtotal * 0.6,
+      serviceFee: subtotal * 0.15,
+      tax: totalTax,
       surgeMultiplier,
       totalCharges: pricingResult.grandTotal,
       currency: 'KES',
@@ -334,3 +341,6 @@ export class DeliveryLifecycleCoordinator {
     };
   }
 }
+
+// Re-export enum values for convenience in tests
+export { DeliveryStatus };
