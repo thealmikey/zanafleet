@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { DateTime } from 'luxon';
@@ -16,6 +16,9 @@ import {
   ConstraintResult,
   BlockedByType,
 } from '../dto/constraint.types';
+import { EventBusService } from '../../../core/event-bus/event-bus.service';
+import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
+import { ConstraintBlockedActionEventV1 } from '../events/calendar.events';
 
 const MAX_SEARCH_DAYS = 7;
 
@@ -33,12 +36,15 @@ const MAX_SEARCH_DAYS = 7;
  */
 @Injectable()
 export class SchedulingConstraintService {
+  private readonly logger = new Logger(SchedulingConstraintService.name);
+
   constructor(
     private readonly calendarBindingService: CalendarBindingService,
     private readonly calendarEventRepository: CalendarEventRepository,
     private readonly calendarService: CalendarService,
     @InjectRepository(CalendarRuleEntity)
     private readonly calendarRuleRepo: Repository<CalendarRuleEntity>,
+    private readonly eventBusService: EventBusService,
   ) {}
 
   /**
@@ -85,10 +91,12 @@ export class SchedulingConstraintService {
         regionFilter,
         context,
       );
-      return {
+      const result = {
         ...holidayResult,
         suggestedReschedule: suggestedReschedule ?? undefined,
       };
+      this.emitBlockedEvent(context, result);
+      return result;
     }
 
     // 3. Check for blackout periods
@@ -102,10 +110,12 @@ export class SchedulingConstraintService {
         regionFilter,
         context,
       );
-      return {
+      const result = {
         ...blackoutResult,
         suggestedReschedule: suggestedReschedule ?? undefined,
       };
+      this.emitBlockedEvent(context, result);
+      return result;
     }
 
     // 4. Check time windows (working hours)
@@ -125,10 +135,12 @@ export class SchedulingConstraintService {
         regionFilter,
         context,
       );
-      return {
+      const result = {
         ...workingHoursResult,
         suggestedReschedule: suggestedReschedule ?? undefined,
       };
+      this.emitBlockedEvent(context, result);
+      return result;
     }
 
     return {
@@ -578,5 +590,28 @@ export class SchedulingConstraintService {
       default:
         return CalendarScope.GLOBAL;
     }
+  }
+
+  private emitBlockedEvent(
+    context: ConstraintContext,
+    result: ConstraintResult,
+  ): void {
+    if (!result.blockedBy) return;
+
+    const event = new ConstraintBlockedActionEventV1({
+      targetType: context.targetType,
+      targetId: context.targetId,
+      operationType: context.operationType,
+      blockedByType: result.blockedBy.type,
+      blockedByName: result.blockedBy.name,
+      blockedById: result.blockedBy.id,
+      reason: result.reason,
+      timestamp: context.timestamp,
+      suggestedReschedule: result.suggestedReschedule ?? null,
+    });
+
+    this.eventBusService.publish(NatsSubjects.Calendar.CONSTRAINT_BLOCKED_V1, event).catch((err) => {
+      this.logger.warn(`Failed to publish ConstraintBlockedActionEventV1: ${err.message}`);
+    });
   }
 }

@@ -15,6 +15,7 @@ import { CalendarService } from '../../services/calendar.service';
 import { CalendarRuleEntity } from '../../entities/calendar-rule.entity';
 import { CalendarEventEntity } from '../../entities/calendar-event.entity';
 import { ConstraintContext } from '../../dto/constraint.types';
+import { EventBusService } from '../../../../core/event-bus/event-bus.service';
 
 describe('SchedulingConstraintService', () => {
   let service: SchedulingConstraintService;
@@ -22,6 +23,7 @@ describe('SchedulingConstraintService', () => {
   let calendarEventRepository: jest.Mocked<CalendarEventRepository>;
   let calendarService: jest.Mocked<CalendarService>;
   let calendarRuleRepo: jest.Mocked<Repository<CalendarRuleEntity>>;
+  let eventBusService: jest.Mocked<EventBusService>;
 
   const now = new Date('2024-12-25T10:00:00Z');
 
@@ -66,6 +68,10 @@ describe('SchedulingConstraintService', () => {
       save: jest.fn(),
     } as unknown as jest.Mocked<Repository<CalendarRuleEntity>>;
 
+    eventBusService = {
+      publish: jest.fn().mockResolvedValue(undefined),
+    } as unknown as jest.Mocked<EventBusService>;
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SchedulingConstraintService,
@@ -84,6 +90,10 @@ describe('SchedulingConstraintService', () => {
         {
           provide: getRepositoryToken(CalendarRuleEntity),
           useValue: calendarRuleRepo,
+        },
+        {
+          provide: EventBusService,
+          useValue: eventBusService,
         },
       ],
     }).compile();

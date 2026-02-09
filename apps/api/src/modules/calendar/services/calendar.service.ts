@@ -15,6 +15,9 @@ import { CalendarEntity } from '../entities/calendar.entity';
 import { TimeWindowEntity } from '../entities/time-window.entity';
 import { CalendarRuleEntity } from '../entities/calendar-rule.entity';
 import { CalendarRepository } from '../repositories/calendar.repository';
+import { EventBusService } from '../../../core/event-bus/event-bus.service';
+import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
+import { CalendarCreatedEventV1 } from '../events/calendar.events';
 
 /**
  * Input for creating a calendar rule.
@@ -51,6 +54,7 @@ export class CalendarService {
     private readonly timeWindowRepo: Repository<TimeWindowEntity>,
     @InjectRepository(CalendarRuleEntity)
     private readonly calendarRuleRepo: Repository<CalendarRuleEntity>,
+    private readonly eventBusService: EventBusService,
   ) {}
 
   /**
@@ -72,6 +76,19 @@ export class CalendarService {
 
     const saved = await this.calendarRepository.save(entity);
     this.logger.log(`Created calendar: ${saved.id} (${saved.name})`);
+
+    const event = new CalendarCreatedEventV1({
+      calendarId: saved.id,
+      name: saved.name,
+      timezone: saved.timezone,
+      ownerScope: saved.ownerScope,
+      ownerScopeId: saved.ownerScopeId,
+    });
+
+    this.eventBusService.publish(NatsSubjects.Calendar.CREATED_V1, event).catch((err) => {
+      this.logger.warn(`Failed to publish CalendarCreatedEventV1: ${err.message}`);
+    });
+
     return this.toCalendarResponse(saved);
   }
 

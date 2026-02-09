@@ -18,3 +18,10 @@ export type {
 } from './dto/constraint.types';
 export { CalendarRepository } from './repositories/calendar.repository';
 export { CalendarEventRepository } from './repositories/calendar-event.repository';
+export {
+  CalendarCreatedEventV1,
+  CalendarEventAddedEventV1,
+  HolidayDeclaredEventV1,
+  OverrideAppliedEventV1,
+  ConstraintBlockedActionEventV1,
+} from './events/calendar.events';

@@ -12,12 +12,14 @@ import { CalendarRepository } from '../../repositories/calendar.repository';
 import { CalendarEntity } from '../../entities/calendar.entity';
 import { TimeWindowEntity } from '../../entities/time-window.entity';
 import { CalendarRuleEntity } from '../../entities/calendar-rule.entity';
+import { EventBusService } from '../../../../core/event-bus/event-bus.service';
 
 describe('CalendarService', () => {
   let service: CalendarService;
   let calendarRepository: jest.Mocked<CalendarRepository>;
   let timeWindowRepo: jest.Mocked<Repository<TimeWindowEntity>>;
   let calendarRuleRepo: jest.Mocked<Repository<CalendarRuleEntity>>;
+  let eventBusService: jest.Mocked<EventBusService>;
 
   const now = new Date('2024-01-15T10:00:00Z');
 
@@ -43,6 +45,10 @@ describe('CalendarService', () => {
       save: jest.fn(),
     } as unknown as jest.Mocked<Repository<CalendarRuleEntity>>;
 
+    eventBusService = {
+      publish: jest.fn().mockResolvedValue(undefined),
+    } as unknown as jest.Mocked<EventBusService>;
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CalendarService,
@@ -57,6 +63,10 @@ describe('CalendarService', () => {
         {
           provide: getRepositoryToken(CalendarRuleEntity),
           useValue: calendarRuleRepo,
+        },
+        {
+          provide: EventBusService,
+          useValue: eventBusService,
         },
       ],
     }).compile();
