@@ -1,4 +1,5 @@
 import { CalendarEventType } from '@zanafleet/contracts';
+
 import { PolicyCondition, EvaluationContext, PolicyTrigger } from '../../dto';
 import { JsonLogicEvaluatorService } from '../../services/json-logic-evaluator.service';
 

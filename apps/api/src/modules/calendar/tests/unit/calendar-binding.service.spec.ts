@@ -1,18 +1,19 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
 import {
   BindingTargetType,
   CalendarScope,
   CreateCalendarBindingInput,
   CreateCalendarOverrideInput,
 } from '@zanafleet/contracts';
-import { CalendarBindingService } from '../../services/calendar-binding.service';
-import { CalendarRepository } from '../../repositories/calendar.repository';
+import { Repository } from 'typeorm';
+
 import { CalendarBindingEntity } from '../../entities/calendar-binding.entity';
 import { CalendarOverrideEntity } from '../../entities/calendar-override.entity';
 import { CalendarEntity } from '../../entities/calendar.entity';
+import { CalendarRepository } from '../../repositories/calendar.repository';
+import { CalendarBindingService } from '../../services/calendar-binding.service';
 
 describe('CalendarBindingService', () => {
   let service: CalendarBindingService;

@@ -1,14 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import {
   BindingTargetType,
   CalendarScope,
 } from '@zanafleet/contracts';
+import { v4 as uuidv4 } from 'uuid';
+
 import { CalendarModule } from '../../calendar.module';
-import { CalendarBindingService } from '../../services/calendar-binding.service';
-import { CalendarRepository } from '../../repositories/calendar.repository';
 import { CalendarEntity } from '../../entities/calendar.entity';
+import { CalendarRepository } from '../../repositories/calendar.repository';
+import { CalendarBindingService } from '../../services/calendar-binding.service';
 
 const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
 

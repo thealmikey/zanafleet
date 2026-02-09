@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
+import { RankedCandidate, GeoPoint } from '../../delivery/services/candidate-selection.service';
 import {
   PolicyTrigger,
   PolicyEffect,
@@ -9,7 +10,6 @@ import {
 } from '../dto';
 
 import { PolicyEvaluationEngineService, EvaluationOptions } from './policy-evaluation-engine.service';
-import { RankedCandidate, GeoPoint } from '../../delivery/services/candidate-selection.service';
 
 /**
  * Result of filtering candidates by policy.

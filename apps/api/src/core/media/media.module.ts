@@ -1,8 +1,9 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { MediaAssetEntity } from './entities/media-asset.entity';
-import { StorageProviderRegistry } from './providers/storage-provider-registry.service';
 import { NoOpStorageProvider } from './providers/noop-storage.provider';
+import { StorageProviderRegistry } from './providers/storage-provider-registry.service';
 import { MediaService } from './services/media.service';
 
 @Module({

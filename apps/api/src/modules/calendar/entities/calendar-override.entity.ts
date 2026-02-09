@@ -1,3 +1,4 @@
+import { CalendarScope } from '@zanafleet/contracts';
 import {
   Entity,
   PrimaryColumn,
@@ -7,7 +8,6 @@ import {
   Index,
 } from 'typeorm';
 
-import { CalendarScope } from '@zanafleet/contracts';
 
 /**
  * CalendarOverride Entity

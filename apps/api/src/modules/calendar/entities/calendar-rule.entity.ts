@@ -1,3 +1,4 @@
+import { CalendarScope, CalendarRuleType } from '@zanafleet/contracts';
 import {
   Entity,
   PrimaryColumn,
@@ -9,7 +10,6 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { CalendarScope, CalendarRuleType } from '@zanafleet/contracts';
 import { CalendarEntity } from './calendar.entity';
 
 /**

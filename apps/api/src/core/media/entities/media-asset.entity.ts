@@ -1,4 +1,9 @@
 import {
+  MediaAssetMetadata,
+  MediaAssetStatus,
+  OwnerEntityType,
+} from '@zanafleet/contracts';
+import {
   Column,
   CreateDateColumn,
   Entity,
@@ -7,11 +12,6 @@ import {
   UpdateDateColumn,
   VersionColumn,
 } from 'typeorm';
-import {
-  MediaAssetMetadata,
-  MediaAssetStatus,
-  OwnerEntityType,
-} from '@zanafleet/contracts';
 
 /**
  * TypeORM transformer for bigint columns.

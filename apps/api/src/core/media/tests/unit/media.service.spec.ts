@@ -1,16 +1,18 @@
+import { NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository, OptimisticLockVersionMismatchError } from 'typeorm';
-import { NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
-import { MediaService } from '../../services/media.service';
-import { MediaAssetEntity } from '../../entities/media-asset.entity';
-import { StorageProviderRegistry } from '../../providers/storage-provider-registry.service';
-import { StorageProvider } from '../../providers/storage-provider.interface';
 import {
   CreateMediaAssetInput,
   MediaAssetStatus,
   OwnerEntityType,
 } from '@zanafleet/contracts';
+import { Repository, OptimisticLockVersionMismatchError } from 'typeorm';
+
+import { MediaAssetEntity } from '../../entities/media-asset.entity';
+import { StorageProviderRegistry } from '../../providers/storage-provider-registry.service';
+import { StorageProvider } from '../../providers/storage-provider.interface';
+import { MediaService } from '../../services/media.service';
+
 
 describe('MediaService', () => {
   let service: MediaService;

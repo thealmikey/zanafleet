@@ -1,10 +1,11 @@
 import { CalendarScope, CalendarRuleType, CalendarEventType, RecurrencePattern, BindingTargetType } from '@zanafleet/contracts';
+
+import { CalendarBindingEntity } from '../../entities/calendar-binding.entity';
+import { CalendarEventEntity } from '../../entities/calendar-event.entity';
+import { CalendarOverrideEntity } from '../../entities/calendar-override.entity';
+import { CalendarRuleEntity } from '../../entities/calendar-rule.entity';
 import { CalendarEntity } from '../../entities/calendar.entity';
 import { TimeWindowEntity } from '../../entities/time-window.entity';
-import { CalendarRuleEntity } from '../../entities/calendar-rule.entity';
-import { CalendarEventEntity } from '../../entities/calendar-event.entity';
-import { CalendarBindingEntity } from '../../entities/calendar-binding.entity';
-import { CalendarOverrideEntity } from '../../entities/calendar-override.entity';
 
 describe('Calendar Entities', () => {
   describe('CalendarEntity', () => {

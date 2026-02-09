@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { MediaModule } from '../../media.module';
-import { MediaService } from '../../services/media.service';
-import { StorageProviderRegistry } from '../../providers/storage-provider-registry.service';
-import { NoOpStorageProvider } from '../../providers/noop-storage.provider';
+
 import { MediaAssetEntity } from '../../entities/media-asset.entity';
+import { MediaModule } from '../../media.module';
+import { NoOpStorageProvider } from '../../providers/noop-storage.provider';
+import { StorageProviderRegistry } from '../../providers/storage-provider-registry.service';
+import { MediaService } from '../../services/media.service';
 
 describe('MediaModule', () => {
   let module: TestingModule;

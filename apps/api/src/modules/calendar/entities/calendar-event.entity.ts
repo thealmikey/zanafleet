@@ -1,3 +1,4 @@
+import { CalendarEventType, RecurrencePattern } from '@zanafleet/contracts';
 import {
   Entity,
   PrimaryColumn,
@@ -7,7 +8,6 @@ import {
   Index,
 } from 'typeorm';
 
-import { CalendarEventType, RecurrencePattern } from '@zanafleet/contracts';
 
 /**
  * Region Scope Interface

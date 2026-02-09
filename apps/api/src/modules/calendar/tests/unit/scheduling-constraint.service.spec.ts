@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import {
   BindingTargetType,
   CalendarScope,
@@ -8,14 +7,16 @@ import {
   CalendarEventType,
   RecurrencePattern,
 } from '@zanafleet/contracts';
-import { SchedulingConstraintService } from '../../services/scheduling-constraint.service';
-import { CalendarBindingService } from '../../services/calendar-binding.service';
-import { CalendarEventRepository } from '../../repositories/calendar-event.repository';
-import { CalendarService } from '../../services/calendar.service';
-import { CalendarRuleEntity } from '../../entities/calendar-rule.entity';
-import { CalendarEventEntity } from '../../entities/calendar-event.entity';
-import { ConstraintContext } from '../../dto/constraint.types';
+import { Repository } from 'typeorm';
+
 import { EventBusService } from '../../../../core/event-bus/event-bus.service';
+import { ConstraintContext } from '../../dto/constraint.types';
+import { CalendarEventEntity } from '../../entities/calendar-event.entity';
+import { CalendarRuleEntity } from '../../entities/calendar-rule.entity';
+import { CalendarEventRepository } from '../../repositories/calendar-event.repository';
+import { CalendarBindingService } from '../../services/calendar-binding.service';
+import { CalendarService } from '../../services/calendar.service';
+import { SchedulingConstraintService } from '../../services/scheduling-constraint.service';
 
 describe('SchedulingConstraintService', () => {
   let service: SchedulingConstraintService;

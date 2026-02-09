@@ -1,18 +1,19 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
 import {
   CalendarScope,
   CalendarRuleType,
   CreateCalendarInput,
 } from '@zanafleet/contracts';
-import { CalendarService, UpdateCalendarInput } from '../../services/calendar.service';
-import { CalendarRepository } from '../../repositories/calendar.repository';
+import { Repository } from 'typeorm';
+
+import { EventBusService } from '../../../../core/event-bus/event-bus.service';
+import { CalendarRuleEntity } from '../../entities/calendar-rule.entity';
 import { CalendarEntity } from '../../entities/calendar.entity';
 import { TimeWindowEntity } from '../../entities/time-window.entity';
-import { CalendarRuleEntity } from '../../entities/calendar-rule.entity';
-import { EventBusService } from '../../../../core/event-bus/event-bus.service';
+import { CalendarRepository } from '../../repositories/calendar.repository';
+import { CalendarService, UpdateCalendarInput } from '../../services/calendar.service';
 
 describe('CalendarService', () => {
   let service: CalendarService;

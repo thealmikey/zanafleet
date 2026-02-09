@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
  */
 export class CalendarCreatedEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'CalendarCreatedEvent-V1' = 'CalendarCreatedEvent-V1';
+  readonly eventType: 'Calendar.Calendar.CreatedV1' = 'Calendar.Calendar.CreatedV1';
   readonly eventVersion: '1.0.0' = '1.0.0';
   readonly occurredAt: Date;
   readonly aggregateId: string;
@@ -84,7 +84,7 @@ export class CalendarCreatedEventV1 implements BaseEvent {
  */
 export class CalendarEventAddedEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'CalendarEventAddedEvent-V1' = 'CalendarEventAddedEvent-V1';
+  readonly eventType: 'Calendar.Event.AddedV1' = 'Calendar.Event.AddedV1';
   readonly eventVersion: '1.0.0' = '1.0.0';
   readonly occurredAt: Date;
   readonly aggregateId: string;
@@ -171,7 +171,7 @@ export class CalendarEventAddedEventV1 implements BaseEvent {
  */
 export class HolidayDeclaredEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'HolidayDeclaredEvent-V1' = 'HolidayDeclaredEvent-V1';
+  readonly eventType: 'Calendar.Holiday.DeclaredV1' = 'Calendar.Holiday.DeclaredV1';
   readonly eventVersion: '1.0.0' = '1.0.0';
   readonly occurredAt: Date;
   readonly aggregateId: string;
@@ -248,7 +248,7 @@ export class HolidayDeclaredEventV1 implements BaseEvent {
  */
 export class OverrideAppliedEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'OverrideAppliedEvent-V1' = 'OverrideAppliedEvent-V1';
+  readonly eventType: 'Calendar.Override.AppliedV1' = 'Calendar.Override.AppliedV1';
   readonly eventVersion: '1.0.0' = '1.0.0';
   readonly occurredAt: Date;
   readonly aggregateId: string;
@@ -335,7 +335,7 @@ export class OverrideAppliedEventV1 implements BaseEvent {
  */
 export class ConstraintBlockedActionEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'ConstraintBlockedActionEvent-V1' = 'ConstraintBlockedActionEvent-V1';
+  readonly eventType: 'Calendar.Constraint.BlockedV1' = 'Calendar.Constraint.BlockedV1';
   readonly eventVersion: '1.0.0' = '1.0.0';
   readonly occurredAt: Date;
   readonly aggregateId: string;

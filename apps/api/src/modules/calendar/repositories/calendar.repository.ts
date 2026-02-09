@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { CalendarScope } from '@zanafleet/contracts';
+import { Repository } from 'typeorm';
+
 import { CalendarEntity } from '../entities/calendar.entity';
 
 /**

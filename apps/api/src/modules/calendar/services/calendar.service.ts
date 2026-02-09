@@ -1,7 +1,5 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import {
   CreateCalendarInput,
   CreateTimeWindowInput,
@@ -11,13 +9,16 @@ import {
   CalendarScope,
   CalendarRuleType,
 } from '@zanafleet/contracts';
+import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
+
+import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
+import { EventBusService } from '../../../core/event-bus/event-bus.service';
+import { CalendarRuleEntity } from '../entities/calendar-rule.entity';
 import { CalendarEntity } from '../entities/calendar.entity';
 import { TimeWindowEntity } from '../entities/time-window.entity';
-import { CalendarRuleEntity } from '../entities/calendar-rule.entity';
-import { CalendarRepository } from '../repositories/calendar.repository';
-import { EventBusService } from '../../../core/event-bus/event-bus.service';
-import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
 import { CalendarCreatedEventV1 } from '../events/calendar.events';
+import { CalendarRepository } from '../repositories/calendar.repository';
 
 /**
  * Input for creating a calendar rule.

@@ -1,7 +1,9 @@
 import { Module, OnModuleInit, Logger } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
+
 import {
   CalendarEntity,
   TimeWindowEntity,
@@ -10,10 +12,10 @@ import {
   CalendarBindingEntity,
   CalendarOverrideEntity,
 } from './entities';
-import { CalendarRepository } from './repositories/calendar.repository';
 import { CalendarEventRepository } from './repositories/calendar-event.repository';
-import { CalendarService } from './services/calendar.service';
+import { CalendarRepository } from './repositories/calendar.repository';
 import { CalendarBindingService } from './services/calendar-binding.service';
+import { CalendarService } from './services/calendar.service';
 import { SchedulingConstraintService } from './services/scheduling-constraint.service';
 
 @Module({

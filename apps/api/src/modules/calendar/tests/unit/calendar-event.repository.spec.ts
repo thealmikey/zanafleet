@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
 import { CalendarEventType, RecurrencePattern } from '@zanafleet/contracts';
-import { CalendarEventRepository, RegionFilter } from '../../repositories/calendar-event.repository';
+import { Repository, SelectQueryBuilder } from 'typeorm';
+
 import { CalendarEventEntity } from '../../entities/calendar-event.entity';
+import { CalendarEventRepository, RegionFilter } from '../../repositories/calendar-event.repository';
 
 describe('CalendarEventRepository', () => {
   let repository: CalendarEventRepository;

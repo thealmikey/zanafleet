@@ -2,11 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { PolicyEffect, PolicyTrigger, EvaluationContext } from '../dto';
 import {
   PolicyDecisionLogEntity,
   EvaluatedPolicyLogEntry,
 } from '../entities/policy-decision-log.entity';
-import { PolicyEffect, PolicyTrigger, EvaluationContext } from '../dto';
 
 /**
  * Input data for creating a policy decision log entry.

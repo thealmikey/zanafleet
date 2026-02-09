@@ -1,3 +1,4 @@
+import { BindingTargetType } from '@zanafleet/contracts';
 import {
   Entity,
   PrimaryColumn,
@@ -10,7 +11,6 @@ import {
   Unique,
 } from 'typeorm';
 
-import { BindingTargetType } from '@zanafleet/contracts';
 import { CalendarEntity } from './calendar.entity';
 
 /**

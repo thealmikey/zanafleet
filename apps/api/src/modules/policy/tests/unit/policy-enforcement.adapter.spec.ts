@@ -1,12 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import {
-  PolicyEnforcementAdapter,
-  FilterCandidatesContext,
-  DeliveryCreationInput,
-  RiderAssignmentInput,
-} from '../../services/policy-enforcement.adapter';
-import { PolicyEvaluationEngineService } from '../../services/policy-evaluation-engine.service';
+import { RankedCandidate, GeoPoint } from '../../../delivery/services/candidate-selection.service';
 import {
   PolicyTrigger,
   PolicyEffect,
@@ -15,7 +9,13 @@ import {
   PolicyDecision,
   EvaluationContext,
 } from '../../dto';
-import { RankedCandidate, GeoPoint } from '../../../delivery/services/candidate-selection.service';
+import {
+  PolicyEnforcementAdapter,
+  FilterCandidatesContext,
+  DeliveryCreationInput,
+  RiderAssignmentInput,
+} from '../../services/policy-enforcement.adapter';
+import { PolicyEvaluationEngineService } from '../../services/policy-evaluation-engine.service';
 
 function createMockDecision(
   effect: PolicyEffect,

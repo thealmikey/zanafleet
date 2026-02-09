@@ -1,17 +1,18 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
-import { MediaModule } from '../../media.module';
-import { MediaService } from '../../services/media.service';
-import { StorageProviderRegistry } from '../../providers/storage-provider-registry.service';
-import { MediaAssetEntity } from '../../entities/media-asset.entity';
 import {
   CreateMediaAssetInput,
   MediaAssetStatus,
   OwnerEntityType,
 } from '@zanafleet/contracts';
+import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
+
+import { MediaAssetEntity } from '../../entities/media-asset.entity';
+import { MediaModule } from '../../media.module';
+import { StorageProviderRegistry } from '../../providers/storage-provider-registry.service';
+import { MediaService } from '../../services/media.service';
 
 const isDbAvailable = Boolean(process.env.TEST_DB_HOST || process.env.CI);
 const describeWithDb = isDbAvailable ? describe : describe.skip;

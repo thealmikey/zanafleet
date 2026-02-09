@@ -1,12 +1,12 @@
-import { Injectable, Logger, Optional } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { BindingTargetType, CalendarEventType } from '@zanafleet/contracts';
 
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
-import { SchedulingConstraintService } from '../../calendar/services/scheduling-constraint.service';
-import { CalendarBindingService } from '../../calendar/services/calendar-binding.service';
 import { CalendarEventRepository, RegionFilter } from '../../calendar/repositories/calendar-event.repository';
+import { CalendarBindingService } from '../../calendar/services/calendar-binding.service';
+import { SchedulingConstraintService } from '../../calendar/services/scheduling-constraint.service';
 import {
   PolicyScope,
   PolicyEffect,

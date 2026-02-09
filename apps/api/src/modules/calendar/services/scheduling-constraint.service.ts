@@ -1,24 +1,27 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { DateTime } from 'luxon';
 import {
   BindingTargetType,
   CalendarScope,
   CalendarRuleType,
 } from '@zanafleet/contracts';
-import { CalendarBindingService, InheritanceContext } from './calendar-binding.service';
-import { CalendarEventRepository, RegionFilter } from '../repositories/calendar-event.repository';
-import { CalendarService } from './calendar.service';
-import { CalendarRuleEntity } from '../entities/calendar-rule.entity';
+import { DateTime } from 'luxon';
+import { Repository } from 'typeorm';
+
+import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
+import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import {
   ConstraintContext,
   ConstraintResult,
   BlockedByType,
 } from '../dto/constraint.types';
-import { EventBusService } from '../../../core/event-bus/event-bus.service';
-import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
+import { CalendarRuleEntity } from '../entities/calendar-rule.entity';
 import { ConstraintBlockedActionEventV1 } from '../events/calendar.events';
+import { CalendarEventRepository, RegionFilter } from '../repositories/calendar-event.repository';
+
+import { CalendarBindingService, InheritanceContext } from './calendar-binding.service';
+import { CalendarService } from './calendar.service';
+
 
 const MAX_SEARCH_DAYS = 7;
 

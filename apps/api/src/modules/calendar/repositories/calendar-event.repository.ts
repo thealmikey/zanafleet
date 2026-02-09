@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Brackets } from 'typeorm';
 import { CalendarEventType } from '@zanafleet/contracts';
+import { Repository, Brackets } from 'typeorm';
+
 import { CalendarEventEntity } from '../entities/calendar-event.entity';
 
 /**

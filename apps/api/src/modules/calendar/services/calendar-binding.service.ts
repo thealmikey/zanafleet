@@ -1,7 +1,5 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import {
   BindingTargetType,
   CalendarScope,
@@ -10,6 +8,9 @@ import {
   CreateCalendarBindingInput,
   CreateCalendarOverrideInput,
 } from '@zanafleet/contracts';
+import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
+
 import { CalendarBindingEntity } from '../entities/calendar-binding.entity';
 import { CalendarOverrideEntity } from '../entities/calendar-override.entity';
 import { CalendarRepository } from '../repositories/calendar.repository';
