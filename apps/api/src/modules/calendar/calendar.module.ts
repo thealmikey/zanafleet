@@ -15,6 +15,7 @@ import {
 import { CalendarEventRepository } from './repositories/calendar-event.repository';
 import { CalendarRepository } from './repositories/calendar.repository';
 import { CalendarBindingService } from './services/calendar-binding.service';
+import { CalendarPolicyBridgeService } from './services/calendar-policy-bridge.service';
 import { CalendarSyncService } from './services/calendar-sync.service';
 import { CalendarService } from './services/calendar.service';
 import { SchedulingConstraintService } from './services/scheduling-constraint.service';
@@ -39,12 +40,14 @@ import { SchedulingConstraintService } from './services/scheduling-constraint.se
     CalendarBindingService,
     CalendarSyncService,
     SchedulingConstraintService,
+    CalendarPolicyBridgeService,
   ],
   exports: [
     CalendarService,
     CalendarBindingService,
     CalendarSyncService,
     SchedulingConstraintService,
+    CalendarPolicyBridgeService,
     CalendarRepository,
     CalendarEventRepository,
   ],

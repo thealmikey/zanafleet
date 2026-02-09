@@ -71,6 +71,8 @@ export const NatsSubjects = {
     BUSINESS_CLOSED_V1: 'calendar.events.business-closed-v1',
     OVERRIDE_APPLIED_V1: 'calendar.events.override-applied-v1',
     CONSTRAINT_BLOCKED_V1: 'calendar.events.constraint-blocked-v1',
+    POLICY_BINDING_CREATED_V1: 'calendar.events.policy-binding-created-v1',
+    POLICY_BINDING_ACTIVATED_V1: 'calendar.events.policy-binding-activated-v1',
     ALL: 'calendar.events.*',
   },
   Formation: {
