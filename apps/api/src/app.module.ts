@@ -9,6 +9,7 @@ import { Neo4jModule } from './core/neo4j';
 import { ActorModule } from './modules/actor/actor.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BusinessModule } from './modules/business/business.module';
+import { CalendarModule } from './modules/calendar/calendar.module';
 import { CapabilityModule } from './modules/capability/capability.module';
 import { CommitmentsModule } from './modules/commitments/commitments.module';
 import { CommunicationModule } from './modules/communication/communication.module';
@@ -53,6 +54,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     ActorModule,
     AuthModule,
     BusinessModule,
+    CalendarModule,
     CapabilityModule,
     CommitmentsModule,
     CommunicationModule,
