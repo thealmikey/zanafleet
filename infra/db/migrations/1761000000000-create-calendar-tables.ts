@@ -76,13 +76,15 @@ export class CreateCalendarTables1761000000000 implements MigrationInterface {
     `);
 
     // Create time_windows table
+    // day_of_week uses JavaScript convention: 0=Sunday, 1=Monday, ..., 6=Saturday
+    // NULL means the window applies to all days
     await queryRunner.query(`
       CREATE TABLE "time_windows" (
         "id" uuid NOT NULL,
         "calendar_id" uuid NOT NULL,
         "start_time" TIME NOT NULL,
         "end_time" TIME NOT NULL,
-        "day_of_week" int,
+        "day_of_week" int CHECK ("day_of_week" IS NULL OR ("day_of_week" >= 0 AND "day_of_week" <= 6)),
         "recurrence_rule" jsonb,
         "is_active" boolean NOT NULL DEFAULT true,
         "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),

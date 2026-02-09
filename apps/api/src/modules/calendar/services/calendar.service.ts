@@ -209,7 +209,7 @@ export class CalendarService {
 
   /**
    * Get effective time windows for a calendar on a specific date.
-   * Filters windows by day of week (ISO: Monday=1, Sunday=7).
+   * Filters windows by day of week using JavaScript convention (0=Sunday, 6=Saturday).
    * @param calendarId The calendar ID
    * @param date The date to resolve windows for
    */
@@ -223,7 +223,6 @@ export class CalendarService {
     }
 
     const dayOfWeek = date.getDay();
-    const isoWeekday = dayOfWeek === 0 ? 7 : dayOfWeek;
 
     const windows = await this.timeWindowRepo.find({
       where: { calendarId, isActive: true },
@@ -233,7 +232,7 @@ export class CalendarService {
       if (window.dayOfWeek === null) {
         return true;
       }
-      return window.dayOfWeek === isoWeekday;
+      return window.dayOfWeek === dayOfWeek;
     });
 
     return effectiveWindows.map((w) => this.toTimeWindowResponse(w));

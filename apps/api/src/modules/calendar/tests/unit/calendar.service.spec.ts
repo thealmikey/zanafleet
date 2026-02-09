@@ -425,7 +425,7 @@ describe('CalendarService', () => {
       expect(result[0].dayOfWeek).toBeNull();
     });
 
-    it('should convert Sunday to ISO weekday 7', async () => {
+    it('should match Sunday windows using JavaScript convention (dayOfWeek=0)', async () => {
       const calendar = CalendarEntity.fromDomain({
         calendarId: 'calendar-uuid',
         name: 'Test',
@@ -439,7 +439,7 @@ describe('CalendarService', () => {
         calendarId: 'calendar-uuid',
         startTime: '10:00:00',
         endTime: '16:00:00',
-        dayOfWeek: 7,
+        dayOfWeek: 0, // Sunday in JavaScript convention
         isActive: true,
         createdAt: now,
       });
@@ -447,11 +447,11 @@ describe('CalendarService', () => {
       calendarRepository.findById.mockResolvedValue(calendar);
       timeWindowRepo.find.mockResolvedValue([sundayWindow]);
 
-      const sunday = new Date('2024-01-21'); // Sunday
+      const sunday = new Date('2024-01-21'); // Sunday (getDay() returns 0)
       const result = await service.getEffectiveTimeWindows('calendar-uuid', sunday);
 
       expect(result).toHaveLength(1);
-      expect(result[0].dayOfWeek).toBe(7);
+      expect(result[0].dayOfWeek).toBe(0);
     });
 
     it('should throw NotFoundException when calendar not found', async () => {

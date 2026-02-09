@@ -37,6 +37,10 @@ export class TimeWindowEntity {
   @Column('time')
   endTime!: string;
 
+  /**
+   * Day of week using JavaScript convention: 0=Sunday, 1=Monday, ..., 6=Saturday.
+   * Null means the window applies to all days.
+   */
   @Column('int', { nullable: true })
   dayOfWeek!: number | null;
 
@@ -86,11 +90,16 @@ export class TimeWindowEntity {
   /**
    * Create entity from domain data
    */
+  /**
+   * Create entity from domain data
+   * @param data.dayOfWeek Day of week using JavaScript convention (0=Sunday, 6=Saturday), or null for all days
+   */
   static fromDomain(data: {
     timeWindowId: string;
     calendarId: string;
     startTime: string;
     endTime: string;
+    /** Day of week: 0=Sunday, 1=Monday, ..., 6=Saturday. Null for all days. */
     dayOfWeek?: number | null;
     recurrenceRule?: Record<string, unknown> | null;
     isActive?: boolean;
