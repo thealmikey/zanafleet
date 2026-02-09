@@ -26,6 +26,8 @@ export interface PublishOptions {
 export class EventBusService implements OnModuleInit {
   private readonly logger = new Logger(EventBusService.name);
   private isConnected = false;
+  private publishFailureCount = 0;
+  private publishFailuresBySubject: Map<string, number> = new Map();
 
   constructor(
     @Inject(NATS_CLIENT) private readonly natsClient: ClientProxy,
@@ -64,6 +66,7 @@ export class EventBusService implements OnModuleInit {
         const connectionError =
           error instanceof Error ? error : new Error('NATS client is not connected');
         this.eventLogger.logFailed(event, connectionError);
+        this.recordPublishFailure(subject);
         throw connectionError;
       }
     }
@@ -96,6 +99,7 @@ export class EventBusService implements OnModuleInit {
       if (!result.success) {
         const error = result.error ?? new Error('Unknown error during publish');
         this.eventLogger.logFailed(event, error, result.attempts);
+        this.recordPublishFailure(subject);
         throw error;
       }
     } else {
@@ -103,6 +107,7 @@ export class EventBusService implements OnModuleInit {
         await publishOperation();
       } catch (error) {
         this.eventLogger.logFailed(event, error as Error);
+        this.recordPublishFailure(subject);
         throw error;
       }
     }
@@ -173,5 +178,39 @@ export class EventBusService implements OnModuleInit {
    */
   isReady(): boolean {
     return this.isConnected;
+  }
+
+  /**
+   * Returns the total count of publish failures since service startup.
+   * Useful for monitoring and alerting on event bus connectivity issues.
+   */
+  getPublishFailureCount(): number {
+    return this.publishFailureCount;
+  }
+
+  /**
+   * Returns publish failure counts grouped by NATS subject.
+   * Useful for identifying specific event types experiencing issues.
+   */
+  getPublishFailuresBySubject(): Map<string, number> {
+    return new Map(this.publishFailuresBySubject);
+  }
+
+  /**
+   * Resets all failure counters. Primarily for testing purposes.
+   */
+  resetPublishFailureCounters(): void {
+    this.publishFailureCount = 0;
+    this.publishFailuresBySubject.clear();
+  }
+
+  /**
+   * Records a publish failure for tracking and alerting purposes.
+   * @param subject - The NATS subject that failed
+   */
+  private recordPublishFailure(subject: string): void {
+    this.publishFailureCount++;
+    const currentCount = this.publishFailuresBySubject.get(subject) ?? 0;
+    this.publishFailuresBySubject.set(subject, currentCount + 1);
   }
 }

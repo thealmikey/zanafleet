@@ -618,7 +618,8 @@ export class SchedulingConstraintService {
       suggestedReschedule: result.suggestedReschedule ?? null,
     });
 
-    this.eventBusService.publish(NatsSubjects.Calendar.CONSTRAINT_BLOCKED_V1, event).catch((err) => {
+    this.eventBusService.publish(NatsSubjects.Calendar.CONSTRAINT_BLOCKED_V1, event).catch((publishError: unknown) => {
+      const err = publishError instanceof Error ? publishError : new Error(String(publishError));
       this.logger.warn(`Failed to publish ConstraintBlockedActionEventV1: ${err.message}`);
     });
   }

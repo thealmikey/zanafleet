@@ -1,8 +1,6 @@
 import {
-  PolicyEffect,
   PolicyScope,
   PolicyTrigger,
-  PolicyCondition,
   PolicyDecision,
   CalendarEventType,
 } from '@zanafleet/contracts';

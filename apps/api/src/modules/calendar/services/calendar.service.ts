@@ -86,7 +86,8 @@ export class CalendarService {
       ownerScopeId: saved.ownerScopeId,
     });
 
-    this.eventBusService.publish(NatsSubjects.Calendar.CREATED_V1, event).catch((err) => {
+    this.eventBusService.publish(NatsSubjects.Calendar.CREATED_V1, event).catch((publishError: unknown) => {
+      const err = publishError instanceof Error ? publishError : new Error(String(publishError));
       this.logger.warn(`Failed to publish CalendarCreatedEventV1: ${err.message}`);
     });
 
@@ -166,7 +167,7 @@ export class CalendarService {
       endTime: input.endTime,
       dayOfWeek: input.dayOfWeek,
       recurrenceRule: input.recurrenceRule
-        ? JSON.parse(input.recurrenceRule)
+        ? (JSON.parse(input.recurrenceRule) as Record<string, unknown>)
         : null,
       isActive: input.isActive,
       createdAt: now,
