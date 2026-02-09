@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { AccountModule } from '../account/account.module';
 import { LedgerModule } from '../ledger/ledger.module';
 
+import { PaymentFlowOrchestrator } from './coordinators/payment-flow.orchestrator';
 import { PaymentWebhookController } from './controllers/payment-webhook.controller';
 import { PaymentIntentEntity } from './entities/payment-intent.entity';
 import { PaymentTransactionEntity } from './entities/payment-transaction.entity';
@@ -20,11 +22,24 @@ const CommandHandlers = [CreatePaymentIntentCommandHandler, ProcessPaymentComman
   imports: [
     TypeOrmModule.forFeature([PaymentIntentEntity, PaymentTransactionEntity]),
     CqrsModule,
+    EventBusModule,
     LedgerModule,
     AccountModule,
   ],
   controllers: [PaymentWebhookController],
-  providers: [PaymentProviderRegistry, NoOpPaymentProvider, FraudCheckService, ...CommandHandlers],
-  exports: [PaymentProviderRegistry, NoOpPaymentProvider, FraudCheckService, TypeOrmModule],
+  providers: [
+    PaymentProviderRegistry,
+    NoOpPaymentProvider,
+    FraudCheckService,
+    PaymentFlowOrchestrator,
+    ...CommandHandlers,
+  ],
+  exports: [
+    PaymentProviderRegistry,
+    NoOpPaymentProvider,
+    FraudCheckService,
+    PaymentFlowOrchestrator,
+    TypeOrmModule,
+  ],
 })
 export class PaymentModule {}

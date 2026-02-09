@@ -10,5 +10,6 @@ export * from './events/payment-failed.event';
 export * from './handlers/create-payment-intent.handler';
 export * from './handlers/process-payment.handler';
 export * from './services/fraud-check.service';
+export * from './coordinators/payment-flow.orchestrator';
 export * from './providers';
 export * from './payment.module';

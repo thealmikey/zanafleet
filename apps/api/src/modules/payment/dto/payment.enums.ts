@@ -5,6 +5,7 @@
 
 export enum PaymentIntentStatus {
   CREATED = 'CREATED',
+  PENDING = 'PENDING',
   PROCESSING = 'PROCESSING',
   SUCCEEDED = 'SUCCEEDED',
   FAILED = 'FAILED',
