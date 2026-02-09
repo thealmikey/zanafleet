@@ -1,0 +1,171 @@
+import { EventBus } from '@nestjs/cqrs';
+import { Repository } from 'typeorm';
+import { PaymentCompletedListener } from '../../listeners/payment-completed.listener';
+import { InvoiceEntity } from '../../entities/invoice.entity';
+import { InvoicePaidEventV1 } from '../../events/invoice-paid.event';
+import { InvoiceStatus } from '../../dto/billing.enums';
+import { PaymentCompletedEventV1, PaymentIntentEntity, PaymentFlowType } from '@api/modules/payment';
+import { EventBusService } from '@api/core/event-bus';
+
+describe('PaymentCompletedListener', () => {
+  let listener: PaymentCompletedListener;
+  let mockInvoiceRepo: jest.Mocked<Repository<InvoiceEntity>>;
+  let mockPaymentIntentRepo: jest.Mocked<Repository<PaymentIntentEntity>>;
+  let mockEventBus: jest.Mocked<EventBus>;
+  let mockEventBusService: jest.Mocked<EventBusService>;
+
+  const createPaymentCompletedEvent = (paymentIntentId: string): PaymentCompletedEventV1 => {
+    return new PaymentCompletedEventV1({
+      eventId: '110e8400-e29b-41d4-a716-446655440010',
+      paymentIntentId,
+      payerAccountId: '660e8400-e29b-41d4-a716-446655440001',
+      payeeAccountId: '770e8400-e29b-41d4-a716-446655440002',
+      flowType: PaymentFlowType.C2B,
+      amount: 104.4,
+      currency: 'USD',
+      providerId: 'stripe',
+      providerTransactionId: 'pi_provider_123',
+      transactionId: 'tx-123',
+      correlationId: 'corr-123',
+    });
+  };
+
+  const existingInvoice = (): InvoiceEntity => {
+    const entity = new InvoiceEntity();
+    entity.id = '550e8400-e29b-41d4-a716-446655440000';
+    entity.payerAccountId = '660e8400-e29b-41d4-a716-446655440001';
+    entity.payeeAccountId = '770e8400-e29b-41d4-a716-446655440002';
+    entity.status = InvoiceStatus.ISSUED;
+    entity.subtotal = '100.00';
+    entity.totalDiscounts = '10.00';
+    entity.totalTax = '14.40';
+    entity.grandTotal = '104.40';
+    entity.currency = 'USD';
+    entity.dueDate = null;
+    entity.paidAt = null;
+    entity.metadata = null;
+    entity.createdAt = new Date();
+    entity.updatedAt = new Date();
+    return entity;
+  };
+
+  const existingPaymentIntent = (invoiceId: string | null): PaymentIntentEntity => {
+    const entity = new PaymentIntentEntity();
+    entity.id = '880e8400-e29b-41d4-a716-446655440003';
+    entity.invoiceId = invoiceId;
+    return entity;
+  };
+
+  beforeEach(() => {
+    mockInvoiceRepo = {
+      findOne: jest.fn(),
+      update: jest.fn().mockResolvedValue(undefined),
+    } as unknown as jest.Mocked<Repository<InvoiceEntity>>;
+
+    mockPaymentIntentRepo = {
+      findOne: jest.fn(),
+    } as unknown as jest.Mocked<Repository<PaymentIntentEntity>>;
+
+    mockEventBus = {
+      publish: jest.fn(),
+    } as unknown as jest.Mocked<EventBus>;
+
+    mockEventBusService = {
+      publish: jest.fn().mockResolvedValue(undefined),
+    } as unknown as jest.Mocked<EventBusService>;
+
+    listener = new PaymentCompletedListener(
+      mockInvoiceRepo,
+      mockPaymentIntentRepo,
+      mockEventBus,
+      mockEventBusService,
+    );
+  });
+
+  describe('handle', () => {
+    it('should mark invoice as PAID when payment completes', async () => {
+      const invoiceId = '550e8400-e29b-41d4-a716-446655440000';
+      const paymentIntentId = '880e8400-e29b-41d4-a716-446655440003';
+
+      mockPaymentIntentRepo.findOne.mockResolvedValue(existingPaymentIntent(invoiceId));
+      mockInvoiceRepo.findOne.mockResolvedValue(existingInvoice());
+
+      await listener.handle(createPaymentCompletedEvent(paymentIntentId));
+
+      expect(mockInvoiceRepo.update).toHaveBeenCalledWith(invoiceId, {
+        status: InvoiceStatus.PAID,
+        paidAt: expect.any(Date),
+      });
+    });
+
+    it('should publish InvoicePaidEventV1', async () => {
+      const invoiceId = '550e8400-e29b-41d4-a716-446655440000';
+      const paymentIntentId = '880e8400-e29b-41d4-a716-446655440003';
+
+      mockPaymentIntentRepo.findOne.mockResolvedValue(existingPaymentIntent(invoiceId));
+      mockInvoiceRepo.findOne.mockResolvedValue(existingInvoice());
+
+      await listener.handle(createPaymentCompletedEvent(paymentIntentId));
+
+      expect(mockEventBus.publish).toHaveBeenCalledTimes(1);
+      const publishedEvent = mockEventBus.publish.mock.calls[0][0] as InvoicePaidEventV1;
+      expect(publishedEvent.eventType).toBe('InvoicePaidEvent-V1');
+      expect(publishedEvent.invoiceId).toBe(invoiceId);
+      expect(publishedEvent.status).toBe(InvoiceStatus.PAID);
+    });
+
+    it('should skip when payment intent has no associated invoice', async () => {
+      const paymentIntentId = '880e8400-e29b-41d4-a716-446655440003';
+
+      mockPaymentIntentRepo.findOne.mockResolvedValue(existingPaymentIntent(null));
+
+      await listener.handle(createPaymentCompletedEvent(paymentIntentId));
+
+      expect(mockInvoiceRepo.findOne).not.toHaveBeenCalled();
+      expect(mockInvoiceRepo.update).not.toHaveBeenCalled();
+      expect(mockEventBus.publish).not.toHaveBeenCalled();
+    });
+
+    it('should skip when payment intent does not exist', async () => {
+      const paymentIntentId = '880e8400-e29b-41d4-a716-446655440003';
+
+      mockPaymentIntentRepo.findOne.mockResolvedValue(null);
+
+      await listener.handle(createPaymentCompletedEvent(paymentIntentId));
+
+      expect(mockInvoiceRepo.findOne).not.toHaveBeenCalled();
+      expect(mockInvoiceRepo.update).not.toHaveBeenCalled();
+    });
+
+    it('should skip when invoice is already PAID', async () => {
+      const invoiceId = '550e8400-e29b-41d4-a716-446655440000';
+      const paymentIntentId = '880e8400-e29b-41d4-a716-446655440003';
+
+      mockPaymentIntentRepo.findOne.mockResolvedValue(existingPaymentIntent(invoiceId));
+
+      const paidInvoice = existingInvoice();
+      paidInvoice.status = InvoiceStatus.PAID;
+      mockInvoiceRepo.findOne.mockResolvedValue(paidInvoice);
+
+      await listener.handle(createPaymentCompletedEvent(paymentIntentId));
+
+      expect(mockInvoiceRepo.update).not.toHaveBeenCalled();
+      expect(mockEventBus.publish).not.toHaveBeenCalled();
+    });
+
+    it('should publish to NATS when eventBusService is available', async () => {
+      const invoiceId = '550e8400-e29b-41d4-a716-446655440000';
+      const paymentIntentId = '880e8400-e29b-41d4-a716-446655440003';
+
+      mockPaymentIntentRepo.findOne.mockResolvedValue(existingPaymentIntent(invoiceId));
+      mockInvoiceRepo.findOne.mockResolvedValue(existingInvoice());
+
+      await listener.handle(createPaymentCompletedEvent(paymentIntentId));
+
+      expect(mockEventBusService.publish).toHaveBeenCalledWith(
+        'billing.events.invoice-paid-v1',
+        expect.any(InvoicePaidEventV1),
+      );
+    });
+  });
+});

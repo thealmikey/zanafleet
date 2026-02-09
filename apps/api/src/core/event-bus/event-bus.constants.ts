@@ -129,6 +129,12 @@ export const NatsSubjects = {
     REFUNDED_V1: 'payment.events.refunded-v1',
     ALL: 'payment.events.*',
   },
+  Billing: {
+    INVOICE_CREATED_V1: 'billing.events.invoice-created-v1',
+    INVOICE_ISSUED_V1: 'billing.events.invoice-issued-v1',
+    INVOICE_PAID_V1: 'billing.events.invoice-paid-v1',
+    ALL: 'billing.events.*',
+  },
 } as const;
 
 /**

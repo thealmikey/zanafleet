@@ -8,6 +8,7 @@ import { MediaModule } from './core/media';
 import { Neo4jModule } from './core/neo4j';
 import { AccountModule } from './modules/account/account.module';
 import { ActorModule } from './modules/actor/actor.module';
+import { BillingModule } from './modules/billing/billing.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BusinessModule } from './modules/business/business.module';
 import { CalendarModule } from './modules/calendar/calendar.module';
@@ -57,6 +58,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     AccountModule,
     ActorModule,
     AuthModule,
+    BillingModule,
     BusinessModule,
     CalendarModule,
     CapabilityModule,
