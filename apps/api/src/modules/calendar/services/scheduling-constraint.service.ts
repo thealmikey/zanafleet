@@ -327,13 +327,13 @@ export class SchedulingConstraintService {
 
     for (const resolved of resolvedBindings) {
       // Check BLACKOUT rules
-      const blackoutRules = (await this.calendarRuleRepo.find({
+      const blackoutRules = await this.calendarRuleRepo.find({
         where: {
           calendarId: resolved.binding.calendarId,
           ruleType: CalendarRuleType.BLACKOUT,
           isActive: true,
         },
-      })) ?? [];
+      });
 
       for (const rule of blackoutRules) {
         if (this.isTimestampInRuleRange(timestamp, rule.conditions)) {
@@ -350,13 +350,13 @@ export class SchedulingConstraintService {
       }
 
       // Check CLOSURE rules
-      const closureRules = (await this.calendarRuleRepo.find({
+      const closureRules = await this.calendarRuleRepo.find({
         where: {
           calendarId: resolved.binding.calendarId,
           ruleType: CalendarRuleType.CLOSURE,
           isActive: true,
         },
-      })) ?? [];
+      });
 
       for (const rule of closureRules) {
         if (this.isTimestampInRuleRange(timestamp, rule.conditions)) {

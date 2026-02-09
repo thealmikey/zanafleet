@@ -64,7 +64,7 @@ describe('SchedulingConstraintService', () => {
     } as unknown as jest.Mocked<CalendarService>;
 
     calendarRuleRepo = {
-      find: jest.fn(),
+      find: jest.fn().mockResolvedValue([]),
       findOne: jest.fn(),
       save: jest.fn(),
     } as unknown as jest.Mocked<Repository<CalendarRuleEntity>>;
