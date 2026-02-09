@@ -1,31 +1,34 @@
 /**
- * Notification Channel Enumeration
- * Defines the supported communication channels for notifications
+ * Notification Channel Enum
+ * Defines the delivery channels for notifications
  */
 export enum NotificationChannel {
-  EMAIL = 'email',
-  SMS = 'sms',
-  PUSH = 'push',
-  IN_APP = 'in_app',
+  SMS = 'SMS',
+  EMAIL = 'EMAIL',
+  PUSH = 'PUSH',
+  WHATSAPP = 'WHATSAPP',
 }
 
 /**
- * Notification Status Enumeration
- * Represents the lifecycle state of a notification
+ * Notification Status Enum
+ * Defines the lifecycle states of a notification
  */
 export enum NotificationStatus {
-  PENDING = 'pending',
-  SENT = 'sent',
-  FAILED = 'failed',
-  SKIPPED = 'skipped',
+  PENDING = 'PENDING',
+  SENT = 'SENT',
+  DELIVERED = 'DELIVERED',
+  FAILED = 'FAILED',
+  SKIPPED = 'SKIPPED',
 }
 
 /**
- * Recipient Type Enumeration
- * Identifies the type of entity receiving the notification
+ * Recipient Type Enum
+ * Defines the types of recipients for notifications
  */
 export enum RecipientType {
-  ACTOR = 'actor',
-  RIDER = 'rider',
-  BUSINESS = 'business',
+  RIDER = 'RIDER',
+  BUSINESS = 'BUSINESS',
+  CUSTOMER = 'CUSTOMER',
+  ADMIN = 'ADMIN',
+  SACCO = 'SACCO',
 }

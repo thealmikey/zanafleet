@@ -5,11 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { MessagingModule } from '../../core/messaging/messaging.module';
 
+import { NotificationDispatchCoordinator } from './coordinators/notification-dispatch.coordinator';
 import { NotificationEntity } from './entities/notification.entity';
 import { NotificationPreferenceEntity } from './entities/preference.entity';
 import { TemplateEntity } from './entities/template.entity';
 import { SendNotificationCommandHandler } from './handlers/send-notification.handler';
 import { NotificationNeo4jProjection } from './projections/notification-neo4j.projection';
+import { ChannelProviderRegistry } from './providers/channel-provider.interface';
+import { NoOpChannelProvider, createNoOpProviders } from './providers/noop-channel.provider';
 import { MessageBuilderService } from './services/message-builder.service';
 import { PreferenceService } from './services/preference.service';
 import { TemplateService } from './services/template.service';
@@ -23,6 +26,7 @@ import { NotificationSubscriber } from './subscribers/notification.subscriber';
  * Subscribes to domain events to trigger notifications
  * Manages notification templates with variable interpolation and workspace branding
  * Maintains Neo4j graph projections for real-time notification visibility
+ * Supports multi-channel dispatch via ChannelProvider abstraction
  */
 @Module({
   imports: [
@@ -39,7 +43,15 @@ import { NotificationSubscriber } from './subscribers/notification.subscriber';
     CommunicationSubscriber,
     NotificationNeo4jProjection,
     NotificationSubscriber,
+    NotificationDispatchCoordinator,
+    ChannelProviderRegistry,
+    NoOpChannelProvider,
   ],
-  exports: [TemplateService, PreferenceService],
+  exports: [
+    TemplateService,
+    PreferenceService,
+    NotificationDispatchCoordinator,
+    ChannelProviderRegistry,
+  ],
 })
 export class CommunicationModule {}
