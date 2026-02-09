@@ -153,6 +153,9 @@ export class CreateCalendarTables1761000000000 implements MigrationInterface {
         "recurrence_rule" jsonb,
         "priority" int NOT NULL DEFAULT 0,
         "is_active" boolean NOT NULL DEFAULT true,
+        "external_id" varchar(255),
+        "external_source" varchar(100),
+        "external_metadata" jsonb,
         "created_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         "updated_at" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
         CONSTRAINT "PK_calendar_events" PRIMARY KEY ("id")
