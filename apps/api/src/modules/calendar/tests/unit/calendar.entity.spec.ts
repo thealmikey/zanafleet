@@ -501,6 +501,9 @@ describe('Calendar Entities', () => {
           recurrenceRule: null,
           priority: 80,
           isActive: true,
+          externalId: null,
+          externalSource: null,
+          externalMetadata: null,
           createdAt: now,
           updatedAt: now,
         };

@@ -663,6 +663,17 @@ export interface CalendarRuleResponse {
 }
 
 /**
+ * RegionScopeResponse Interface
+ * Represents geographic applicability for calendar events.
+ * Events can target specific regions hierarchically: country > administrativeArea > locality
+ */
+export interface RegionScopeResponse {
+  country?: string;
+  administrativeArea?: string;
+  locality?: string;
+}
+
+/**
  * CalendarEventResponse Interface
  * Represents a calendar event (holiday, closure, etc.).
  */
@@ -673,7 +684,7 @@ export interface CalendarEventResponse {
   description: string | null;
   startTime: Date;
   endTime: Date;
-  regionScope: CalendarScope;
+  regionScope: RegionScopeResponse;
   recurrencePattern: RecurrencePattern;
   isActive: boolean;
 }
