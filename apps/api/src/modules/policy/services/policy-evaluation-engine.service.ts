@@ -1,7 +1,7 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 
-import { BindingTargetType, CalendarEventType, CalendarScope } from '@zanafleet/contracts';
+import { BindingTargetType, CalendarEventType } from '@zanafleet/contracts';
 
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { SchedulingConstraintService } from '../../calendar/services/scheduling-constraint.service';
@@ -285,22 +285,6 @@ export class PolicyEvaluationEngineService {
       return { targetType: BindingTargetType.SACCO, targetId: context.saccoId };
     }
     return { targetType: BindingTargetType.WORKSPACE, targetId: context.workspaceId };
-  }
-
-  /**
-   * Map subject type to CalendarScope for override lookups.
-   */
-  private mapSubjectTypeToCalendarScope(subjectType: string): CalendarScope {
-    switch (subjectType) {
-      case 'Rider':
-        return CalendarScope.RIDER;
-      case 'Business':
-        return CalendarScope.BUSINESS;
-      case 'Sacco':
-        return CalendarScope.SACCO;
-      default:
-        return CalendarScope.GLOBAL;
-    }
   }
 
   /**
