@@ -1,6 +1,7 @@
 import * as path from 'path';
 
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { EventBusModule } from './core/event-bus';
@@ -56,6 +57,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     Neo4jModule.forRoot({
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     MediaModule,
     AccountModule,
     ActorModule,
