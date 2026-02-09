@@ -1,5 +1,5 @@
 import { EventBusService, NatsSubjects } from '@api/core/event-bus';
-import { PaymentCompletedEventV1, PaymentIntentEntity } from '@api/modules/payment';
+import { PaymentCompletedEventV1 } from '@api/modules/payment';
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { EventsHandler, IEventHandler, EventBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -22,8 +22,6 @@ export class PaymentCompletedListener implements IEventHandler<PaymentCompletedE
   constructor(
     @InjectRepository(InvoiceEntity)
     private readonly invoiceRepository: Repository<InvoiceEntity>,
-    @InjectRepository(PaymentIntentEntity)
-    private readonly paymentIntentRepository: Repository<PaymentIntentEntity>,
     private readonly eventBus: EventBus,
     @Optional() private readonly eventBusService?: EventBusService,
   ) {}
@@ -31,11 +29,7 @@ export class PaymentCompletedListener implements IEventHandler<PaymentCompletedE
   async handle(event: PaymentCompletedEventV1): Promise<void> {
     this.logger.debug(`Handling PaymentCompletedEventV1: ${event.paymentIntentId}`);
 
-    const paymentIntent = await this.paymentIntentRepository.findOne({
-      where: { id: event.paymentIntentId },
-    });
-
-    if (!paymentIntent || !paymentIntent.invoiceId) {
+    if (!event.invoiceId) {
       this.logger.debug(
         `Payment ${event.paymentIntentId} is not associated with an invoice, skipping`,
       );
@@ -43,11 +37,11 @@ export class PaymentCompletedListener implements IEventHandler<PaymentCompletedE
     }
 
     const invoice = await this.invoiceRepository.findOne({
-      where: { id: paymentIntent.invoiceId },
+      where: { id: event.invoiceId },
     });
 
     if (!invoice) {
-      this.logger.warn(`Invoice not found for payment: ${paymentIntent.invoiceId}`);
+      this.logger.warn(`Invoice not found for payment: ${event.invoiceId}`);
       return;
     }
 

@@ -177,6 +177,7 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
         providerId: intent.providerId,
         providerTransactionId: providerResult.providerReference ?? transactionId,
         transactionId,
+        invoiceId: intentDomain.invoiceId,
         correlationId: command.correlationId,
       });
 

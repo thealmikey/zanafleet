@@ -4,17 +4,16 @@ import { PaymentCompletedListener } from '../../listeners/payment-completed.list
 import { InvoiceEntity } from '../../entities/invoice.entity';
 import { InvoicePaidEventV1 } from '../../events/invoice-paid.event';
 import { InvoiceStatus } from '../../dto/billing.enums';
-import { PaymentCompletedEventV1, PaymentIntentEntity, PaymentFlowType } from '@api/modules/payment';
+import { PaymentCompletedEventV1, PaymentFlowType } from '@api/modules/payment';
 import { EventBusService } from '@api/core/event-bus';
 
 describe('PaymentCompletedListener', () => {
   let listener: PaymentCompletedListener;
   let mockInvoiceRepo: jest.Mocked<Repository<InvoiceEntity>>;
-  let mockPaymentIntentRepo: jest.Mocked<Repository<PaymentIntentEntity>>;
   let mockEventBus: jest.Mocked<EventBus>;
   let mockEventBusService: jest.Mocked<EventBusService>;
 
-  const createPaymentCompletedEvent = (paymentIntentId: string): PaymentCompletedEventV1 => {
+  const createPaymentCompletedEvent = (paymentIntentId: string, invoiceId?: string | null): PaymentCompletedEventV1 => {
     return new PaymentCompletedEventV1({
       eventId: '110e8400-e29b-41d4-a716-446655440010',
       paymentIntentId,
@@ -26,6 +25,7 @@ describe('PaymentCompletedListener', () => {
       providerId: 'stripe',
       providerTransactionId: 'pi_provider_123',
       transactionId: 'tx-123',
+      invoiceId: invoiceId ?? null,
       correlationId: 'corr-123',
     });
   };
@@ -49,22 +49,11 @@ describe('PaymentCompletedListener', () => {
     return entity;
   };
 
-  const existingPaymentIntent = (invoiceId: string | null): PaymentIntentEntity => {
-    const entity = new PaymentIntentEntity();
-    entity.id = '880e8400-e29b-41d4-a716-446655440003';
-    entity.invoiceId = invoiceId;
-    return entity;
-  };
-
   beforeEach(() => {
     mockInvoiceRepo = {
       findOne: jest.fn(),
       update: jest.fn().mockResolvedValue(undefined),
     } as unknown as jest.Mocked<Repository<InvoiceEntity>>;
-
-    mockPaymentIntentRepo = {
-      findOne: jest.fn(),
-    } as unknown as jest.Mocked<Repository<PaymentIntentEntity>>;
 
     mockEventBus = {
       publish: jest.fn(),
@@ -76,7 +65,6 @@ describe('PaymentCompletedListener', () => {
 
     listener = new PaymentCompletedListener(
       mockInvoiceRepo,
-      mockPaymentIntentRepo,
       mockEventBus,
       mockEventBusService,
     );
@@ -87,10 +75,9 @@ describe('PaymentCompletedListener', () => {
       const invoiceId = '550e8400-e29b-41d4-a716-446655440000';
       const paymentIntentId = '880e8400-e29b-41d4-a716-446655440003';
 
-      mockPaymentIntentRepo.findOne.mockResolvedValue(existingPaymentIntent(invoiceId));
       mockInvoiceRepo.findOne.mockResolvedValue(existingInvoice());
 
-      await listener.handle(createPaymentCompletedEvent(paymentIntentId));
+      await listener.handle(createPaymentCompletedEvent(paymentIntentId, invoiceId));
 
       expect(mockInvoiceRepo.update).toHaveBeenCalledWith(invoiceId, {
         status: InvoiceStatus.PAID,
@@ -102,10 +89,9 @@ describe('PaymentCompletedListener', () => {
       const invoiceId = '550e8400-e29b-41d4-a716-446655440000';
       const paymentIntentId = '880e8400-e29b-41d4-a716-446655440003';
 
-      mockPaymentIntentRepo.findOne.mockResolvedValue(existingPaymentIntent(invoiceId));
       mockInvoiceRepo.findOne.mockResolvedValue(existingInvoice());
 
-      await listener.handle(createPaymentCompletedEvent(paymentIntentId));
+      await listener.handle(createPaymentCompletedEvent(paymentIntentId, invoiceId));
 
       expect(mockEventBus.publish).toHaveBeenCalledTimes(1);
       const publishedEvent = mockEventBus.publish.mock.calls[0][0] as InvoicePaidEventV1;
@@ -114,40 +100,25 @@ describe('PaymentCompletedListener', () => {
       expect(publishedEvent.status).toBe(InvoiceStatus.PAID);
     });
 
-    it('should skip when payment intent has no associated invoice', async () => {
+    it('should skip when event has no associated invoice', async () => {
       const paymentIntentId = '880e8400-e29b-41d4-a716-446655440003';
 
-      mockPaymentIntentRepo.findOne.mockResolvedValue(existingPaymentIntent(null));
-
-      await listener.handle(createPaymentCompletedEvent(paymentIntentId));
+      await listener.handle(createPaymentCompletedEvent(paymentIntentId, null));
 
       expect(mockInvoiceRepo.findOne).not.toHaveBeenCalled();
       expect(mockInvoiceRepo.update).not.toHaveBeenCalled();
       expect(mockEventBus.publish).not.toHaveBeenCalled();
     });
 
-    it('should skip when payment intent does not exist', async () => {
-      const paymentIntentId = '880e8400-e29b-41d4-a716-446655440003';
-
-      mockPaymentIntentRepo.findOne.mockResolvedValue(null);
-
-      await listener.handle(createPaymentCompletedEvent(paymentIntentId));
-
-      expect(mockInvoiceRepo.findOne).not.toHaveBeenCalled();
-      expect(mockInvoiceRepo.update).not.toHaveBeenCalled();
-    });
-
     it('should skip when invoice is already PAID', async () => {
       const invoiceId = '550e8400-e29b-41d4-a716-446655440000';
       const paymentIntentId = '880e8400-e29b-41d4-a716-446655440003';
-
-      mockPaymentIntentRepo.findOne.mockResolvedValue(existingPaymentIntent(invoiceId));
 
       const paidInvoice = existingInvoice();
       paidInvoice.status = InvoiceStatus.PAID;
       mockInvoiceRepo.findOne.mockResolvedValue(paidInvoice);
 
-      await listener.handle(createPaymentCompletedEvent(paymentIntentId));
+      await listener.handle(createPaymentCompletedEvent(paymentIntentId, invoiceId));
 
       expect(mockInvoiceRepo.update).not.toHaveBeenCalled();
       expect(mockEventBus.publish).not.toHaveBeenCalled();
@@ -157,10 +128,9 @@ describe('PaymentCompletedListener', () => {
       const invoiceId = '550e8400-e29b-41d4-a716-446655440000';
       const paymentIntentId = '880e8400-e29b-41d4-a716-446655440003';
 
-      mockPaymentIntentRepo.findOne.mockResolvedValue(existingPaymentIntent(invoiceId));
       mockInvoiceRepo.findOne.mockResolvedValue(existingInvoice());
 
-      await listener.handle(createPaymentCompletedEvent(paymentIntentId));
+      await listener.handle(createPaymentCompletedEvent(paymentIntentId, invoiceId));
 
       expect(mockEventBusService.publish).toHaveBeenCalledWith(
         'billing.events.invoice-paid-v1',

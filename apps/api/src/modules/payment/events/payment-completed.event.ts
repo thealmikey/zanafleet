@@ -21,6 +21,7 @@ export class PaymentCompletedEventV1 {
   readonly providerId: string;
   readonly providerTransactionId: string;
   readonly transactionId: string;
+  readonly invoiceId: string | null;
 
   readonly correlationId?: string;
   readonly causationId?: string;
@@ -36,6 +37,7 @@ export class PaymentCompletedEventV1 {
     providerId: string;
     providerTransactionId: string;
     transactionId: string;
+    invoiceId?: string | null;
     occurredAt?: Date;
     correlationId?: string;
     causationId?: string;
@@ -51,6 +53,7 @@ export class PaymentCompletedEventV1 {
     this.providerId = data.providerId;
     this.providerTransactionId = data.providerTransactionId;
     this.transactionId = data.transactionId;
+    this.invoiceId = data.invoiceId ?? null;
     this.occurredAt = data.occurredAt ?? new Date();
     this.correlationId = data.correlationId;
     this.causationId = data.causationId;
@@ -72,6 +75,7 @@ export class PaymentCompletedEventV1 {
     providerId: string;
     providerTransactionId: string;
     transactionId: string;
+    invoiceId: string | null;
     correlationId?: string;
     causationId?: string;
   } {
@@ -91,6 +95,7 @@ export class PaymentCompletedEventV1 {
       providerId: this.providerId,
       providerTransactionId: this.providerTransactionId,
       transactionId: this.transactionId,
+      invoiceId: this.invoiceId,
       correlationId: this.correlationId,
       causationId: this.causationId,
     };
@@ -107,6 +112,7 @@ export class PaymentCompletedEventV1 {
     providerId: string;
     providerTransactionId: string;
     transactionId: string;
+    invoiceId?: string | null;
     occurredAt: string;
     correlationId?: string;
     causationId?: string;
@@ -122,6 +128,7 @@ export class PaymentCompletedEventV1 {
       providerId: data.providerId,
       providerTransactionId: data.providerTransactionId,
       transactionId: data.transactionId,
+      invoiceId: data.invoiceId,
       occurredAt: new Date(data.occurredAt),
       correlationId: data.correlationId,
       causationId: data.causationId,
