@@ -833,5 +833,86 @@ export interface CreateCalendarOverrideInput {
   isActive?: boolean;
 }
 
+// ============================================================================
+// Capability Access Control Contracts
+// ============================================================================
+
+/**
+ * AccessContext Interface
+ * Contextual data for policy-aware capability checks
+ */
+export interface AccessContext {
+  resourceType?: string;
+  resourceId?: string;
+  action?: string;
+  metadata?: Record<string, unknown>;
+}
+
+/**
+ * Capability Interface
+ * Represents a specific capability
+ */
+export interface Capability {
+  capabilityId: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * ActorCapability Interface
+ * Represents a capability assigned to an actor
+ */
+export interface ActorCapability {
+  capabilityId: string;
+  capabilityName: string;
+  grantedAt: Date;
+  source: 'direct' | 'inherited';
+  sourceId?: string; // personaId if inherited
+}
+
+/**
+ * AccessDecision Interface
+ * Result of an access check
+ */
+export interface AccessDecision {
+  allowed: boolean;
+  capabilityName: string;
+  reason: string;
+  grantedAt?: Date;
+  source: 'direct' | 'inherited' | 'policy';
+  sourceId?: string;
+}
+
+/**
+ * Capability.Access.GrantedV1 Event
+ * Emitted when a capability is granted to an actor
+ */
+export interface CapabilityAccessGrantedV1 extends BaseEvent {
+  readonly aggregateType: 'CapabilityAccess';
+  readonly payload: {
+    actorId: string;
+    capabilityId: string;
+    capabilityName: string;
+    grantedBy: string;
+    source: 'direct' | 'inherited';
+  };
+}
+
+/**
+ * Capability.Access.DeniedV1 Event
+ * Emitted when access is denied for a capability
+ */
+export interface CapabilityAccessDeniedV1 extends BaseEvent {
+  readonly aggregateType: 'CapabilityAccess';
+  readonly payload: {
+    actorId: string;
+    capabilityName: string;
+    reason: string;
+    deniedAt: Date;
+    context?: Record<string, unknown>;
+  };
+}
+
 export { TEST_ACCOUNTS, TEST_PASSWORD, TEST_WORKSPACE_ID } from './test-accounts';
 export type { TestAccount } from './test-accounts';
