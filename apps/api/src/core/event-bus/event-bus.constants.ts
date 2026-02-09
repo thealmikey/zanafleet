@@ -109,6 +109,10 @@ export const NatsSubjects = {
     RIDER_ASSIGNED_V1: 'delivery.events.rider-assigned-v1',
     RIDER_REJECTED_V1: 'delivery.events.rider-rejected-v1',
     MATCHING_TIMEOUT_V1: 'delivery.events.matching-timeout-v1',
+    PICKUP_CONFIRMED_V1: 'delivery.events.pickup-confirmed-v1',
+    DROPOFF_CONFIRMED_V1: 'delivery.events.dropoff-confirmed-v1',
+    PROGRESS_UPDATED_V1: 'delivery.events.progress-updated-v1',
+    DELAY_DETECTED_V1: 'delivery.events.delay-detected-v1',
     ALL: 'delivery.events.*',
   },
   Location: {
