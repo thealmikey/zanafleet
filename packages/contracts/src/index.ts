@@ -202,6 +202,51 @@ export interface RiderLocationUpdatedEventV1 extends BaseEvent {
   };
 }
 
+// ============================================================================
+// Geo Query Contracts
+// ============================================================================
+
+export interface GeoPoint {
+  latitude: number;
+  longitude: number;
+}
+
+export interface GeoBounds {
+  minLat: number;
+  maxLat: number;
+  minLng: number;
+  maxLng: number;
+}
+
+export interface ZoneCluster {
+  zoneId: string;
+  center: GeoPoint;
+  bounds: GeoBounds;
+  riderCount: number;
+  averageLoad: number;
+}
+
+export interface ETAResult {
+  durationSeconds: number;
+  distanceMeters: number;
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW';
+  calculatedAt: Date;
+}
+
+export interface DistanceResult {
+  distanceMeters: number;
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW';
+  calculatedAt: Date;
+}
+
+export interface NearbyRidersParams {
+  latitude: number;
+  longitude: number;
+  radiusMeters: number;
+  limit?: number;
+  now?: Date;
+}
+
 export interface CreateLocationInput {
   latitude?: number;
   longitude?: number;

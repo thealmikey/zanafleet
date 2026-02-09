@@ -6,6 +6,7 @@ import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { Neo4jModule } from '../../core/neo4j/neo4j.module';
 import { RedisModule } from '../../core/redis/redis.module';
 
+import { GeoQueryCoordinator } from './coordinators/geo-query.coordinator';
 import { RiderLocationHistoryEntity } from './entities/rider-location-history.entity';
 import { RiderLocationSnapshotEntity } from './entities/rider-location-snapshot.entity';
 import { UpdateRiderLocationHandler } from './handlers/update-rider-location.handler';
@@ -52,6 +53,7 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
     Neo4jRiderCandidateRepository,
     UpdateRiderLocationHandler,
     RiderTelemetrySubscriber,
+    GeoQueryCoordinator,
   ],
   exports: [
     TypeOrmModule,
@@ -64,6 +66,7 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
     Neo4jRiderCandidateRepository,
     UpdateRiderLocationHandler,
     RiderTelemetrySubscriber,
+    GeoQueryCoordinator,
   ],
 })
 export class LocationIntelligenceModule implements OnModuleInit {

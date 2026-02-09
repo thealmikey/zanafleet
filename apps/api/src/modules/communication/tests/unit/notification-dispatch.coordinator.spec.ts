@@ -417,7 +417,9 @@ describe('NotificationDispatchCoordinator', () => {
       coordinator.registerChannelProvider(pushProvider);
 
       mockTemplateService.findByName.mockResolvedValue(createMockTemplate(NotificationChannel.PUSH));
-      mockTemplateService.validateVariables.mockReturnValue({ isValid: false });
+      mockTemplateService.validateVariables.mockReturnValue({
+        isValid: false,
+      });
 
       const input = createMockInput({ variables: {} });
       const result = await coordinator.dispatch(input);

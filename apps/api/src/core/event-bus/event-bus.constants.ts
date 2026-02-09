@@ -120,6 +120,8 @@ export const NatsSubjects = {
     RIDER_TELEMETRY_V1: 'location.rider.telemetry',
     /** Outbound event when rider location is updated */
     RIDER_LOCATION_UPDATED_V1: 'location.events.rider-location-updated-v1',
+    /** Outbound event when a geo query is executed */
+    QUERY_EXECUTED_V1: 'location.events.query-executed-v1',
     ALL: 'location.events.*',
   },
   Policy: {
