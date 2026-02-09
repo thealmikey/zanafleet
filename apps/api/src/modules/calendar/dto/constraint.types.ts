@@ -27,6 +27,14 @@ export interface ConstraintContext {
   operationType: OperationType;
   /** Additional context (e.g., region info, inheritance context) */
   metadata?: Record<string, unknown>;
+  /** Optional workspace ID for full inheritance context resolution */
+  workspaceId?: string;
+  /** Optional business ID for full inheritance context resolution */
+  businessId?: string;
+  /** Optional sacco ID for full inheritance context resolution */
+  saccoId?: string;
+  /** Optional rider ID for full inheritance context resolution */
+  riderId?: string;
 }
 
 /**

@@ -83,6 +83,7 @@ export class SchedulingConstraintService {
         timestamp,
         timezone,
         regionFilter,
+        context,
       );
       return {
         ...holidayResult,
@@ -91,7 +92,7 @@ export class SchedulingConstraintService {
     }
 
     // 3. Check for blackout periods
-    const blackoutResult = await this.checkBlackoutPeriod(targetType, targetId, timestamp);
+    const blackoutResult = await this.checkBlackoutPeriod(targetType, targetId, timestamp, context);
     if (!blackoutResult.allowed) {
       const suggestedReschedule = await this.suggestNextAvailableTime(
         targetType,
@@ -99,6 +100,7 @@ export class SchedulingConstraintService {
         timestamp,
         timezone,
         regionFilter,
+        context,
       );
       return {
         ...blackoutResult,
@@ -112,6 +114,7 @@ export class SchedulingConstraintService {
       targetId,
       timestamp,
       timezone,
+      context,
     );
     if (!workingHoursResult.allowed) {
       const suggestedReschedule = await this.suggestNextAvailableTime(
@@ -120,6 +123,7 @@ export class SchedulingConstraintService {
         timestamp,
         timezone,
         regionFilter,
+        context,
       );
       return {
         ...workingHoursResult,
@@ -226,6 +230,7 @@ export class SchedulingConstraintService {
     fromTimestamp: Date,
     timezone: string,
     regionFilter?: RegionFilter,
+    context?: ConstraintContext,
   ): Promise<Date | null> {
     let currentTime = DateTime.fromJSDate(fromTimestamp, { zone: timezone });
     const maxSearchDate = currentTime.plus({ days: MAX_SEARCH_DAYS });
@@ -253,6 +258,7 @@ export class SchedulingConstraintService {
         targetId,
         currentTime,
         timezone,
+        context,
       );
 
       if (nextWorkingTime) {
@@ -295,8 +301,9 @@ export class SchedulingConstraintService {
     targetType: BindingTargetType,
     targetId: string,
     timestamp: Date,
+    context?: ConstraintContext,
   ): Promise<ConstraintResult> {
-    const inheritanceContext = this.buildInheritanceContext(targetType, targetId);
+    const inheritanceContext = this.buildInheritanceContext(targetType, targetId, context);
     const resolvedBindings = await this.calendarBindingService.resolveEffectiveCalendars(
       targetType,
       targetId,
@@ -359,8 +366,9 @@ export class SchedulingConstraintService {
     targetId: string,
     timestamp: Date,
     timezone: string,
+    context?: ConstraintContext,
   ): Promise<ConstraintResult> {
-    const inheritanceContext = this.buildInheritanceContext(targetType, targetId);
+    const inheritanceContext = this.buildInheritanceContext(targetType, targetId, context);
     const resolvedBindings = await this.calendarBindingService.resolveEffectiveCalendars(
       targetType,
       targetId,
@@ -414,8 +422,9 @@ export class SchedulingConstraintService {
     targetId: string,
     currentTime: DateTime,
     _timezone: string,
+    context?: ConstraintContext,
   ): Promise<Date | null> {
-    const inheritanceContext = this.buildInheritanceContext(targetType, targetId);
+    const inheritanceContext = this.buildInheritanceContext(targetType, targetId, context);
     const resolvedBindings = await this.calendarBindingService.resolveEffectiveCalendars(
       targetType,
       targetId,
@@ -527,19 +536,33 @@ export class SchedulingConstraintService {
   private buildInheritanceContext(
     targetType: BindingTargetType,
     targetId: string,
+    context?: ConstraintContext,
   ): InheritanceContext {
+    const result: InheritanceContext = {};
+
+    // If context provides hierarchy IDs, use them for full inheritance resolution
+    if (context?.workspaceId) result.workspaceId = context.workspaceId;
+    if (context?.businessId) result.businessId = context.businessId;
+    if (context?.saccoId) result.saccoId = context.saccoId;
+    if (context?.riderId) result.riderId = context.riderId;
+
+    // Always ensure the primary target ID is set based on targetType
     switch (targetType) {
       case BindingTargetType.RIDER:
-        return { riderId: targetId };
+        result.riderId = targetId;
+        break;
       case BindingTargetType.BUSINESS:
-        return { businessId: targetId };
+        result.businessId = targetId;
+        break;
       case BindingTargetType.SACCO:
-        return { saccoId: targetId };
+        result.saccoId = targetId;
+        break;
       case BindingTargetType.WORKSPACE:
-        return { workspaceId: targetId };
-      default:
-        return {};
+        result.workspaceId = targetId;
+        break;
     }
+
+    return result;
   }
 
   private mapTargetTypeToScope(targetType: BindingTargetType): CalendarScope {
