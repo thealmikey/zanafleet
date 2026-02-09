@@ -1,5 +1,5 @@
-import { NoOpPaymentProvider } from '../../providers/noop-payment.provider';
 import { PaymentStatus } from '../../providers/dto/payment-provider.types';
+import { NoOpPaymentProvider } from '../../providers/noop-payment.provider';
 
 describe('NoOpPaymentProvider', () => {
   let provider: NoOpPaymentProvider;

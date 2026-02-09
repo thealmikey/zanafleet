@@ -1,6 +1,6 @@
-import { IncentiveEligibilityService, EligibilityContext } from '../../services/incentive-eligibility.service';
-import { CampaignEntity } from '../../entities/campaign.entity';
 import { IncentiveType, CampaignStatus, FundingSource } from '../../dto/incentive.enums';
+import { CampaignEntity } from '../../entities/campaign.entity';
+import { IncentiveEligibilityService, EligibilityContext } from '../../services/incentive-eligibility.service';
 
 describe('IncentiveEligibilityService', () => {
   let service: IncentiveEligibilityService;

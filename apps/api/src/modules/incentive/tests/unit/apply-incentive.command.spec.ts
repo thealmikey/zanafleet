@@ -1,4 +1,5 @@
 import { ZodError } from 'zod';
+
 import { ApplyIncentiveCommand } from '../../commands/apply-incentive.command';
 
 describe('ApplyIncentiveCommand', () => {

@@ -1,9 +1,9 @@
-import { PaymentIntentEntity } from '../../entities/payment-intent.entity';
 import {
   PaymentIntentStatus,
   PaymentFlowType,
   PaymentMethod,
 } from '../../dto/payment.enums';
+import { PaymentIntentEntity } from '../../entities/payment-intent.entity';
 
 describe('PaymentIntentEntity', () => {
   const domainData = {

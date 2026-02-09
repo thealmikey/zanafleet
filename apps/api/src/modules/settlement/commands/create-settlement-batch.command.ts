@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { PayoutMethod } from '../dto/settlement.enums';
 
 /**

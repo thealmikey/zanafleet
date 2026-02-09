@@ -1,5 +1,5 @@
-import { InvoiceEntity } from '../../entities/invoice.entity';
 import { InvoiceStatus } from '../../dto/billing.enums';
+import { InvoiceEntity } from '../../entities/invoice.entity';
 
 describe('InvoiceEntity', () => {
   const domainData = {

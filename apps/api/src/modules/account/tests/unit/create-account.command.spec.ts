@@ -1,4 +1,5 @@
 import { ZodError } from 'zod';
+
 import { CreateAccountCommand } from '../../commands/create-account.command';
 import { AccountType } from '../../dto/account.enums';
 

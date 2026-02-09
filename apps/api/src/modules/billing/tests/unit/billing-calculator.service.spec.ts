@@ -1,5 +1,5 @@
-import { BillingCalculatorService } from '../../services/billing-calculator.service';
 import { ChargeType } from '../../dto/billing.enums';
+import { BillingCalculatorService } from '../../services/billing-calculator.service';
 import { PricingSignalService, PricingSignals } from '../../services/pricing-signal.service';
 
 describe('BillingCalculatorService', () => {

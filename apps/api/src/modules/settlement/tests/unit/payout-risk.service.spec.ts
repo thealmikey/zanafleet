@@ -1,13 +1,14 @@
+import { AccountEntity, AccountStatus, AccountType } from '@api/modules/account';
+import { LedgerEntryEntity, LedgerEntryType, LedgerCategory, LedgerReferenceType } from '@api/modules/ledger';
 import { Repository } from 'typeorm';
+
+import { SettlementStatus, PayoutMethod } from '../../dto/settlement.enums';
+import { SettlementBatchEntity } from '../../entities/settlement-batch.entity';
 import {
   PayoutRiskService,
   RiskDecision,
   PayoutRiskLevel,
 } from '../../services/payout-risk.service';
-import { SettlementBatchEntity } from '../../entities/settlement-batch.entity';
-import { SettlementStatus, PayoutMethod } from '../../dto/settlement.enums';
-import { AccountEntity, AccountStatus, AccountType } from '@api/modules/account';
-import { LedgerEntryEntity, LedgerEntryType, LedgerCategory, LedgerReferenceType } from '@api/modules/ledger';
 
 describe('PayoutRiskService', () => {
   let service: PayoutRiskService;

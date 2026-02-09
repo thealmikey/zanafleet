@@ -16,9 +16,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { ProcessPayoutCommand } from '../commands/process-payout.command';
 import { SettlementStatus } from '../dto/settlement.enums';
 import { SettlementBatchEntity } from '../entities/settlement-batch.entity';
-import { PayoutInitiatedEventV1 } from '../events/payout-initiated.event';
 import { PayoutCompletedEventV1 } from '../events/payout-completed.event';
 import { PayoutFailedEventV1 } from '../events/payout-failed.event';
+import { PayoutInitiatedEventV1 } from '../events/payout-initiated.event';
 import { PayoutRiskService, RiskDecision } from '../services/payout-risk.service';
 
 /**

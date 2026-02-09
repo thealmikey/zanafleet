@@ -1,5 +1,5 @@
-import { ChargeEntity } from '../../entities/charge.entity';
 import { ChargeType } from '../../dto/billing.enums';
+import { ChargeEntity } from '../../entities/charge.entity';
 
 describe('ChargeEntity', () => {
   const domainData = {

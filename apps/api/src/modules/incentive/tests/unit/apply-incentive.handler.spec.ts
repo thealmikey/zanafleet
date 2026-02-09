@@ -1,15 +1,17 @@
-import { EventBus, CommandBus } from '@nestjs/cqrs';
+import { EventBusService } from '@api/core/event-bus';
+import { RecordLedgerEntryCommand } from '@api/modules/ledger';
 import { NotFoundException } from '@nestjs/common';
-import { ApplyIncentiveCommandHandler } from '../../handlers/apply-incentive.handler';
+import { EventBus, CommandBus } from '@nestjs/cqrs';
+
 import { ApplyIncentiveCommand } from '../../commands/apply-incentive.command';
+import { IncentiveType, CampaignStatus, FundingSource } from '../../dto/incentive.enums';
 import { CampaignEntity } from '../../entities/campaign.entity';
+import { BudgetExhaustedEventV1 } from '../../events/budget-exhausted.event';
 import { IncentiveAppliedEventV1 } from '../../events/incentive-applied.event';
 import { SponsorshipConsumedEventV1 } from '../../events/sponsorship-consumed.event';
-import { BudgetExhaustedEventV1 } from '../../events/budget-exhausted.event';
-import { IncentiveType, CampaignStatus, FundingSource } from '../../dto/incentive.enums';
+import { ApplyIncentiveCommandHandler } from '../../handlers/apply-incentive.handler';
 import { IncentiveEngineService } from '../../services/incentive-engine.service';
-import { RecordLedgerEntryCommand } from '@api/modules/ledger';
-import { EventBusService } from '@api/core/event-bus';
+
 
 describe('ApplyIncentiveCommandHandler', () => {
   let handler: ApplyIncentiveCommandHandler;

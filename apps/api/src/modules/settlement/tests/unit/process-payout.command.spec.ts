@@ -1,4 +1,5 @@
 import { ZodError } from 'zod';
+
 import { ProcessPayoutCommand } from '../../commands/process-payout.command';
 
 describe('ProcessPayoutCommand', () => {

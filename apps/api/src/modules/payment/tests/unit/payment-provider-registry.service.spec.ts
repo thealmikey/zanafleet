@@ -1,5 +1,3 @@
-import { PaymentProviderRegistry } from '../../providers/payment-provider-registry.service';
-import { PaymentProvider } from '../../providers/payment-provider.interface';
 import {
   ProviderCapability,
   PaymentStatus,
@@ -9,6 +7,8 @@ import {
   RefundResult,
   WebhookProcessingResult,
 } from '../../providers/dto/payment-provider.types';
+import { PaymentProviderRegistry } from '../../providers/payment-provider-registry.service';
+import { PaymentProvider } from '../../providers/payment-provider.interface';
 
 class MockPaymentProvider implements PaymentProvider {
   constructor(

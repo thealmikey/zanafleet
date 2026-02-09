@@ -1,4 +1,5 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+
 import { IncentiveType, CampaignStatus, FundingSource } from '../dto/incentive.enums';
 
 /**

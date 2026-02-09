@@ -1,11 +1,12 @@
+import { EventBusService } from '@api/core/event-bus';
 import { EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
-import { CreateAccountCommandHandler } from '../../handlers/create-account.handler';
+
 import { CreateAccountCommand } from '../../commands/create-account.command';
+import { AccountType, AccountStatus } from '../../dto/account.enums';
 import { AccountEntity } from '../../entities/account.entity';
 import { AccountCreatedEventV1 } from '../../events/account-created.event';
-import { AccountType, AccountStatus } from '../../dto/account.enums';
-import { EventBusService } from '@api/core/event-bus';
+import { CreateAccountCommandHandler } from '../../handlers/create-account.handler';
 
 describe('CreateAccountCommandHandler', () => {
   let handler: CreateAccountCommandHandler;

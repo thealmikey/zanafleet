@@ -20,6 +20,14 @@ export { IdempotencyService } from './services/idempotency.service';
 export { RetryService, RetryOptions, RetryResult } from './services/retry.service';
 export { EventLoggerService, EventLogEntry } from './services/event-logger.service';
 export {
+  DomainEventRouter,
+  EventFilter,
+  EventContext,
+  DomainEventEnvelope,
+  EventSubscriberCallback,
+  RegisteredSubscriber,
+} from './services/domain-event-router.service';
+export {
   Idempotent,
   IdempotentHandler,
   withIdempotency,

@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { PaymentModule } from '../payment/payment.module';
+
 import { ChargeEntity } from './entities/charge.entity';
 import { InvoiceEntity } from './entities/invoice.entity';
 import { CreateInvoiceCommandHandler } from './handlers/create-invoice.handler';

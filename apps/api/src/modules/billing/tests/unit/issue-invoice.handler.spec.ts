@@ -1,13 +1,15 @@
+import { EventBusService } from '@api/core/event-bus';
+import { PaymentMethod, CreatePaymentIntentCommand } from '@api/modules/payment';
+import { NotFoundException } from '@nestjs/common';
 import { EventBus, CommandBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
-import { IssueInvoiceCommandHandler } from '../../handlers/issue-invoice.handler';
+
 import { IssueInvoiceCommand } from '../../commands/issue-invoice.command';
+import { InvoiceStatus } from '../../dto/billing.enums';
 import { InvoiceEntity } from '../../entities/invoice.entity';
 import { InvoiceIssuedEventV1 } from '../../events/invoice-issued.event';
-import { InvoiceStatus } from '../../dto/billing.enums';
-import { PaymentMethod, CreatePaymentIntentCommand } from '@api/modules/payment';
-import { EventBusService } from '@api/core/event-bus';
+import { IssueInvoiceCommandHandler } from '../../handlers/issue-invoice.handler';
+
 
 describe('IssueInvoiceCommandHandler', () => {
   let handler: IssueInvoiceCommandHandler;

@@ -1,7 +1,8 @@
-import { PricingSignalService, PricingContext } from '../../services/pricing-signal.service';
-import { PolicyEvaluationEngineService } from '@api/modules/policy/services/policy-evaluation-engine.service';
-import { SchedulingConstraintService } from '@api/modules/calendar/services/scheduling-constraint.service';
 import { BindingTargetType } from '@api/modules/calendar/dto';
+import { SchedulingConstraintService } from '@api/modules/calendar/services/scheduling-constraint.service';
+import { PolicyEvaluationEngineService } from '@api/modules/policy/services/policy-evaluation-engine.service';
+
+import { PricingSignalService, PricingContext } from '../../services/pricing-signal.service';
 
 describe('PricingSignalService', () => {
   let service: PricingSignalService;

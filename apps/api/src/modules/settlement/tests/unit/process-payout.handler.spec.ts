@@ -1,16 +1,18 @@
+import { EventBusService } from '@api/core/event-bus';
+import { RecordLedgerEntryCommand } from '@api/modules/ledger';
+import { PaymentProviderRegistry, PaymentProvider, PaymentStatus } from '@api/modules/payment';
+import { NotFoundException } from '@nestjs/common';
 import { EventBus, CommandBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
-import { ProcessPayoutCommandHandler } from '../../handlers/process-payout.handler';
+
 import { ProcessPayoutCommand } from '../../commands/process-payout.command';
+import { SettlementStatus, PayoutMethod } from '../../dto/settlement.enums';
 import { SettlementBatchEntity } from '../../entities/settlement-batch.entity';
-import { PayoutInitiatedEventV1 } from '../../events/payout-initiated.event';
 import { PayoutCompletedEventV1 } from '../../events/payout-completed.event';
 import { PayoutFailedEventV1 } from '../../events/payout-failed.event';
-import { SettlementStatus, PayoutMethod } from '../../dto/settlement.enums';
-import { PaymentProviderRegistry, PaymentProvider, PaymentStatus } from '@api/modules/payment';
-import { RecordLedgerEntryCommand } from '@api/modules/ledger';
-import { EventBusService } from '@api/core/event-bus';
+import { PayoutInitiatedEventV1 } from '../../events/payout-initiated.event';
+import { ProcessPayoutCommandHandler } from '../../handlers/process-payout.handler';
+
 
 describe('ProcessPayoutCommandHandler', () => {
   let handler: ProcessPayoutCommandHandler;

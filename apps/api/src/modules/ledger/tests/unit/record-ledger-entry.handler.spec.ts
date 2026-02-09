@@ -1,11 +1,12 @@
+import { EventBusService } from '@api/core/event-bus';
 import { EventBus } from '@nestjs/cqrs';
 import { DataSource, EntityManager, Repository } from 'typeorm';
-import { RecordLedgerEntryCommandHandler } from '../../handlers/record-ledger-entry.handler';
+
 import { RecordLedgerEntryCommand } from '../../commands/record-ledger-entry.command';
+import { LedgerEntryType, LedgerCategory, LedgerReferenceType } from '../../dto/ledger.enums';
 import { LedgerEntryEntity } from '../../entities/ledger-entry.entity';
 import { LedgerEntryRecordedEventV1 } from '../../events/ledger-entry-recorded.event';
-import { LedgerEntryType, LedgerCategory, LedgerReferenceType } from '../../dto/ledger.enums';
-import { EventBusService } from '@api/core/event-bus';
+import { RecordLedgerEntryCommandHandler } from '../../handlers/record-ledger-entry.handler';
 
 describe('RecordLedgerEntryCommandHandler', () => {
   let handler: RecordLedgerEntryCommandHandler;

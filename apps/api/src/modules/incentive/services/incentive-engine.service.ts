@@ -1,12 +1,13 @@
+import { ChargeType } from '@api/modules/billing';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ChargeType } from '@api/modules/billing';
+import { CampaignStatus, IncentiveType, FundingSource } from '../dto/incentive.enums';
 import { CampaignEntity } from '../entities/campaign.entity';
 import { IncentiveApplicationEntity } from '../entities/incentive-application.entity';
-import { CampaignStatus, IncentiveType, FundingSource } from '../dto/incentive.enums';
+
 import {
   IncentiveEligibilityService,
   EligibilityContext,

@@ -1,5 +1,5 @@
-import { AccountEntity } from '../../entities/account.entity';
 import { AccountType, AccountStatus } from '../../dto/account.enums';
+import { AccountEntity } from '../../entities/account.entity';
 
 describe('AccountEntity', () => {
   const domainData = {

@@ -1,10 +1,11 @@
+import { ChargeType } from '@api/modules/billing';
 import { Repository } from 'typeorm';
-import { IncentiveEngineService } from '../../services/incentive-engine.service';
-import { IncentiveEligibilityService } from '../../services/incentive-eligibility.service';
+
+import { IncentiveType, CampaignStatus, FundingSource } from '../../dto/incentive.enums';
 import { CampaignEntity } from '../../entities/campaign.entity';
 import { IncentiveApplicationEntity } from '../../entities/incentive-application.entity';
-import { IncentiveType, CampaignStatus, FundingSource } from '../../dto/incentive.enums';
-import { ChargeType } from '@api/modules/billing';
+import { IncentiveEligibilityService } from '../../services/incentive-eligibility.service';
+import { IncentiveEngineService } from '../../services/incentive-engine.service';
 
 describe('IncentiveEngineService', () => {
   let service: IncentiveEngineService;

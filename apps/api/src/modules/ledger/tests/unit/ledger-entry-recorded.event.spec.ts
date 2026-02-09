@@ -1,5 +1,5 @@
-import { LedgerEntryRecordedEventV1 } from '../../events/ledger-entry-recorded.event';
 import { LedgerEntryType, LedgerCategory, LedgerReferenceType } from '../../dto/ledger.enums';
+import { LedgerEntryRecordedEventV1 } from '../../events/ledger-entry-recorded.event';
 
 describe('LedgerEntryRecordedEventV1', () => {
   const validEventData = {

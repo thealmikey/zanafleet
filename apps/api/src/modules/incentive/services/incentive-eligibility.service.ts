@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { CampaignEntity } from '../entities/campaign.entity';
 import { CampaignStatus, IncentiveType } from '../dto/incentive.enums';
+import { CampaignEntity } from '../entities/campaign.entity';
 
 export interface EligibilityContext {
   accountId: string;

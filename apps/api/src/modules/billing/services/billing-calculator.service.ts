@@ -1,6 +1,8 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
-import { ChargeType } from '../dto/billing.enums';
+
 import { ChargeInput } from '../commands/create-invoice.command';
+import { ChargeType } from '../dto/billing.enums';
+
 import { PricingSignalService, PricingContext, PricingSignals } from './pricing-signal.service';
 
 export interface DeliveryPricingInput {

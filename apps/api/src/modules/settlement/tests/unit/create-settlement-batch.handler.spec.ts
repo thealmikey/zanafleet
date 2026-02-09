@@ -1,13 +1,14 @@
+import { EventBusService } from '@api/core/event-bus';
+import { LedgerEntryEntity, LedgerCategory, LedgerEntryType, LedgerReferenceType } from '@api/modules/ledger';
 import { EventBus } from '@nestjs/cqrs';
 import { DataSource, Repository, EntityManager } from 'typeorm';
-import { CreateSettlementBatchCommandHandler } from '../../handlers/create-settlement-batch.handler';
+
 import { CreateSettlementBatchCommand } from '../../commands/create-settlement-batch.command';
+import { SettlementStatus, PayoutMethod } from '../../dto/settlement.enums';
 import { SettlementBatchEntity } from '../../entities/settlement-batch.entity';
 import { SettlementItemEntity } from '../../entities/settlement-item.entity';
 import { SettlementBatchCreatedEventV1 } from '../../events/batch-created.event';
-import { SettlementStatus, PayoutMethod } from '../../dto/settlement.enums';
-import { LedgerEntryEntity, LedgerCategory, LedgerEntryType, LedgerReferenceType } from '@api/modules/ledger';
-import { EventBusService } from '@api/core/event-bus';
+import { CreateSettlementBatchCommandHandler } from '../../handlers/create-settlement-batch.handler';
 
 describe('CreateSettlementBatchCommandHandler', () => {
   let handler: CreateSettlementBatchCommandHandler;

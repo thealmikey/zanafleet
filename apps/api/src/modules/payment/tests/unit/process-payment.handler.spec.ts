@@ -1,18 +1,19 @@
+import { EventBusService } from '@api/core/event-bus';
+import { RecordLedgerEntryCommand } from '@api/modules/ledger';
+import { NotFoundException } from '@nestjs/common';
 import { EventBus, CommandBus } from '@nestjs/cqrs';
 import { DataSource, Repository } from 'typeorm';
-import { NotFoundException } from '@nestjs/common';
-import { ProcessPaymentCommandHandler } from '../../handlers/process-payment.handler';
+
 import { ProcessPaymentCommand } from '../../commands/process-payment.command';
+import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../../dto/payment.enums';
 import { PaymentIntentEntity } from '../../entities/payment-intent.entity';
 import { PaymentTransactionEntity } from '../../entities/payment-transaction.entity';
 import { PaymentCompletedEventV1 } from '../../events/payment-completed.event';
 import { PaymentFailedEventV1 } from '../../events/payment-failed.event';
-import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../../dto/payment.enums';
+import { ProcessPaymentCommandHandler } from '../../handlers/process-payment.handler';
 import { PaymentStatus } from '../../providers/dto/payment-provider.types';
 import { PaymentProviderRegistry } from '../../providers/payment-provider-registry.service';
 import { PaymentProvider } from '../../providers/payment-provider.interface';
-import { EventBusService } from '@api/core/event-bus';
-import { RecordLedgerEntryCommand } from '@api/modules/ledger';
 import { FraudCheckService, FraudDecision, RiskLevel, FraudCheckResult } from '../../services/fraud-check.service';
 
 describe('ProcessPaymentCommandHandler', () => {

@@ -1,11 +1,12 @@
+import { EventBusService } from '@api/core/event-bus';
+import { PaymentCompletedEventV1, PaymentFlowType } from '@api/modules/payment';
 import { EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
-import { PaymentCompletedListener } from '../../listeners/payment-completed.listener';
+
+import { InvoiceStatus } from '../../dto/billing.enums';
 import { InvoiceEntity } from '../../entities/invoice.entity';
 import { InvoicePaidEventV1 } from '../../events/invoice-paid.event';
-import { InvoiceStatus } from '../../dto/billing.enums';
-import { PaymentCompletedEventV1, PaymentFlowType } from '@api/modules/payment';
-import { EventBusService } from '@api/core/event-bus';
+import { PaymentCompletedListener } from '../../listeners/payment-completed.listener';
 
 describe('PaymentCompletedListener', () => {
   let listener: PaymentCompletedListener;

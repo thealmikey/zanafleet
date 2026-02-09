@@ -1,11 +1,12 @@
+import { EventBusService } from '@api/core/event-bus';
 import { EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
-import { CreateCampaignCommandHandler } from '../../handlers/create-campaign.handler';
+
 import { CreateCampaignCommand } from '../../commands/create-campaign.command';
+import { IncentiveType, CampaignStatus, FundingSource } from '../../dto/incentive.enums';
 import { CampaignEntity } from '../../entities/campaign.entity';
 import { CampaignCreatedEventV1 } from '../../events/campaign-created.event';
-import { IncentiveType, CampaignStatus, FundingSource } from '../../dto/incentive.enums';
-import { EventBusService } from '@api/core/event-bus';
+import { CreateCampaignCommandHandler } from '../../handlers/create-campaign.handler';
 
 describe('CreateCampaignCommandHandler', () => {
   let handler: CreateCampaignCommandHandler;

@@ -12,9 +12,9 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { ApplyIncentiveCommand } from '../commands/apply-incentive.command';
 import { FundingSource } from '../dto/incentive.enums';
+import { BudgetExhaustedEventV1 } from '../events/budget-exhausted.event';
 import { IncentiveAppliedEventV1 } from '../events/incentive-applied.event';
 import { SponsorshipConsumedEventV1 } from '../events/sponsorship-consumed.event';
-import { BudgetExhaustedEventV1 } from '../events/budget-exhausted.event';
 import { IncentiveEngineService, ApplyIncentiveResult } from '../services/incentive-engine.service';
 
 /**

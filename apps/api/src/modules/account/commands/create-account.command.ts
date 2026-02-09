@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { AccountType } from '../dto/account.enums';
 
 /**

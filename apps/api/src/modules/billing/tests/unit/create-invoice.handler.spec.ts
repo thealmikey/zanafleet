@@ -1,13 +1,14 @@
+import { EventBusService } from '@api/core/event-bus';
 import { EventBus } from '@nestjs/cqrs';
 import { DataSource, EntityManager } from 'typeorm';
-import { CreateInvoiceCommandHandler } from '../../handlers/create-invoice.handler';
+
 import { CreateInvoiceCommand } from '../../commands/create-invoice.command';
+import { ChargeType, InvoiceStatus } from '../../dto/billing.enums';
 import { ChargeEntity } from '../../entities/charge.entity';
 import { InvoiceEntity } from '../../entities/invoice.entity';
 import { InvoiceCreatedEventV1 } from '../../events/invoice-created.event';
-import { ChargeType, InvoiceStatus } from '../../dto/billing.enums';
+import { CreateInvoiceCommandHandler } from '../../handlers/create-invoice.handler';
 import { BillingCalculatorService } from '../../services/billing-calculator.service';
-import { EventBusService } from '@api/core/event-bus';
 
 describe('CreateInvoiceCommandHandler', () => {
   let handler: CreateInvoiceCommandHandler;

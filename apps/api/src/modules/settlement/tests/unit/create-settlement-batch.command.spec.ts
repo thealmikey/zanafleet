@@ -1,4 +1,5 @@
 import { ZodError } from 'zod';
+
 import { CreateSettlementBatchCommand } from '../../commands/create-settlement-batch.command';
 import { PayoutMethod } from '../../dto/settlement.enums';
 

@@ -1,11 +1,12 @@
+import { EventBusService } from '@api/core/event-bus';
 import { EventBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
-import { CreatePaymentIntentCommandHandler } from '../../handlers/create-payment-intent.handler';
+
 import { CreatePaymentIntentCommand } from '../../commands/create-payment-intent.command';
+import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../../dto/payment.enums';
 import { PaymentIntentEntity } from '../../entities/payment-intent.entity';
 import { PaymentIntentCreatedEventV1 } from '../../events/payment-intent-created.event';
-import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../../dto/payment.enums';
-import { EventBusService } from '@api/core/event-bus';
+import { CreatePaymentIntentCommandHandler } from '../../handlers/create-payment-intent.handler';
 
 describe('CreatePaymentIntentCommandHandler', () => {
   let handler: CreatePaymentIntentCommandHandler;

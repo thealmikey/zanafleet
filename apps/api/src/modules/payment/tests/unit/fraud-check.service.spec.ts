@@ -1,13 +1,14 @@
+import { AccountEntity, AccountStatus, AccountType } from '@api/modules/account';
+import { PolicyEvaluationEngineService } from '@api/modules/policy/services/policy-evaluation-engine.service';
 import { Repository } from 'typeorm';
+
+import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../../dto/payment.enums';
+import { PaymentIntentEntity } from '../../entities/payment-intent.entity';
 import {
   FraudCheckService,
   FraudDecision,
   RiskLevel,
 } from '../../services/fraud-check.service';
-import { PaymentIntentEntity } from '../../entities/payment-intent.entity';
-import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../../dto/payment.enums';
-import { AccountEntity, AccountStatus, AccountType } from '@api/modules/account';
-import { PolicyEvaluationEngineService } from '@api/modules/policy/services/policy-evaluation-engine.service';
 
 describe('FraudCheckService', () => {
   let service: FraudCheckService;

@@ -1,5 +1,5 @@
-import { SettlementBatchEntity } from '../../entities/settlement-batch.entity';
 import { SettlementStatus, PayoutMethod } from '../../dto/settlement.enums';
+import { SettlementBatchEntity } from '../../entities/settlement-batch.entity';
 
 describe('SettlementBatchEntity', () => {
   const domainData = {

@@ -1,5 +1,5 @@
-import { CampaignEntity } from '../../entities/campaign.entity';
 import { IncentiveType, CampaignStatus, FundingSource } from '../../dto/incentive.enums';
+import { CampaignEntity } from '../../entities/campaign.entity';
 
 describe('CampaignEntity', () => {
   const domainData = {

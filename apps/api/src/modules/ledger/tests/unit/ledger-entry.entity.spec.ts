@@ -1,5 +1,5 @@
-import { LedgerEntryEntity } from '../../entities/ledger-entry.entity';
 import { LedgerEntryType, LedgerCategory, LedgerReferenceType } from '../../dto/ledger.enums';
+import { LedgerEntryEntity } from '../../entities/ledger-entry.entity';
 
 describe('LedgerEntryEntity', () => {
   const domainData = {

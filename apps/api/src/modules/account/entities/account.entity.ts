@@ -1,4 +1,5 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
+
 import { AccountType, AccountStatus } from '../dto/account.enums';
 
 /**
