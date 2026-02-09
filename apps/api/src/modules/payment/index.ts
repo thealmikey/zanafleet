@@ -9,5 +9,6 @@ export * from './events/payment-completed.event';
 export * from './events/payment-failed.event';
 export * from './handlers/create-payment-intent.handler';
 export * from './handlers/process-payment.handler';
+export * from './services/fraud-check.service';
 export * from './providers';
 export * from './payment.module';

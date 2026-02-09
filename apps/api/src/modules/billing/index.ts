@@ -7,4 +7,5 @@ export * from './events/invoice-created.event';
 export * from './events/invoice-issued.event';
 export * from './events/invoice-paid.event';
 export * from './services/billing-calculator.service';
+export * from './services/pricing-signal.service';
 export * from './billing.module';

@@ -10,4 +10,5 @@ export * from './events/payout-failed.event';
 export * from './handlers/create-settlement-batch.handler';
 export * from './handlers/process-payout.handler';
 export * from './services/settlement-scheduler.service';
+export * from './services/payout-risk.service';
 export * from './settlement.module';

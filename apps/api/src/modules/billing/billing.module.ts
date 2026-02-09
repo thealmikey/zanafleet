@@ -8,10 +8,12 @@ import { InvoiceEntity } from './entities/invoice.entity';
 import { CreateInvoiceCommandHandler } from './handlers/create-invoice.handler';
 import { IssueInvoiceCommandHandler } from './handlers/issue-invoice.handler';
 import { PaymentCompletedListener } from './listeners/payment-completed.listener';
+import { PolicyEvaluatedListener } from './listeners/policy-evaluated.listener';
 import { BillingCalculatorService } from './services/billing-calculator.service';
+import { PricingSignalService } from './services/pricing-signal.service';
 
 const CommandHandlers = [CreateInvoiceCommandHandler, IssueInvoiceCommandHandler];
-const EventHandlers = [PaymentCompletedListener];
+const EventHandlers = [PaymentCompletedListener, PolicyEvaluatedListener];
 
 @Module({
   imports: [
@@ -19,7 +21,7 @@ const EventHandlers = [PaymentCompletedListener];
     CqrsModule,
     PaymentModule,
   ],
-  providers: [BillingCalculatorService, ...CommandHandlers, ...EventHandlers],
-  exports: [TypeOrmModule, BillingCalculatorService],
+  providers: [BillingCalculatorService, PricingSignalService, ...CommandHandlers, ...EventHandlers],
+  exports: [TypeOrmModule, BillingCalculatorService, PricingSignalService],
 })
 export class BillingModule {}

@@ -18,6 +18,7 @@ import { SettlementBatchEntity } from '../entities/settlement-batch.entity';
 import { PayoutInitiatedEventV1 } from '../events/payout-initiated.event';
 import { PayoutCompletedEventV1 } from '../events/payout-completed.event';
 import { PayoutFailedEventV1 } from '../events/payout-failed.event';
+import { PayoutRiskService, RiskDecision } from '../services/payout-risk.service';
 
 /**
  * ProcessPayoutCommandHandler
@@ -37,6 +38,7 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
     private readonly eventBus: EventBus,
     private readonly commandBus: CommandBus,
     @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly payoutRiskService?: PayoutRiskService,
   ) {}
 
   async execute(command: ProcessPayoutCommand): Promise<string> {
@@ -53,6 +55,69 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
         `Settlement batch ${batch.id} is not in PENDING status (current: ${batch.status})`,
       );
       throw new Error(`Settlement batch is not in PENDING status: ${batch.status}`);
+    }
+
+    if (this.payoutRiskService) {
+      const riskResult = await this.payoutRiskService.checkPayoutEligibility(batch);
+
+      if (riskResult.decision === RiskDecision.REJECT) {
+        this.logger.warn(
+          `Settlement batch ${batch.id} rejected by risk check: ${riskResult.holdReason}`,
+        );
+
+        await this.batchRepository.update(batch.id, {
+          status: SettlementStatus.FAILED,
+          failureReason: `Risk check rejected: ${riskResult.holdReason}`,
+        });
+
+        const batchDomain = batch.toDomain();
+
+        const failedEvent = new PayoutFailedEventV1({
+          eventId: uuidv4(),
+          batchId: batch.id,
+          riderAccountId: batchDomain.riderAccountId,
+          amount: batchDomain.netPayout,
+          currency: batchDomain.currency,
+          payoutMethod: batchDomain.payoutMethod,
+          providerId: command.providerId,
+          errorCode: 'RISK_CHECK_REJECTED',
+          errorMessage: riskResult.holdReason,
+          correlationId: command.correlationId,
+        });
+
+        this.eventBus.publish(failedEvent);
+
+        if (this.eventBusService) {
+          this.eventBusService
+            .publish(NatsSubjects.Settlement.PAYOUT_FAILED_V1, failedEvent)
+            .catch((error) => {
+              this.logger.error(
+                `Failed to publish PayoutFailedEvent to NATS: ${error.message}`,
+              );
+            });
+        }
+
+        return batch.id;
+      }
+
+      if (riskResult.decision === RiskDecision.HOLD) {
+        this.logger.warn(
+          `Settlement batch ${batch.id} held for review: ${riskResult.holdReason}`,
+        );
+
+        await this.batchRepository.update(batch.id, {
+          metadata: {
+            ...batch.metadata,
+            riskCheckHold: true,
+            riskCheckReason: riskResult.holdReason,
+            riskCheckAt: new Date().toISOString(),
+          },
+        });
+      }
+
+      this.logger.debug(
+        `Risk check passed for batch ${batch.id}: decision=${riskResult.decision}, risk=${riskResult.riskLevel}`,
+      );
     }
 
     const provider = this.providerRegistry.get(command.providerId);

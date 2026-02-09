@@ -11,6 +11,7 @@ import { SettlementItemEntity } from './entities/settlement-item.entity';
 import { CreateSettlementBatchCommandHandler } from './handlers/create-settlement-batch.handler';
 import { ProcessPayoutCommandHandler } from './handlers/process-payout.handler';
 import { SettlementSchedulerService } from './services/settlement-scheduler.service';
+import { PayoutRiskService } from './services/payout-risk.service';
 
 const CommandHandlers = [CreateSettlementBatchCommandHandler, ProcessPayoutCommandHandler];
 
@@ -23,7 +24,7 @@ const CommandHandlers = [CreateSettlementBatchCommandHandler, ProcessPayoutComma
     LedgerModule,
     PaymentModule,
   ],
-  providers: [SettlementSchedulerService, ...CommandHandlers],
-  exports: [TypeOrmModule, SettlementSchedulerService],
+  providers: [SettlementSchedulerService, PayoutRiskService, ...CommandHandlers],
+  exports: [TypeOrmModule, SettlementSchedulerService, PayoutRiskService],
 })
 export class SettlementModule {}

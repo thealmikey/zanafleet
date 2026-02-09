@@ -1,11 +1,17 @@
 import { BillingCalculatorService } from '../../services/billing-calculator.service';
 import { ChargeType } from '../../dto/billing.enums';
+import { PricingSignalService, PricingSignals } from '../../services/pricing-signal.service';
 
 describe('BillingCalculatorService', () => {
   let service: BillingCalculatorService;
+  let mockPricingSignalService: jest.Mocked<PricingSignalService>;
 
   beforeEach(() => {
-    service = new BillingCalculatorService();
+    mockPricingSignalService = {
+      getPricingSignals: jest.fn(),
+    } as unknown as jest.Mocked<PricingSignalService>;
+
+    service = new BillingCalculatorService(undefined);
   });
 
   describe('calculateDeliveryCharges', () => {
@@ -145,6 +151,91 @@ describe('BillingCalculatorService', () => {
       expect(distanceFee?.amount).toBe(100);
 
       expect(result.grandTotal).toBeGreaterThan(200);
+    });
+  });
+
+  describe('calculateDeliveryChargesWithSignals', () => {
+    beforeEach(() => {
+      service = new BillingCalculatorService(mockPricingSignalService);
+    });
+
+    it('should apply surge multiplier from pricing signals', async () => {
+      const pricingSignals: PricingSignals = {
+        surgeMultiplier: 1.5,
+        isOffPeak: false,
+        isHoliday: false,
+        dynamicAdjustments: [],
+        evaluatedAt: new Date(),
+      };
+      mockPricingSignalService.getPricingSignals.mockResolvedValue(pricingSignals);
+
+      const result = await service.calculateDeliveryChargesWithSignals({
+        distanceKm: 10,
+        currency: 'USD',
+        pricingContext: {
+          workspaceId: 'ws-123',
+          timestamp: new Date(),
+          timezone: 'UTC',
+        },
+      });
+
+      expect(result.pricingSignals).toBe(pricingSignals);
+
+      const surgeFee = result.charges.find((c) => c.chargeType === ChargeType.SURGE_FEE);
+      expect(surgeFee).toBeDefined();
+      expect(surgeFee?.amount).toBe(10);
+    });
+
+    it('should not override explicit surge multiplier', async () => {
+      const pricingSignals: PricingSignals = {
+        surgeMultiplier: 2.0,
+        isOffPeak: false,
+        isHoliday: false,
+        dynamicAdjustments: [],
+        evaluatedAt: new Date(),
+      };
+      mockPricingSignalService.getPricingSignals.mockResolvedValue(pricingSignals);
+
+      const result = await service.calculateDeliveryChargesWithSignals({
+        distanceKm: 10,
+        currency: 'USD',
+        surgeMultiplier: 1.5,
+        pricingContext: {
+          workspaceId: 'ws-123',
+          timestamp: new Date(),
+          timezone: 'UTC',
+        },
+      });
+
+      const surgeFee = result.charges.find((c) => c.chargeType === ChargeType.SURGE_FEE);
+      expect(surgeFee?.amount).toBe(10);
+    });
+
+    it('should work without pricing context', async () => {
+      const result = await service.calculateDeliveryChargesWithSignals({
+        distanceKm: 10,
+        currency: 'USD',
+      });
+
+      expect(result.pricingSignals).toBeUndefined();
+      expect(mockPricingSignalService.getPricingSignals).not.toHaveBeenCalled();
+    });
+
+    it('should handle pricing signal service errors gracefully', async () => {
+      mockPricingSignalService.getPricingSignals.mockRejectedValue(new Error('Service error'));
+
+      const result = await service.calculateDeliveryChargesWithSignals({
+        distanceKm: 10,
+        currency: 'USD',
+        pricingContext: {
+          workspaceId: 'ws-123',
+          timestamp: new Date(),
+          timezone: 'UTC',
+        },
+      });
+
+      expect(result.pricingSignals).toBeUndefined();
+      expect(result.grandTotal).toBeGreaterThan(0);
     });
   });
 

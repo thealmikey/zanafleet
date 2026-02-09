@@ -1,6 +1,7 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { ChargeType } from '../dto/billing.enums';
 import { ChargeInput } from '../commands/create-invoice.command';
+import { PricingSignalService, PricingContext, PricingSignals } from './pricing-signal.service';
 
 export interface DeliveryPricingInput {
   distanceKm: number;
@@ -13,6 +14,7 @@ export interface DeliveryPricingInput {
   tip?: number;
   discount?: number;
   subsidy?: number;
+  pricingContext?: PricingContext;
 }
 
 export interface CalculatedCharges {
@@ -26,6 +28,7 @@ export interface CalculatedCharges {
 /**
  * BillingCalculatorService
  * Calculates delivery charges based on distance and applies pricing rules
+ * Integrates with PricingSignalService for dynamic pricing when available
  */
 @Injectable()
 export class BillingCalculatorService {
@@ -35,6 +38,50 @@ export class BillingCalculatorService {
   private readonly DEFAULT_PRICE_PER_KM = 1.5;
   private readonly DEFAULT_SERVICE_FEE_PERCENT = 0.1;
   private readonly DEFAULT_TAX_PERCENT = 0.16;
+
+  constructor(
+    @Optional() private readonly pricingSignalService?: PricingSignalService,
+  ) {
+    if (!this.pricingSignalService) {
+      this.logger.warn('PricingSignalService not available - dynamic pricing disabled');
+    }
+  }
+
+  async calculateDeliveryChargesWithSignals(
+    input: DeliveryPricingInput,
+  ): Promise<CalculatedCharges & { pricingSignals?: PricingSignals }> {
+    let pricingSignals: PricingSignals | undefined;
+
+    if (this.pricingSignalService && input.pricingContext) {
+      try {
+        pricingSignals = await this.pricingSignalService.getPricingSignals(input.pricingContext);
+
+        if (input.surgeMultiplier === undefined && pricingSignals.surgeMultiplier !== 1.0) {
+          input = { ...input, surgeMultiplier: pricingSignals.surgeMultiplier };
+        }
+
+        for (const adjustment of pricingSignals.dynamicAdjustments) {
+          if (adjustment.type === 'DISCOUNT' && adjustment.fixedAmount && !input.discount) {
+            input = { ...input, discount: (input.discount ?? 0) + adjustment.fixedAmount };
+          }
+          if (adjustment.type === 'SUBSIDY' && adjustment.fixedAmount && !input.subsidy) {
+            input = { ...input, subsidy: (input.subsidy ?? 0) + adjustment.fixedAmount };
+          }
+        }
+      } catch (error) {
+        this.logger.error(
+          `Failed to get pricing signals: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
+      }
+    }
+
+    const result = this.calculateDeliveryCharges(input);
+
+    return {
+      ...result,
+      pricingSignals,
+    };
+  }
 
   calculateDeliveryCharges(input: DeliveryPricingInput): CalculatedCharges {
     const charges: ChargeInput[] = [];

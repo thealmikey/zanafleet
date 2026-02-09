@@ -14,6 +14,7 @@ import { PaymentFailedEventV1 } from '../events/payment-failed.event';
 import { PaymentStatus } from '../providers/dto/payment-provider.types';
 import { PaymentProviderRegistry } from '../providers/payment-provider-registry.service';
 import { RecordLedgerEntryCommand } from '@api/modules/ledger';
+import { FraudCheckService, FraudDecision } from '../services/fraud-check.service';
 
 /**
  * ProcessPaymentCommandHandler
@@ -30,6 +31,7 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
     private readonly eventBus: EventBus,
     private readonly commandBus: CommandBus,
     @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly fraudCheckService?: FraudCheckService,
   ) {}
 
   async execute(command: ProcessPaymentCommand): Promise<string> {
@@ -51,6 +53,54 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
         `Payment intent ${intent.id} is not in CREATED status (current: ${intent.status})`,
       );
       throw new Error(`Payment intent is not in CREATED status: ${intent.status}`);
+    }
+
+    if (this.fraudCheckService) {
+      const fraudResult = await this.fraudCheckService.checkPaymentIntent(intent);
+
+      if (fraudResult.decision === FraudDecision.BLOCK) {
+        this.logger.warn(
+          `Payment intent ${intent.id} blocked by fraud check: ${fraudResult.blockReason}`,
+        );
+
+        await intentRepo.update(intent.id, { status: PaymentIntentStatus.FAILED });
+
+        const intentDomain = intent.toDomain();
+        const transactionId = uuidv4();
+
+        const failedEvent = new PaymentFailedEventV1({
+          eventId: uuidv4(),
+          paymentIntentId: intent.id,
+          payerAccountId: intentDomain.payerAccountId,
+          payeeAccountId: intentDomain.payeeAccountId,
+          flowType: intentDomain.flowType,
+          amount: intentDomain.amount,
+          currency: intentDomain.currency,
+          providerId: intent.providerId,
+          errorCode: 'FRAUD_CHECK_BLOCKED',
+          errorMessage: fraudResult.blockReason,
+          transactionId,
+          correlationId: command.correlationId,
+        });
+
+        this.eventBus.publish(failedEvent);
+
+        if (this.eventBusService) {
+          this.eventBusService
+            .publish(NatsSubjects.Payment.FAILED_V1, failedEvent)
+            .catch((error) => {
+              this.logger.error(
+                `Failed to publish PaymentFailedEvent to NATS: ${error.message}`,
+              );
+            });
+        }
+
+        return transactionId;
+      }
+
+      this.logger.debug(
+        `Fraud check passed for payment ${intent.id}: decision=${fraudResult.decision}, risk=${fraudResult.riskLevel}`,
+      );
     }
 
     const provider = this.providerRegistry.get(intent.providerId);

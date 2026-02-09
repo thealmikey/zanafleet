@@ -13,6 +13,7 @@ import { PaymentProviderRegistry } from '../../providers/payment-provider-regist
 import { PaymentProvider } from '../../providers/payment-provider.interface';
 import { EventBusService } from '@api/core/event-bus';
 import { RecordLedgerEntryCommand } from '@api/modules/ledger';
+import { FraudCheckService, FraudDecision, RiskLevel, FraudCheckResult } from '../../services/fraud-check.service';
 
 describe('ProcessPaymentCommandHandler', () => {
   let handler: ProcessPaymentCommandHandler;
@@ -21,6 +22,7 @@ describe('ProcessPaymentCommandHandler', () => {
   let mockEventBus: jest.Mocked<EventBus>;
   let mockCommandBus: jest.Mocked<CommandBus>;
   let mockEventBusService: jest.Mocked<EventBusService>;
+  let mockFraudCheckService: jest.Mocked<FraudCheckService>;
   let mockIntentRepo: jest.Mocked<Repository<PaymentIntentEntity>>;
   let mockTransactionRepo: jest.Mocked<Repository<PaymentTransactionEntity>>;
   let mockProvider: jest.Mocked<PaymentProvider>;
@@ -95,6 +97,16 @@ describe('ProcessPaymentCommandHandler', () => {
     mockEventBusService = {
       publish: jest.fn().mockResolvedValue(undefined),
     } as unknown as jest.Mocked<EventBusService>;
+
+    mockFraudCheckService = {
+      checkPaymentIntent: jest.fn().mockResolvedValue({
+        decision: FraudDecision.ALLOW,
+        riskLevel: RiskLevel.LOW,
+        checks: [],
+        policyEvaluated: false,
+        evaluatedAt: new Date(),
+      } as FraudCheckResult),
+    } as unknown as jest.Mocked<FraudCheckService>;
   });
 
   describe('successful payment', () => {
@@ -105,6 +117,7 @@ describe('ProcessPaymentCommandHandler', () => {
         mockEventBus,
         mockCommandBus,
         mockEventBusService,
+        mockFraudCheckService,
       );
 
       mockIntentRepo.findOne.mockResolvedValue(existingIntent());
@@ -201,6 +214,7 @@ describe('ProcessPaymentCommandHandler', () => {
         mockEventBus,
         mockCommandBus,
         mockEventBusService,
+        mockFraudCheckService,
       );
 
       mockIntentRepo.findOne.mockResolvedValue(existingIntent());
@@ -248,6 +262,78 @@ describe('ProcessPaymentCommandHandler', () => {
     });
   });
 
+  describe('fraud check integration', () => {
+    beforeEach(() => {
+      handler = new ProcessPaymentCommandHandler(
+        mockDataSource,
+        mockProviderRegistry,
+        mockEventBus,
+        mockCommandBus,
+        mockEventBusService,
+        mockFraudCheckService,
+      );
+
+      mockIntentRepo.findOne.mockResolvedValue(existingIntent());
+      mockProvider.initiatePayment.mockResolvedValue({
+        success: true,
+        transactionId: 'tx-id',
+        status: PaymentStatus.SUCCEEDED,
+      });
+    });
+
+    it('should block payment when fraud check returns BLOCK', async () => {
+      mockFraudCheckService.checkPaymentIntent.mockResolvedValue({
+        decision: FraudDecision.BLOCK,
+        riskLevel: RiskLevel.CRITICAL,
+        checks: [],
+        policyEvaluated: true,
+        evaluatedAt: new Date(),
+        blockReason: 'Velocity limit exceeded',
+      });
+
+      const result = await handler.execute(validCommand);
+
+      expect(result).toBeDefined();
+      expect(mockProvider.initiatePayment).not.toHaveBeenCalled();
+      expect(mockIntentRepo.update).toHaveBeenCalledWith(
+        validCommand.paymentIntentId,
+        { status: PaymentIntentStatus.FAILED },
+      );
+
+      const failedEvent = mockEventBus.publish.mock.calls[0][0] as PaymentFailedEventV1;
+      expect(failedEvent.errorCode).toBe('FRAUD_CHECK_BLOCKED');
+      expect(failedEvent.errorMessage).toBe('Velocity limit exceeded');
+    });
+
+    it('should proceed when fraud check returns ALLOW', async () => {
+      mockFraudCheckService.checkPaymentIntent.mockResolvedValue({
+        decision: FraudDecision.ALLOW,
+        riskLevel: RiskLevel.LOW,
+        checks: [],
+        policyEvaluated: true,
+        evaluatedAt: new Date(),
+      });
+
+      await handler.execute(validCommand);
+
+      expect(mockProvider.initiatePayment).toHaveBeenCalled();
+    });
+
+    it('should proceed when fraud check returns REVIEW', async () => {
+      mockFraudCheckService.checkPaymentIntent.mockResolvedValue({
+        decision: FraudDecision.REVIEW,
+        riskLevel: RiskLevel.HIGH,
+        checks: [],
+        policyEvaluated: true,
+        evaluatedAt: new Date(),
+      });
+
+      await handler.execute(validCommand);
+
+      expect(mockProvider.initiatePayment).toHaveBeenCalled();
+    });
+  });
+
   describe('error handling', () => {
     beforeEach(() => {
       handler = new ProcessPaymentCommandHandler(
@@ -255,6 +341,7 @@ describe('ProcessPaymentCommandHandler', () => {
         mockProviderRegistry,
         mockEventBus,
         mockCommandBus,
+        undefined,
         undefined,
       );
     });
@@ -290,6 +377,7 @@ describe('ProcessPaymentCommandHandler', () => {
         mockProviderRegistry,
         mockEventBus,
         mockCommandBus,
+        undefined,
         undefined,
       );
 
