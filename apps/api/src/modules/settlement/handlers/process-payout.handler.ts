@@ -1,3 +1,4 @@
+import { PLATFORM_ACCOUNT_ID } from '@api/core/constants';
 import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 import {
   RecordLedgerEntryCommand,
@@ -28,8 +29,6 @@ import { PayoutRiskService, RiskDecision } from '../services/payout-risk.service
 @CommandHandler(ProcessPayoutCommand)
 export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayoutCommand> {
   private readonly logger = new Logger(ProcessPayoutCommandHandler.name);
-
-  private readonly PLATFORM_ACCOUNT_ID = '00000000-0000-0000-0000-000000000001';
 
   constructor(
     @InjectRepository(SettlementBatchEntity)
@@ -189,7 +188,7 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
               description: `Payout for settlement batch ${batch.id}`,
             },
             {
-              accountId: this.PLATFORM_ACCOUNT_ID,
+              accountId: PLATFORM_ACCOUNT_ID,
               entryType: LedgerEntryType.CREDIT,
               category: LedgerCategory.PLATFORM_FEE,
               amount: batchDomain.platformCommission,
@@ -197,7 +196,7 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
               description: `Commission for settlement batch ${batch.id}`,
             },
             {
-              accountId: this.PLATFORM_ACCOUNT_ID,
+              accountId: PLATFORM_ACCOUNT_ID,
               entryType: LedgerEntryType.DEBIT,
               category: LedgerCategory.PAYOUT,
               amount: batchDomain.netPayout,

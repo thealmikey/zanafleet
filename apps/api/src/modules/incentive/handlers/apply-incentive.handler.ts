@@ -1,3 +1,4 @@
+import { PLATFORM_ACCOUNT_ID } from '@api/core/constants';
 import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 import {
   RecordLedgerEntryCommand,
@@ -15,8 +16,6 @@ import { IncentiveAppliedEventV1 } from '../events/incentive-applied.event';
 import { SponsorshipConsumedEventV1 } from '../events/sponsorship-consumed.event';
 import { BudgetExhaustedEventV1 } from '../events/budget-exhausted.event';
 import { IncentiveEngineService, ApplyIncentiveResult } from '../services/incentive-engine.service';
-
-const PLATFORM_ACCOUNT_ID = '00000000-0000-0000-0000-000000000001';
 
 /**
  * ApplyIncentiveCommandHandler
