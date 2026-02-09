@@ -32,6 +32,8 @@ export interface RecurrenceRule {
   byDay?: string[];
   byMonth?: number[];
   byMonthDay?: number[];
+  /** Raw RRULE string from external calendar sources */
+  rule?: string;
 }
 
 /**

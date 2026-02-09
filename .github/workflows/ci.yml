@@ -188,6 +188,7 @@ jobs:
       - name: Run integration tests
         run: npm run test:integration -- --coverage --ci
         env:
+          RUN_INTEGRATION_TESTS: 'true'
           DB_HOST: postgres
           DB_PORT: 5432
           DB_USER: postgres
