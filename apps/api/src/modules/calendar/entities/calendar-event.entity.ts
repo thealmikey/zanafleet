@@ -155,7 +155,7 @@ export class CalendarEventEntity {
     startTime: Date;
     endTime: Date;
     allDay?: boolean;
-    regionScope: RegionScope;
+    regionScope?: RegionScope;
     recurrencePattern?: RecurrencePattern;
     recurrenceRule?: RecurrenceRule | null;
     priority?: number;
@@ -174,7 +174,7 @@ export class CalendarEventEntity {
     entity.startTime = data.startTime;
     entity.endTime = data.endTime;
     entity.allDay = data.allDay ?? false;
-    entity.regionScope = data.regionScope;
+    entity.regionScope = data.regionScope ?? {};
     entity.recurrencePattern = data.recurrencePattern ?? RecurrencePattern.NONE;
     entity.recurrenceRule = data.recurrenceRule ?? null;
     entity.priority = data.priority ?? 0;
