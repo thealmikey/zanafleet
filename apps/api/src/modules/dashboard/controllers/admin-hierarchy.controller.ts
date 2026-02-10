@@ -24,6 +24,9 @@ import {
   RIDERS_IN_WORKSPACE_SCOPE,
   ALL_BUSINESS_IDS_IN_SCOPE,
   ALL_RIDER_IDS_IN_SCOPE,
+  ADMIN_SCOPED_BUSINESS_IDS,
+  ADMIN_SCOPED_SACCO_IDS,
+  ADMIN_SCOPED_RIDER_IDS,
 } from '@api/core/neo4j/queries';
 
 import { BusinessEntity } from '../../business/entities/business.entity';
@@ -76,8 +79,9 @@ export class AdminHierarchyController {
   }> {
     const { pagination, sort, filter } = parseQueryParams(query);
     const workspaceId = req.user?.workspaceId ?? null;
+    const actorId = req.user?.actorId ?? null;
 
-    const businessIds = await this.queryBusinessIdsInScope(workspaceId);
+    const businessIds = await this.queryBusinessIdsInScope(workspaceId, actorId);
 
     if (businessIds.length === 0) {
       return {
@@ -115,8 +119,9 @@ export class AdminHierarchyController {
   }> {
     const { pagination, sort, filter } = parseQueryParams(query);
     const workspaceId = req.user?.workspaceId ?? null;
+    const actorId = req.user?.actorId ?? null;
 
-    const saccoIds = await this.querySaccoIdsInScope(workspaceId);
+    const saccoIds = await this.querySaccoIdsInScope(workspaceId, actorId);
 
     if (saccoIds.length === 0) {
       return {
@@ -154,6 +159,7 @@ export class AdminHierarchyController {
   }> {
     const { pagination, sort, filter } = parseQueryParams(query);
     const workspaceId = req.user?.workspaceId ?? null;
+    const actorId = req.user?.actorId ?? null;
     const { saccoId, businessId, riderId } = query;
 
     let riderIds: string[];
@@ -161,7 +167,7 @@ export class AdminHierarchyController {
     if (riderId) {
       riderIds = [riderId];
     } else {
-      riderIds = await this.queryRiderIdsInScope(workspaceId, saccoId ?? null);
+      riderIds = await this.queryRiderIdsInScope(workspaceId, saccoId ?? null, actorId);
     }
 
     if (riderIds.length === 0) {
@@ -206,6 +212,7 @@ export class AdminHierarchyController {
   }> {
     const { pagination, sort, filter } = parseQueryParams(query);
     const workspaceId = req.user?.workspaceId ?? null;
+    const actorId = req.user?.actorId ?? null;
     const { businessId, riderId } = query;
 
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
@@ -224,7 +231,7 @@ export class AdminHierarchyController {
       if (businessId) {
         deliveryWhereClause.businessId = businessId;
       } else {
-        const scopedBusinessIds = await this.queryBusinessIdsInScope(workspaceId);
+        const scopedBusinessIds = await this.queryBusinessIdsInScope(workspaceId, actorId);
         if (scopedBusinessIds.length > 0) {
           deliveryWhereClause.businessId = In(scopedBusinessIds);
         }
@@ -251,7 +258,7 @@ export class AdminHierarchyController {
       if (businessId) {
         businessIds = [businessId];
       } else {
-        businessIds = await this.queryBusinessIdsInScope(workspaceId);
+        businessIds = await this.queryBusinessIdsInScope(workspaceId, actorId);
       }
 
       if (businessIds.length === 0) {
@@ -288,6 +295,7 @@ export class AdminHierarchyController {
   }> {
     const { pagination, sort, filter } = parseQueryParams(query);
     const workspaceId = req.user?.workspaceId ?? null;
+    const actorId = req.user?.actorId ?? null;
     const { businessId, riderId } = query;
 
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
@@ -301,8 +309,8 @@ export class AdminHierarchyController {
     } else if (businessId) {
       whereClause.businessId = businessId;
     } else {
-      const businessIds = await this.queryBusinessIdsInScope(workspaceId);
-      const riderIds = await this.queryAllRiderIdsInScope(workspaceId);
+      const businessIds = await this.queryBusinessIdsInScope(workspaceId, actorId);
+      const riderIds = await this.queryAllRiderIdsInScope(workspaceId, actorId);
 
       if (businessIds.length === 0 && riderIds.length === 0) {
         return {
@@ -329,9 +337,23 @@ export class AdminHierarchyController {
     };
   }
 
-  private async queryBusinessIdsInScope(workspaceId: string | null): Promise<string[]> {
+  /**
+   * Query business IDs scoped to admin actor or workspace.
+   * Prefers actor-scoped query when actorId is available.
+   */
+  private async queryBusinessIdsInScope(
+    workspaceId: string | null,
+    actorId?: string | null
+  ): Promise<string[]> {
     const session = this.neo4jService.getReadSession();
     try {
+      if (actorId) {
+        const result = await session.run(ADMIN_SCOPED_BUSINESS_IDS, { actorId });
+        const ids = result.records.map((r) => r.get('businessId') as string);
+        if (ids.length > 0) {
+          return ids;
+        }
+      }
       const result = await session.run(BUSINESSES_IN_WORKSPACE_SCOPE, { workspaceId });
       return result.records.map((r) => r.get('businessId') as string);
     } catch (error) {
@@ -342,9 +364,23 @@ export class AdminHierarchyController {
     }
   }
 
-  private async querySaccoIdsInScope(workspaceId: string | null): Promise<string[]> {
+  /**
+   * Query sacco IDs scoped to admin actor or workspace.
+   * Prefers actor-scoped query when actorId is available.
+   */
+  private async querySaccoIdsInScope(
+    workspaceId: string | null,
+    actorId?: string | null
+  ): Promise<string[]> {
     const session = this.neo4jService.getReadSession();
     try {
+      if (actorId) {
+        const result = await session.run(ADMIN_SCOPED_SACCO_IDS, { actorId });
+        const ids = result.records.map((r) => r.get('saccoId') as string);
+        if (ids.length > 0) {
+          return ids;
+        }
+      }
       const result = await session.run(SACCOS_IN_WORKSPACE_SCOPE, { workspaceId });
       return result.records.map((r) => r.get('saccoId') as string);
     } catch (error) {
@@ -355,12 +391,24 @@ export class AdminHierarchyController {
     }
   }
 
+  /**
+   * Query rider IDs scoped to admin actor or workspace, optionally filtered by saccoId.
+   * Prefers actor-scoped query when actorId is available.
+   */
   private async queryRiderIdsInScope(
     workspaceId: string | null,
-    saccoId: string | null
+    saccoId: string | null,
+    actorId?: string | null
   ): Promise<string[]> {
     const session = this.neo4jService.getReadSession();
     try {
+      if (actorId) {
+        const result = await session.run(ADMIN_SCOPED_RIDER_IDS, { actorId, saccoId });
+        const ids = result.records.map((r) => r.get('riderId') as string);
+        if (ids.length > 0) {
+          return ids;
+        }
+      }
       const result = await session.run(RIDERS_IN_WORKSPACE_SCOPE, { workspaceId, saccoId });
       return result.records.map((r) => r.get('riderId') as string);
     } catch (error) {
@@ -371,9 +419,22 @@ export class AdminHierarchyController {
     }
   }
 
-  private async queryAllRiderIdsInScope(workspaceId: string | null): Promise<string[]> {
+  /**
+   * Query all rider IDs in scope (without sacco filter).
+   */
+  private async queryAllRiderIdsInScope(
+    workspaceId: string | null,
+    actorId?: string | null
+  ): Promise<string[]> {
     const session = this.neo4jService.getReadSession();
     try {
+      if (actorId) {
+        const result = await session.run(ADMIN_SCOPED_RIDER_IDS, { actorId, saccoId: null });
+        const ids = result.records.map((r) => r.get('riderId') as string);
+        if (ids.length > 0) {
+          return ids;
+        }
+      }
       const result = await session.run(ALL_RIDER_IDS_IN_SCOPE, { workspaceId });
       return result.records.map((r) => r.get('riderId') as string);
     } catch (error) {

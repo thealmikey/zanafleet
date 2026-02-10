@@ -3,7 +3,86 @@
  *
  * Neo4j queries for retrieving entity IDs scoped to an admin's workspace.
  * These queries return ID sets that are then used to load full entities from Postgres.
+ *
+ * Query Naming Conventions:
+ * - ADMIN_SCOPED_*: Start from Actor.id, traverse MEMBER_OF to Workspace, then to entities
+ * - *_IN_WORKSPACE_SCOPE: Accept workspaceId directly (used when workspaceId is already known)
+ * - BUSINESS_SCOPED_*: Filter by businessId (for Order/Delivery which have FK in Postgres)
  */
+
+// ============================================================================
+// ADMIN-SCOPED QUERIES (start from actorId)
+// ============================================================================
+
+/**
+ * Get business IDs scoped to an admin actor's workspace memberships.
+ * Traverses: Actor -[:MEMBER_OF]-> Workspace <-[:OPERATES_IN|MEMBER_OF]- Business
+ *
+ * @param $actorId - The admin actor's ID
+ * @returns businessId for each business in the actor's workspace scope
+ */
+export const ADMIN_SCOPED_BUSINESS_IDS = `
+  MATCH (a:Actor {id: $actorId})-[:MEMBER_OF]->(w:Workspace)
+  MATCH (b:Business)-[:OPERATES_IN|MEMBER_OF]->(w)
+  RETURN DISTINCT b.id as businessId
+  ORDER BY b.businessName
+`;
+
+/**
+ * Get sacco IDs scoped to an admin actor's workspace memberships.
+ * Traverses: Actor -[:MEMBER_OF]-> Workspace <-[:OPERATES_IN|MEMBER_OF]- Sacco
+ *
+ * @param $actorId - The admin actor's ID
+ * @returns saccoId for each sacco in the actor's workspace scope
+ */
+export const ADMIN_SCOPED_SACCO_IDS = `
+  MATCH (a:Actor {id: $actorId})-[:MEMBER_OF]->(w:Workspace)
+  MATCH (s:Sacco)-[:OPERATES_IN|MEMBER_OF]->(w)
+  RETURN DISTINCT s.id as saccoId
+  ORDER BY s.name
+`;
+
+/**
+ * Get rider IDs scoped to an admin actor's workspace memberships.
+ * Includes riders directly linked to workspace or via their Sacco's workspace membership.
+ *
+ * @param $actorId - The admin actor's ID
+ * @param $saccoId - Optional sacco filter (null for all saccos)
+ * @returns riderId for each rider in scope
+ */
+export const ADMIN_SCOPED_RIDER_IDS = `
+  MATCH (a:Actor {id: $actorId})-[:MEMBER_OF]->(w:Workspace)
+  OPTIONAL MATCH (r1:Rider)-[:MEMBER_OF]->(w)
+  OPTIONAL MATCH (s:Sacco)-[:OPERATES_IN|MEMBER_OF]->(w)
+  OPTIONAL MATCH (r2:Rider)-[:BELONGS_TO]->(s)
+  WITH collect(DISTINCT r1) + collect(DISTINCT r2) as allRiders
+  UNWIND allRiders as rider
+  WITH rider WHERE rider IS NOT NULL
+  WITH rider WHERE $saccoId IS NULL OR rider.saccoId = $saccoId
+  RETURN DISTINCT rider.id as riderId
+  ORDER BY rider.fullName
+`;
+
+// ============================================================================
+// BUSINESS-SCOPED QUERIES (for Order/Delivery filtering)
+// ============================================================================
+
+/**
+ * Note: Orders and Deliveries have businessId as a Postgres foreign key.
+ * Instead of Neo4j queries, use Postgres WHERE clauses with the business IDs
+ * returned from ADMIN_SCOPED_BUSINESS_IDS or BUSINESSES_IN_WORKSPACE_SCOPE.
+ *
+ * Example Postgres filter pattern:
+ *   const businessIds = await neo4jQuery(ADMIN_SCOPED_BUSINESS_IDS, { actorId });
+ *   const orders = await orderRepo.find({ where: { businessId: In(businessIds) } });
+ *
+ * If Neo4j projections for Order/Delivery are added in the future, add:
+ *   BUSINESS_SCOPED_ORDER_IDS and BUSINESS_SCOPED_DELIVERY_IDS queries here.
+ */
+
+// ============================================================================
+// WORKSPACE-SCOPED QUERIES (accept workspaceId directly)
+// ============================================================================
 
 /**
  * Find all business IDs within a workspace scope.
