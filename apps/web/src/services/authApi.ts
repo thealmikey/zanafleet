@@ -75,3 +75,43 @@ export async function getCurrentUser(token?: string): Promise<User> {
   });
   return handleResponse<User>(response);
 }
+
+/**
+ * Get the current user's profile
+ * GET /api/user/profile
+ */
+export async function getProfile(token?: string): Promise<User> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  const response = await fetch(`${API_BASE_URL}/user/profile`, {
+    method: 'GET',
+    headers,
+  });
+  return handleResponse<User>(response);
+}
+
+/**
+ * Update the current user's profile
+ * PUT /api/user/profile
+ */
+export async function updateProfile(
+  update: Partial<User>,
+  token?: string
+): Promise<User> {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  const response = await fetch(`${API_BASE_URL}/user/profile`, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify(update),
+  });
+  return handleResponse<User>(response);
+}

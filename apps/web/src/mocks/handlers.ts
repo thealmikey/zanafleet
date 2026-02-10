@@ -275,9 +275,23 @@ export const handlers: HttpHandler[] = [
 
   // GET /api/auth/me
   http.get('/api/auth/me', () => {
-    // Return current user regardless of token by default (can be tightened to 401 if needed)
-    // Keeping this permissive avoids unnecessary auth coupling in tests.
-    // Optionally, could validate token here against currentToken
+    return HttpResponse.json(currentUser, { status: 200 });
+  }),
+
+  // GET /api/user/profile
+  http.get('/api/user/profile', () => {
+    return HttpResponse.json(currentUser, { status: 200 });
+  }),
+
+  // PUT /api/user/profile
+  http.put('/api/user/profile', async ({ request }) => {
+    const body = (await request.json()) as Partial<User>;
+    if (typeof body.name === 'string') {
+      currentUser.name = body.name;
+    }
+    if (typeof body.email === 'string') {
+      currentUser.email = body.email;
+    }
     return HttpResponse.json(currentUser, { status: 200 });
   }),
 

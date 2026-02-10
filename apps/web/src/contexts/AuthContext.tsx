@@ -24,6 +24,7 @@ export interface AuthActions {
   login: (credentials: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
   clearError: () => void;
+  updateUser: (user: User) => void;
 }
 
 export type AuthContextValue = AuthState & AuthActions;
@@ -33,7 +34,8 @@ type Action =
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'LOGIN_SUCCESS'; payload: { user: User; token: string } }
   | { type: 'LOGOUT' }
-  | { type: 'RESTORE_SESSION'; payload: { user: User; token: string } };
+  | { type: 'RESTORE_SESSION'; payload: { user: User; token: string } }
+  | { type: 'UPDATE_USER'; payload: User };
 
 const initialState: AuthState = {
   user: null,
@@ -71,6 +73,11 @@ function reducer(state: AuthState, action: Action): AuthState {
         user: action.payload.user,
         token: action.payload.token,
         isAuthenticated: true,
+      };
+    case 'UPDATE_USER':
+      return {
+        ...state,
+        user: action.payload,
       };
     default:
       return state;
@@ -155,12 +162,17 @@ export function AuthProvider({ children }: AuthProviderProps): React.ReactElemen
     dispatch({ type: 'SET_ERROR', payload: null });
   }, []);
 
+  const updateUser = useCallback((user: User): void => {
+    dispatch({ type: 'UPDATE_USER', payload: user });
+  }, []);
+
   const value = useMemo<AuthContextValue>(() => ({
     ...state,
     login,
     logout,
     clearError,
-  }), [state, login, logout, clearError]);
+    updateUser,
+  }), [state, login, logout, clearError, updateUser]);
 
   return (
     <AuthContext.Provider value={value}>
