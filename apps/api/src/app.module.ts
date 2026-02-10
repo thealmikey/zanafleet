@@ -31,6 +31,7 @@ import { SignUpModule } from './modules/signup/signup.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { WalletModule } from './modules/wallet/wallet.module';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 /**
  * AppModule
@@ -83,6 +84,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     TransactionModule,
     WalletModule,
     WorkspaceModule,
+    DashboardModule,
   ],
 })
 export class AppModule {}
