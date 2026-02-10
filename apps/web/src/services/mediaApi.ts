@@ -106,7 +106,7 @@ export async function getSignedUrl(
 
 export async function uploadToSignedUrl(
   url: string,
-  body: Blob | ArrayBuffer | ArrayBufferView,
+  body: Blob | ArrayBuffer | ArrayBufferView<ArrayBuffer>,
   contentType: string
 ): Promise<void> {
   const response = await fetch(url, {
