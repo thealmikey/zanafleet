@@ -28,6 +28,7 @@
     "@zanafleet/contracts": "*",
     "keycloak-js": "^26.2.2",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.20.0"
   },

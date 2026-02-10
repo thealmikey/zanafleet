@@ -15,6 +15,7 @@ import { SupportDashboard } from './pages/SupportDashboard';
 import { OperatorDashboard } from './pages/OperatorDashboard';
 import { BusinessDashboard } from './pages/BusinessDashboard';
 import { RiderDashboard } from './pages/RiderDashboard';
+import { ComponentsDemo } from './pages/Demo/ComponentsDemo';
 
 const theme = createTheme();
 
@@ -29,6 +30,7 @@ function App(): React.ReactElement {
               <Route path="/" element={<HomePage />} />
               <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignupWizard />} />
+              <Route path="/demo/components" element={<ComponentsDemo />} />
               <Route
                 path="/dashboard"
                 element={
