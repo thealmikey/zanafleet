@@ -124,6 +124,7 @@ const COMMON_NAV_ITEMS: NavItem[] = [
   { label: 'Profile', icon: <ProfileIcon />, path: '/profile' },
   { label: 'Settings', icon: <SettingsIcon />, path: '/settings' },
   { label: 'Messages', icon: <MessagesIcon />, path: '/messages' },
+  { label: 'History', icon: <HistoryIcon />, path: '/history' },
   { label: 'AI Assistant', icon: <AIIcon />, path: '/ai' },
 ];
 

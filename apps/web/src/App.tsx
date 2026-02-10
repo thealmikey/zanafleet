@@ -19,6 +19,7 @@ import { ProfilePage } from './pages/Profile';
 import { SettingsPage } from './pages/Settings';
 import { MessagingPage } from './pages/Messaging';
 import { AIAssistantPage } from './pages/AIAssistant';
+import { HistoryCalendarPage } from './pages/HistoryCalendar';
 import { ComponentsDemo } from './pages/Demo/ComponentsDemo';
 
 const theme = createTheme();
@@ -64,6 +65,14 @@ function App(): React.ReactElement {
                 element={
                   <ProtectedRoute>
                     <AIAssistantPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/history"
+                element={
+                  <ProtectedRoute>
+                    <HistoryCalendarPage />
                   </ProtectedRoute>
                 }
               />
