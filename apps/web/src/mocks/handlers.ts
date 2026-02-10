@@ -1022,4 +1022,9 @@ export const handlers: HttpHandler[] = [
       { status: 200 }
     );
   }),
+
+  // PUT /mock-storage/* - simulate uploading to a signed URL
+  http.put('/mock-storage/*', () => {
+    return new HttpResponse(null, { status: 200 });
+  }),
 ];
