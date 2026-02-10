@@ -237,6 +237,112 @@ export function resetMockNotifications(): void {
   notifications = createSeededNotifications();
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// In-memory Messages Store
+// ─────────────────────────────────────────────────────────────────────────
+
+interface MockThreadMessage {
+  id: string;
+  threadId: string;
+  senderId: string;
+  senderName: string;
+  body: string;
+  createdAt: string;
+}
+
+interface MockMessageThread {
+  id: string;
+  subject: string;
+  participants: { id: string; name: string }[];
+  messages: MockThreadMessage[];
+  createdAt: string;
+  updatedAt: string;
+  read: boolean;
+}
+
+function createSeededMessages(): MockMessageThread[] {
+  const now = Date.now();
+  return [
+    {
+      id: 'thread_1',
+      subject: 'Welcome to ZanaFleet!',
+      participants: [
+        { id: 'system', name: 'ZanaFleet Support' },
+        { id: 'user_1', name: 'Test User' },
+      ],
+      messages: [
+        {
+          id: 'msg_1_1',
+          threadId: 'thread_1',
+          senderId: 'system',
+          senderName: 'ZanaFleet Support',
+          body: 'Welcome to ZanaFleet! We are excited to have you on board. If you have any questions, feel free to reach out.',
+          createdAt: new Date(now - 1000 * 60 * 60 * 24 * 3).toISOString(),
+        },
+        {
+          id: 'msg_1_2',
+          threadId: 'thread_1',
+          senderId: 'user_1',
+          senderName: 'Test User',
+          body: 'Thank you! Looking forward to using the platform.',
+          createdAt: new Date(now - 1000 * 60 * 60 * 24 * 2).toISOString(),
+        },
+      ],
+      createdAt: new Date(now - 1000 * 60 * 60 * 24 * 3).toISOString(),
+      updatedAt: new Date(now - 1000 * 60 * 60 * 24 * 2).toISOString(),
+      read: true,
+    },
+    {
+      id: 'thread_2',
+      subject: 'Delivery Assignment Update',
+      participants: [
+        { id: 'operator_1', name: 'Fleet Operator' },
+        { id: 'user_1', name: 'Test User' },
+      ],
+      messages: [
+        {
+          id: 'msg_2_1',
+          threadId: 'thread_2',
+          senderId: 'operator_1',
+          senderName: 'Fleet Operator',
+          body: 'You have been assigned a new delivery route for tomorrow. Please check your dashboard for details.',
+          createdAt: new Date(now - 1000 * 60 * 60 * 5).toISOString(),
+        },
+      ],
+      createdAt: new Date(now - 1000 * 60 * 60 * 5).toISOString(),
+      updatedAt: new Date(now - 1000 * 60 * 60 * 5).toISOString(),
+      read: false,
+    },
+    {
+      id: 'thread_3',
+      subject: 'Payment Confirmation',
+      participants: [
+        { id: 'billing', name: 'Billing Department' },
+        { id: 'user_1', name: 'Test User' },
+      ],
+      messages: [
+        {
+          id: 'msg_3_1',
+          threadId: 'thread_3',
+          senderId: 'billing',
+          senderName: 'Billing Department',
+          body: 'Your payment of KES 5,000 has been processed successfully. Thank you for your business!',
+          createdAt: new Date(now - 1000 * 60 * 30).toISOString(),
+        },
+      ],
+      createdAt: new Date(now - 1000 * 60 * 30).toISOString(),
+      updatedAt: new Date(now - 1000 * 60 * 30).toISOString(),
+      read: false,
+    },
+  ];
+}
+
+let messageThreads: MockMessageThread[] = createSeededMessages();
+
+export function resetMockMessages(): void {
+  messageThreads = createSeededMessages();
+}
+
 // Optional: helper to seed a session for debugging
 export function seedMockSession(partial?: Partial<SignupSession>): SignupSession {
   const id = partial?.sessionId ?? createId('sess');
@@ -683,5 +789,79 @@ export const handlers: HttpHandler[] = [
     const lng = parseFloat(url.searchParams.get('lng') ?? '0');
     const inNairobi = lat >= -1.4 && lat <= -1.2 && lng >= 36.7 && lng <= 36.9;
     return HttpResponse.json({ contains: inNairobi }, { status: 200 });
+  }),
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Messaging
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // GET /api/messages - list message threads (inbox)
+  http.get('/api/messages', ({ request }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+
+    const previews = messageThreads.map((thread) => {
+      const lastMessage = thread.messages[thread.messages.length - 1];
+      return {
+        id: thread.id,
+        subject: thread.subject,
+        snippet: lastMessage?.body.slice(0, 100) ?? '',
+        senderName: lastMessage?.senderName ?? 'Unknown',
+        senderId: lastMessage?.senderId ?? '',
+        createdAt: thread.updatedAt,
+        read: thread.read,
+        replyCount: thread.messages.length,
+      };
+    });
+
+    // Sort by most recent first
+    previews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const { paginatedData, meta } = createPaginationMeta(previews, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  // GET /api/messages/:id - get thread details
+  http.get('/api/messages/:id', ({ params }) => {
+    const threadId = String(params.id ?? '');
+    const thread = messageThreads.find((t) => t.id === threadId);
+
+    if (!thread) {
+      return HttpResponse.json({ message: 'Thread not found' }, { status: 404 });
+    }
+
+    // Mark as read when fetched
+    thread.read = true;
+
+    return HttpResponse.json(thread, { status: 200 });
+  }),
+
+  // POST /api/messages/:id/reply - add a reply to thread
+  http.post('/api/messages/:id/reply', async ({ params, request }) => {
+    const threadId = String(params.id ?? '');
+    const thread = messageThreads.find((t) => t.id === threadId);
+
+    if (!thread) {
+      return HttpResponse.json({ message: 'Thread not found' }, { status: 404 });
+    }
+
+    const body = (await request.json()) as { body?: string };
+    if (!body.body || typeof body.body !== 'string') {
+      return HttpResponse.json({ message: 'Message body is required' }, { status: 400 });
+    }
+
+    const newMessage: MockThreadMessage = {
+      id: createId('msg'),
+      threadId: thread.id,
+      senderId: currentUser.id,
+      senderName: currentUser.name,
+      body: body.body,
+      createdAt: nowIso(),
+    };
+
+    thread.messages.push(newMessage);
+    thread.updatedAt = nowIso();
+
+    return HttpResponse.json(thread, { status: 200 });
   }),
 ];

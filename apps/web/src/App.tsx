@@ -17,6 +17,7 @@ import { BusinessDashboard } from './pages/BusinessDashboard';
 import { RiderDashboard } from './pages/RiderDashboard';
 import { ProfilePage } from './pages/Profile';
 import { SettingsPage } from './pages/Settings';
+import { MessagingPage } from './pages/Messaging';
 import { ComponentsDemo } from './pages/Demo/ComponentsDemo';
 
 const theme = createTheme();
@@ -46,6 +47,14 @@ function App(): React.ReactElement {
                 element={
                   <ProtectedRoute>
                     <SettingsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/messages"
+                element={
+                  <ProtectedRoute>
+                    <MessagingPage />
                   </ProtectedRoute>
                 }
               />
