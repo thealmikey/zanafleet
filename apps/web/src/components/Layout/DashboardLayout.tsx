@@ -28,6 +28,7 @@ import {
   Menu as MenuIcon,
   Paid as EarningsIcon,
   People as ManagementIcon,
+  Person as ProfileIcon,
   Receipt as SettlementsIcon,
   SupportAgent as SupportIcon,
   TwoWheeler as RiderIcon,
@@ -100,6 +101,7 @@ const ROLE_NAV_CONFIG: Record<DashboardRole, { title: string; icon: React.ReactN
 
 const COMMON_NAV_ITEMS: NavItem[] = [
   { label: 'Home', icon: <HomeIcon />, path: '/' },
+  { label: 'Profile', icon: <ProfileIcon />, path: '/profile' },
 ];
 
 export interface DashboardLayoutProps {
