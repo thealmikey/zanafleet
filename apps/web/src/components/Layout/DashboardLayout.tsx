@@ -3,6 +3,7 @@ import {
   AppBar,
   Avatar,
   Box,
+  ButtonBase,
   Divider,
   Drawer,
   IconButton,
@@ -236,17 +237,30 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps): Reac
             {title ?? roleConfig?.title ?? 'Dashboard'}
           </Typography>
           {user && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <ButtonBase
+              onClick={() => navigate('/profile')}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 1,
+                borderRadius: 1,
+                p: 0.5,
+                '&:hover': {
+                  bgcolor: 'action.hover',
+                },
+              }}
+              aria-label="Go to profile"
+            >
               <Typography
                 variant="body2"
-                sx={{ display: { xs: 'none', sm: 'block' } }}
+                sx={{ display: { xs: 'none', sm: 'block' }, color: 'inherit' }}
               >
                 {user.name}
               </Typography>
               <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main' }}>
                 {getInitials(user.name)}
               </Avatar>
-            </Box>
+            </ButtonBase>
           )}
         </Toolbar>
       </AppBar>

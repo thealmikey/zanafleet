@@ -15,6 +15,7 @@ import { SupportDashboard } from './pages/SupportDashboard';
 import { OperatorDashboard } from './pages/OperatorDashboard';
 import { BusinessDashboard } from './pages/BusinessDashboard';
 import { RiderDashboard } from './pages/RiderDashboard';
+import { ProfilePage } from './pages/Profile';
 import { ComponentsDemo } from './pages/Demo/ComponentsDemo';
 
 const theme = createTheme();
@@ -31,6 +32,14 @@ function App(): React.ReactElement {
               <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignupWizard />} />
               <Route path="/demo/components" element={<ComponentsDemo />} />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/dashboard"
                 element={
