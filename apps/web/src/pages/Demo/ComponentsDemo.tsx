@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Container, Divider, Paper, Typography } from '@mui/material';
+import { Box, Container, Divider, Paper, Typography, useTheme } from '@mui/material';
 import {
   TrendingUp as TrendingIcon,
   ShoppingCart as OrdersIcon,
@@ -16,6 +16,12 @@ import {
   Filters,
   NotificationList,
   GeoMap,
+  LineChart,
+  BarChart,
+  DoughnutChart,
+  sampleEarningsTrend,
+  sampleDeliveryVolumes,
+  sampleSettlementStatusBreakdown,
 } from '../../components/common';
 import type {
   KPIGridItem,
@@ -61,6 +67,7 @@ const STATUS_OPTIONS = [
 ];
 
 export function ComponentsDemo(): React.ReactElement {
+  const theme = useTheme();
   const [selectedTab, setSelectedTab] = useState('tab1');
   const [listPage, setListPage] = useState(1);
   const [filters, setFilters] = useState<FilterValues>({});
@@ -252,6 +259,38 @@ export function ComponentsDemo(): React.ReactElement {
           onMarkerClick={setClickedMarker}
           ariaLabel="Demo map showing Nairobi locations"
         />
+      </Paper>
+
+      <Divider sx={{ my: 4 }} />
+
+      {/* Charts */}
+      <Paper sx={{ p: 3, mb: 4 }}>
+        <Typography variant="h5" component="h2" gutterBottom>
+          Charts
+        </Typography>
+        <Box sx={{ display: 'grid', gap: 2 }}>
+          <Box sx={{ height: 240 }}>
+            <LineChart
+              data={sampleEarningsTrend(theme.palette)}
+              height={240}
+              ariaLabel="Sample earnings line chart"
+            />
+          </Box>
+          <Box sx={{ height: 240 }}>
+            <BarChart
+              data={sampleDeliveryVolumes(theme.palette)}
+              height={240}
+              ariaLabel="Sample delivery volumes bar chart"
+            />
+          </Box>
+          <Box sx={{ height: 240 }}>
+            <DoughnutChart
+              data={sampleSettlementStatusBreakdown(theme.palette)}
+              height={240}
+              ariaLabel="Sample settlement breakdown doughnut chart"
+            />
+          </Box>
+        </Box>
       </Paper>
     </Container>
   );

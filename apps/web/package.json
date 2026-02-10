@@ -26,6 +26,7 @@
     "@react-google-maps/api": "^2.20.8",
     "@xyflow/react": "^12.10.0",
     "@zanafleet/contracts": "*",
+    "chart.js": "^4.4.1",
     "keycloak-js": "^26.2.2",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.3.1",
