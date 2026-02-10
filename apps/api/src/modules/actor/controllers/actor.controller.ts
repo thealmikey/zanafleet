@@ -1,41 +1,58 @@
 import {
-  BadRequestException,
-  Body,
   Controller,
-  Delete,
   Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  Query,
+  UseGuards,
+  NotFoundException,
   HttpCode,
   HttpStatus,
-  NotFoundException,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ZodError } from 'zod';
+
+import { CapabilityGuard } from '@api/core/api/guards';
+import { RequireCapability } from '@api/core/api/decorators';
+import {
+  parseQueryParams,
+  createPaginationMeta,
+  RawQueryParams,
+} from '@api/core/api/utils';
 
 import { CreateActorCommand } from '../commands/create-actor.command';
-import { UpdateActorCommand } from '../commands/update-actor.command';
-import { ActorResponseDto } from '../dto/actor-response.dto';
-import { CreateActorDto } from '../dto/create-actor.dto';
-import { UpdateActorDto } from '../dto/update-actor.dto';
 import { ActorEntity } from '../entities/actor.entity';
+import { ActorType } from '../dto/actor.enums';
 
-/**
- * ActorController
- *
- * REST controller for actor CRUD operations.
- * Implements the following endpoints:
- * - POST /actors - Create a new actor
- * - GET /actors - List all actors
- * - GET /actors/:id - Get actor by ID
- * - PATCH /actors/:id - Update an actor
- * - DELETE /actors/:id - Delete an actor
- */
+export class CreateActorDto {
+  email!: string;
+  username!: string;
+  type!: ActorType;
+  passwordHash?: string;
+  location?: string | null;
+  roles?: string[];
+  linkedWallets?: string[];
+  workspaceId?: string | null;
+}
+
+export class UpdateActorDto {
+  email?: string;
+  username?: string;
+  type?: ActorType;
+  passwordHash?: string;
+  location?: string | null;
+  roles?: string[];
+  linkedWallets?: string[];
+  workspaceId?: string | null;
+}
+
 @Controller('actors')
+@UseGuards(CapabilityGuard)
+@RequireCapability('actor.manage')
 export class ActorController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -45,98 +62,66 @@ export class ActorController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() body: CreateActorDto): Promise<{ actorId: string }> {
-    try {
-      const input = CreateActorCommand.validate(body);
-      const command = new CreateActorCommand(input);
-      const actorId = await this.commandBus.execute<CreateActorCommand, string>(command);
-      return { actorId };
-    } catch (error: unknown) {
-      if (error instanceof ZodError) {
-        throw this.createValidationException(error);
-      }
-      throw error;
-    }
-  }
-
-  @Get()
-  async findAll(): Promise<ActorResponseDto[]> {
-    const actors = await this.actorRepository.find({
-      order: { createdAt: 'DESC' },
-    });
-
-    return actors.map((actor) => this.mapEntityToDto(actor));
+  async create(@Body() dto: CreateActorDto): Promise<{ id: string }> {
+    const validated = CreateActorCommand.validate(dto);
+    const id = await this.commandBus.execute(new CreateActorCommand(validated));
+    return { id };
   }
 
   @Get(':id')
-  async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<ActorResponseDto> {
-    const actor = await this.actorRepository.findOne({
-      where: { id },
-    });
-
-    if (!actor) {
+  async findOne(@Param('id') id: string): Promise<ReturnType<ActorEntity['toDomain']>> {
+    const entity = await this.actorRepository.findOne({ where: { id } });
+    if (!entity) {
       throw new NotFoundException(`Actor with ID "${id}" not found`);
     }
+    return entity.toDomain();
+  }
 
-    return this.mapEntityToDto(actor);
+  @Get()
+  async findAll(@Query() query: RawQueryParams): Promise<{
+    data: ReturnType<ActorEntity['toDomain']>[];
+    meta: ReturnType<typeof createPaginationMeta>;
+  }> {
+    const { pagination, sort, filter } = parseQueryParams(query);
+
+    const order = sort ? { [sort.field]: sort.order } : undefined;
+
+    const [entities, total] = await this.actorRepository.findAndCount({
+      where: filter as Record<string, unknown>,
+      order,
+      skip: pagination.offset,
+      take: pagination.limit,
+    });
+
+    return {
+      data: entities.map((e) => e.toDomain()),
+      meta: createPaginationMeta(pagination, total),
+    };
   }
 
   @Patch(':id')
   async update(
-    @Param('id', new ParseUUIDPipe()) id: string,
-    @Body() body: UpdateActorDto
-  ): Promise<{ actorId: string }> {
-    try {
-      const input = UpdateActorCommand.validate({
-        ...body,
-        actorId: id,
-      });
-      const command = new UpdateActorCommand(input);
-      const actorId = await this.commandBus.execute<UpdateActorCommand, string>(command);
-      return { actorId };
-    } catch (error: unknown) {
-      if (error instanceof ZodError) {
-        throw this.createValidationException(error);
-      }
-      throw error;
-    }
-  }
-
-  @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', new ParseUUIDPipe()) id: string): Promise<void> {
-    const actor = await this.actorRepository.findOne({
-      where: { id },
-    });
-
-    if (!actor) {
+    @Param('id') id: string,
+    @Body() dto: UpdateActorDto
+  ): Promise<ReturnType<ActorEntity['toDomain']>> {
+    const existing = await this.actorRepository.findOne({ where: { id } });
+    if (!existing) {
       throw new NotFoundException(`Actor with ID "${id}" not found`);
     }
 
-    await this.actorRepository.remove(actor);
+    await this.actorRepository.update(id, dto);
+
+    const updated = await this.actorRepository.findOne({ where: { id } });
+    return updated!.toDomain();
   }
 
-  private mapEntityToDto(entity: ActorEntity): ActorResponseDto {
-    const domain = entity.toDomain();
-    const dto = new ActorResponseDto();
-    dto.actorId = domain.actorId;
-    dto.email = domain.email;
-    dto.username = domain.username;
-    dto.type = domain.type;
-    dto.workspaceId = domain.workspaceId;
-    dto.createdAt = domain.createdAt;
-    dto.updatedAt = domain.updatedAt;
-    return dto;
-  }
-
-  private createValidationException(error: ZodError): BadRequestException {
-    return new BadRequestException({
-      message: 'Validation failed',
-      issues: error.issues.map(({ path, message, code }) => ({
-        path,
-        message,
-        code,
-      })),
-    });
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  async remove(@Param('id') id: string): Promise<{ deleted: boolean }> {
+    const result = await this.actorRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Actor with ID "${id}" not found`);
+    }
+    return { deleted: true };
   }
 }
