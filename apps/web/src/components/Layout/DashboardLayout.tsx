@@ -62,7 +62,8 @@ const ROLE_NAV_CONFIG: Record<DashboardRole, { title: string; icon: React.ReactN
     items: [
       { label: 'Metrics', icon: <MetricsIcon />, path: '/dashboard/support' },
       { label: 'Disputes', icon: <DisputesIcon />, path: '/dashboard/support/disputes' },
-      { label: 'History', icon: <HistoryIcon />, path: '/dashboard/support/history' },
+      { label: 'Refunds', icon: <EarningsIcon />, path: '/dashboard/support/refunds' },
+      { label: 'Payments', icon: <HistoryIcon />, path: '/dashboard/support/history' },
     ],
   },
   operator: {
