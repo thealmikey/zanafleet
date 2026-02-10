@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Avatar,
@@ -12,11 +12,13 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { Save as SaveIcon } from '@mui/icons-material';
+import { PhotoCamera as PhotoCameraIcon, Save as SaveIcon } from '@mui/icons-material';
 
 import { useAuth } from '../../hooks/useAuth';
 import { DashboardLayout } from '../../components/Layout';
 import { getProfile, updateProfile } from '../../services/authApi';
+import { getSettings, updateSettings } from '../../services/settingsApi';
+import { createMediaAsset, getSignedUrl, uploadToSignedUrl } from '../../services/mediaApi';
 
 function getInitials(name: string): string {
   return name
@@ -32,10 +34,14 @@ export function ProfilePage(): React.ReactElement {
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -44,10 +50,16 @@ export function ProfilePage(): React.ReactElement {
       setIsLoading(true);
       setError(null);
       try {
-        const profile = await getProfile(token ?? undefined);
+        const [profile, settings] = await Promise.all([
+          getProfile(token ?? undefined),
+          getSettings(token ?? undefined),
+        ]);
         if (!cancelled) {
           setName(profile.name);
           setEmail(profile.email);
+          if (settings.profileImage?.url) {
+            setProfileImageUrl(settings.profileImage.url);
+          }
         }
       } catch (err) {
         if (!cancelled) {
@@ -82,6 +94,61 @@ export function ProfilePage(): React.ReactElement {
     }
   }, [name, email, token, updateUser]);
 
+  const handlePhotoChange = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>): Promise<void> => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      setIsUploadingPhoto(true);
+      setError(null);
+      setSuccess(false);
+
+      try {
+        const asset = await createMediaAsset(
+          {
+            filename: file.name,
+            mimeType: file.type,
+            size: file.size,
+            ownerId: user?.id ?? 'unknown',
+            ownerType: 'Rider',
+          },
+          token ?? undefined
+        );
+
+        const signedUrlResp = await getSignedUrl(
+          asset.mediaAssetId,
+          'PUT',
+          { contentType: file.type },
+          token ?? undefined
+        );
+
+        await uploadToSignedUrl(signedUrlResp.url, file, file.type);
+
+        const newImageUrl = signedUrlResp.url.split('?')[0];
+
+        await updateSettings(
+          { profileImage: { mediaAssetId: asset.mediaAssetId, url: newImageUrl } },
+          token ?? undefined
+        );
+
+        setProfileImageUrl(newImageUrl);
+        setSuccess(true);
+      } catch (err) {
+        setError('Failed to upload photo');
+      } finally {
+        setIsUploadingPhoto(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+      }
+    },
+    [user?.id, token]
+  );
+
+  const handleChangePhotoClick = useCallback((): void => {
+    fileInputRef.current?.click();
+  }, []);
+
   if (isLoading) {
     return (
       <DashboardLayout title="Profile">
@@ -96,16 +163,43 @@ export function ProfilePage(): React.ReactElement {
     <DashboardLayout title="Profile">
       <Paper sx={{ p: 4, maxWidth: 600 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 3 }}>
-          <Avatar
-            sx={{
-              width: 80,
-              height: 80,
-              bgcolor: 'primary.main',
-              fontSize: '2rem',
-            }}
-          >
-            {getInitials(name || 'U')}
-          </Avatar>
+          <Box sx={{ position: 'relative' }}>
+            <Avatar
+              src={profileImageUrl ?? undefined}
+              sx={{
+                width: 80,
+                height: 80,
+                bgcolor: 'primary.main',
+                fontSize: '2rem',
+              }}
+            >
+              {getInitials(name || 'U')}
+            </Avatar>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoChange}
+              style={{ display: 'none' }}
+              aria-label="Upload profile photo"
+            />
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={handleChangePhotoClick}
+              disabled={isUploadingPhoto}
+              startIcon={
+                isUploadingPhoto ? (
+                  <CircularProgress size={14} color="inherit" />
+                ) : (
+                  <PhotoCameraIcon fontSize="small" />
+                )
+              }
+              sx={{ mt: 1, fontSize: '0.75rem' }}
+            >
+              {isUploadingPhoto ? 'Uploading...' : 'Change Photo'}
+            </Button>
+          </Box>
           <Box>
             <Typography variant="h5" component="h1">
               {name || 'User'}
