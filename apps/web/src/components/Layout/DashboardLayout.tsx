@@ -27,12 +27,15 @@ import {
   History as HistoryIcon,
   Home as HomeIcon,
   Logout as LogoutIcon,
+  Mail as MessagesIcon,
   Menu as MenuIcon,
   Notifications as NotificationsIcon,
   Paid as EarningsIcon,
   People as ManagementIcon,
   Person as ProfileIcon,
   Receipt as SettlementsIcon,
+  Settings as SettingsIcon,
+  SmartToy as AIIcon,
   SupportAgent as SupportIcon,
   TwoWheeler as RiderIcon,
   Workspaces as OperatorIcon,
@@ -119,6 +122,9 @@ const ROLE_NAV_CONFIG: Record<DashboardRole, { title: string; icon: React.ReactN
 const COMMON_NAV_ITEMS: NavItem[] = [
   { label: 'Home', icon: <HomeIcon />, path: '/' },
   { label: 'Profile', icon: <ProfileIcon />, path: '/profile' },
+  { label: 'Settings', icon: <SettingsIcon />, path: '/settings' },
+  { label: 'Messages', icon: <MessagesIcon />, path: '/messages' },
+  { label: 'AI Assistant', icon: <AIIcon />, path: '/ai' },
 ];
 
 export interface DashboardLayoutProps {

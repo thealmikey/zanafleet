@@ -128,6 +128,9 @@ describe('Role-based Navigation', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /home/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /profile/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /settings/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /messages/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /ai assistant/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
     });
   });
