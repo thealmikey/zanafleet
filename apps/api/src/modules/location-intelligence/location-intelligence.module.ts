@@ -6,6 +6,7 @@ import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { Neo4jModule } from '../../core/neo4j/neo4j.module';
 import { RedisModule } from '../../core/redis/redis.module';
 
+import { GeoController } from './controllers/geo.controller';
 import { GeoQueryCoordinator } from './coordinators/geo-query.coordinator';
 import { RiderLocationHistoryEntity } from './entities/rider-location-history.entity';
 import { RiderLocationSnapshotEntity } from './entities/rider-location-snapshot.entity';
@@ -43,6 +44,7 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
     Neo4jModule,
     RedisModule.forRoot(),
   ],
+  controllers: [GeoController],
   providers: [
     GeoProviderRegistry,
     NoOpGeoProvider,
