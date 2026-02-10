@@ -12,6 +12,13 @@ import {
   type LoginResponse,
   type User,
 } from '../types';
+import type { PaginationMeta } from '../services/dashboardApi';
+import * as adminFixtures from './fixtures/admin';
+import * as businessFixtures from './fixtures/business';
+import * as riderFixtures from './fixtures/rider';
+import * as operatorFixtures from './fixtures/operator';
+import * as supportFixtures from './fixtures/support';
+import * as geoFixtures from './fixtures/geo';
 
 function nowIso(): string {
   return new Date().toISOString();
@@ -48,6 +55,29 @@ let currentUser: User = {
   name: 'Test User',
   roles: ['user'],
 };
+
+// Pagination helper
+function createPaginationMeta<T>(
+  data: T[],
+  page: number,
+  limit: number
+): { paginatedData: T[]; meta: PaginationMeta } {
+  const total = data.length;
+  const totalPages = Math.ceil(total / limit);
+  const start = (page - 1) * limit;
+  const paginatedData = data.slice(start, start + limit);
+  return {
+    paginatedData,
+    meta: { page, limit, total, totalPages },
+  };
+}
+
+function parseQueryParams(url: URL): { page: number; limit: number; periodDays: number } {
+  const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1', 10));
+  const limit = Math.max(1, Math.min(100, parseInt(url.searchParams.get('limit') ?? '20', 10)));
+  const periodDays = parseInt(url.searchParams.get('periodDays') ?? '30', 10);
+  return { page, limit, periodDays };
+}
 
 function createEmptySession(sessionId: string, actorType: ActorType): SignupSession {
   const now = nowIso();
@@ -254,5 +284,231 @@ export const handlers: HttpHandler[] = [
     };
 
     return HttpResponse.json(resp, { status: 200 });
+  }),
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Admin Dashboard
+  // ─────────────────────────────────────────────────────────────────────────
+
+  http.get('/api/dashboard/admin/metrics', ({ request }) => {
+    const url = new URL(request.url);
+    const { periodDays } = parseQueryParams(url);
+    return HttpResponse.json(adminFixtures.createAdminMetrics(periodDays), { status: 200 });
+  }),
+
+  http.get('/api/dashboard/admin/settlements', ({ request }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+    const settlements = adminFixtures.createSettlements();
+    const { paginatedData, meta } = createPaginationMeta(settlements, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  http.get('/api/dashboard/admin/policies', ({ request }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+    const policies = adminFixtures.createPolicies();
+    const { paginatedData, meta } = createPaginationMeta(policies, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Business Dashboard
+  // ─────────────────────────────────────────────────────────────────────────
+
+  http.get('/api/dashboard/business/:businessId/metrics', ({ request, params }) => {
+    const url = new URL(request.url);
+    const { periodDays } = parseQueryParams(url);
+    void params.businessId;
+    return HttpResponse.json(businessFixtures.createBusinessMetrics(periodDays), { status: 200 });
+  }),
+
+  http.get('/api/dashboard/business/:businessId/orders', ({ request, params }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+    const businessId = String(params.businessId ?? '');
+    const orders = businessFixtures.createOrders(businessId);
+    const { paginatedData, meta } = createPaginationMeta(orders, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  http.get('/api/dashboard/business/:businessId/deliveries', ({ request, params }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+    const businessId = String(params.businessId ?? '');
+    const deliveries = businessFixtures.createDeliveryHistory(businessId);
+    const { paginatedData, meta } = createPaginationMeta(deliveries, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  http.get('/api/dashboard/business/:businessId/invoices', ({ request, params }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+    const businessId = String(params.businessId ?? '');
+    const invoices = businessFixtures.createInvoices(businessId);
+    const { paginatedData, meta } = createPaginationMeta(invoices, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Rider Dashboard
+  // ─────────────────────────────────────────────────────────────────────────
+
+  http.get('/api/dashboard/rider/:riderId/deliveries/active', ({ request, params }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+    const riderId = String(params.riderId ?? '');
+    const deliveries = riderFixtures.createActiveDeliveries(riderId);
+    const { paginatedData, meta } = createPaginationMeta(deliveries, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  http.get('/api/dashboard/rider/:riderId/deliveries/history', ({ request, params }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+    const riderId = String(params.riderId ?? '');
+    const deliveries = riderFixtures.createDeliveryHistory(riderId);
+    const { paginatedData, meta } = createPaginationMeta(deliveries, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  http.get('/api/dashboard/rider/:riderId/earnings', ({ request }) => {
+    const url = new URL(request.url);
+    const { periodDays } = parseQueryParams(url);
+    return HttpResponse.json(riderFixtures.createEarningsSummary(periodDays), { status: 200 });
+  }),
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Operator Dashboard
+  // ─────────────────────────────────────────────────────────────────────────
+
+  http.get('/api/dashboard/operator/metrics', () => {
+    return HttpResponse.json(operatorFixtures.createOperatorMetrics(), { status: 200 });
+  }),
+
+  http.get('/api/dashboard/operator/assignment-queue', ({ request }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+    const queue = operatorFixtures.createAssignmentQueue();
+    const { paginatedData, meta } = createPaginationMeta(queue, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  http.get('/api/dashboard/operator/candidates', ({ request }) => {
+    const url = new URL(request.url);
+    const limit = parseInt(url.searchParams.get('limit') ?? '10', 10);
+    const candidates = operatorFixtures.createCandidates().slice(0, limit);
+    return HttpResponse.json(candidates, { status: 200 });
+  }),
+
+  http.get('/api/dashboard/operator/route-hint', () => {
+    return HttpResponse.json(operatorFixtures.createRouteHint(), { status: 200 });
+  }),
+
+  http.get('/api/dashboard/operator/deliveries/:deliveryId/candidates', ({ request }) => {
+    const url = new URL(request.url);
+    const limit = parseInt(url.searchParams.get('limit') ?? '10', 10);
+    const candidates = operatorFixtures.createCandidates().slice(0, limit);
+    return HttpResponse.json(candidates, { status: 200 });
+  }),
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Support Dashboard
+  // ─────────────────────────────────────────────────────────────────────────
+
+  http.get('/api/dashboard/support/metrics', ({ request }) => {
+    const url = new URL(request.url);
+    const { periodDays } = parseQueryParams(url);
+    return HttpResponse.json(supportFixtures.createSupportMetrics(periodDays), { status: 200 });
+  }),
+
+  http.get('/api/dashboard/support/disputes', ({ request }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+    const disputes = supportFixtures.createDisputes();
+    const { paginatedData, meta } = createPaginationMeta(disputes, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  http.get('/api/dashboard/support/disputes/escalated', ({ request }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+    const disputes = supportFixtures.createEscalatedDisputes();
+    const { paginatedData, meta } = createPaginationMeta(disputes, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  http.get('/api/dashboard/support/refunds', ({ request }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+    const refunds = supportFixtures.createRefunds();
+    const { paginatedData, meta } = createPaginationMeta(refunds, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  http.get('/api/dashboard/support/payments/recent', ({ request }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+    const payments = supportFixtures.createPaymentActivity();
+    const { paginatedData, meta } = createPaginationMeta(payments, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Geo Endpoints
+  // ─────────────────────────────────────────────────────────────────────────
+
+  http.get('/api/geo/nearby-riders', ({ request }) => {
+    const url = new URL(request.url);
+    const lat = parseFloat(url.searchParams.get('lat') ?? '-1.2864');
+    const lng = parseFloat(url.searchParams.get('lng') ?? '36.8172');
+    const limit = parseInt(url.searchParams.get('limit') ?? '10', 10);
+    const riders = geoFixtures.createNearbyRiders(lat, lng, limit);
+    return HttpResponse.json(riders, { status: 200 });
+  }),
+
+  http.get('/api/geo/heatmap', ({ request }) => {
+    const url = new URL(request.url);
+    const minLat = parseFloat(url.searchParams.get('minLat') ?? '-1.35');
+    const maxLat = parseFloat(url.searchParams.get('maxLat') ?? '-1.25');
+    const minLng = parseFloat(url.searchParams.get('minLng') ?? '36.75');
+    const maxLng = parseFloat(url.searchParams.get('maxLng') ?? '36.85');
+    const resolution = parseInt(url.searchParams.get('resolution') ?? '10', 10);
+    const cells = geoFixtures.createHeatmapCells(minLat, maxLat, minLng, maxLng, resolution);
+    return HttpResponse.json(cells, { status: 200 });
+  }),
+
+  http.get('/api/geo/zones', () => {
+    const zones = geoFixtures.createZoneClusters();
+    return HttpResponse.json(zones, { status: 200 });
+  }),
+
+  http.get('/api/geo/eta', ({ request }) => {
+    const url = new URL(request.url);
+    const originLat = parseFloat(url.searchParams.get('originLat') ?? '0');
+    const originLng = parseFloat(url.searchParams.get('originLng') ?? '0');
+    const destLat = parseFloat(url.searchParams.get('destLat') ?? '0');
+    const destLng = parseFloat(url.searchParams.get('destLng') ?? '0');
+    const distance = geoFixtures.createDistanceResult(originLat, originLng, destLat, destLng);
+    const eta = geoFixtures.createETAResult(distance.distanceMeters);
+    return HttpResponse.json(eta, { status: 200 });
+  }),
+
+  http.get('/api/geo/distance', ({ request }) => {
+    const url = new URL(request.url);
+    const originLat = parseFloat(url.searchParams.get('originLat') ?? '0');
+    const originLng = parseFloat(url.searchParams.get('originLng') ?? '0');
+    const destLat = parseFloat(url.searchParams.get('destLat') ?? '0');
+    const destLng = parseFloat(url.searchParams.get('destLng') ?? '0');
+    const distance = geoFixtures.createDistanceResult(originLat, originLng, destLat, destLng);
+    return HttpResponse.json(distance, { status: 200 });
+  }),
+
+  http.get('/api/geo/service-area/:areaId/contains', ({ request }) => {
+    const url = new URL(request.url);
+    const lat = parseFloat(url.searchParams.get('lat') ?? '0');
+    const lng = parseFloat(url.searchParams.get('lng') ?? '0');
+    const inNairobi = lat >= -1.4 && lat <= -1.2 && lng >= 36.7 && lng <= 36.9;
+    return HttpResponse.json({ contains: inNairobi }, { status: 200 });
   }),
 ];
