@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   AppBar,
   Avatar,
+  Badge,
   Box,
   ButtonBase,
   Divider,
@@ -12,6 +13,7 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  Popover,
   Toolbar,
   Typography,
   useMediaQuery,
@@ -26,6 +28,7 @@ import {
   Home as HomeIcon,
   Logout as LogoutIcon,
   Menu as MenuIcon,
+  Notifications as NotificationsIcon,
   Paid as EarningsIcon,
   People as ManagementIcon,
   Person as ProfileIcon,
@@ -38,6 +41,8 @@ import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 
 import { useAuth } from '../../hooks/useAuth';
 import { DashboardRole, getHighestPriorityRole } from '../../utils/roleRouting';
+import { NotificationList, NotificationItem } from '../common/NotificationList';
+import { getNotifications, markNotificationRead } from '../../services/notificationsApi';
 
 const DRAWER_WIDTH = 240;
 
@@ -114,16 +119,68 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps): Reac
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout, isLoading } = useAuth();
+  const { user, token, logout, isLoading } = useAuth();
 
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [notificationsAnchor, setNotificationsAnchor] = useState<HTMLButtonElement | null>(null);
 
   const dashboardRole = getHighestPriorityRole(user?.roles);
   const roleConfig = dashboardRole ? ROLE_NAV_CONFIG[dashboardRole] : null;
 
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchNotifications(): Promise<void> {
+      try {
+        const result = await getNotifications(token ?? undefined);
+        if (!cancelled) {
+          setNotifications(result.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch notifications:', err);
+      }
+    }
+
+    if (user) {
+      void fetchNotifications();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, token]);
+
   const handleDrawerToggle = useCallback((): void => {
     setMobileOpen((prev) => !prev);
   }, []);
+
+  const handleNotificationsOpen = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>): void => {
+      setNotificationsAnchor(event.currentTarget);
+    },
+    []
+  );
+
+  const handleNotificationsClose = useCallback((): void => {
+    setNotificationsAnchor(null);
+  }, []);
+
+  const handleNotificationClick = useCallback(
+    async (id: string): Promise<void> => {
+      try {
+        const updated = await markNotificationRead(id, token ?? undefined);
+        setNotifications((prev) =>
+          prev.map((n) => (n.id === id ? updated : n))
+        );
+      } catch (err) {
+        console.error('Failed to mark notification as read:', err);
+      }
+    },
+    [token]
+  );
 
   const handleLogout = useCallback(async (): Promise<void> => {
     await logout();
@@ -238,6 +295,50 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps): Reac
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {title ?? roleConfig?.title ?? 'Dashboard'}
           </Typography>
+          {user && (
+            <>
+              <IconButton
+                color="inherit"
+                onClick={handleNotificationsOpen}
+                aria-label="Open notifications"
+                sx={{ mr: 1 }}
+              >
+                <Badge badgeContent={unreadCount} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+              <Popover
+                open={Boolean(notificationsAnchor)}
+                anchorEl={notificationsAnchor}
+                onClose={handleNotificationsClose}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right',
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                slotProps={{
+                  paper: {
+                    sx: { width: 360, maxHeight: 480 },
+                  },
+                }}
+              >
+                <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    Notifications
+                  </Typography>
+                </Box>
+                <Box sx={{ maxHeight: 400, overflow: 'auto' }}>
+                  <NotificationList
+                    items={notifications}
+                    onItemClick={handleNotificationClick}
+                  />
+                </Box>
+              </Popover>
+            </>
+          )}
           {user && (
             <ButtonBase
               onClick={() => navigate('/profile')}
