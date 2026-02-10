@@ -1,16 +1,28 @@
 import {
   Controller,
   Get,
+  Patch,
   Query,
+  Param,
+  Body,
   Req,
   UseGuards,
   Header,
   Logger,
+  ForbiddenException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
+import {
+  LocationData,
+  VehicleType,
+  BusinessType,
+  DeliveryStatus,
+  PolicyTrigger,
+} from '@zanafleet/contracts';
 
-import { CapabilityGuard } from '@api/core/api/guards';
+import { CapabilityGuard, PolicyGuard } from '@api/core/api/guards';
 import { RequireCapability } from '@api/core/api/decorators';
 import {
   parseQueryParams,
@@ -46,6 +58,46 @@ interface HierarchyQueryParams extends RawQueryParams {
   saccoId?: string;
   businessId?: string;
   riderId?: string;
+}
+
+export class UpdateBusinessHierarchyDto {
+  businessName?: string;
+  phone?: string;
+  location?: LocationData;
+  businessType?: BusinessType;
+  email?: string | null;
+}
+
+export class UpdateSaccoHierarchyDto {
+  name?: string;
+  location?: LocationData;
+  contactPhone?: string;
+}
+
+export class UpdateRiderHierarchyDto {
+  fullName?: string;
+  nationalId?: string;
+  phone?: string;
+  location?: LocationData | null;
+  vehicleType?: VehicleType;
+  saccoId?: string | null;
+  email?: string | null;
+}
+
+export class UpdateOrderHierarchyDto {
+  businessId?: string;
+  itemSummary?: string;
+  itemMetadata?: Record<string, unknown>;
+  customerName?: string;
+  customerPhone?: string;
+  scheduledTime?: Date;
+}
+
+export class UpdateDeliveryHierarchyDto {
+  assignedRiderId?: string;
+  status?: DeliveryStatus;
+  scheduledPickupTime?: Date;
+  scheduledDropoffTime?: Date;
 }
 
 @Controller('dashboards/admin/hierarchy')
@@ -335,6 +387,141 @@ export class AdminHierarchyController {
       data: entities.map((e) => e.toDomain()),
       meta: createPaginationMeta(pagination, total),
     };
+  }
+
+  @Patch('businesses/:id')
+  @RequireCapability('admin.hierarchy.write', 'business.manage')
+  async updateBusiness(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() dto: UpdateBusinessHierarchyDto
+  ): Promise<ReturnType<BusinessEntity['toDomain']>> {
+    const workspaceId = req.user?.workspaceId ?? null;
+    const actorId = req.user?.actorId ?? null;
+
+    const scopedIds = await this.queryBusinessIdsInScope(workspaceId, actorId);
+    if (!scopedIds.includes(id)) {
+      throw new ForbiddenException(`Business "${id}" is not within your administrative scope`);
+    }
+
+    const existing = await this.businessRepository.findOne({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Business with ID "${id}" not found`);
+    }
+
+    await this.businessRepository.update(id, dto as Record<string, unknown>);
+    const updated = await this.businessRepository.findOne({ where: { id } });
+    return updated!.toDomain();
+  }
+
+  @Patch('saccos/:id')
+  @RequireCapability('admin.hierarchy.write', 'sacco.manage')
+  async updateSacco(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() dto: UpdateSaccoHierarchyDto
+  ): Promise<ReturnType<SaccoEntity['toDomain']>> {
+    const workspaceId = req.user?.workspaceId ?? null;
+    const actorId = req.user?.actorId ?? null;
+
+    const scopedIds = await this.querySaccoIdsInScope(workspaceId, actorId);
+    if (!scopedIds.includes(id)) {
+      throw new ForbiddenException(`Sacco "${id}" is not within your administrative scope`);
+    }
+
+    const existing = await this.saccoRepository.findOne({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Sacco with ID "${id}" not found`);
+    }
+
+    await this.saccoRepository.update(id, dto as Record<string, unknown>);
+    const updated = await this.saccoRepository.findOne({ where: { id } });
+    return updated!.toDomain();
+  }
+
+  @Patch('riders/:id')
+  @RequireCapability('admin.hierarchy.write', 'rider.manage')
+  async updateRider(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() dto: UpdateRiderHierarchyDto
+  ): Promise<ReturnType<RiderEntity['toDomain']>> {
+    const workspaceId = req.user?.workspaceId ?? null;
+    const actorId = req.user?.actorId ?? null;
+
+    const scopedIds = await this.queryRiderIdsInScope(workspaceId, null, actorId);
+    if (!scopedIds.includes(id)) {
+      throw new ForbiddenException(`Rider "${id}" is not within your administrative scope`);
+    }
+
+    const existing = await this.riderRepository.findOne({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Rider with ID "${id}" not found`);
+    }
+
+    await this.riderRepository.update(id, dto as Partial<RiderEntity> as Record<string, unknown>);
+    const updated = await this.riderRepository.findOne({ where: { id } });
+    return updated!.toDomain();
+  }
+
+  @Patch('orders/:id')
+  @RequireCapability('admin.hierarchy.write', 'order.manage')
+  async updateOrder(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() dto: UpdateOrderHierarchyDto
+  ): Promise<ReturnType<OrderEntity['toDomain']>> {
+    const workspaceId = req.user?.workspaceId ?? null;
+    const actorId = req.user?.actorId ?? null;
+
+    const existing = await this.orderRepository.findOne({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Order with ID "${id}" not found`);
+    }
+
+    const scopedBusinessIds = await this.queryBusinessIdsInScope(workspaceId, actorId);
+    if (!scopedBusinessIds.includes(existing.businessId)) {
+      throw new ForbiddenException(`Order "${id}" is not within your administrative scope`);
+    }
+
+    await this.orderRepository.update(id, dto as Record<string, unknown>);
+    const updated = await this.orderRepository.findOne({ where: { id } });
+    return updated!.toDomain();
+  }
+
+  @Patch('deliveries/:id')
+  @RequireCapability('admin.hierarchy.write', 'delivery.manage')
+  @UseGuards(
+    CapabilityGuard,
+    PolicyGuard({
+      trigger: PolicyTrigger.STATUS_TRANSITION,
+      buildContext: (req) => ({
+        deliveryId: (req.params as Record<string, string>)?.id,
+      }),
+      failOpen: false,
+    })
+  )
+  async updateDelivery(
+    @Req() req: AuthenticatedRequest,
+    @Param('id') id: string,
+    @Body() dto: UpdateDeliveryHierarchyDto
+  ): Promise<ReturnType<DeliveryEntity['toDomain']>> {
+    const workspaceId = req.user?.workspaceId ?? null;
+    const actorId = req.user?.actorId ?? null;
+
+    const existing = await this.deliveryRepository.findOne({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Delivery with ID "${id}" not found`);
+    }
+
+    const scopedBusinessIds = await this.queryBusinessIdsInScope(workspaceId, actorId);
+    if (!scopedBusinessIds.includes(existing.businessId)) {
+      throw new ForbiddenException(`Delivery "${id}" is not within your administrative scope`);
+    }
+
+    await this.deliveryRepository.update(id, dto as Record<string, unknown>);
+    const updated = await this.deliveryRepository.findOne({ where: { id } });
+    return updated!.toDomain();
   }
 
   /**
