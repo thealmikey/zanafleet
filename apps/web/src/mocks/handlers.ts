@@ -64,6 +64,37 @@ let currentUser: User = {
   roles: ['user'],
 };
 
+// In-memory user settings store
+interface MockUserSettings {
+  availability: boolean;
+  workingHours: {
+    start: string;
+    end: string;
+  };
+  businessLocations?: string[];
+  riderVehicleInfo?: {
+    type: string;
+    licensePlate: string;
+  };
+}
+
+function createDefaultSettings(): MockUserSettings {
+  return {
+    availability: true,
+    workingHours: {
+      start: '09:00',
+      end: '17:00',
+    },
+    businessLocations: ['Main Office'],
+    riderVehicleInfo: {
+      type: 'Motorcycle',
+      licensePlate: 'KAA 123B',
+    },
+  };
+}
+
+let userSettings: MockUserSettings = createDefaultSettings();
+
 // In-memory notifications store
 interface MockNotification {
   id: string;
@@ -199,6 +230,7 @@ export function resetMockSessions(): void {
     roles: ['user'],
   };
   notifications = createSeededNotifications();
+  userSettings = createDefaultSettings();
 }
 
 export function resetMockNotifications(): void {
@@ -356,6 +388,29 @@ export const handlers: HttpHandler[] = [
       currentUser.email = body.email;
     }
     return HttpResponse.json(currentUser, { status: 200 });
+  }),
+
+  // GET /api/user/settings
+  http.get('/api/user/settings', () => {
+    return HttpResponse.json(userSettings, { status: 200 });
+  }),
+
+  // PUT /api/user/settings
+  http.put('/api/user/settings', async ({ request }) => {
+    const body = (await request.json()) as Partial<MockUserSettings>;
+    if (typeof body.availability === 'boolean') {
+      userSettings.availability = body.availability;
+    }
+    if (body.workingHours) {
+      userSettings.workingHours = { ...userSettings.workingHours, ...body.workingHours };
+    }
+    if (body.businessLocations) {
+      userSettings.businessLocations = body.businessLocations;
+    }
+    if (body.riderVehicleInfo) {
+      userSettings.riderVehicleInfo = { ...userSettings.riderVehicleInfo, ...body.riderVehicleInfo };
+    }
+    return HttpResponse.json(userSettings, { status: 200 });
   }),
 
   // ─────────────────────────────────────────────────────────────────────────

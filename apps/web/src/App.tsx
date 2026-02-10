@@ -16,6 +16,7 @@ import { OperatorDashboard } from './pages/OperatorDashboard';
 import { BusinessDashboard } from './pages/BusinessDashboard';
 import { RiderDashboard } from './pages/RiderDashboard';
 import { ProfilePage } from './pages/Profile';
+import { SettingsPage } from './pages/Settings';
 import { ComponentsDemo } from './pages/Demo/ComponentsDemo';
 
 const theme = createTheme();
@@ -37,6 +38,14 @@ function App(): React.ReactElement {
                 element={
                   <ProtectedRoute>
                     <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <SettingsPage />
                   </ProtectedRoute>
                 }
               />
