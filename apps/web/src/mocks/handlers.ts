@@ -41,10 +41,18 @@ const SESSION_TTL_MINUTES = 60 * 24;
 const sessions = new Map<string, SignupSession>();
 
 // Lookup helper for test accounts
-function getTestAccountByEmail(email: string): (typeof TEST_ACCOUNTS)[number] | null {
+export function getTestAccountByEmail(email: string): (typeof TEST_ACCOUNTS)[number] | null {
   const search = email?.trim().toLowerCase() ?? '';
   const acc = TEST_ACCOUNTS.find((a) => a.email.toLowerCase() === search);
   return acc ?? null;
+}
+
+export function getTestAccounts(): typeof TEST_ACCOUNTS {
+  return TEST_ACCOUNTS;
+}
+
+export function createMockToken(prefix = 'token'): string {
+  return createId(prefix);
 }
 
 // Simple in-memory auth token and user
