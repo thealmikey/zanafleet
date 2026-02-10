@@ -18,6 +18,7 @@ import { RiderDashboard } from './pages/RiderDashboard';
 import { ProfilePage } from './pages/Profile';
 import { SettingsPage } from './pages/Settings';
 import { MessagingPage } from './pages/Messaging';
+import { AIAssistantPage } from './pages/AIAssistant';
 import { ComponentsDemo } from './pages/Demo/ComponentsDemo';
 
 const theme = createTheme();
@@ -55,6 +56,14 @@ function App(): React.ReactElement {
                 element={
                   <ProtectedRoute>
                     <MessagingPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/ai"
+                element={
+                  <ProtectedRoute>
+                    <AIAssistantPage />
                   </ProtectedRoute>
                 }
               />

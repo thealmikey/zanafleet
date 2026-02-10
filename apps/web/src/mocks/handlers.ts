@@ -836,6 +836,40 @@ export const handlers: HttpHandler[] = [
     return HttpResponse.json(thread, { status: 200 });
   }),
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // AI Assistant
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // POST /api/ai/assist
+  http.post('/api/ai/assist', async ({ request }) => {
+    const body = (await request.json()) as { prompt?: string; context?: string };
+    const prompt = body.prompt?.trim() ?? '';
+
+    if (!prompt) {
+      return HttpResponse.json({ message: 'Prompt is required' }, { status: 400 });
+    }
+
+    // Generate a canned response based on the prompt
+    const responses = [
+      `I understand you're asking about "${prompt.slice(0, 50)}${prompt.length > 50 ? '...' : ''}". Let me help you with that.`,
+      `Based on your question, here's what I can tell you about ${prompt.slice(0, 30)}${prompt.length > 30 ? '...' : ''}.`,
+      `Great question! Regarding "${prompt.slice(0, 40)}${prompt.length > 40 ? '...' : ''}", here's my response.`,
+    ];
+
+    const content = responses[Math.floor(Math.random() * responses.length)] +
+      '\n\nThis is a mock AI response. In production, this would be connected to a real AI service. ' +
+      'For now, I can confirm your message was received successfully.';
+
+    return HttpResponse.json(
+      {
+        role: 'assistant',
+        content,
+        createdAt: nowIso(),
+      },
+      { status: 200 }
+    );
+  }),
+
   // POST /api/messages/:id/reply - add a reply to thread
   http.post('/api/messages/:id/reply', async ({ params, request }) => {
     const threadId = String(params.id ?? '');
