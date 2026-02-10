@@ -7,9 +7,14 @@ import { SignupWizardProvider } from './contexts/SignupWizardContext';
 import { DevAccountSwitcher } from './components/DevAccountSwitcher';
 import { HomePage } from './components/HomePage';
 import { SignIn } from './components/SignIn';
-import { Dashboard } from './components/Dashboard';
 import { SignupWizard } from './components/SignupWizard';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { RoleDashboardRouter } from './components/Layout';
+import { AdminDashboard } from './pages/AdminDashboard';
+import { SupportDashboard } from './pages/SupportDashboard';
+import { OperatorDashboard } from './pages/OperatorDashboard';
+import { BusinessDashboard } from './pages/BusinessDashboard';
+import { RiderDashboard } from './pages/RiderDashboard';
 
 const theme = createTheme();
 
@@ -21,17 +26,57 @@ function App(): React.ReactElement {
         <SignupWizardProvider>
           <BrowserRouter>
             <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignupWizard />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/signup" element={<SignupWizard />} />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <RoleDashboardRouter />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/admin/*"
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/support/*"
+                element={
+                  <ProtectedRoute>
+                    <SupportDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/operator/*"
+                element={
+                  <ProtectedRoute>
+                    <OperatorDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/business/*"
+                element={
+                  <ProtectedRoute>
+                    <BusinessDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/rider/*"
+                element={
+                  <ProtectedRoute>
+                    <RiderDashboard />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </BrowserRouter>
         </SignupWizardProvider>
