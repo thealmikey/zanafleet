@@ -64,6 +64,64 @@ let currentUser: User = {
   roles: ['user'],
 };
 
+// In-memory notifications store
+interface MockNotification {
+  id: string;
+  title: string;
+  message?: string;
+  createdAt: string;
+  type: 'info' | 'warning' | 'success' | 'error';
+  read: boolean;
+}
+
+function createSeededNotifications(): MockNotification[] {
+  const now = Date.now();
+  return [
+    {
+      id: 'notif_1',
+      title: 'Welcome to ZanaFleet',
+      message: 'Your account has been successfully created.',
+      createdAt: new Date(now - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
+      type: 'success',
+      read: true,
+    },
+    {
+      id: 'notif_2',
+      title: 'New delivery assigned',
+      message: 'You have a new delivery request waiting for pickup.',
+      createdAt: new Date(now - 1000 * 60 * 60 * 3).toISOString(), // 3 hours ago
+      type: 'info',
+      read: false,
+    },
+    {
+      id: 'notif_3',
+      title: 'Payment received',
+      message: 'KES 1,500 has been credited to your wallet.',
+      createdAt: new Date(now - 1000 * 60 * 30).toISOString(), // 30 minutes ago
+      type: 'success',
+      read: false,
+    },
+    {
+      id: 'notif_4',
+      title: 'Document expiring soon',
+      message: 'Your vehicle insurance expires in 7 days. Please renew.',
+      createdAt: new Date(now - 1000 * 60 * 15).toISOString(), // 15 minutes ago
+      type: 'warning',
+      read: false,
+    },
+    {
+      id: 'notif_5',
+      title: 'Delivery cancelled',
+      message: 'Order #12345 was cancelled by the customer.',
+      createdAt: new Date(now - 1000 * 60 * 5).toISOString(), // 5 minutes ago
+      type: 'error',
+      read: false,
+    },
+  ];
+}
+
+let notifications: MockNotification[] = createSeededNotifications();
+
 // Pagination helper
 function createPaginationMeta<T>(
   data: T[],
@@ -140,6 +198,11 @@ export function resetMockSessions(): void {
     name: 'Test User',
     roles: ['user'],
   };
+  notifications = createSeededNotifications();
+}
+
+export function resetMockNotifications(): void {
+  notifications = createSeededNotifications();
 }
 
 // Optional: helper to seed a session for debugging
@@ -293,6 +356,39 @@ export const handlers: HttpHandler[] = [
       currentUser.email = body.email;
     }
     return HttpResponse.json(currentUser, { status: 200 });
+  }),
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Notifications
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // GET /api/notifications
+  http.get('/api/notifications', ({ request }) => {
+    const url = new URL(request.url);
+    const { page, limit } = parseQueryParams(url);
+    const { paginatedData, meta } = createPaginationMeta(notifications, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  // PATCH /api/notifications/:id/read
+  http.patch('/api/notifications/:id/read', ({ params }) => {
+    const notificationId = String(params.id ?? '');
+    const notification = notifications.find((n) => n.id === notificationId);
+
+    if (!notification) {
+      return HttpResponse.json({ message: 'Notification not found' }, { status: 404 });
+    }
+
+    notification.read = true;
+    return HttpResponse.json(notification, { status: 200 });
+  }),
+
+  // PATCH /api/notifications/read-all
+  http.patch('/api/notifications/read-all', () => {
+    notifications.forEach((n) => {
+      n.read = true;
+    });
+    return HttpResponse.json({ message: 'All notifications marked as read' }, { status: 200 });
   }),
 
   // POST /api/auth/keycloak/token
