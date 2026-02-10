@@ -9,3 +9,4 @@ export * from './riders.queries';
 export * from './businesses.queries';
 export * from './actors.queries';
 export * from './workspaces.queries';
+export * from './hierarchy.queries';
