@@ -19,7 +19,6 @@ import {
   useTheme,
 } from '@mui/material';
 import {
-  Assessment as MetricsIcon,
   LocalShipping as DeliveriesIcon,
   AttachMoney as RevenueIcon,
   TwoWheeler as RidersIcon,
