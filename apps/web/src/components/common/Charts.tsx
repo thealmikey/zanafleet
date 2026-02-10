@@ -28,29 +28,28 @@ ChartJS.register(
   Filler
 );
 
-function mergeDeep<T>(target: any, source: any): T {
+type CartesianChartType = 'line' | 'bar';
+
+function mergeDeep<T extends object>(target: T, source: Partial<T> | undefined): T {
   if (source === null || source === undefined) {
     return target;
   }
-  if (target === null || target === undefined) {
-    return source;
-  }
-  if (Array.isArray(source)) {
+  if (typeof source !== 'object' || typeof target !== 'object') {
     return source as T;
   }
-  if (typeof source !== 'object' || typeof target !== 'object') {
-    return source;
-  }
 
-  const result = { ...target };
+  const result = { ...target } as Record<string, unknown>;
   for (const key of Object.keys(source)) {
-    const sourceValue = source[key];
-    const targetValue = target[key];
+    const sourceValue = (source as Record<string, unknown>)[key];
+    const targetValue = (target as Record<string, unknown>)[key];
 
     if (Array.isArray(sourceValue)) {
       result[key] = sourceValue;
     } else if (typeof sourceValue === 'object' && sourceValue !== null) {
-      result[key] = mergeDeep(targetValue ?? {}, sourceValue);
+      result[key] = mergeDeep(
+        (targetValue as object) ?? {},
+        sourceValue as Partial<object>
+      );
     } else {
       result[key] = sourceValue;
     }
@@ -58,7 +57,7 @@ function mergeDeep<T>(target: any, source: any): T {
   return result as T;
 }
 
-function buildDefaults(theme: Theme): ChartOptions {
+function buildCartesianDefaults(theme: Theme): ChartOptions<CartesianChartType> {
   const textColor = theme.palette.text.secondary;
   const gridColor = theme.palette.divider;
 
@@ -96,11 +95,41 @@ function buildDefaults(theme: Theme): ChartOptions {
   };
 }
 
+function buildDoughnutDefaults(theme: Theme): ChartOptions<'doughnut'> {
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: {
+          color: theme.palette.text.secondary,
+        },
+      },
+      title: {
+        color: theme.palette.text.primary,
+      },
+    },
+  };
+}
+
 export interface BaseChartProps {
-  data: ChartData<any>;
-  options?: ChartOptions;
   height?: number;
   ariaLabel?: string;
+}
+
+export interface LineChartProps extends BaseChartProps {
+  data: ChartData<'line'>;
+  options?: ChartOptions<'line'>;
+}
+
+export interface BarChartProps extends BaseChartProps {
+  data: ChartData<'bar'>;
+  options?: ChartOptions<'bar'>;
+}
+
+export interface DoughnutChartProps extends BaseChartProps {
+  data: ChartData<'doughnut'>;
+  options?: ChartOptions<'doughnut'>;
 }
 
 export function LineChart({
@@ -108,9 +137,12 @@ export function LineChart({
   options,
   height,
   ariaLabel,
-}: BaseChartProps): React.ReactElement {
+}: LineChartProps): React.ReactElement {
   const theme = useTheme();
-  const mergedOptions = mergeDeep<ChartOptions>(buildDefaults(theme), options ?? {});
+  const mergedOptions = mergeDeep<ChartOptions<'line'>>(
+    buildCartesianDefaults(theme) as ChartOptions<'line'>,
+    options
+  );
 
   return (
     <div
@@ -129,9 +161,12 @@ export function BarChart({
   options,
   height,
   ariaLabel,
-}: BaseChartProps): React.ReactElement {
+}: BarChartProps): React.ReactElement {
   const theme = useTheme();
-  const mergedOptions = mergeDeep<ChartOptions>(buildDefaults(theme), options ?? {});
+  const mergedOptions = mergeDeep<ChartOptions<'bar'>>(
+    buildCartesianDefaults(theme) as ChartOptions<'bar'>,
+    options
+  );
 
   return (
     <div
@@ -150,23 +185,12 @@ export function DoughnutChart({
   options,
   height,
   ariaLabel,
-}: BaseChartProps): React.ReactElement {
+}: DoughnutChartProps): React.ReactElement {
   const theme = useTheme();
-  const defaultOptions: ChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        labels: {
-          color: theme.palette.text.secondary,
-        },
-      },
-      title: {
-        color: theme.palette.text.primary,
-      },
-    },
-  };
-  const mergedOptions = mergeDeep<ChartOptions>(defaultOptions, options ?? {});
+  const mergedOptions = mergeDeep<ChartOptions<'doughnut'>>(
+    buildDoughnutDefaults(theme),
+    options
+  );
 
   return (
     <div
