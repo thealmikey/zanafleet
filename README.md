@@ -160,6 +160,33 @@ npm run test
 
 ---
 
+## Web Application Features
+
+### UserSettings Extensions
+
+The web application supports optional user settings fields:
+
+- **profileImage**: Optional media reference for user avatar (`mediaAssetId`, `url`)
+- **vehicle**: Optional vehicle information with photos (`type`, `make`, `model`, `year`, `color`, `licensePlate`, `photos`)
+- **documents**: Optional document uploads (`nationalId`, `driversLicense`)
+
+### Media Upload Flow (MSW Mocked)
+
+Web uploads are mocked via MSW for local development and testing:
+
+- `POST /api/media/assets` – Creates an in-memory media asset record
+- `GET /api/media/assets/:id/signed-url` – Returns a `/mock-storage/...` URL and HTTP method
+- `PUT /mock-storage/*` – Accepts uploads (no-op in mock)
+
+The Profile page and Settings page use a signed-URL upload flow via `apps/web/src/services/mediaApi.ts`:
+
+1. Create a media asset via `createMediaAsset()`
+2. Obtain a signed upload URL via `getSignedUrl(assetId, 'PUT')`
+3. Upload the file via `uploadToSignedUrl(url, blob, contentType)`
+4. Update user settings with the new media reference
+
+---
+
 ## License
 
 MIT – Use, extend, and contribute responsibly.

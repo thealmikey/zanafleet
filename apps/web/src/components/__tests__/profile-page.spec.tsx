@@ -8,6 +8,7 @@ import { handlers, resetMockSessions } from '../../mocks/handlers';
 import { AuthProvider } from '../../contexts/AuthContext';
 import { ProfilePage } from '../../pages/Profile';
 import { TEST_ACCOUNTS, TEST_PASSWORD } from '@zanafleet/contracts';
+import { updateSettings } from '../../services/settingsApi';
 
 const server = setupServer(...handlers);
 
@@ -113,5 +114,19 @@ describe('ProfilePage', () => {
     });
 
     expect(screen.getByText(/user id/i)).toBeInTheDocument();
+  });
+
+  it('renders avatar image when profileImage.url is set in settings', async () => {
+    await updateSettings({ profileImage: { url: 'https://cdn.test/avatar.png' } });
+
+    renderProfilePage();
+
+    await waitFor(() => {
+      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+    });
+
+    const images = screen.getAllByRole('img');
+    const avatarImage = images.find((img) => img.getAttribute('src') === 'https://cdn.test/avatar.png');
+    expect(avatarImage).toBeInTheDocument();
   });
 });
