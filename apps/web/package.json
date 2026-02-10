@@ -23,6 +23,7 @@
     "@fullcalendar/react": "^6.1.20",
     "@mui/icons-material": "^5.15.0",
     "@mui/material": "^5.15.0",
+    "@react-google-maps/api": "^2.20.8",
     "@xyflow/react": "^12.10.0",
     "@zanafleet/contracts": "*",
     "keycloak-js": "^26.2.2",
