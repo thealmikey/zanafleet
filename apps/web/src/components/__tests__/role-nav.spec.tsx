@@ -30,7 +30,7 @@ const ROLE_NAV_TEST_CASES: RoleNavTestCase[] = [
   {
     accountType: 'admin',
     expectedNavItems: ['Metrics', 'Settlements', 'Management'],
-    unexpectedNavItems: ['Queue', 'Candidates', 'Orders', 'Deliveries', 'Active', 'Earnings'],
+    unexpectedNavItems: ['Queue', 'Candidates', 'Orders', 'Invoices', 'Active'],
   },
   {
     accountType: 'support',
@@ -98,7 +98,7 @@ describe('Role-based Navigation', () => {
 
         await waitFor(() => {
           expectedNavItems.forEach((item) => {
-            expect(screen.getByRole('button', { name: item })).toBeInTheDocument();
+            expect(screen.getByRole('link', { name: item })).toBeInTheDocument();
           });
         });
       });
@@ -111,7 +111,7 @@ describe('Role-based Navigation', () => {
         });
 
         unexpectedNavItems.forEach((item) => {
-          expect(screen.queryByRole('button', { name: item })).not.toBeInTheDocument();
+          expect(screen.queryByRole('link', { name: item })).not.toBeInTheDocument();
         });
       });
     }
@@ -126,12 +126,25 @@ describe('Role-based Navigation', () => {
     renderDashboardLayout();
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /home/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /profile/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /settings/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /messages/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /ai assistant/i })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /profile/i })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /settings/i })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /messages/i })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: /ai assistant/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
+    });
+  });
+
+  it('displays role-specific dashboard title', async () => {
+    const account = getTestAccountByType('admin');
+    if (account) {
+      await login({ email: account.email, password: TEST_PASSWORD });
+    }
+
+    renderDashboardLayout();
+
+    await waitFor(() => {
+      expect(screen.getByText('Admin Dashboard')).toBeInTheDocument();
     });
   });
 });
