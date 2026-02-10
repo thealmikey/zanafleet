@@ -7,6 +7,30 @@ export interface WorkingHours {
   end: string;
 }
 
+export interface MediaReference {
+  mediaAssetId?: string;
+  url?: string;
+}
+
+export interface VehiclePhoto extends MediaReference {
+  caption?: string;
+}
+
+export interface VehicleInfo {
+  type: string;
+  make?: string;
+  model?: string;
+  year?: string;
+  color?: string;
+  licensePlate?: string;
+  photos?: VehiclePhoto[];
+}
+
+export interface DocumentsInfo {
+  nationalId?: MediaReference;
+  driversLicense?: MediaReference;
+}
+
 export interface UserSettings {
   availability: boolean;
   workingHours: WorkingHours;
@@ -15,6 +39,9 @@ export interface UserSettings {
     type: string;
     licensePlate: string;
   };
+  profileImage?: MediaReference | null;
+  vehicle?: VehicleInfo | null;
+  documents?: DocumentsInfo | null;
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
