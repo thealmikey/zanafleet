@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { MessagingModule } from '../../core/messaging/messaging.module';
 
+import { NotificationsController } from './controllers/notifications.controller';
 import { NotificationDispatchCoordinator } from './coordinators/notification-dispatch.coordinator';
 import { NotificationEntity } from './entities/notification.entity';
 import { NotificationPreferenceEntity } from './entities/preference.entity';
@@ -35,6 +36,7 @@ import { NotificationSubscriber } from './subscribers/notification.subscriber';
     EventBusModule.forFeature(),
     TypeOrmModule.forFeature([NotificationEntity, TemplateEntity, NotificationPreferenceEntity]),
   ],
+  controllers: [NotificationsController],
   providers: [
     SendNotificationCommandHandler,
     TemplateService,
