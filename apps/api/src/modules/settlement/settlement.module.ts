@@ -7,6 +7,7 @@ import { AccountModule } from '../account/account.module';
 import { LedgerModule } from '../ledger/ledger.module';
 import { PaymentModule } from '../payment/payment.module';
 
+import { SettlementsController } from './controllers/settlements.controller';
 import { PayoutOrchestrator } from './coordinators/payout.orchestrator';
 import { SettlementBatchEntity } from './entities/settlement-batch.entity';
 import { SettlementItemEntity } from './entities/settlement-item.entity';
@@ -26,6 +27,7 @@ const CommandHandlers = [CreateSettlementBatchCommandHandler, ProcessPayoutComma
     LedgerModule,
     PaymentModule,
   ],
+  controllers: [SettlementsController],
   providers: [SettlementSchedulerService, PayoutRiskService, PayoutOrchestrator, ...CommandHandlers],
   exports: [TypeOrmModule, SettlementSchedulerService, PayoutRiskService, PayoutOrchestrator],
 })
