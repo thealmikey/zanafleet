@@ -237,10 +237,6 @@ export function resetMockNotifications(): void {
   notifications = createSeededNotifications();
 }
 
-export function resetMockMessages(): void {
-  messageThreads = createSeededMessages();
-}
-
 // ─────────────────────────────────────────────────────────────────────────
 // In-memory Messages Store
 // ─────────────────────────────────────────────────────────────────────────
