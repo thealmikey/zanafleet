@@ -22,6 +22,7 @@ import { RiderDashboardController } from './controllers/rider-dashboard.controll
 import { BusinessDashboardController } from './controllers/business-dashboard.controller';
 import { SupportDashboardController } from './controllers/support-dashboard.controller';
 import { OperatorDashboardController } from './controllers/operator-dashboard.controller';
+import { AdminScopeService } from './services/admin-scope.service';
 
 /**
  * DashboardModule
@@ -64,5 +65,7 @@ import { OperatorDashboardController } from './controllers/operator-dashboard.co
     SupportDashboardController,
     OperatorDashboardController,
   ],
+  providers: [AdminScopeService],
+  exports: [AdminScopeService],
 })
 export class DashboardModule {}
