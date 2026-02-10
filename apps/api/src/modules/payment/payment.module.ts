@@ -8,6 +8,7 @@ import { LedgerModule } from '../ledger/ledger.module';
 
 import { PaymentFlowOrchestrator } from './coordinators/payment-flow.orchestrator';
 import { RefundDisputeCoordinator } from './coordinators/refund-dispute.coordinator';
+import { PaymentController } from './controllers/payment.controller';
 import { PaymentWebhookController } from './controllers/payment-webhook.controller';
 import { DisputeEntity } from './entities/dispute.entity';
 import { PaymentIntentEntity } from './entities/payment-intent.entity';
@@ -34,7 +35,7 @@ const CommandHandlers = [CreatePaymentIntentCommandHandler, ProcessPaymentComman
     LedgerModule,
     AccountModule,
   ],
-  controllers: [PaymentWebhookController],
+  controllers: [PaymentController, PaymentWebhookController],
   providers: [
     PaymentProviderRegistry,
     NoOpPaymentProvider,
