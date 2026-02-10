@@ -72,7 +72,8 @@ const ROLE_NAV_CONFIG: Record<DashboardRole, { title: string; icon: React.ReactN
     items: [
       { label: 'Metrics', icon: <MetricsIcon />, path: '/dashboard/operator' },
       { label: 'Queue', icon: <ManagementIcon />, path: '/dashboard/operator/queue' },
-      { label: 'History', icon: <HistoryIcon />, path: '/dashboard/operator/history' },
+      { label: 'Candidates', icon: <RiderIcon />, path: '/dashboard/operator/candidates' },
+      { label: 'Route', icon: <HistoryIcon />, path: '/dashboard/operator/route' },
     ],
   },
   business: {
