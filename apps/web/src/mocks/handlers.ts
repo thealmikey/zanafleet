@@ -76,6 +76,20 @@ interface MockUserSettings {
     type: string;
     licensePlate: string;
   };
+  profileImage?: { mediaAssetId?: string; url?: string } | null;
+  vehicle?: {
+    type: string;
+    make?: string;
+    model?: string;
+    year?: string;
+    color?: string;
+    licensePlate?: string;
+    photos?: Array<{ mediaAssetId?: string; url?: string; caption?: string }>;
+  } | null;
+  documents?: {
+    nationalId?: { mediaAssetId?: string; url?: string };
+    driversLicense?: { mediaAssetId?: string; url?: string };
+  } | null;
 }
 
 function createDefaultSettings(): MockUserSettings {
@@ -90,10 +104,31 @@ function createDefaultSettings(): MockUserSettings {
       type: 'Motorcycle',
       licensePlate: 'KAA 123B',
     },
+    profileImage: null,
+    vehicle: null,
+    documents: null,
   };
 }
 
 let userSettings: MockUserSettings = createDefaultSettings();
+
+// In-memory media assets store
+interface MediaAsset {
+  mediaAssetId: string;
+  filename: string;
+  mimeType: string;
+  size: number;
+  checksum: string;
+  ownerId: string;
+  ownerType: string;
+  status: 'Pending' | 'Uploading' | 'Active' | 'Archived' | 'Deleted';
+  storageKey: string;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const mediaAssets = new Map<string, MediaAsset>();
 
 // In-memory notifications store
 interface MockNotification {
@@ -231,6 +266,7 @@ export function resetMockSessions(): void {
   };
   notifications = createSeededNotifications();
   userSettings = createDefaultSettings();
+  mediaAssets.clear();
 }
 
 export function resetMockNotifications(): void {
@@ -515,6 +551,23 @@ export const handlers: HttpHandler[] = [
     }
     if (body.riderVehicleInfo) {
       userSettings.riderVehicleInfo = { ...userSettings.riderVehicleInfo, ...body.riderVehicleInfo };
+    }
+    if (typeof body.profileImage !== 'undefined') {
+      userSettings.profileImage = body.profileImage;
+    }
+    if (typeof body.vehicle !== 'undefined') {
+      if (body.vehicle === null) {
+        userSettings.vehicle = null;
+      } else {
+        userSettings.vehicle = { ...userSettings.vehicle, ...body.vehicle };
+      }
+    }
+    if (typeof body.documents !== 'undefined') {
+      if (body.documents === null) {
+        userSettings.documents = null;
+      } else {
+        userSettings.documents = { ...userSettings.documents, ...body.documents };
+      }
     }
     return HttpResponse.json(userSettings, { status: 200 });
   }),
@@ -897,5 +950,76 @@ export const handlers: HttpHandler[] = [
     thread.updatedAt = nowIso();
 
     return HttpResponse.json(thread, { status: 200 });
+  }),
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Media Assets
+  // ─────────────────────────────────────────────────────────────────────────
+
+  // POST /api/media/assets - create a new media asset
+  http.post('/api/media/assets', async ({ request }) => {
+    const body = (await request.json()) as {
+      filename?: string;
+      mimeType?: string;
+      size?: number;
+      ownerId?: string;
+      ownerType?: string;
+    };
+
+    if (!body.filename || !body.mimeType || typeof body.size !== 'number' || !body.ownerId || !body.ownerType) {
+      return HttpResponse.json(
+        { message: 'filename, mimeType, size, ownerId, and ownerType are required' },
+        { status: 400 }
+      );
+    }
+
+    const mediaAssetId = createId('media');
+    const storageKey = `noop/${body.ownerType}/${body.ownerId}/${mediaAssetId}/${body.filename}`;
+    const now = nowIso();
+
+    const asset: MediaAsset = {
+      mediaAssetId,
+      filename: body.filename,
+      mimeType: body.mimeType,
+      size: body.size,
+      checksum: `${body.size}-mock`,
+      ownerId: body.ownerId,
+      ownerType: body.ownerType,
+      status: 'Active',
+      storageKey,
+      metadata: null,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    mediaAssets.set(mediaAssetId, asset);
+
+    return HttpResponse.json(asset, { status: 200 });
+  }),
+
+  // GET /api/media/assets/:id/signed-url - get a signed URL for a media asset
+  http.get('/api/media/assets/:id/signed-url', ({ params, request }) => {
+    const assetId = String(params.id ?? '');
+    const asset = mediaAssets.get(assetId);
+
+    if (!asset) {
+      return HttpResponse.json({ message: 'Media asset not found' }, { status: 404 });
+    }
+
+    const url = new URL(request.url);
+    const op = url.searchParams.get('op') ?? 'GET';
+    const expiresInSeconds = parseInt(url.searchParams.get('expiresInSeconds') ?? '3600', 10);
+
+    const signedUrl = `/mock-storage/${encodeURIComponent(asset.storageKey)}`;
+    const expiresAt = futureIso(expiresInSeconds / 60);
+
+    return HttpResponse.json(
+      {
+        url: signedUrl,
+        method: op as 'GET' | 'PUT',
+        expiresAt,
+      },
+      { status: 200 }
+    );
   }),
 ];
