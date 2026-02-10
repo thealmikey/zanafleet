@@ -20,6 +20,7 @@ import {
   BusinessType,
   DeliveryStatus,
   PolicyTrigger,
+  ValidatedUser,
 } from '@zanafleet/contracts';
 
 import { CapabilityGuard, PolicyGuard } from '@api/core/api/guards';
@@ -37,11 +38,13 @@ import { OrderEntity } from '../../order/entities/order.entity';
 import { DeliveryEntity } from '../../delivery/entities/delivery.entity';
 import { AdminScopeService } from '../services/admin-scope.service';
 
+/**
+ * Request type for authenticated endpoints.
+ * The `user` property is populated by JwtStrategy after successful authentication.
+ * CapabilityGuard ensures user.actorId is present before controller methods execute.
+ */
 interface AuthenticatedRequest {
-  user?: {
-    actorId?: string;
-    workspaceId?: string;
-  };
+  user?: ValidatedUser;
 }
 
 interface HierarchyQueryParams extends RawQueryParams {
