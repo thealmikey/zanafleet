@@ -53,6 +53,15 @@ export interface NavItem {
   disabled?: boolean;
 }
 
+/**
+ * Role-based navigation configuration.
+ *
+ * Each dashboard role maps to a title, icon, and set of navigation items.
+ * The user's highest-priority role (determined by `getHighestPriorityRole`)
+ * selects which configuration to display in the sidebar.
+ *
+ * Priority order: admin > support > operator > business > rider
+ */
 const ROLE_NAV_CONFIG: Record<DashboardRole, { title: string; icon: React.ReactNode; items: NavItem[] }> = {
   admin: {
     title: 'Admin Dashboard',
@@ -104,6 +113,9 @@ const ROLE_NAV_CONFIG: Record<DashboardRole, { title: string; icon: React.ReactN
   },
 };
 
+/**
+ * Navigation items shown for all authenticated users regardless of role.
+ */
 const COMMON_NAV_ITEMS: NavItem[] = [
   { label: 'Home', icon: <HomeIcon />, path: '/' },
   { label: 'Profile', icon: <ProfileIcon />, path: '/profile' },
@@ -125,11 +137,14 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps): Reac
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [notificationsAnchor, setNotificationsAnchor] = useState<HTMLButtonElement | null>(null);
 
+  // Determine which role-specific nav config to use based on highest-priority role
   const dashboardRole = getHighestPriorityRole(user?.roles);
   const roleConfig = dashboardRole ? ROLE_NAV_CONFIG[dashboardRole] : null;
 
+  // Badge displays the count of unread notifications
   const unreadCount = notifications.filter((n) => !n.read).length;
 
+  // Fetch notifications on mount and when user/token changes
   useEffect(() => {
     let cancelled = false;
 
@@ -168,6 +183,10 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps): Reac
     setNotificationsAnchor(null);
   }, []);
 
+  /**
+   * Marks a notification as read via API and updates local state.
+   * The badge count updates automatically since it derives from `notifications`.
+   */
   const handleNotificationClick = useCallback(
     async (id: string): Promise<void> => {
       try {
