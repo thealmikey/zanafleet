@@ -241,6 +241,8 @@ export interface AssignmentQueueItem {
   status: string;
   pickupAddress: string;
   dropoffAddress: string;
+  customerName?: string;
+  customerPhone?: string;
   priority: number;
   createdAt: Date;
   attempts: number;

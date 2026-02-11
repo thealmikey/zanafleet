@@ -95,7 +95,7 @@ export function DeliveryCard({
           <PersonIcon fontSize="small" color="action" />
           <Box>
             <Typography variant="caption" color="text.secondary" display="block">
-              Recipient
+              Customer
             </Typography>
             <Typography variant="body2" sx={{ fontWeight: 600 }}>
               {recipientName || 'Customer'}

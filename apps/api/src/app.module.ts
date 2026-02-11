@@ -32,6 +32,7 @@ import { RoleModule } from './modules/role/role.module';
 import { SaccoModule } from './modules/sacco/sacco.module';
 import { SettlementModule } from './modules/settlement/settlement.module';
 import { SignUpModule } from './modules/signup/signup.module';
+import { SearchModule } from './modules/search/search.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { WalletModule } from './modules/wallet/wallet.module';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
@@ -91,6 +92,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     TransactionModule,
     WalletModule,
     WorkspaceModule,
+    SearchModule,
   ],
 })
 export class AppModule { }

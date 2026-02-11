@@ -24,6 +24,8 @@ import { ComponentsDemo } from './pages/Demo/ComponentsDemo';
 import { RequestDeliveryPage } from './pages/RequestDelivery';
 import { ShopPage } from './pages/Shop';
 import { OrderTrackingPage } from './pages/OrderTracking';
+import { ShopperDashboard } from './pages/ShopperDashboard';
+import { SearchResultsPage } from './pages/Search/SearchResults';
 
 const theme = createTheme();
 
@@ -128,6 +130,14 @@ function App(): React.ReactElement {
                 }
               />
               <Route
+                path="/dashboard/shopper/*"
+                element={
+                  <ProtectedRoute>
+                    <ShopperDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/delivery/request"
                 element={
                   <ProtectedRoute>
@@ -148,6 +158,14 @@ function App(): React.ReactElement {
                 element={
                   <ProtectedRoute>
                     <OrderTrackingPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/search"
+                element={
+                  <ProtectedRoute>
+                    <SearchResultsPage />
                   </ProtectedRoute>
                 }
               />

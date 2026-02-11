@@ -46,6 +46,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { DashboardRole, getHighestPriorityRole } from '../../utils/roleRouting';
 import { NotificationList, NotificationItem } from '../common/NotificationList';
 import { getNotifications, markNotificationRead } from '../../services/notificationsApi';
+import { SearchBar } from '../Search/SearchBar';
 
 const DRAWER_WIDTH = 240;
 
@@ -113,6 +114,15 @@ const ROLE_NAV_CONFIG: Record<DashboardRole, { title: string; icon: React.ReactN
       { label: 'Active', icon: <MetricsIcon />, path: '/dashboard/rider' },
       { label: 'History', icon: <HistoryIcon />, path: '/dashboard/rider/history' },
       { label: 'Earnings', icon: <EarningsIcon />, path: '/dashboard/rider/earnings' },
+    ],
+  },
+  shopper: {
+    title: 'Shopper Dashboard',
+    icon: <HistoryIcon />,
+    items: [
+      { label: 'Overview', icon: <MetricsIcon />, path: '/dashboard/shopper' },
+      { label: 'Orders', icon: <HistoryIcon />, path: '/dashboard/shopper/orders' },
+      { label: 'Insights', icon: <EarningsIcon />, path: '/dashboard/shopper/insights' },
     ],
   },
 };
@@ -319,9 +329,13 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps): Reac
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', md: 'block' }, fontWeight: 600 }}>
             {title ?? roleConfig?.title ?? 'Dashboard'}
           </Typography>
+
+          <Box sx={{ flexGrow: 1, px: 2, display: 'flex', justifyContent: 'center' }}>
+            <SearchBar />
+          </Box>
           {user && (
             <>
               <IconButton

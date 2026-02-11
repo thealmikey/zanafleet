@@ -25,3 +25,15 @@ export const getBusinessAvailability = async (): Promise<any[]> => {
     const body = await response.json();
     return body.data || [];
 };
+
+export const getShopperOrders = async (customerId: string): Promise<any[]> => {
+    const response = await fetch(`${API_URL}/customers/me/orders?customerId=${customerId}`);
+    const body = await response.json();
+    return body.data || [];
+};
+
+export const getShopperInsights = async (customerId: string): Promise<any> => {
+    const response = await fetch(`${API_URL}/customers/me/insights?customerId=${customerId}`);
+    const body = await response.json();
+    return body.data;
+};

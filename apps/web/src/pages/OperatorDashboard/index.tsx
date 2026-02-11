@@ -111,41 +111,41 @@ function MetricsTab(): React.ReactElement {
 
   const kpiItems: KPIGridItem[] = metrics
     ? [
-        {
-          title: 'Active Deliveries',
-          value: metrics.activeDeliveries.toLocaleString(),
-          icon: <DeliveriesIcon fontSize="large" />,
-          color: 'primary',
-          loading,
-        },
-        {
-          title: 'Pending Assignments',
-          value: metrics.pendingAssignments.toLocaleString(),
-          icon: <QueueIcon fontSize="large" />,
-          color: 'warning',
-          loading,
-        },
-        {
-          title: 'Available Riders',
-          value: metrics.availableRiders.toLocaleString(),
-          icon: <RidersIcon fontSize="large" />,
-          color: 'success',
-          loading,
-        },
-        {
-          title: 'Avg Assignment Time',
-          value: formatDuration(metrics.avgAssignmentTime),
-          icon: <TimeIcon fontSize="large" />,
-          color: 'secondary',
-          loading,
-        },
-      ]
+      {
+        title: 'Active Deliveries',
+        value: metrics.activeDeliveries.toLocaleString(),
+        icon: <DeliveriesIcon fontSize="large" />,
+        color: 'primary',
+        loading,
+      },
+      {
+        title: 'Pending Assignments',
+        value: metrics.pendingAssignments.toLocaleString(),
+        icon: <QueueIcon fontSize="large" />,
+        color: 'warning',
+        loading,
+      },
+      {
+        title: 'Available Riders',
+        value: metrics.availableRiders.toLocaleString(),
+        icon: <RidersIcon fontSize="large" />,
+        color: 'success',
+        loading,
+      },
+      {
+        title: 'Avg Assignment Time',
+        value: formatDuration(metrics.avgAssignmentTime),
+        icon: <TimeIcon fontSize="large" />,
+        color: 'secondary',
+        loading,
+      },
+    ]
     : [
-        { title: 'Active Deliveries', value: '-', loading: true },
-        { title: 'Pending Assignments', value: '-', loading: true },
-        { title: 'Available Riders', value: '-', loading: true },
-        { title: 'Avg Assignment Time', value: '-', loading: true },
-      ];
+      { title: 'Active Deliveries', value: '-', loading: true },
+      { title: 'Pending Assignments', value: '-', loading: true },
+      { title: 'Available Riders', value: '-', loading: true },
+      { title: 'Avg Assignment Time', value: '-', loading: true },
+    ];
 
   return (
     <Box>
@@ -249,6 +249,9 @@ function QueueTab(): React.ReactElement {
             <Chip label={item.status} size="small" color={getStatusColor(item.status)} />
           </Box>
         </Box>
+        <Typography variant="body2" color="text.secondary" gutterBottom>
+          <strong>Customer:</strong> {item.customerName || 'N/A'} {item.customerPhone ? `(${item.customerPhone})` : ''}
+        </Typography>
         <Typography variant="body2" color="text.secondary" gutterBottom>
           <strong>Pickup:</strong> {item.pickupAddress}
         </Typography>

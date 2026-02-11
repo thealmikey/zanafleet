@@ -182,8 +182,8 @@ function OverviewTab({
               <Typography variant="body2" color="text.secondary">
                 {item.pickupLocationId ?? 'N/A'} {'->'} {item.dropoffLocationId ?? 'N/A'}
               </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Customer: {item.customerName ?? '-'} {item.customerPhone ? `(${item.customerPhone})` : ''}
+              <Typography variant="caption" color="primary.main" sx={{ fontWeight: 'bold' }}>
+                CUSTOMER: {item.customerName ?? '-'} {item.customerPhone ? `(${item.customerPhone})` : ''}
               </Typography>
             </CardContent>
           </Card>
@@ -301,7 +301,9 @@ function DeliveriesTab({
                 <Typography variant="subtitle2">{item.deliveryId}</Typography>
                 <Chip size="small" color={statusColor(item.status)} label={item.status} />
               </Box>
-              <Typography variant="body2">Customer: {item.customerName ?? '-'} {item.customerPhone ? `(${item.customerPhone})` : ''}</Typography>
+              <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.dark' }}>
+                CUSTOMER: {item.customerName ?? 'Walk-in'} {item.customerPhone ? `(${item.customerPhone})` : ''}
+              </Typography>
               <Typography variant="body2">{item.pickupLocationId ?? 'N/A'} {'->'} {item.dropoffLocationId ?? 'N/A'}</Typography>
               <Typography variant="body2">Rider: {item.assignedRiderName ?? item.assignedRiderId ?? '-'}</Typography>
               <Typography variant="body2">Price: {item.price != null ? formatCurrency(item.price, item.currency ?? 'KES') : '-'}</Typography>

@@ -19,3 +19,4 @@ export {
 export * from './operator';
 export * from './support';
 export * from './geo';
+export * from './shopper';

@@ -3,7 +3,7 @@
  * Determines which dashboard a user should see based on their roles.
  */
 
-export type DashboardRole = 'admin' | 'support' | 'operator' | 'business' | 'rider';
+export type DashboardRole = 'admin' | 'support' | 'operator' | 'business' | 'rider' | 'shopper';
 
 /**
  * Role priority order (highest privilege first).
@@ -15,6 +15,7 @@ const ROLE_PRIORITY: readonly DashboardRole[] = [
   'operator',
   'business',
   'rider',
+  'shopper',
 ] as const;
 
 /**
@@ -31,6 +32,8 @@ const ROLE_TO_DASHBOARD: Record<string, DashboardRole> = {
   Business: 'business',
   Rider: 'rider',
   Driver: 'rider',
+  Customer: 'shopper',
+  Shopper: 'shopper',
 };
 
 /**
@@ -42,6 +45,7 @@ export const DASHBOARD_ROUTES: Record<DashboardRole, string> = {
   operator: '/dashboard/operator',
   business: '/dashboard/business',
   rider: '/dashboard/rider',
+  shopper: '/dashboard/shopper',
 };
 
 /**
@@ -77,6 +81,8 @@ export function getHighestPriorityRole(roles: string[] | undefined): DashboardRo
 export function getDashboardRoute(roles: string[] | undefined): string {
   const dashboardRole = getHighestPriorityRole(roles);
   if (!dashboardRole) {
+    // If user has 'Customer' role but no higher priority, default to shopper dashboard
+    if (roles?.includes('Customer')) return '/dashboard/shopper';
     return '/dashboard/rider';
   }
   return DASHBOARD_ROUTES[dashboardRole];
