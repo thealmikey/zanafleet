@@ -28,7 +28,7 @@
     "@xyflow/react": "^12.10.0",
     "@zanafleet/contracts": "*",
     "chart.js": "^4.4.1",
-    "date-fns": "^4.1.0",
+    "date-fns": "^3.6.0",
     "keycloak-js": "^26.2.2",
     "react": "^18.2.0",
     "react-chartjs-2": "^5.3.1",
