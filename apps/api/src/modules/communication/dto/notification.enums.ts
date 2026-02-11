@@ -7,6 +7,7 @@ export enum NotificationChannel {
   EMAIL = 'EMAIL',
   PUSH = 'PUSH',
   WHATSAPP = 'WHATSAPP',
+  IN_APP = 'IN_APP',
 }
 
 /**
@@ -31,4 +32,5 @@ export enum RecipientType {
   CUSTOMER = 'CUSTOMER',
   ADMIN = 'ADMIN',
   SACCO = 'SACCO',
+  ACTOR = 'ACTOR',
 }

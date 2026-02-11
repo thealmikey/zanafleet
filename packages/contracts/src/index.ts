@@ -255,6 +255,15 @@ export interface CreateLocationInput {
   country?: string;
 }
 
+export interface Address {
+  formattedAddress: string;
+  street?: string;
+  city?: string;
+  region?: string;
+  postalCode?: string;
+  country?: string;
+}
+
 // ============================================================================
 // Sacco Contracts
 // ============================================================================
@@ -324,37 +333,37 @@ export interface BusinessResponse {
   updatedAt: Date;
 }
 
- // ============================================================================
- // Delivery Contracts
- // ============================================================================
- 
- export enum DeliveryStatus {
-   Requested = 'Requested',
-   Assigned = 'Assigned',
-   PickedUp = 'PickedUp',
-   InTransit = 'InTransit',
-   Delivered = 'Delivered',
-   Cancelled = 'Cancelled',
- }
- 
- export interface DeliveryResponse {
-   deliveryId: string;
-   businessId: string;
-   pickupLocationId: string;
-   dropoffLocationId: string;
-   assignedRiderId: string | null;
-   status: DeliveryStatus;
-   // Scheduling (optional)
-   scheduledPickupTime?: Date | null;
-   scheduledDropoffTime?: Date | null;
-   isScheduled?: boolean;
-   createdAt: Date;
-   updatedAt: Date;
- }
- 
- // ============================================================================
- // Test Account Definitions (Dev/Test Only)
- // ============================================================================
+// ============================================================================
+// Delivery Contracts
+// ============================================================================
+
+export enum DeliveryStatus {
+  Requested = 'Requested',
+  Assigned = 'Assigned',
+  PickedUp = 'PickedUp',
+  InTransit = 'InTransit',
+  Delivered = 'Delivered',
+  Cancelled = 'Cancelled',
+}
+
+export interface DeliveryResponse {
+  deliveryId: string;
+  businessId: string;
+  pickupLocationId: string;
+  dropoffLocationId: string;
+  assignedRiderId: string | null;
+  status: DeliveryStatus;
+  // Scheduling (optional)
+  scheduledPickupTime?: Date | null;
+  scheduledDropoffTime?: Date | null;
+  isScheduled?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============================================================================
+// Test Account Definitions (Dev/Test Only)
+// ============================================================================
 
 /**
  * ============================================================================

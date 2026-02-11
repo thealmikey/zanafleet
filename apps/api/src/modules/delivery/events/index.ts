@@ -5,6 +5,7 @@
  */
 
 export { DeliveryCreatedEventV1 } from './delivery-created.event';
+export { DeliveryRequestedEventV1 } from './delivery-requested.event';
 export { DeliveryStateTransitionedEventV1 } from './delivery-state-transitioned.event';
 export { DeliveryPricingAppliedEventV1 } from './delivery-pricing-applied.event';
 export { DeliveryCancelledEventV1 } from './delivery-cancelled.event';

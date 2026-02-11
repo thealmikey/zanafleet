@@ -17,11 +17,13 @@ import { CapabilityModule } from './modules/capability/capability.module';
 import { CommitmentsModule } from './modules/commitments/commitments.module';
 import { CommunicationModule } from './modules/communication/communication.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { DeliveryModule } from './modules/delivery/delivery.module';
 import { EvidenceModule } from './modules/evidence/evidence.module';
 import { FormationModule } from './modules/formation/formation.module';
 import { IncentiveModule } from './modules/incentive/incentive.module';
 import { LedgerModule } from './modules/ledger/ledger.module';
 import { OrganizationModule } from './modules/organization/organization.module';
+import { OrderModule } from './modules/order/order.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { PersonaModule } from './modules/persona/persona.module';
 import { RiderModule } from './modules/rider/rider.module';
@@ -69,10 +71,13 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     CapabilityModule,
     CommitmentsModule,
     CommunicationModule,
+    DashboardModule,
+    DeliveryModule,
     EvidenceModule,
     FormationModule,
     IncentiveModule,
     LedgerModule,
+    OrderModule,
     PaymentModule,
     SettlementModule,
     OrganizationModule,
@@ -84,7 +89,6 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     TransactionModule,
     WalletModule,
     WorkspaceModule,
-    DashboardModule,
   ],
 })
 export class AppModule {}

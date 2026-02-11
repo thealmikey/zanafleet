@@ -137,6 +137,96 @@ describe('Dashboard MSW Handlers', () => {
     });
   });
 
+  describe('Business Owner Dashboard', () => {
+    const businessId = 'biz_demo_001';
+
+    it('returns my linked businesses', async () => {
+      const response = await fetch('/api/businesses/mine');
+      expect(response.ok).toBe(true);
+      const payload = await response.json();
+
+      expect(Array.isArray(payload.data)).toBe(true);
+      expect(payload.data[0]).toMatchObject({
+        businessId: expect.any(String),
+        businessName: expect.any(String),
+      });
+    });
+
+    it('returns business overview, deliveries, details and billing summary', async () => {
+      const overviewRes = await fetch(`/api/businesses/${businessId}/stats/overview`);
+      expect(overviewRes.ok).toBe(true);
+      const overview = await overviewRes.json();
+      expect(overview).toMatchObject({
+        totalDeliveries: expect.any(Number),
+        activeDeliveries: expect.any(Number),
+        successfulDeliveries: expect.any(Number),
+        spendThisMonth: expect.any(Number),
+      });
+
+      const deliveriesRes = await fetch(`/api/businesses/${businessId}/deliveries?page=1&limit=10`);
+      expect(deliveriesRes.ok).toBe(true);
+      const deliveriesPayload = await deliveriesRes.json();
+      expect(Array.isArray(deliveriesPayload.data)).toBe(true);
+      expect(deliveriesPayload.meta).toMatchObject({
+        page: 1,
+        limit: 10,
+        total: expect.any(Number),
+        totalPages: expect.any(Number),
+      });
+
+      const firstDeliveryId = deliveriesPayload.data[0]?.deliveryId;
+      expect(firstDeliveryId).toEqual(expect.any(String));
+
+      const detailRes = await fetch(`/api/businesses/${businessId}/deliveries/${firstDeliveryId}`);
+      expect(detailRes.ok).toBe(true);
+      const detail = await detailRes.json();
+      expect(detail).toMatchObject({
+        deliveryId: firstDeliveryId,
+        status: expect.any(String),
+        timeline: expect.any(Array),
+      });
+
+      const billingRes = await fetch(`/api/businesses/${businessId}/billing/summary`);
+      expect(billingRes.ok).toBe(true);
+      const billing = await billingRes.json();
+      expect(billing).toMatchObject({
+        currency: expect.any(String),
+        totalSpend: expect.any(Number),
+        pendingCharges: expect.any(Number),
+        paidDeliveries: expect.any(Number),
+        invoiceHistory: expect.any(Array),
+      });
+    });
+
+    it('accepts delivery request and makes it visible in list', async () => {
+      const createRes = await fetch(`/api/businesses/${businessId}/deliveries/request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pickupLocationId: 'loc_pickup_new',
+          dropoffLocationId: 'loc_dropoff_new',
+          recipientName: 'Test Recipient',
+          recipientPhone: '+254700000111',
+          itemDescription: 'MSW seeded package',
+        }),
+      });
+      expect(createRes.ok).toBe(true);
+      const created = await createRes.json();
+      expect(created).toMatchObject({
+        deliveryId: expect.any(String),
+        orderId: expect.any(String),
+        estimatedCharges: expect.any(Number),
+      });
+
+      const deliveriesRes = await fetch(`/api/businesses/${businessId}/deliveries?page=1&limit=10`);
+      const deliveriesPayload = await deliveriesRes.json();
+      expect(deliveriesPayload.data[0]).toMatchObject({
+        deliveryId: created.deliveryId,
+        orderId: created.orderId,
+      });
+    });
+  });
+
   describe('Rider Dashboard', () => {
     const riderId = 'test-rider-456';
 

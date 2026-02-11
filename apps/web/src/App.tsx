@@ -21,6 +21,7 @@ import { MessagingPage } from './pages/Messaging';
 import { AIAssistantPage } from './pages/AIAssistant';
 import { HistoryCalendarPage } from './pages/HistoryCalendar';
 import { ComponentsDemo } from './pages/Demo/ComponentsDemo';
+import { RequestDeliveryPage } from './pages/RequestDelivery';
 
 const theme = createTheme();
 
@@ -121,6 +122,14 @@ function App(): React.ReactElement {
                 element={
                   <ProtectedRoute>
                     <RiderDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/delivery/request"
+                element={
+                  <ProtectedRoute>
+                    <RequestDeliveryPage />
                   </ProtectedRoute>
                 }
               />

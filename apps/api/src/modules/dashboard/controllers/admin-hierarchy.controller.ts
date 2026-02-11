@@ -3,6 +3,7 @@ import { CapabilityGuard, PolicyGuard } from '@api/core/api/guards';
 import {
   parseQueryParams,
   createPaginationMeta,
+  getStringFilterValue,
 } from '@api/core/api/utils';
 import {
   Controller,
@@ -215,13 +216,11 @@ export class AdminHierarchyController {
 
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
-    const whereClause: Record<string, unknown> = {
-      ...(filter ),
-    };
-
-    // Apply status filter if provided
-    if (status) {
-      whereClause.status = status;
+    const { status: _statusFilter, ...baseFilter } = filter;
+    const whereClause: Record<string, unknown> = { ...baseFilter };
+    const resolvedStatus = status ?? getStringFilterValue(filter, 'status');
+    if (resolvedStatus) {
+      whereClause.status = resolvedStatus;
     }
 
     if (riderId) {
@@ -303,13 +302,11 @@ export class AdminHierarchyController {
 
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
-    const whereClause: Record<string, unknown> = {
-      ...(filter ),
-    };
-
-    // Apply status filter if provided
-    if (status) {
-      whereClause.status = status;
+    const { status: _statusFilter, ...baseFilter } = filter;
+    const whereClause: Record<string, unknown> = { ...baseFilter };
+    const resolvedStatus = status ?? getStringFilterValue(filter, 'status');
+    if (resolvedStatus) {
+      whereClause.status = resolvedStatus;
     }
 
     if (riderId) {
@@ -329,6 +326,8 @@ export class AdminHierarchyController {
 
       if (businessIds.length > 0) {
         whereClause.businessId = In(businessIds);
+      } else if (riderIds.length > 0) {
+        whereClause.assignedRiderId = In(riderIds);
       }
     }
 

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { Injectable, Logger, Optional } from '@nestjs/common';
-import { BindingTargetType, CalendarEventType } from '@zanafleet/contracts';
+import { BindingTargetType } from '@zanafleet/contracts';
 
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { CalendarEventRepository, RegionFilter } from '../../calendar/repositories/calendar-event.repository';

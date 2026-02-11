@@ -187,6 +187,7 @@ function createSeededNotifications(): MockNotification[] {
 }
 
 let notifications: MockNotification[] = createSeededNotifications();
+const businessOwnerDeliveriesByBusinessId = new Map<string, ReturnType<typeof businessFixtures.createDeliveryHistory>>();
 
 // Pagination helper
 function createPaginationMeta<T>(
@@ -209,6 +210,24 @@ function parseQueryParams(url: URL): { page: number; limit: number; periodDays: 
   const limit = Math.max(1, Math.min(100, parseInt(url.searchParams.get('limit') ?? '20', 10)));
   const periodDays = parseInt(url.searchParams.get('periodDays') ?? '30', 10);
   return { page, limit, periodDays };
+}
+
+function getBusinessOwnerDeliveries(businessId: string): ReturnType<typeof businessFixtures.createDeliveryHistory> {
+  const existing = businessOwnerDeliveriesByBusinessId.get(businessId);
+  if (existing) {
+    return existing;
+  }
+  const seeded = businessFixtures.createDeliveryHistory(businessId);
+  businessOwnerDeliveriesByBusinessId.set(businessId, seeded);
+  return seeded;
+}
+
+function toDateOrNull(value: string | null): Date | null {
+  if (!value) {
+    return null;
+  }
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 function createEmptySession(sessionId: string, actorType: ActorType): SignupSession {
@@ -265,6 +284,7 @@ export function resetMockSessions(): void {
     roles: ['user'],
   };
   notifications = createSeededNotifications();
+  businessOwnerDeliveriesByBusinessId.clear();
   userSettings = createDefaultSettings();
   mediaAssets.clear();
 }
@@ -647,6 +667,148 @@ export const handlers: HttpHandler[] = [
   // ─────────────────────────────────────────────────────────────────────────
   // Business Dashboard
   // ─────────────────────────────────────────────────────────────────────────
+
+  http.get('/api/businesses/mine', () => {
+    return HttpResponse.json({ data: businessFixtures.createBusinessIdentities() }, { status: 200 });
+  }),
+
+  http.get('/api/businesses/:businessId/stats/overview', ({ params }) => {
+    const businessId = String(params.businessId ?? '');
+    const seededDeliveries = getBusinessOwnerDeliveries(businessId);
+    const overview = businessFixtures.createBusinessOverview(businessId);
+    const activeStatuses = new Set(['requested', 'assigned', 'pickedup', 'intransit']);
+
+    const activeDeliveries = seededDeliveries.filter((d) =>
+      activeStatuses.has(d.status.toLowerCase())
+    ).length;
+    const successfulDeliveries = seededDeliveries.filter(
+      (d) => d.status.toLowerCase() === 'delivered'
+    ).length;
+    const cancelledDeliveries = seededDeliveries.filter(
+      (d) => d.status.toLowerCase() === 'cancelled'
+    ).length;
+    const spendThisMonth = seededDeliveries.reduce((sum, d) => sum + (d.price ?? 0), 0);
+
+    return HttpResponse.json(
+      {
+        ...overview,
+        totalDeliveries: seededDeliveries.length,
+        activeDeliveries,
+        successfulDeliveries,
+        cancelledDeliveries,
+        spendThisMonth,
+      },
+      { status: 200 }
+    );
+  }),
+
+  http.get('/api/businesses/:businessId/deliveries', ({ request, params }) => {
+    const url = new URL(request.url);
+    const businessId = String(params.businessId ?? '');
+    const { page, limit } = parseQueryParams(url);
+
+    const status = url.searchParams.get('status');
+    const from = toDateOrNull(url.searchParams.get('from'));
+    const to = toDateOrNull(url.searchParams.get('to'));
+    const locationId = url.searchParams.get('locationId');
+    const riderId = url.searchParams.get('riderId');
+    const paymentState = url.searchParams.get('paymentState');
+    const activeOnly = url.searchParams.get('activeOnly') === 'true';
+
+    const activeStatuses = new Set(['requested', 'assigned', 'pickedup', 'intransit']);
+    const deliveries = getBusinessOwnerDeliveries(businessId).filter((delivery) => {
+      if (status && delivery.status !== status) return false;
+      if (locationId && delivery.pickupLocationId !== locationId && delivery.dropoffLocationId !== locationId) {
+        return false;
+      }
+      if (riderId && delivery.assignedRiderId !== riderId) return false;
+      if (paymentState && delivery.paymentStatus !== paymentState) return false;
+      if (activeOnly && !activeStatuses.has(delivery.status.toLowerCase())) return false;
+
+      const createdAt = new Date(delivery.createdAt);
+      if (from && createdAt < from) return false;
+      if (to && createdAt > to) return false;
+
+      return true;
+    });
+
+    const { paginatedData, meta } = createPaginationMeta(deliveries, page, limit);
+    return HttpResponse.json({ data: paginatedData, meta }, { status: 200 });
+  }),
+
+  http.post('/api/businesses/:businessId/deliveries/request', async ({ request, params }) => {
+    const businessId = String(params.businessId ?? '');
+    const body = (await request.json()) as {
+      pickupLocationId?: string;
+      dropoffLocationId?: string;
+      recipientName?: string;
+      recipientPhone?: string;
+      itemDescription?: string;
+      scheduledPickupTime?: string;
+    };
+
+    const result = businessFixtures.createDeliveryRequestResult(businessId);
+    const current = getBusinessOwnerDeliveries(businessId);
+    const now = new Date();
+    const seeded = {
+      deliveryId: result.deliveryId,
+      status: body.scheduledPickupTime ? 'Requested' : 'Assigned',
+      orderId: result.orderId,
+      customerName: body.recipientName ?? 'New Customer',
+      customerPhone: body.recipientPhone ?? '+254700000000',
+      pickupLocationId: body.pickupLocationId ?? 'loc_pickup_new',
+      dropoffLocationId: body.dropoffLocationId ?? 'loc_dropoff_new',
+      assignedRiderId: result.assignedRiderId,
+      assignedRiderName: result.assignedRiderId ? 'Auto Assigned Rider' : null,
+      assignedRiderPhone: result.assignedRiderId ? '+254711000999' : null,
+      price: result.estimatedCharges,
+      currency: result.currency,
+      scheduledPickupTime: body.scheduledPickupTime ?? null,
+      paymentStatus: 'UNPAID',
+      itemSummary: body.itemDescription ?? 'Requested item',
+      createdAt: now,
+    };
+
+    businessOwnerDeliveriesByBusinessId.set(businessId, [seeded, ...current]);
+    return HttpResponse.json(result, { status: 200 });
+  }),
+
+  http.get('/api/businesses/:businessId/deliveries/:deliveryId', ({ params }) => {
+    const businessId = String(params.businessId ?? '');
+    const deliveryId = String(params.deliveryId ?? '');
+    const seededDeliveries = getBusinessOwnerDeliveries(businessId);
+    const seeded = seededDeliveries.find((d) => d.deliveryId === deliveryId) ?? seededDeliveries[0];
+    const baseDetail = businessFixtures.createDeliveryDetail(businessId, deliveryId);
+    const detail = seeded
+      ? {
+          ...baseDetail,
+          deliveryId: seeded.deliveryId,
+          status: seeded.status,
+          riderId: seeded.assignedRiderId,
+          riderName: seeded.assignedRiderName,
+          riderPhone: seeded.assignedRiderPhone,
+          scheduledPickupTime: seeded.scheduledPickupTime,
+          paymentStatus: seeded.paymentStatus,
+          timeline: businessFixtures.createDeliveryTimeline(
+            seeded.deliveryId,
+            new Date(seeded.createdAt)
+          ),
+        }
+      : baseDetail;
+    return HttpResponse.json(detail, { status: 200 });
+  }),
+
+  http.get('/api/deliveries/:deliveryId/timeline', ({ params }) => {
+    const deliveryId = String(params.deliveryId ?? '');
+    const data = businessFixtures.createDeliveryTimeline(deliveryId);
+    return HttpResponse.json({ data }, { status: 200 });
+  }),
+
+  http.get('/api/businesses/:businessId/billing/summary', ({ params }) => {
+    const businessId = String(params.businessId ?? '');
+    const summary = businessFixtures.createBillingSummary(businessId);
+    return HttpResponse.json(summary, { status: 200 });
+  }),
 
   http.get('/api/dashboard/business/:businessId/metrics', ({ request, params }) => {
     const url = new URL(request.url);

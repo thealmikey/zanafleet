@@ -99,10 +99,11 @@ const ROLE_NAV_CONFIG: Record<DashboardRole, { title: string; icon: React.ReactN
     title: 'Business Dashboard',
     icon: <BusinessIcon />,
     items: [
-      { label: 'Metrics', icon: <MetricsIcon />, path: '/dashboard/business' },
-      { label: 'Orders', icon: <SettlementsIcon />, path: '/dashboard/business/orders' },
+      { label: 'Overview', icon: <MetricsIcon />, path: '/dashboard/business' },
       { label: 'Deliveries', icon: <HistoryIcon />, path: '/dashboard/business/deliveries' },
-      { label: 'Invoices', icon: <EarningsIcon />, path: '/dashboard/business/invoices' },
+      { label: 'New Request', icon: <SettlementsIcon />, path: '/dashboard/business/request' },
+      { label: 'Active', icon: <RiderIcon />, path: '/dashboard/business/active' },
+      { label: 'Billing', icon: <EarningsIcon />, path: '/dashboard/business/billing' },
     ],
   },
   rider: {

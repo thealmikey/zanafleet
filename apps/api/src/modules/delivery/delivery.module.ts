@@ -10,10 +10,12 @@ import { LedgerModule } from '../ledger/ledger.module';
 import { LocationIntelligenceModule } from '../location-intelligence/location-intelligence.module';
 import { PolicyModule } from '../policy/policy.module';
 
+import { DeliveriesController } from './controllers/deliveries.controller';
 import { DeliveryTrackingController } from './controllers/delivery-tracking.controller';
 import { DeliveryExecutionCoordinator } from './coordinators/delivery-execution.coordinator';
 import { DeliveryLifecycleCoordinator } from './coordinators/delivery-lifecycle.coordinator';
 import { DeliveryMatchingCoordinator } from './coordinators/delivery-matching.coordinator';
+import { DeliveryRequestCoordinator } from './coordinators/delivery-request.coordinator';
 import { DeliveryEntity } from './entities/delivery.entity';
 import { AcceptDeliveryAssignmentHandler } from './handlers/accept-delivery-assignment.handler';
 import { AssignRiderToDeliveryHandler } from './handlers/assign-rider-to-delivery.handler';
@@ -39,12 +41,13 @@ import { OrderCreatedSubscriber } from './subscribers/order-created.subscriber';
     forwardRef(() => LedgerModule),
     forwardRef(() => LocationIntelligenceModule),
   ],
-  controllers: [DeliveryTrackingController],
+  controllers: [DeliveriesController, DeliveryTrackingController],
   providers: [
     DeliveryService,
     DeliveryLifecycleCoordinator,
     DeliveryMatchingCoordinator,
     DeliveryExecutionCoordinator,
+    DeliveryRequestCoordinator,
     OrderCreatedSubscriber,
     DeliveryScheduledSubscriber,
     CandidateSelectionService,

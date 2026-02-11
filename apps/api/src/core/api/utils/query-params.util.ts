@@ -225,3 +225,19 @@ export function createPaginationMeta(
     hasPreviousPage: pagination.page > 1,
   };
 }
+
+/**
+ * Extract a trimmed string filter value by key.
+ */
+export function getStringFilterValue(
+  filter: Record<string, unknown>,
+  key: string
+): string | undefined {
+  const raw = filter[key];
+  if (typeof raw !== 'string') {
+    return undefined;
+  }
+
+  const trimmed = raw.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
+}

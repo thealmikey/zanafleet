@@ -27,6 +27,15 @@ function buildQueryString(params: Record<string, string | number | undefined>): 
 // Geo Types
 // ─────────────────────────────────────────────────────────────────────────────
 
+export interface Address {
+  formattedAddress: string;
+  street?: string;
+  city?: string;
+  region?: string;
+  postalCode?: string;
+  country?: string;
+}
+
 export interface RiderCandidate {
   riderId: string;
   name: string;
@@ -90,6 +99,15 @@ export async function getNearbyRiders(params: NearbyRidersParams): Promise<Rider
     },
   });
   return handleResponse<RiderCandidate[]>(response);
+}
+
+export async function searchAddress(query: string): Promise<Address[]> {
+  const qs = buildQueryString({ q: query });
+  const response = await fetch(`${API_BASE_URL}/geo/search${qs}`, {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  return handleResponse<Address[]>(response);
 }
 
 export interface HeatmapParams {
