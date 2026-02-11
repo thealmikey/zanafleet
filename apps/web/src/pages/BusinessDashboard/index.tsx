@@ -425,16 +425,13 @@ function CustomersTab({
   businessId: string;
 }): React.ReactElement {
   const [customers, setCustomers] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setLoading(true);
     fetch(`/api/customers?businessId=${businessId}`)
       .then(res => res.json())
       .then(body => setCustomers(body.data || []))
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false));
+      .catch(err => setError(err.message));
   }, [businessId]);
 
   return (

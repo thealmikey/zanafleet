@@ -13,3 +13,15 @@ export const searchCustomers = async (businessId: string, query: string): Promis
     const body = await response.json();
     return body.data || [];
 };
+
+export const getCustomerActivity = async (businessId: string, customerId: string): Promise<any> => {
+    const response = await fetch(`${API_URL}/customers/me/activity/${businessId}?customerId=${customerId}`);
+    const body = await response.json();
+    return body.data;
+};
+
+export const getBusinessAvailability = async (): Promise<any[]> => {
+    const response = await fetch(`${API_URL}/customers/businesses/availability`);
+    const body = await response.json();
+    return body.data || [];
+};

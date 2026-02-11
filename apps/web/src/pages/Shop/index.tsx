@@ -21,14 +21,30 @@ import {
     MenuItem,
     Tab,
     Tabs,
+    Chip,
 } from '@mui/material';
 import { useAuth } from '../../hooks/useAuth';
 import { placeCustomerOrder } from '../../services/orderApi';
 import { searchAddress, Address } from '../../services/geoApi';
 import { getCustomerActivity, getBusinessAvailability } from '../../services/customerApi';
-import { BusinessAvailabilityProjection } from '../../../../api/src/modules/customer/entities/business-availability.projection';
-import { CustomerActivityProjection } from '../../../../api/src/modules/customer/entities/customer-activity.projection';
-import { CheckCircle as CheckCircleIcon, Error as ErrorIcon, Stars as StarsIcon, ShoppingBag as ShoppingBagIcon } from '@mui/icons-material';
+
+interface BusinessAvailability {
+    businessId: string;
+    capacityLimit: number;
+    activeOrderCount: number;
+    isCurrentlyOpen: boolean;
+    lastUpdatedAt: Date;
+}
+
+interface CustomerActivity {
+    customerId: string;
+    businessId: string;
+    totalOrders: number;
+    totalSpent: number;
+    frequentItems: Record<string, number>;
+}
+
+import { CheckCircle as CheckCircleIcon, Error as ErrorIcon, Stars as StarsIcon } from '@mui/icons-material';
 // Mock business service or reuse dashboardApi if it has listBusinesses
 // Mock business service or reuse dashboardApi if it has listBusinesses
 
@@ -57,15 +73,14 @@ export const ShopPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState(0);
     const [orderHistory, setOrderHistory] = useState<any[]>([]);
-    const [availabilities, setAvailabilities] = useState<Record<string, BusinessAvailabilityProjection>>({});
-    const [customerActivity, setCustomerActivity] = useState<CustomerActivityProjection | null>(null);
-    const [userCoords, setUserCoords] = useState<{ lat: number, lng: number } | null>(null);
+    const [availabilities, setAvailabilities] = useState<Record<string, BusinessAvailability>>({});
+    const [customerActivity, setCustomerActivity] = useState<CustomerActivity | null>(null);
 
     // Order State
     const [itemDescription, setItemDescription] = useState('');
     const [itemPrice, setItemPrice] = useState<number>(0);
     const [recipientName, setRecipientName] = useState(user?.name || '');
-    const [recipientPhone, setRecipientPhone] = useState(user?.phoneNumber || '');
+    const [recipientPhone, setRecipientPhone] = useState('');
     const [paymentMethod, setPaymentMethod] = useState('MOBILE_MONEY');
 
     // Order State
@@ -85,8 +100,8 @@ export const ShopPage: React.FC = () => {
                 setBusinesses(busRes.data || []);
                 setOrderHistory(histRes.data || []);
 
-                const availMap: Record<string, any> = {};
-                (availRes || []).forEach(a => {
+                const availMap: Record<string, BusinessAvailability> = {};
+                (availRes || []).forEach((a: BusinessAvailability) => {
                     availMap[a.businessId] = a;
                 });
                 setAvailabilities(availMap);
@@ -96,13 +111,6 @@ export const ShopPage: React.FC = () => {
             }
         };
         fetchData();
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (pos) => setUserCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-                (err) => console.warn('Geolocation failed', err)
-            );
-        }
     }, []);
 
     useEffect(() => {
