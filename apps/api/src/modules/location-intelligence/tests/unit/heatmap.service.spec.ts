@@ -322,7 +322,7 @@ describe('HeatmapService', () => {
         resolution: H3_RESOLUTION_FINE,
       });
 
-      const query = mockDataSource.query.mock.calls[0][0] as string;
+      const query = mockDataSource.query.mock.calls[0][0] ;
       expect(query).toContain('h3_index_fine');
       expect(query).not.toContain('h3_index_medium');
       expect(query).not.toContain('h3_index_coarse');
@@ -336,7 +336,7 @@ describe('HeatmapService', () => {
         resolution: H3_RESOLUTION_MEDIUM,
       });
 
-      const query = mockDataSource.query.mock.calls[0][0] as string;
+      const query = mockDataSource.query.mock.calls[0][0] ;
       expect(query).toContain('h3_index_medium');
     });
 
@@ -348,7 +348,7 @@ describe('HeatmapService', () => {
         resolution: H3_RESOLUTION_COARSE,
       });
 
-      const query = mockDataSource.query.mock.calls[0][0] as string;
+      const query = mockDataSource.query.mock.calls[0][0] ;
       expect(query).toContain('h3_index_coarse');
     });
   });

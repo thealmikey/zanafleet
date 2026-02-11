@@ -1,3 +1,10 @@
+import { RequireCapability } from '@api/core/api/decorators';
+import { CapabilityGuard } from '@api/core/api/guards';
+import {
+  parseQueryParams,
+  createPaginationMeta,
+  RawQueryParams,
+} from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -8,17 +15,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThanOrEqual } from 'typeorm';
 
-import { CapabilityGuard } from '@api/core/api/guards';
-import { RequireCapability } from '@api/core/api/decorators';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
 
 import { DisputeEntity } from '../../payment/entities/dispute.entity';
-import { RefundEntity } from '../../payment/entities/refund.entity';
 import { PaymentIntentEntity } from '../../payment/entities/payment-intent.entity';
+import { RefundEntity } from '../../payment/entities/refund.entity';
 
 export interface DisputeSummary {
   disputeId: string;
@@ -133,7 +133,7 @@ export class SupportDashboardController {
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
     const [entities, total] = await this.disputeRepository.findAndCount({
-      where: filter as Record<string, unknown>,
+      where: filter ,
       order,
       skip: pagination.offset,
       take: pagination.limit,
@@ -203,7 +203,7 @@ export class SupportDashboardController {
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
     const [entities, total] = await this.refundRepository.findAndCount({
-      where: filter as Record<string, unknown>,
+      where: filter ,
       order,
       skip: pagination.offset,
       take: pagination.limit,
@@ -238,7 +238,7 @@ export class SupportDashboardController {
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
     const [entities, total] = await this.paymentIntentRepository.findAndCount({
-      where: filter as Record<string, unknown>,
+      where: filter ,
       order,
       skip: pagination.offset,
       take: pagination.limit,

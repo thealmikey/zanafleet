@@ -1,3 +1,9 @@
+import { RequireCapability } from '@api/core/api/decorators';
+import { CapabilityGuard, PolicyGuard } from '@api/core/api/guards';
+import {
+  parseQueryParams,
+  createPaginationMeta,
+} from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -13,29 +19,34 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, In } from 'typeorm';
 import {
-  LocationData,
-  VehicleType,
-  BusinessType,
-  DeliveryStatus,
   PolicyTrigger,
   ValidatedUser,
 } from '@zanafleet/contracts';
+import { Repository, In } from 'typeorm';
 
-import { CapabilityGuard, PolicyGuard } from '@api/core/api/guards';
-import { RequireCapability } from '@api/core/api/decorators';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
 
 import { BusinessEntity } from '../../business/entities/business.entity';
-import { SaccoEntity } from '../../sacco/entities/sacco.entity';
-import { RiderEntity } from '../../rider/entities/rider.entity';
-import { OrderEntity } from '../../order/entities/order.entity';
 import { DeliveryEntity } from '../../delivery/entities/delivery.entity';
+import { OrderEntity } from '../../order/entities/order.entity';
+import { RiderEntity } from '../../rider/entities/rider.entity';
+import { SaccoEntity } from '../../sacco/entities/sacco.entity';
+import {
+  BusinessResponseDto,
+  SaccoResponseDto,
+  RiderResponseDto,
+  OrderResponseDto,
+  DeliveryResponseDto,
+  PaginatedResponseDto,
+  HierarchyQueryDto,
+  OrdersQueryDto,
+  DeliveriesQueryDto,
+  UpdateBusinessHierarchyDto,
+  UpdateSaccoHierarchyDto,
+  UpdateRiderHierarchyDto,
+  UpdateOrderHierarchyDto,
+  UpdateDeliveryHierarchyDto,
+} from '../dto';
 import { AdminScopeService } from '../services/admin-scope.service';
 
 /**
@@ -45,52 +56,6 @@ import { AdminScopeService } from '../services/admin-scope.service';
  */
 interface AuthenticatedRequest {
   user?: ValidatedUser;
-}
-
-interface HierarchyQueryParams extends RawQueryParams {
-  saccoId?: string;
-  businessId?: string;
-  riderId?: string;
-}
-
-export class UpdateBusinessHierarchyDto {
-  businessName?: string;
-  phone?: string;
-  location?: LocationData;
-  businessType?: BusinessType;
-  email?: string | null;
-}
-
-export class UpdateSaccoHierarchyDto {
-  name?: string;
-  location?: LocationData;
-  contactPhone?: string;
-}
-
-export class UpdateRiderHierarchyDto {
-  fullName?: string;
-  nationalId?: string;
-  phone?: string;
-  location?: LocationData | null;
-  vehicleType?: VehicleType;
-  saccoId?: string | null;
-  email?: string | null;
-}
-
-export class UpdateOrderHierarchyDto {
-  businessId?: string;
-  itemSummary?: string;
-  itemMetadata?: Record<string, unknown>;
-  customerName?: string;
-  customerPhone?: string;
-  scheduledTime?: Date;
-}
-
-export class UpdateDeliveryHierarchyDto {
-  assignedRiderId?: string;
-  status?: DeliveryStatus;
-  scheduledPickupTime?: Date;
-  scheduledDropoffTime?: Date;
 }
 
 @Controller('dashboards/admin/hierarchy')
@@ -117,11 +82,8 @@ export class AdminHierarchyController {
   @Header('Cache-Control', 'private, max-age=30')
   async getBusinesses(
     @Req() req: AuthenticatedRequest,
-    @Query() query: RawQueryParams
-  ): Promise<{
-    data: ReturnType<BusinessEntity['toDomain']>[];
-    meta: ReturnType<typeof createPaginationMeta>;
-  }> {
+    @Query() query: HierarchyQueryDto
+  ): Promise<PaginatedResponseDto<BusinessResponseDto>> {
     const { pagination, sort, filter } = parseQueryParams(query);
     const workspaceId = req.user?.workspaceId ?? null;
     const actorId = req.user?.actorId ?? null;
@@ -139,7 +101,7 @@ export class AdminHierarchyController {
 
     const [entities, total] = await this.businessRepository.findAndCount({
       where: {
-        ...(filter as Record<string, unknown>),
+        ...(filter ),
         id: In(businessIds),
       },
       order,
@@ -157,11 +119,8 @@ export class AdminHierarchyController {
   @Header('Cache-Control', 'private, max-age=30')
   async getSaccos(
     @Req() req: AuthenticatedRequest,
-    @Query() query: RawQueryParams
-  ): Promise<{
-    data: ReturnType<SaccoEntity['toDomain']>[];
-    meta: ReturnType<typeof createPaginationMeta>;
-  }> {
+    @Query() query: HierarchyQueryDto
+  ): Promise<PaginatedResponseDto<SaccoResponseDto>> {
     const { pagination, sort, filter } = parseQueryParams(query);
     const workspaceId = req.user?.workspaceId ?? null;
     const actorId = req.user?.actorId ?? null;
@@ -179,7 +138,7 @@ export class AdminHierarchyController {
 
     const [entities, total] = await this.saccoRepository.findAndCount({
       where: {
-        ...(filter as Record<string, unknown>),
+        ...(filter ),
         id: In(saccoIds),
       },
       order,
@@ -197,11 +156,8 @@ export class AdminHierarchyController {
   @Header('Cache-Control', 'private, max-age=30')
   async getRiders(
     @Req() req: AuthenticatedRequest,
-    @Query() query: HierarchyQueryParams
-  ): Promise<{
-    data: ReturnType<RiderEntity['toDomain']>[];
-    meta: ReturnType<typeof createPaginationMeta>;
-  }> {
+    @Query() query: HierarchyQueryDto
+  ): Promise<PaginatedResponseDto<RiderResponseDto>> {
     const { pagination, sort, filter } = parseQueryParams(query);
     const workspaceId = req.user?.workspaceId ?? null;
     const actorId = req.user?.actorId ?? null;
@@ -225,7 +181,7 @@ export class AdminHierarchyController {
     const order = sort ? { [sort.field]: sort.order } : undefined;
 
     const whereClause: Record<string, unknown> = {
-      ...(filter as Record<string, unknown>),
+      ...(filter ),
       id: In(riderIds),
     };
 
@@ -250,21 +206,23 @@ export class AdminHierarchyController {
   @Header('Cache-Control', 'private, max-age=30')
   async getOrders(
     @Req() req: AuthenticatedRequest,
-    @Query() query: HierarchyQueryParams
-  ): Promise<{
-    data: ReturnType<OrderEntity['toDomain']>[];
-    meta: ReturnType<typeof createPaginationMeta>;
-  }> {
+    @Query() query: OrdersQueryDto
+  ): Promise<PaginatedResponseDto<OrderResponseDto>> {
     const { pagination, sort, filter } = parseQueryParams(query);
     const workspaceId = req.user?.workspaceId ?? null;
     const actorId = req.user?.actorId ?? null;
-    const { businessId, riderId } = query;
+    const { businessId, riderId, status } = query;
 
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
     const whereClause: Record<string, unknown> = {
-      ...(filter as Record<string, unknown>),
+      ...(filter ),
     };
+
+    // Apply status filter if provided
+    if (status) {
+      whereClause.status = status;
+    }
 
     if (riderId) {
       this.logger.debug(`Filtering orders by riderId: ${riderId} (via delivery lookup)`);
@@ -336,21 +294,23 @@ export class AdminHierarchyController {
   @Header('Cache-Control', 'private, max-age=30')
   async getDeliveries(
     @Req() req: AuthenticatedRequest,
-    @Query() query: HierarchyQueryParams
-  ): Promise<{
-    data: ReturnType<DeliveryEntity['toDomain']>[];
-    meta: ReturnType<typeof createPaginationMeta>;
-  }> {
+    @Query() query: DeliveriesQueryDto
+  ): Promise<PaginatedResponseDto<DeliveryResponseDto>> {
     const { pagination, sort, filter } = parseQueryParams(query);
     const workspaceId = req.user?.workspaceId ?? null;
     const actorId = req.user?.actorId ?? null;
-    const { businessId, riderId } = query;
+    const { businessId, riderId, status } = query;
 
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
     const whereClause: Record<string, unknown> = {
-      ...(filter as Record<string, unknown>),
+      ...(filter ),
     };
+
+    // Apply status filter if provided
+    if (status) {
+      whereClause.status = status;
+    }
 
     if (riderId) {
       whereClause.assignedRiderId = riderId;
@@ -391,7 +351,7 @@ export class AdminHierarchyController {
     @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() dto: UpdateBusinessHierarchyDto
-  ): Promise<ReturnType<BusinessEntity['toDomain']>> {
+  ): Promise<BusinessResponseDto> {
     const workspaceId = req.user?.workspaceId ?? null;
     const actorId = req.user?.actorId ?? null;
 
@@ -416,7 +376,7 @@ export class AdminHierarchyController {
     @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() dto: UpdateSaccoHierarchyDto
-  ): Promise<ReturnType<SaccoEntity['toDomain']>> {
+  ): Promise<SaccoResponseDto> {
     const workspaceId = req.user?.workspaceId ?? null;
     const actorId = req.user?.actorId ?? null;
 
@@ -441,7 +401,7 @@ export class AdminHierarchyController {
     @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() dto: UpdateRiderHierarchyDto
-  ): Promise<ReturnType<RiderEntity['toDomain']>> {
+  ): Promise<RiderResponseDto> {
     const workspaceId = req.user?.workspaceId ?? null;
     const actorId = req.user?.actorId ?? null;
 
@@ -466,7 +426,7 @@ export class AdminHierarchyController {
     @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() dto: UpdateOrderHierarchyDto
-  ): Promise<ReturnType<OrderEntity['toDomain']>> {
+  ): Promise<OrderResponseDto> {
     const workspaceId = req.user?.workspaceId ?? null;
     const actorId = req.user?.actorId ?? null;
 
@@ -505,7 +465,7 @@ export class AdminHierarchyController {
     @Req() req: AuthenticatedRequest,
     @Param('id') id: string,
     @Body() dto: UpdateDeliveryHierarchyDto
-  ): Promise<ReturnType<DeliveryEntity['toDomain']>> {
+  ): Promise<DeliveryResponseDto> {
     const workspaceId = req.user?.workspaceId ?? null;
     const actorId = req.user?.actorId ?? null;
 

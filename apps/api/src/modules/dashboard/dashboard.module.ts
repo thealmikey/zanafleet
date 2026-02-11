@@ -1,27 +1,27 @@
+import { Neo4jModule } from '@api/core/neo4j';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { Neo4jModule } from '@api/core/neo4j';
 
-import { DeliveryEntity } from '../delivery/entities/delivery.entity';
-import { OrderEntity } from '../order/entities/order.entity';
 import { InvoiceEntity } from '../billing/entities/invoice.entity';
-import { SettlementBatchEntity } from '../settlement/entities/settlement-batch.entity';
-import { PolicyEntity } from '../policy/entities/policy.entity';
-import { DisputeEntity } from '../payment/entities/dispute.entity';
-import { RefundEntity } from '../payment/entities/refund.entity';
-import { PaymentIntentEntity } from '../payment/entities/payment-intent.entity';
 import { BusinessEntity } from '../business/entities/business.entity';
-import { SaccoEntity } from '../sacco/entities/sacco.entity';
-import { RiderEntity } from '../rider/entities/rider.entity';
+import { DeliveryEntity } from '../delivery/entities/delivery.entity';
 import { LocationIntelligenceModule } from '../location-intelligence/location-intelligence.module';
+import { OrderEntity } from '../order/entities/order.entity';
+import { DisputeEntity } from '../payment/entities/dispute.entity';
+import { PaymentIntentEntity } from '../payment/entities/payment-intent.entity';
+import { RefundEntity } from '../payment/entities/refund.entity';
+import { PolicyEntity } from '../policy/entities/policy.entity';
+import { RiderEntity } from '../rider/entities/rider.entity';
+import { SaccoEntity } from '../sacco/entities/sacco.entity';
+import { SettlementBatchEntity } from '../settlement/entities/settlement-batch.entity';
 
 import { AdminDashboardController } from './controllers/admin-dashboard.controller';
 import { AdminHierarchyController } from './controllers/admin-hierarchy.controller';
-import { RiderDashboardController } from './controllers/rider-dashboard.controller';
 import { BusinessDashboardController } from './controllers/business-dashboard.controller';
-import { SupportDashboardController } from './controllers/support-dashboard.controller';
 import { OperatorDashboardController } from './controllers/operator-dashboard.controller';
+import { RiderDashboardController } from './controllers/rider-dashboard.controller';
+import { SupportDashboardController } from './controllers/support-dashboard.controller';
 import { AdminScopeService } from './services/admin-scope.service';
 
 /**

@@ -1,13 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { CapabilityGuard } from '@api/core/api/guards';
 import { INestApplication, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 
-import { CapabilityGuard } from '@api/core/api/guards';
 import { SettlementsController } from '../../controllers/settlements.controller';
 import { PayoutOrchestrator } from '../../coordinators/payout.orchestrator';
-import { SettlementSchedulerService } from '../../services/settlement-scheduler.service';
 import { PayoutMethod } from '../../dto/settlement.enums';
+import { SettlementSchedulerService } from '../../services/settlement-scheduler.service';
 
 describe('SettlementsController (e2e)', () => {
   let app: INestApplication;

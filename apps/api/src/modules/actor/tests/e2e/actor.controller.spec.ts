@@ -1,14 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { CapabilityGuard } from '@api/core/api/guards';
 import { INestApplication, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { CommandBus } from '@nestjs/cqrs';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import request from 'supertest';
 
-import { CapabilityGuard } from '@api/core/api/guards';
 import { ActorController } from '../../controllers/actor.controller';
-import { ActorEntity } from '../../entities/actor.entity';
 import { ActorType } from '../../dto/actor.enums';
+import { ActorEntity } from '../../entities/actor.entity';
 
 describe('ActorController (e2e)', () => {
   let app: INestApplication;

@@ -194,7 +194,7 @@ describe('PolicyEnforcementAdapter', () => {
       await adapter.filterCandidatesByPolicy([candidate], baseContext);
 
       const afterCall = new Date();
-      const calledContext = mockEngine.evaluate.mock.calls[0][0] as EvaluationContext;
+      const calledContext = mockEngine.evaluate.mock.calls[0][0] ;
 
       expect(calledContext.timestamp.getTime()).toBeGreaterThanOrEqual(beforeCall.getTime());
       expect(calledContext.timestamp.getTime()).toBeLessThanOrEqual(afterCall.getTime());
@@ -355,7 +355,7 @@ describe('PolicyEnforcementAdapter', () => {
 
       await adapter.evaluateDeliveryCreation(baseInput);
 
-      const calledContext = mockEngine.evaluate.mock.calls[0][0] as EvaluationContext;
+      const calledContext = mockEngine.evaluate.mock.calls[0][0] ;
       expect(calledContext.location).toBeUndefined();
     });
   });
@@ -484,7 +484,7 @@ describe('PolicyEnforcementAdapter', () => {
         timestamp: customTimestamp,
       });
 
-      const calledContext = mockEngine.evaluate.mock.calls[0][0] as EvaluationContext;
+      const calledContext = mockEngine.evaluate.mock.calls[0][0] ;
       expect(calledContext.timestamp).toEqual(customTimestamp);
     });
 
@@ -499,7 +499,7 @@ describe('PolicyEnforcementAdapter', () => {
       });
 
       const afterCall = new Date();
-      const calledContext = mockEngine.evaluate.mock.calls[0][0] as EvaluationContext;
+      const calledContext = mockEngine.evaluate.mock.calls[0][0] ;
 
       expect(calledContext.timestamp.getTime()).toBeGreaterThanOrEqual(beforeCall.getTime());
       expect(calledContext.timestamp.getTime()).toBeLessThanOrEqual(afterCall.getTime());

@@ -1,3 +1,10 @@
+import { RequireCapability } from '@api/core/api/decorators';
+import { CapabilityGuard } from '@api/core/api/guards';
+import {
+  parseQueryParams,
+  createPaginationMeta,
+  RawQueryParams,
+} from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -14,16 +21,9 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { VehicleType, LocationData } from '@zanafleet/contracts';
+import { Repository } from 'typeorm';
 
-import { CapabilityGuard } from '@api/core/api/guards';
-import { RequireCapability } from '@api/core/api/decorators';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
 
 import { CreateRiderCommand } from '../commands/create-rider.command';
 import { RiderEntity } from '../entities/rider.entity';
@@ -85,7 +85,7 @@ export class RiderController {
     const order = sort ? { [sort.field]: sort.order } : undefined;
 
     const [entities, total] = await this.riderRepository.findAndCount({
-      where: filter as Record<string, unknown>,
+      where: filter ,
       order,
       skip: pagination.offset,
       take: pagination.limit,

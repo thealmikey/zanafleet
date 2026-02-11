@@ -156,8 +156,8 @@ export class RiderLocationRepository {
           longitude: rider.longitude,
         }),
       }))
-      .filter((rider) => rider.distanceMeters! <= radiusMeters)
-      .sort((a, b) => a.distanceMeters! - b.distanceMeters!);
+      .filter((rider) => rider.distanceMeters <= radiusMeters)
+      .sort((a, b) => a.distanceMeters - b.distanceMeters);
 
     return limit ? refined.slice(0, limit) : refined;
   }

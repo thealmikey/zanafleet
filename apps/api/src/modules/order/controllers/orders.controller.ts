@@ -1,3 +1,10 @@
+import { RequireCapability } from '@api/core/api/decorators';
+import { CapabilityGuard } from '@api/core/api/guards';
+import {
+  parseQueryParams,
+  createPaginationMeta,
+  RawQueryParams,
+} from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -16,13 +23,6 @@ import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CapabilityGuard } from '@api/core/api/guards';
-import { RequireCapability } from '@api/core/api/decorators';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
 
 import { CreateOrderCommand } from '../commands/create-order.command';
 import { OrderEntity } from '../entities/order.entity';
@@ -82,7 +82,7 @@ export class OrdersController {
     const order = sort ? { [sort.field]: sort.order } : undefined;
 
     const [entities, total] = await this.orderRepository.findAndCount({
-      where: filter as Record<string, unknown>,
+      where: filter ,
       order,
       skip: pagination.offset,
       take: pagination.limit,

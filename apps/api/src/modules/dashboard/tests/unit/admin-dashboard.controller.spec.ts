@@ -1,13 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { CapabilityGuard } from '@api/core/api/guards';
 import { INestApplication, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import request from 'supertest';
 
-import { CapabilityGuard } from '@api/core/api/guards';
-import { AdminDashboardController } from '../../controllers/admin-dashboard.controller';
-import { SettlementBatchEntity } from '../../../settlement/entities/settlement-batch.entity';
 import { PolicyEntity } from '../../../policy/entities/policy.entity';
+import { SettlementBatchEntity } from '../../../settlement/entities/settlement-batch.entity';
+import { AdminDashboardController } from '../../controllers/admin-dashboard.controller';
 
 describe('AdminDashboardController (e2e)', () => {
   let app: INestApplication;

@@ -1,8 +1,8 @@
+import { BaseEvent } from '@api/core/event-bus/interfaces/base-event.interface';
+import { Neo4jService } from '@api/core/neo4j';
 import { Logger } from '@nestjs/common';
 import { Session } from 'neo4j-driver';
 
-import { Neo4jService } from '@api/core/neo4j';
-import { BaseEvent } from '@api/core/event-bus/interfaces/base-event.interface';
 
 /**
  * Projection state tracking for replay support

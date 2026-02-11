@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
+import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../dto/payment.enums';
 import { PaymentIntentEntity } from '../entities/payment-intent.entity';
 import { PaymentTransactionEntity } from '../entities/payment-transaction.entity';
@@ -15,8 +15,8 @@ import {
   PaymentStatus,
   WebhookProcessingResult,
 } from '../providers/dto/payment-provider.types';
-import { PaymentProvider } from '../providers/payment-provider.interface';
 import { PaymentProviderRegistry } from '../providers/payment-provider-registry.service';
+import { PaymentProvider } from '../providers/payment-provider.interface';
 import { FraudCheckService, FraudDecision } from '../services/fraud-check.service';
 
 export interface PaymentInitiationInput {
@@ -302,7 +302,7 @@ export class PaymentFlowOrchestrator {
 
     const provider = await this.selectProvider(
       intent.currency,
-      intent.paymentMethod as PaymentMethod,
+      intent.paymentMethod ,
       intent.providerId,
     );
 

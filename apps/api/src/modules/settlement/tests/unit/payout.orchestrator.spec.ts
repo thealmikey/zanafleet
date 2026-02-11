@@ -15,8 +15,12 @@ import {
   RefundResult,
   WebhookProcessingResult,
 } from '../../../payment/providers/dto/payment-provider.types';
-import { PaymentProvider } from '../../../payment/providers/payment-provider.interface';
 import { PaymentProviderRegistry } from '../../../payment/providers/payment-provider-registry.service';
+import { PaymentProvider } from '../../../payment/providers/payment-provider.interface';
+import {
+  PayoutOrchestrator,
+  PayoutStatus,
+} from '../../coordinators/payout.orchestrator';
 import { SettlementStatus, PayoutMethod } from '../../dto/settlement.enums';
 import { SettlementBatchEntity } from '../../entities/settlement-batch.entity';
 import {
@@ -25,10 +29,6 @@ import {
   PayoutRiskLevel,
 } from '../../services/payout-risk.service';
 import { SettlementSchedulerService } from '../../services/settlement-scheduler.service';
-import {
-  PayoutOrchestrator,
-  PayoutStatus,
-} from '../../coordinators/payout.orchestrator';
 
 class MockPaymentProvider implements PaymentProvider {
   constructor(

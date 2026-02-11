@@ -16,6 +16,7 @@ import { CalendarModule } from './modules/calendar/calendar.module';
 import { CapabilityModule } from './modules/capability/capability.module';
 import { CommitmentsModule } from './modules/commitments/commitments.module';
 import { CommunicationModule } from './modules/communication/communication.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { EvidenceModule } from './modules/evidence/evidence.module';
 import { FormationModule } from './modules/formation/formation.module';
 import { IncentiveModule } from './modules/incentive/incentive.module';
@@ -31,7 +32,6 @@ import { SignUpModule } from './modules/signup/signup.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { WalletModule } from './modules/wallet/wallet.module';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
-import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 /**
  * AppModule

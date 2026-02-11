@@ -1,3 +1,10 @@
+import { RequireCapability } from '@api/core/api/decorators';
+import { CapabilityGuard, PolicyGuard } from '@api/core/api/guards';
+import {
+  parseQueryParams,
+  createPaginationMeta,
+  RawQueryParams,
+} from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -13,21 +20,14 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { DeliveryStatus, PolicyTrigger } from '@zanafleet/contracts';
+import { Repository } from 'typeorm';
 
-import { CapabilityGuard, PolicyGuard } from '@api/core/api/guards';
-import { RequireCapability } from '@api/core/api/decorators';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
 
-import { DeliveryEntity } from '../entities/delivery.entity';
+import { DeliveryExecutionCoordinator } from '../coordinators/delivery-execution.coordinator';
 import { DeliveryLifecycleCoordinator } from '../coordinators/delivery-lifecycle.coordinator';
 import { DeliveryMatchingCoordinator } from '../coordinators/delivery-matching.coordinator';
-import { DeliveryExecutionCoordinator } from '../coordinators/delivery-execution.coordinator';
+import { DeliveryEntity } from '../entities/delivery.entity';
 
 export class CreateDeliveryDto {
   businessId!: string;
@@ -123,7 +123,7 @@ export class DeliveriesController {
     const order = sort ? { [sort.field]: sort.order } : undefined;
 
     const [entities, total] = await this.deliveryRepository.findAndCount({
-      where: filter as Record<string, unknown>,
+      where: filter ,
       order,
       skip: pagination.offset,
       take: pagination.limit,

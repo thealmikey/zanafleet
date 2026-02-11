@@ -1,14 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { CapabilityGuard } from '@api/core/api/guards';
 import { INestApplication, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import request from 'supertest';
 import { DeliveryStatus } from '@zanafleet/contracts';
+import request from 'supertest';
 
-import { CapabilityGuard } from '@api/core/api/guards';
-import { RiderDashboardController } from '../../controllers/rider-dashboard.controller';
+
 import { DeliveryEntity } from '../../../delivery/entities/delivery.entity';
 import { SettlementBatchEntity } from '../../../settlement/entities/settlement-batch.entity';
+import { RiderDashboardController } from '../../controllers/rider-dashboard.controller';
 
 describe('RiderDashboardController (e2e)', () => {
   let app: INestApplication;

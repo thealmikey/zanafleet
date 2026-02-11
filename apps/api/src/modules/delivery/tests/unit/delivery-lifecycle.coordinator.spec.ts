@@ -1,8 +1,7 @@
+import { EventBusService } from '@api/core/event-bus';
 import { Test, TestingModule } from '@nestjs/testing';
-
 import { PolicyEffect } from '@zanafleet/contracts';
 
-import { EventBusService } from '@api/core/event-bus';
 import { BillingCalculatorService } from '../../../billing/services/billing-calculator.service';
 import { SchedulingConstraintService } from '../../../calendar/services/scheduling-constraint.service';
 import { LedgerService } from '../../../ledger/services/ledger.service';

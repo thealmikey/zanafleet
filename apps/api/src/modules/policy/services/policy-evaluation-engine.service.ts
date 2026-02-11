@@ -231,7 +231,7 @@ export class PolicyEvaluationEngineService {
 
       const activeEvents = activeEventsEntities.map((e) => ({
         eventId: e.id,
-        eventType: e.eventType as CalendarEventType,
+        eventType: e.eventType ,
         title: e.title,
       }));
 

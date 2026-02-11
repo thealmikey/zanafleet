@@ -1,3 +1,5 @@
+import { RequireCapability } from '@api/core/api/decorators';
+import { CapabilityGuard } from '@api/core/api/guards';
 import {
   Controller,
   Get,
@@ -9,8 +11,6 @@ import {
 } from '@nestjs/common';
 import { GeoPoint, GeoBounds, ETAResult, DistanceResult, ZoneCluster } from '@zanafleet/contracts';
 
-import { CapabilityGuard } from '@api/core/api/guards';
-import { RequireCapability } from '@api/core/api/decorators';
 
 import { GeoQueryCoordinator } from '../coordinators/geo-query.coordinator';
 import { HeatmapCell } from '../types/heatmap.types';

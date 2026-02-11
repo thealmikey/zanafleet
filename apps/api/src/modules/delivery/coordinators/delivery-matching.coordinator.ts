@@ -1,10 +1,10 @@
+import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PolicyEffect, PolicyTrigger, VehicleType } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 import { PolicyEvaluationEngineService } from '../../policy/services/policy-evaluation-engine.service';
 import { DeliveryEntity } from '../entities/delivery.entity';
 import { MatchingTimeoutEventV1 } from '../events/matching-timeout.event';

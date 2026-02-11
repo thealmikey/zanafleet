@@ -1,3 +1,10 @@
+import { RequireCapability } from '@api/core/api/decorators';
+import { CapabilityGuard } from '@api/core/api/guards';
+import {
+  parseQueryParams,
+  createPaginationMeta,
+  RawQueryParams,
+} from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -7,20 +14,13 @@ import {
   Header,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, MoreThanOrEqual } from 'typeorm';
 import { DeliveryStatus, OrderStatus } from '@zanafleet/contracts';
+import { Repository, MoreThanOrEqual } from 'typeorm';
 
-import { CapabilityGuard } from '@api/core/api/guards';
-import { RequireCapability } from '@api/core/api/decorators';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
 
-import { OrderEntity } from '../../order/entities/order.entity';
-import { DeliveryEntity } from '../../delivery/entities/delivery.entity';
 import { InvoiceEntity } from '../../billing/entities/invoice.entity';
+import { DeliveryEntity } from '../../delivery/entities/delivery.entity';
+import { OrderEntity } from '../../order/entities/order.entity';
 
 export interface OrderSummary {
   orderId: string;
@@ -239,7 +239,7 @@ export class BusinessDashboardController {
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
     const [entities, total] = await this.invoiceRepository.findAndCount({
-      where: filter as Record<string, unknown>,
+      where: filter ,
       order,
       skip: pagination.offset,
       take: pagination.limit,

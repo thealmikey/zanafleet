@@ -1,3 +1,5 @@
+import { RequireCapability } from '@api/core/api/decorators';
+import { CapabilityGuard } from '@api/core/api/guards';
 import {
   Controller,
   Post,
@@ -9,8 +11,6 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 
-import { CapabilityGuard } from '@api/core/api/guards';
-import { RequireCapability } from '@api/core/api/decorators';
 
 import {
   NotificationDispatchCoordinator,

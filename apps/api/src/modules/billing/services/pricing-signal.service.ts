@@ -258,7 +258,7 @@ export class PricingSignalService {
         const adj = policy.outputs.adjustment as Partial<DynamicAdjustment>;
         if (adj.type && (adj.multiplier || adj.fixedAmount)) {
           adjustments.push({
-            type: adj.type as DynamicAdjustment['type'],
+            type: adj.type ,
             multiplier: adj.multiplier,
             fixedAmount: adj.fixedAmount,
             reason: adj.reason ?? 'Policy adjustment',

@@ -167,7 +167,7 @@ export class CommunicationSubscriber {
           delivery: { scheduledDropoffTime: payload.scheduledTime ?? null },
         });
 
-        const workspaceId = (payload.workspaceId as string | undefined) ?? '';
+        const workspaceId = (payload.workspaceId ) ?? '';
 
         const command = new SendNotificationCommand(
           businessId,
@@ -236,7 +236,7 @@ export class CommunicationSubscriber {
           delivery: { scheduledDropoffTime: payload.scheduledDropoffTime ?? null },
         });
 
-        const workspaceId = (payload.workspaceId as string | undefined) ?? '';
+        const workspaceId = (payload.workspaceId ) ?? '';
 
         const command = new SendNotificationCommand(
           businessId,

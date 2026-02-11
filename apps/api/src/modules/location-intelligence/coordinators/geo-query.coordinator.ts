@@ -9,8 +9,8 @@ import {
 } from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
+import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { HeatmapService } from '../services/heatmap.service';
 import { LocationIntelligenceService } from '../services/location-intelligence.service';
 import { HeatmapCell, HeatmapParams } from '../types/heatmap.types';

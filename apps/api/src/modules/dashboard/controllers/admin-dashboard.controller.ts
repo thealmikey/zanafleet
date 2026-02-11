@@ -1,3 +1,10 @@
+import { RequireCapability } from '@api/core/api/decorators';
+import { CapabilityGuard } from '@api/core/api/guards';
+import {
+  parseQueryParams,
+  createPaginationMeta,
+  RawQueryParams,
+} from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -8,16 +15,9 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThanOrEqual } from 'typeorm';
 
-import { CapabilityGuard } from '@api/core/api/guards';
-import { RequireCapability } from '@api/core/api/decorators';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
 
-import { SettlementBatchEntity } from '../../settlement/entities/settlement-batch.entity';
 import { PolicyEntity } from '../../policy/entities/policy.entity';
+import { SettlementBatchEntity } from '../../settlement/entities/settlement-batch.entity';
 
 export interface SystemMetrics {
   totalSettlements: number;
@@ -99,7 +99,7 @@ export class AdminDashboardController {
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
     const [entities, total] = await this.settlementRepository.findAndCount({
-      where: filter as Record<string, unknown>,
+      where: filter ,
       order,
       skip: pagination.offset,
       take: pagination.limit,
@@ -140,7 +140,7 @@ export class AdminDashboardController {
     const order = sort ? { [sort.field]: sort.order } : { priority: 'DESC' as const };
 
     const [entities, total] = await this.policyRepository.findAndCount({
-      where: filter as Record<string, unknown>,
+      where: filter ,
       order,
       skip: pagination.offset,
       take: pagination.limit,

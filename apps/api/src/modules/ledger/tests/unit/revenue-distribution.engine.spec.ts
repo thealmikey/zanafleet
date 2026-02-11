@@ -1,5 +1,5 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { CommandBus } from '@nestjs/cqrs';
+import { Test, TestingModule } from '@nestjs/testing';
 import { PolicyEffect } from '@zanafleet/contracts';
 
 import { EventBusService } from '../../../../core/event-bus/event-bus.service';

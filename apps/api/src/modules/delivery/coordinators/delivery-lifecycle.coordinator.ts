@@ -1,3 +1,4 @@
+import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 import { Injectable, Logger } from '@nestjs/common';
 import {
   BindingTargetType,
@@ -7,7 +8,6 @@ import {
 } from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 import { BillingCalculatorService } from '../../billing/services/billing-calculator.service';
 import { SchedulingConstraintService } from '../../calendar/services/scheduling-constraint.service';
 import { LedgerService } from '../../ledger/services/ledger.service';
@@ -271,7 +271,7 @@ export class DeliveryLifecycleCoordinator {
    */
   async applyPricing(
     deliveryId: string,
-    distanceKm: number = 5,
+    distanceKm = 5,
   ): Promise<{ totalCharges: number; surgeMultiplier: number }> {
     this.logger.log(`Applying pricing to delivery ${deliveryId}`);
 

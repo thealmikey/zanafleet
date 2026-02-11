@@ -1,3 +1,5 @@
+import { RequireCapability } from '@api/core/api/decorators';
+import { CapabilityGuard } from '@api/core/api/guards';
 import {
   Controller,
   Get,
@@ -9,12 +11,10 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 
-import { CapabilityGuard } from '@api/core/api/guards';
-import { RequireCapability } from '@api/core/api/decorators';
 
 import { PayoutOrchestrator } from '../coordinators/payout.orchestrator';
-import { SettlementSchedulerService } from '../services/settlement-scheduler.service';
 import { PayoutMethod } from '../dto/settlement.enums';
+import { SettlementSchedulerService } from '../services/settlement-scheduler.service';
 
 export class InitiatePayoutDto {
   riderAccountId!: string;

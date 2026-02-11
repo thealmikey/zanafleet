@@ -1,14 +1,13 @@
-import { ExecutionContext, ForbiddenException } from '@nestjs/common';
+import { ExecutionContext, ForbiddenException , Controller, Get, UseGuards } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Controller, Get, UseGuards } from '@nestjs/common';
 
+import { RequireCapability, CAPABILITY_KEY } from '../../decorators/require-capability.decorator';
 import {
   CapabilityGuard,
   CAPABILITY_ACCESS_CONTROLLER,
   ICapabilityAccessController,
 } from '../../guards/capability.guard';
-import { RequireCapability, CAPABILITY_KEY } from '../../decorators/require-capability.decorator';
 
 describe('CapabilityGuard', () => {
   let guard: CapabilityGuard;

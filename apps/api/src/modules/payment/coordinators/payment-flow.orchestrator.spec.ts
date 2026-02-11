@@ -1,6 +1,6 @@
+import { CommandBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { CommandBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
@@ -8,9 +8,10 @@ import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../dto/paym
 import { PaymentIntentEntity } from '../entities/payment-intent.entity';
 import { PaymentTransactionEntity } from '../entities/payment-transaction.entity';
 import { PaymentStatus, ProviderCapability } from '../providers/dto/payment-provider.types';
-import { PaymentProvider } from '../providers/payment-provider.interface';
 import { PaymentProviderRegistry } from '../providers/payment-provider-registry.service';
+import { PaymentProvider } from '../providers/payment-provider.interface';
 import { FraudCheckService, FraudDecision, RiskLevel } from '../services/fraud-check.service';
+
 import {
   PaymentFlowOrchestrator,
   PaymentInitiationInput,

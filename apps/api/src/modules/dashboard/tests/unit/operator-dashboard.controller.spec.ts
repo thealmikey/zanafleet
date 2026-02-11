@@ -1,14 +1,15 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { CapabilityGuard } from '@api/core/api/guards';
 import { INestApplication, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import request from 'supertest';
 import { DeliveryStatus } from '@zanafleet/contracts';
+import request from 'supertest';
 
-import { CapabilityGuard } from '@api/core/api/guards';
-import { OperatorDashboardController } from '../../controllers/operator-dashboard.controller';
+
 import { DeliveryEntity } from '../../../delivery/entities/delivery.entity';
 import { GeoQueryCoordinator } from '../../../location-intelligence/coordinators/geo-query.coordinator';
+import { OperatorDashboardController } from '../../controllers/operator-dashboard.controller';
 
 describe('OperatorDashboardController (e2e)', () => {
   let app: INestApplication;

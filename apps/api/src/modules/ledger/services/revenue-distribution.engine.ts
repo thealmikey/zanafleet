@@ -3,8 +3,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { PolicyTrigger } from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
+import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { PolicyEvaluationEngineService } from '../../policy/services/policy-evaluation-engine.service';
 import { RecordLedgerEntryCommand } from '../commands/record-ledger-entry.command';
 import {
@@ -29,6 +29,7 @@ import {
   RevenueDistributedEventV1,
   EarningsAccruedEventV1,
 } from '../events/revenue-distribution.events';
+
 import { LedgerService } from './ledger.service';
 
 const DEFAULT_COMMISSION_RATES: DefaultCommissionRates = {
@@ -134,12 +135,12 @@ export class RevenueDistributionEngine {
     const baseRates = this.getBaseRates(context.deliveryType);
     const appliedRates = this.applyCustomRates(baseRates, context);
 
-    let platformAmount = this.roundToTwoDecimals(totalAmount * appliedRates.platformRate);
-    let saccoAmount = context.saccoId
+    const platformAmount = this.roundToTwoDecimals(totalAmount * appliedRates.platformRate);
+    const saccoAmount = context.saccoId
       ? this.roundToTwoDecimals(totalAmount * appliedRates.saccoRate)
       : 0;
     let riderAmount = this.roundToTwoDecimals(totalAmount * appliedRates.riderRate);
-    let campaignSubsidyAmount = context.campaignSubsidyAmount ?? 0;
+    const campaignSubsidyAmount = context.campaignSubsidyAmount ?? 0;
 
     if (campaignSubsidyAmount > 0) {
       riderAmount = this.roundToTwoDecimals(riderAmount + campaignSubsidyAmount);

@@ -10,8 +10,8 @@ import {
 import { ModuleRef } from '@nestjs/core';
 import { PolicyEffect, PolicyTrigger } from '@zanafleet/contracts';
 
-import { PolicyEvaluationEngineService } from '../../../modules/policy/services/policy-evaluation-engine.service';
 import { EvaluationContext } from '../../../modules/policy/dto/policy.types';
+import { PolicyEvaluationEngineService } from '../../../modules/policy/services/policy-evaluation-engine.service';
 
 /**
  * Options for configuring the PolicyGuard.

@@ -8,8 +8,8 @@ import {
 } from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
+import { EventBusService } from '../../../core/event-bus/event-bus.service';
 
 import { CalendarBindingService } from './calendar-binding.service';
 import { SchedulingConstraintService } from './scheduling-constraint.service';

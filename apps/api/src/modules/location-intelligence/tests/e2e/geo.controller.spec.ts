@@ -1,10 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { CapabilityGuard } from '@api/core/api/guards';
 import { INestApplication, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import request from 'supertest';
+import { Test, TestingModule } from '@nestjs/testing';
 import { VehicleType } from '@zanafleet/contracts';
+import request from 'supertest';
 
-import { CapabilityGuard } from '@api/core/api/guards';
+
 import { GeoController } from '../../controllers/geo.controller';
 import { GeoQueryCoordinator } from '../../coordinators/geo-query.coordinator';
 

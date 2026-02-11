@@ -1,9 +1,9 @@
+import { EventBusService } from '@api/core/event-bus';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DeliveryStatus, PolicyEffect, VehicleType } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 
-import { EventBusService } from '@api/core/event-bus';
 import { PolicyEvaluationEngineService } from '../../../policy/services/policy-evaluation-engine.service';
 import {
   DeliveryMatchingCoordinator,

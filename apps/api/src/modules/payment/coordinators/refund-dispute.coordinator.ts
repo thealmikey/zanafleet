@@ -1,17 +1,17 @@
 import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { CommandBus } from '@nestjs/cqrs';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
+import { EventBusService } from '../../../core/event-bus/event-bus.service';
+import { RecordLedgerEntryCommand } from '../../ledger/commands/record-ledger-entry.command';
 import {
   LedgerEntryType,
   LedgerCategory,
   LedgerReferenceType,
 } from '../../ledger/dto/ledger.enums';
-import { RecordLedgerEntryCommand } from '../../ledger/commands/record-ledger-entry.command';
 import {
   DisputeStatus,
   DisputeReason,
@@ -20,9 +20,9 @@ import {
   RefundType,
 } from '../dto/payment.enums';
 import { DisputeEntity } from '../entities/dispute.entity';
-import { RefundEntity } from '../entities/refund.entity';
 import { PaymentIntentEntity } from '../entities/payment-intent.entity';
 import { PaymentTransactionEntity } from '../entities/payment-transaction.entity';
+import { RefundEntity } from '../entities/refund.entity';
 import { PaymentProviderRegistry } from '../providers/payment-provider-registry.service';
 
 export interface OpenDisputeInput {

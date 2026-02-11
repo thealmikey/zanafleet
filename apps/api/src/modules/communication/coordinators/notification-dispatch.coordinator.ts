@@ -3,8 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
+import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { NotificationChannel, NotificationStatus, RecipientType } from '../dto/notification.enums';
 import { NotificationEntity } from '../entities/notification.entity';
 import { TemplateEntity } from '../entities/template.entity';

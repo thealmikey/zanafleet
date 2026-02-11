@@ -181,14 +181,7 @@ export class DeliveryTrackingController {
       ORDER BY "sequence" ASC
     `,
       [base.deliveryId],
-    )) as Array<{
-      sequence: number
-      type: 'pickup' | 'dropoff' | 'waypoint'
-      locationId: string
-      scheduledTime: string | Date | null
-      actualTime: string | Date | null
-      notes: string | null
-    }>
+    ))
 
     const stops: DeliveryTrackingStopDto[] = rows.map((r) => ({
       sequence: Number(r.sequence),

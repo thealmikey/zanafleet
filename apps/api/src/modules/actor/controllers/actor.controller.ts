@@ -1,3 +1,10 @@
+import { RequireCapability } from '@api/core/api/decorators';
+import { CapabilityGuard } from '@api/core/api/guards';
+import {
+  parseQueryParams,
+  createPaginationMeta,
+  RawQueryParams,
+} from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -16,17 +23,10 @@ import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { CapabilityGuard } from '@api/core/api/guards';
-import { RequireCapability } from '@api/core/api/decorators';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
 
 import { CreateActorCommand } from '../commands/create-actor.command';
-import { ActorEntity } from '../entities/actor.entity';
 import { ActorType } from '../dto/actor.enums';
+import { ActorEntity } from '../entities/actor.entity';
 
 export class CreateActorDto {
   email!: string;
@@ -87,7 +87,7 @@ export class ActorController {
     const order = sort ? { [sort.field]: sort.order } : undefined;
 
     const [entities, total] = await this.actorRepository.findAndCount({
-      where: filter as Record<string, unknown>,
+      where: filter ,
       order,
       skip: pagination.offset,
       take: pagination.limit,

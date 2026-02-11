@@ -1,14 +1,14 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { CapabilityGuard } from '@api/core/api/guards';
 import { INestApplication, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import request from 'supertest';
 
-import { CapabilityGuard } from '@api/core/api/guards';
-import { SupportDashboardController } from '../../controllers/support-dashboard.controller';
 import { DisputeEntity } from '../../../payment/entities/dispute.entity';
-import { RefundEntity } from '../../../payment/entities/refund.entity';
 import { PaymentIntentEntity } from '../../../payment/entities/payment-intent.entity';
+import { RefundEntity } from '../../../payment/entities/refund.entity';
+import { SupportDashboardController } from '../../controllers/support-dashboard.controller';
 
 describe('SupportDashboardController (e2e)', () => {
   let app: INestApplication;

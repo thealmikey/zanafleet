@@ -1,8 +1,8 @@
+import { EventBusModule } from '@api/core/event-bus';
 import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '@api/core/event-bus';
 import { LocationResolverService } from '../../core/location/location-resolver.service';
 import { BillingModule } from '../billing/billing.module';
 import { CalendarModule } from '../calendar/calendar.module';
@@ -10,10 +10,10 @@ import { LedgerModule } from '../ledger/ledger.module';
 import { LocationIntelligenceModule } from '../location-intelligence/location-intelligence.module';
 import { PolicyModule } from '../policy/policy.module';
 
+import { DeliveryTrackingController } from './controllers/delivery-tracking.controller';
 import { DeliveryExecutionCoordinator } from './coordinators/delivery-execution.coordinator';
 import { DeliveryLifecycleCoordinator } from './coordinators/delivery-lifecycle.coordinator';
 import { DeliveryMatchingCoordinator } from './coordinators/delivery-matching.coordinator';
-import { DeliveryTrackingController } from './controllers/delivery-tracking.controller';
 import { DeliveryEntity } from './entities/delivery.entity';
 import { AcceptDeliveryAssignmentHandler } from './handlers/accept-delivery-assignment.handler';
 import { AssignRiderToDeliveryHandler } from './handlers/assign-rider-to-delivery.handler';

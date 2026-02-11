@@ -1,10 +1,10 @@
+import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeliveryStatus } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 import { LocationIntelligenceService } from '../../location-intelligence/services/location-intelligence.service';
 import { PolicyEvaluationEngineService } from '../../policy/services/policy-evaluation-engine.service';
 import { DeliveryEntity } from '../entities/delivery.entity';
@@ -12,6 +12,7 @@ import { DelayDetectedEventV1 } from '../events/delay-detected.event';
 import { DropoffConfirmedEventV1 } from '../events/dropoff-confirmed.event';
 import { PickupConfirmedEventV1 } from '../events/pickup-confirmed.event';
 import { ProgressUpdatedEventV1 } from '../events/progress-updated.event';
+
 import { DeliveryLifecycleCoordinator } from './delivery-lifecycle.coordinator';
 
 export interface PickupProofInput {

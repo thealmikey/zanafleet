@@ -1,12 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { CapabilityGuard } from '@api/core/api/guards';
 import { INestApplication, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { CommandBus } from '@nestjs/cqrs';
-import request from 'supertest';
+import { Test, TestingModule } from '@nestjs/testing';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { VehicleType } from '@zanafleet/contracts';
+import request from 'supertest';
 
-import { CapabilityGuard } from '@api/core/api/guards';
+
 import { RiderController } from '../../controllers/rider.controller';
 import { RiderEntity } from '../../entities/rider.entity';
 

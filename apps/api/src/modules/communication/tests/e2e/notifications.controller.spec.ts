@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { CapabilityGuard } from '@api/core/api/guards';
 import { INestApplication, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 
-import { CapabilityGuard } from '@api/core/api/guards';
 import { NotificationsController } from '../../controllers/notifications.controller';
 import { NotificationDispatchCoordinator } from '../../coordinators/notification-dispatch.coordinator';
 import { NotificationChannel, RecipientType, NotificationStatus } from '../../dto/notification.enums';

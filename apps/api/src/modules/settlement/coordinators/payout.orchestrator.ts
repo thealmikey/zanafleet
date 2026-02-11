@@ -3,16 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
+import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { AccountEntity, AccountStatus } from '../../account';
 import { RevenueDistributionEngine } from '../../ledger/services/revenue-distribution.engine';
-import { PaymentProviderRegistry } from '../../payment/providers/payment-provider-registry.service';
 import {
   PaymentStatus,
   ProviderCapability,
   PaymentInitiationResult,
 } from '../../payment/providers/dto/payment-provider.types';
+import { PaymentProviderRegistry } from '../../payment/providers/payment-provider-registry.service';
 import { PaymentProvider } from '../../payment/providers/payment-provider.interface';
 import { SettlementStatus, PayoutMethod } from '../dto/settlement.enums';
 import { SettlementBatchEntity } from '../entities/settlement-batch.entity';

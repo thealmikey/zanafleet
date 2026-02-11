@@ -1,5 +1,5 @@
-import { Neo4jService } from '@api/core/neo4j';
 import { BaseEvent } from '@api/core/event-bus/interfaces/base-event.interface';
+import { Neo4jService } from '@api/core/neo4j';
 
 import { ProjectionBuilder } from '../../projection-builder.base';
 

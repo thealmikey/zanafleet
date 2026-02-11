@@ -1,4 +1,3 @@
-import { Injectable, Logger } from '@nestjs/common';
 
 import { Neo4jService } from '@api/core/neo4j';
 import {
@@ -10,6 +9,7 @@ import {
   RIDERS_IN_WORKSPACE_SCOPE,
   ALL_RIDER_IDS_IN_SCOPE,
 } from '@api/core/neo4j/queries';
+import { Injectable, Logger } from '@nestjs/common';
 
 /**
  * AdminScopeService

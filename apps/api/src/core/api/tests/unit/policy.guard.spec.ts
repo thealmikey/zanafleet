@@ -1,12 +1,11 @@
-import { ExecutionContext, ForbiddenException } from '@nestjs/common';
+import { ExecutionContext, ForbiddenException , Controller, Post, UseGuards } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Controller, Post, UseGuards } from '@nestjs/common';
 import { PolicyEffect, PolicyTrigger } from '@zanafleet/contracts';
 
-import { PolicyGuard, PolicyGuardOptions } from '../../guards/policy.guard';
-import { PolicyEvaluationEngineService } from '../../../../modules/policy/services/policy-evaluation-engine.service';
 import { EvaluationResult } from '../../../../modules/policy/dto/policy.types';
+import { PolicyEvaluationEngineService } from '../../../../modules/policy/services/policy-evaluation-engine.service';
+import { PolicyGuard, PolicyGuardOptions } from '../../guards/policy.guard';
 
 describe('PolicyGuard', () => {
   let mockPolicyEvaluationEngine: jest.Mocked<PolicyEvaluationEngineService>;

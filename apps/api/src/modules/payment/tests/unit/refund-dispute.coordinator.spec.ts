@@ -1,10 +1,15 @@
+import { CommandBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { CommandBus } from '@nestjs/cqrs';
 import { Repository } from 'typeorm';
 
 import { EventBusService } from '../../../../core/event-bus/event-bus.service';
 import { RecordLedgerEntryCommand } from '../../../ledger/commands/record-ledger-entry.command';
+import {
+  RefundDisputeCoordinator,
+  OpenDisputeInput,
+  RefundInput,
+} from '../../coordinators/refund-dispute.coordinator';
 import {
   DisputeStatus,
   DisputeReason,
@@ -16,20 +21,15 @@ import {
   PaymentMethod,
 } from '../../dto/payment.enums';
 import { DisputeEntity } from '../../entities/dispute.entity';
-import { RefundEntity } from '../../entities/refund.entity';
 import { PaymentIntentEntity } from '../../entities/payment-intent.entity';
 import { PaymentTransactionEntity } from '../../entities/payment-transaction.entity';
+import { RefundEntity } from '../../entities/refund.entity';
 import {
   PaymentStatus,
   ProviderCapability,
 } from '../../providers/dto/payment-provider.types';
-import { PaymentProvider } from '../../providers/payment-provider.interface';
 import { PaymentProviderRegistry } from '../../providers/payment-provider-registry.service';
-import {
-  RefundDisputeCoordinator,
-  OpenDisputeInput,
-  RefundInput,
-} from '../../coordinators/refund-dispute.coordinator';
+import { PaymentProvider } from '../../providers/payment-provider.interface';
 
 describe('RefundDisputeCoordinator', () => {
   let coordinator: RefundDisputeCoordinator;

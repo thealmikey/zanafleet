@@ -130,7 +130,7 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
       amount: intentDomain.amount,
       errorCode: providerResult.errorCode,
       errorMessage: providerResult.errorMessage,
-      rawResponse: providerResult.metadata as Record<string, unknown> | undefined,
+      rawResponse: providerResult.metadata ,
       createdAt: now,
     });
 
