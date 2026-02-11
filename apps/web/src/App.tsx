@@ -22,6 +22,7 @@ import { AIAssistantPage } from './pages/AIAssistant';
 import { HistoryCalendarPage } from './pages/HistoryCalendar';
 import { ComponentsDemo } from './pages/Demo/ComponentsDemo';
 import { RequestDeliveryPage } from './pages/RequestDelivery';
+import { ShopPage } from './pages/Shop';
 
 const theme = createTheme();
 
@@ -130,6 +131,14 @@ function App(): React.ReactElement {
                 element={
                   <ProtectedRoute>
                     <RequestDeliveryPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/shop"
+                element={
+                  <ProtectedRoute>
+                    <ShopPage />
                   </ProtectedRoute>
                 }
               />

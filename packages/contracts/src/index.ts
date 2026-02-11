@@ -124,6 +124,22 @@ export enum BusinessType {
   Other = 'Other',
 }
 
+export enum PaymentStatus {
+  Pending = 'Pending',
+  Processing = 'Processing',
+  Succeeded = 'Succeeded',
+  Failed = 'Failed',
+  Cancelled = 'Cancelled',
+  Refunded = 'Refunded',
+}
+
+export enum PaymentMethod {
+  CARD = 'CARD',
+  MOBILE_MONEY = 'MOBILE_MONEY',
+  BANK_TRANSFER = 'BANK_TRANSFER',
+  WALLET_BALANCE = 'WALLET_BALANCE',
+}
+
 // ============================================================================
 // Placeholder DTOs (to be expanded as modules migrate)
 // ============================================================================
@@ -385,6 +401,8 @@ export interface CreateOrderInput {
   customerName?: string;
   customerPhone?: string;
   scheduledTime?: Date;
+  totalAmount?: number;
+  currency?: string;
 }
 
 export interface OrderResponse {
@@ -397,6 +415,9 @@ export interface OrderResponse {
   customerPhone: string | null;
   scheduledTime: Date | null;
   status: OrderStatus;
+  totalAmount: number | null;
+  currency: string | null;
+  paymentStatus: PaymentStatus;
   createdAt: Date;
   updatedAt: Date;
 }

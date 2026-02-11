@@ -1,4 +1,4 @@
-import { OrderStatus } from '@zanafleet/contracts';
+import { OrderStatus, PaymentStatus } from '@zanafleet/contracts';
 
 /**
  * OrderCreatedEventV1
@@ -25,6 +25,9 @@ export class OrderCreatedEventV1 {
   readonly itemSummary: string | null;
   readonly scheduledTime: Date | null;
   readonly status: OrderStatus;
+  readonly totalAmount: number | null;
+  readonly currency: string | null;
+  readonly paymentStatus: PaymentStatus;
   readonly createdAt: Date;
 
   readonly correlationId?: string;
@@ -38,6 +41,9 @@ export class OrderCreatedEventV1 {
     itemSummary: string | null;
     scheduledTime: Date | null;
     status: OrderStatus;
+    totalAmount?: number | null;
+    currency?: string | null;
+    paymentStatus?: PaymentStatus;
     createdAt: Date;
     occurredAt?: Date;
     correlationId?: string;
@@ -51,6 +57,9 @@ export class OrderCreatedEventV1 {
     this.itemSummary = data.itemSummary;
     this.scheduledTime = data.scheduledTime;
     this.status = data.status;
+    this.totalAmount = data.totalAmount ?? null;
+    this.currency = data.currency ?? null;
+    this.paymentStatus = data.paymentStatus ?? PaymentStatus.Pending;
     this.createdAt = data.createdAt;
 
     this.occurredAt = data.occurredAt || new Date();
@@ -71,6 +80,9 @@ export class OrderCreatedEventV1 {
     itemSummary: string | null;
     scheduledTime: string | null;
     status: OrderStatus;
+    totalAmount: number | null;
+    currency: string | null;
+    paymentStatus: PaymentStatus;
     createdAt: string;
     correlationId?: string;
     causationId?: string;
@@ -89,6 +101,9 @@ export class OrderCreatedEventV1 {
       itemSummary: this.itemSummary,
       scheduledTime: this.scheduledTime ? this.scheduledTime.toISOString() : null,
       status: this.status,
+      totalAmount: this.totalAmount,
+      currency: this.currency,
+      paymentStatus: this.paymentStatus,
       createdAt: this.createdAt.toISOString(),
 
       correlationId: this.correlationId,
@@ -109,6 +124,9 @@ export class OrderCreatedEventV1 {
     itemSummary: string | null;
     scheduledTime: string | null;
     status: OrderStatus;
+    totalAmount?: number | null;
+    currency?: string | null;
+    paymentStatus?: PaymentStatus;
     createdAt: string;
     correlationId?: string;
     causationId?: string;
@@ -121,6 +139,9 @@ export class OrderCreatedEventV1 {
       itemSummary: data.itemSummary,
       scheduledTime: data.scheduledTime ? new Date(data.scheduledTime) : null,
       status: data.status,
+      totalAmount: data.totalAmount,
+      currency: data.currency,
+      paymentStatus: data.paymentStatus,
       createdAt: new Date(data.createdAt),
       occurredAt: new Date(data.occurredAt),
       correlationId: data.correlationId,

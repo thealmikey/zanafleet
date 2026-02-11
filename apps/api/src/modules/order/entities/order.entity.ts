@@ -1,4 +1,4 @@
-import { OrderStatus } from '@zanafleet/contracts';
+import { OrderStatus, PaymentStatus } from '@zanafleet/contracts';
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
 
@@ -34,6 +34,15 @@ export class OrderEntity {
   @Column({ type: 'timestamp with time zone', nullable: true })
   scheduledTime: Date | null = null;
 
+  @Column('decimal', { precision: 12, scale: 2, nullable: true })
+  totalAmount: number | null = null;
+
+  @Column('varchar', { length: 10, nullable: true })
+  currency: string | null = null;
+
+  @Column('enum', { enum: PaymentStatus, default: PaymentStatus.Pending })
+  paymentStatus!: PaymentStatus;
+
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;
 
@@ -50,6 +59,9 @@ export class OrderEntity {
     customerPhone: string | null;
     scheduledTime: Date | null;
     status: OrderStatus;
+    totalAmount: number | null;
+    currency: string | null;
+    paymentStatus: PaymentStatus;
     createdAt: Date;
     updatedAt: Date;
   } {
@@ -63,6 +75,9 @@ export class OrderEntity {
       customerPhone: this.customerPhone ?? null,
       scheduledTime: this.scheduledTime ?? null,
       status: this.status,
+      totalAmount: this.totalAmount ? Number(this.totalAmount) : null,
+      currency: this.currency,
+      paymentStatus: this.paymentStatus,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
     };
@@ -78,6 +93,9 @@ export class OrderEntity {
     customerPhone?: string | null;
     scheduledTime?: Date | null;
     status: OrderStatus;
+    totalAmount?: number | null;
+    currency?: string | null;
+    paymentStatus?: PaymentStatus;
     createdAt: Date;
   }): OrderEntity {
     const entity = new OrderEntity();
@@ -90,6 +108,9 @@ export class OrderEntity {
     entity.customerPhone = data.customerPhone ?? null;
     entity.scheduledTime = data.scheduledTime ?? null;
     entity.status = data.status;
+    entity.totalAmount = data.totalAmount ?? null;
+    entity.currency = data.currency ?? null;
+    entity.paymentStatus = data.paymentStatus ?? PaymentStatus.Pending;
     entity.createdAt = data.createdAt;
     return entity;
   }

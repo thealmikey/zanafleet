@@ -67,6 +67,7 @@ import { OrderCreatedSubscriber } from './subscribers/order-created.subscriber';
     DeliveryLifecycleCoordinator,
     DeliveryMatchingCoordinator,
     DeliveryExecutionCoordinator,
+    DeliveryRequestCoordinator,
   ],
 })
-export class DeliveryModule {}
+export class DeliveryModule { }
