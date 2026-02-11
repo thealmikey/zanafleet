@@ -25,6 +25,9 @@ export class OrderEntity {
   @Column('varchar', { length: 20, nullable: true })
   customerPhone: string | null = null;
 
+  @Column('uuid', { nullable: true })
+  customerId: string | null = null;
+
   @Column('varchar', { length: 255, nullable: true })
   itemSummary: string | null = null;
 
@@ -57,6 +60,7 @@ export class OrderEntity {
     itemMetadata: Record<string, unknown> | null;
     customerName: string | null;
     customerPhone: string | null;
+    customerId: string | null;
     scheduledTime: Date | null;
     status: OrderStatus;
     totalAmount: number | null;
@@ -73,6 +77,7 @@ export class OrderEntity {
       itemMetadata: this.itemMetadata ?? null,
       customerName: this.customerName ?? null,
       customerPhone: this.customerPhone ?? null,
+      customerId: this.customerId ?? null,
       scheduledTime: this.scheduledTime ?? null,
       status: this.status,
       totalAmount: this.totalAmount ? Number(this.totalAmount) : null,
@@ -91,6 +96,7 @@ export class OrderEntity {
     itemMetadata?: Record<string, unknown> | null;
     customerName?: string | null;
     customerPhone?: string | null;
+    customerId?: string | null;
     scheduledTime?: Date | null;
     status: OrderStatus;
     totalAmount?: number | null;
@@ -106,6 +112,7 @@ export class OrderEntity {
     entity.itemMetadata = data.itemMetadata ?? null;
     entity.customerName = data.customerName ?? null;
     entity.customerPhone = data.customerPhone ?? null;
+    entity.customerId = data.customerId ?? null;
     entity.scheduledTime = data.scheduledTime ?? null;
     entity.status = data.status;
     entity.totalAmount = data.totalAmount ?? null;

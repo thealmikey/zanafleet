@@ -41,6 +41,12 @@ export class DeliveryEntity {
   @Column({ type: 'timestamp with time zone', nullable: true })
   scheduledDropoffTime!: Date | null
 
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  recipientName!: string | null
+
+  @Column({ type: 'varchar', length: 20, nullable: true })
+  recipientPhone!: string | null
+
   @Column({ type: 'boolean', default: false })
   isScheduled!: boolean
 
@@ -105,6 +111,8 @@ export class DeliveryEntity {
     status: DeliveryStatus
     scheduledPickupTime: Date | null
     scheduledDropoffTime: Date | null
+    recipientName: string | null
+    recipientPhone: string | null
     isScheduled: boolean
     assignedAt: Date | null
     assignmentNotifiedAt: Date | null
@@ -132,6 +140,8 @@ export class DeliveryEntity {
       status: this.status,
       scheduledPickupTime: this.scheduledPickupTime,
       scheduledDropoffTime: this.scheduledDropoffTime,
+      recipientName: this.recipientName,
+      recipientPhone: this.recipientPhone,
       isScheduled: this.isScheduled,
       assignedAt: this.assignedAt,
       assignmentNotifiedAt: this.assignmentNotifiedAt,
@@ -161,6 +171,8 @@ export class DeliveryEntity {
     status: DeliveryStatus
     scheduledPickupTime?: Date | null
     scheduledDropoffTime?: Date | null
+    recipientName?: string | null
+    recipientPhone?: string | null
     isScheduled?: boolean
     assignedAt?: Date | null
     assignmentNotifiedAt?: Date | null
@@ -187,6 +199,8 @@ export class DeliveryEntity {
     e.status = data.status
     e.scheduledPickupTime = data.scheduledPickupTime ?? null
     e.scheduledDropoffTime = data.scheduledDropoffTime ?? null
+    e.recipientName = data.recipientName ?? null
+    e.recipientPhone = data.recipientPhone ?? null
     e.isScheduled = data.isScheduled ?? false
     e.assignedAt = data.assignedAt ?? null
     e.assignmentNotifiedAt = data.assignmentNotifiedAt ?? null

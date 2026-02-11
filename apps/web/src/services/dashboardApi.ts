@@ -198,6 +198,7 @@ export interface BusinessDeliveriesQuery extends PaginationParams {
   riderId?: string;
   paymentState?: 'UNPAID' | 'PENDING' | 'PAID' | 'FAILED';
   activeOnly?: boolean;
+  search?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -207,6 +208,8 @@ export interface BusinessDeliveriesQuery extends PaginationParams {
 export interface ActiveDeliverySummary {
   deliveryId: string;
   status: string;
+  recipientName: string | null;
+  recipientPhone: string | null;
   pickupAddress: string;
   dropoffAddress: string;
   estimatedEarnings: number;
@@ -431,6 +434,7 @@ export async function getBusinessDeliveries(
     riderId: params?.riderId,
     paymentState: params?.paymentState,
     activeOnly: params?.activeOnly ? 'true' : undefined,
+    search: params?.search,
   });
   const response = await fetch(`${API_BASE_URL}/businesses/${businessId}/deliveries${qs}`, {
     method: 'GET',

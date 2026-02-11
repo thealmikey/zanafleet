@@ -42,6 +42,7 @@ export interface RawQueryParams {
   limit?: string | number;
   sort?: string;
   filter?: string | Record<string, unknown>;
+  search?: string;
 }
 
 const DEFAULT_PAGE = 1;

@@ -13,6 +13,8 @@ export interface CreateScheduledDeliveryInput {
   dropoffLocationId?: string | null
   scheduledPickupTime: Date
   scheduledDropoffTime?: Date | null
+  recipientName?: string | null
+  recipientPhone?: string | null
   visibilityToken?: string
 }
 
@@ -20,6 +22,8 @@ export interface CreateOnDemandDeliveryInput {
   businessId: string
   pickupLocationId?: string | null
   dropoffLocationId?: string | null
+  recipientName?: string | null
+  recipientPhone?: string | null
   visibilityToken?: string
 }
 
@@ -48,7 +52,7 @@ export class DeliveryService {
     private readonly deliveryRepo: Repository<DeliveryEntity>,
     @InjectDataSource()
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async createScheduled(input: CreateScheduledDeliveryInput): Promise<DeliveryResponse> {
     this._logger.debug(`Creating scheduled delivery businessId=${input.businessId}`)
@@ -60,6 +64,8 @@ export class DeliveryService {
       status: DeliveryStatus.Requested,
       scheduledPickupTime: input.scheduledPickupTime,
       scheduledDropoffTime: input.scheduledDropoffTime ?? null,
+      recipientName: input.recipientName ?? null,
+      recipientPhone: input.recipientPhone ?? null,
       isScheduled: true,
       visibilityToken: input.visibilityToken ?? this.generateVisibilityToken(),
       assignedRiderId: null,
@@ -92,6 +98,8 @@ export class DeliveryService {
       status: DeliveryStatus.Requested,
       scheduledPickupTime: null,
       scheduledDropoffTime: null,
+      recipientName: input.recipientName ?? null,
+      recipientPhone: input.recipientPhone ?? null,
       isScheduled: false,
       visibilityToken: input.visibilityToken ?? this.generateVisibilityToken(),
       assignedRiderId: null,

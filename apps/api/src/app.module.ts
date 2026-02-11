@@ -12,6 +12,7 @@ import { ActorModule } from './modules/actor/actor.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BillingModule } from './modules/billing/billing.module';
 import { BusinessModule } from './modules/business/business.module';
+import { CustomerModule } from './modules/customer/customer.module';
 import { CalendarModule } from './modules/calendar/calendar.module';
 import { CapabilityModule } from './modules/capability/capability.module';
 import { CommitmentsModule } from './modules/commitments/commitments.module';
@@ -67,6 +68,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     AuthModule,
     BillingModule,
     BusinessModule,
+    CustomerModule,
     CalendarModule,
     CapabilityModule,
     CommitmentsModule,
@@ -91,4 +93,4 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     WorkspaceModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

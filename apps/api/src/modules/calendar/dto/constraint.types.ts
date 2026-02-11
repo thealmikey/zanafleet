@@ -3,7 +3,7 @@ import { BindingTargetType } from '@zanafleet/contracts';
 /**
  * Operation types that can be evaluated for scheduling constraints.
  */
-export type OperationType = 'DELIVERY_CREATION' | 'RIDER_ASSIGNMENT' | 'STATUS_TRANSITION';
+export type OperationType = 'DELIVERY_CREATION' | 'RIDER_ASSIGNMENT' | 'STATUS_TRANSITION' | 'ORDER_PLACEMENT';
 
 /**
  * Types of constraints that can block an operation.

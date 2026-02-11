@@ -63,7 +63,7 @@ export class DeliveryRequestCoordinator {
     private readonly deliveryMatchingCoordinator: DeliveryMatchingCoordinator,
     private readonly deliveryService: DeliveryService,
     private readonly eventBus: EventBusService,
-  ) {}
+  ) { }
 
   async requestDelivery(input: RequestDeliveryInput): Promise<RequestDeliveryResult> {
     const itemSummary = this.buildItemSummary(input.itemId, input.itemDescription);
@@ -101,6 +101,8 @@ export class DeliveryRequestCoordinator {
       dropoffLocationId: dropoff.locationId,
       isScheduled: !!input.scheduledPickupTime,
       scheduledPickupTime: input.scheduledPickupTime,
+      recipientName: input.recipientName,
+      recipientPhone: input.recipientPhone,
       distanceKm,
     });
 

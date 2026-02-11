@@ -50,6 +50,8 @@ export interface CreateDeliveryInput {
   isScheduled?: boolean;
   scheduledPickupTime?: Date;
   scheduledDropoffTime?: Date;
+  recipientName?: string | null;
+  recipientPhone?: string | null;
   distanceKm?: number;
   correlationId?: string;
 }
@@ -125,7 +127,7 @@ export class DeliveryLifecycleCoordinator {
     private readonly schedulingConstraint: SchedulingConstraintService,
     private readonly eventBus: EventBusService,
     _ledgerService: LedgerService,
-  ) {}
+  ) { }
 
   /**
    * Validates if a state transition is allowed by the state machine.
@@ -200,17 +202,21 @@ export class DeliveryLifecycleCoordinator {
 
     const deliveryResult = input.isScheduled
       ? await this.deliveryService.createScheduled({
-          businessId: input.businessId,
-          pickupLocationId: input.pickupLocationId,
-          dropoffLocationId: input.dropoffLocationId,
-          scheduledPickupTime: input.scheduledPickupTime!,
-          scheduledDropoffTime: input.scheduledDropoffTime,
-        })
+        businessId: input.businessId,
+        pickupLocationId: input.pickupLocationId,
+        dropoffLocationId: input.dropoffLocationId,
+        scheduledPickupTime: input.scheduledPickupTime!,
+        scheduledDropoffTime: input.scheduledDropoffTime,
+        recipientName: input.recipientName,
+        recipientPhone: input.recipientPhone,
+      })
       : await this.deliveryService.createOnDemand({
-          businessId: input.businessId,
-          pickupLocationId: input.pickupLocationId,
-          dropoffLocationId: input.dropoffLocationId,
-        });
+        businessId: input.businessId,
+        pickupLocationId: input.pickupLocationId,
+        dropoffLocationId: input.dropoffLocationId,
+        recipientName: input.recipientName,
+        recipientPhone: input.recipientPhone,
+      });
 
     const event = new DeliveryCreatedEventV1({
       eventId: uuidv4(),

@@ -23,6 +23,7 @@ import { HistoryCalendarPage } from './pages/HistoryCalendar';
 import { ComponentsDemo } from './pages/Demo/ComponentsDemo';
 import { RequestDeliveryPage } from './pages/RequestDelivery';
 import { ShopPage } from './pages/Shop';
+import { OrderTrackingPage } from './pages/OrderTracking';
 
 const theme = createTheme();
 
@@ -139,6 +140,14 @@ function App(): React.ReactElement {
                 element={
                   <ProtectedRoute>
                     <ShopPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/order/:id/track"
+                element={
+                  <ProtectedRoute>
+                    <OrderTrackingPage />
                   </ProtectedRoute>
                 }
               />

@@ -12,6 +12,9 @@ import { DeliveryRequestCoordinator, RequestDeliveryInput } from '../../delivery
 import { PaymentFlowOrchestrator, PaymentInitiationInput } from '../../payment/coordinators/payment-flow.orchestrator';
 import { PaymentFlowType } from '../../payment/dto/payment.enums';
 import { OrderEntity } from '../entities/order.entity';
+import { CustomerEntity } from '../../customer/entities/customer.entity';
+import { CommerceContextEngine } from '../../customer/services/commerce-context-engine.service';
+import { CustomerProjectionService } from '../../customer/services/customer-projection.service';
 
 export interface PlaceCustomerOrderInput {
     businessId: string;
@@ -57,16 +60,55 @@ export class CustomerOrderOrchestrator {
     constructor(
         @InjectRepository(OrderEntity)
         private readonly orderRepository: Repository<OrderEntity>,
+        @InjectRepository(CustomerEntity)
+        private readonly customerRepository: Repository<CustomerEntity>,
         private readonly deliveryRequestCoordinator: DeliveryRequestCoordinator,
         private readonly paymentFlowOrchestrator: PaymentFlowOrchestrator,
+        private readonly commerceEngine: CommerceContextEngine,
+        private readonly projectionService: CustomerProjectionService,
     ) { }
 
     async placeOrder(input: PlaceCustomerOrderInput): Promise<PlaceCustomerOrderResult> {
         this.logger.log(`Placing customer order for business ${input.businessId}`);
 
-        // 1. Calculate Total Amount
         const totalAmount = input.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
         const itemSummary = input.items.map(i => `${i.quantity}x ${i.description}`).join(', ');
+
+        // 1.5. Ensure Customer exists
+        let customer = await this.customerRepository.findOne({
+            where: {
+                businessId: input.businessId,
+                phoneNumber: input.recipientPhone,
+            }
+        });
+
+        if (!customer) {
+            customer = this.customerRepository.create({
+                id: uuidv4(),
+                businessId: input.businessId,
+                name: input.recipientName,
+                phoneNumber: input.recipientPhone,
+                createdAt: new Date(),
+            });
+            await this.customerRepository.save(customer);
+            this.logger.log(`Created new customer ${customer.id} for business ${input.businessId}`);
+        }
+
+        // 1.8 Evaluate Commerce Context (Calendar & Policy)
+        const evaluation = await this.commerceEngine.evaluateOrderPlacement(
+            input.businessId,
+            customer,
+            {
+                workspaceId: input.workspaceId,
+                timestamp: new Date(),
+                items: input.items,
+                totalAmount,
+            }
+        );
+
+        if (!evaluation.allowed) {
+            throw new Error(`Order placement rejected: ${evaluation.reason}`);
+        }
 
         // 2. Create Order Intent (Initially Pending)
         const orderId = uuidv4();
@@ -76,6 +118,7 @@ export class CustomerOrderOrchestrator {
             status: OrderStatus.Pending,
             customerName: input.recipientName,
             customerPhone: input.recipientPhone,
+            customerId: customer.id,
             itemSummary,
             itemMetadata: { items: input.items },
             totalAmount,
@@ -141,8 +184,20 @@ export class CustomerOrderOrchestrator {
                 status: OrderStatus.Pending,
             };
 
-        } catch (error) {
+        } catch (error: any) {
             this.logger.error(`Failed to place customer order: ${error.message}`, error.stack);
+
+            // Update Projection for Cancellation
+            if (customer) {
+                await this.projectionService.handleOrderEvent({
+                    orderId: orderId,
+                    businessId: input.businessId,
+                    customerId: customer.id,
+                    status: OrderStatus.Cancelled,
+                    totalAmount: totalAmount,
+                    items: input.items,
+                }).catch(e => this.logger.warn(`Failed to update projection on error: ${e.message}`));
+            }
 
             // Rollback order status if needed
             await this.orderRepository.update(orderId, {
@@ -151,6 +206,22 @@ export class CustomerOrderOrchestrator {
             });
 
             throw error;
+        } finally {
+            // Update Projection for Success (assuming Pending is "progress")
+            // In a real system we'd update on Confirm/Fulfill, but here we track all intents
+            if (customer && orderId) {
+                await this.projectionService.handleOrderEvent({
+                    orderId: orderId,
+                    businessId: input.businessId,
+                    customerId: customer.id,
+                    status: OrderStatus.Confirmed,
+                    totalAmount: totalAmount,
+                    items: input.items,
+                    location: input.dropoff.latitude && input.dropoff.longitude
+                        ? { lat: input.dropoff.latitude, lng: input.dropoff.longitude }
+                        : undefined,
+                }).catch(e => this.logger.warn(`Failed to update projection: ${e.message}`));
+            }
         }
     }
 }

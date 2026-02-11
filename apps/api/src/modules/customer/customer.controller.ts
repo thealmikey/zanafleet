@@ -1,0 +1,55 @@
+import { Controller, Get, Query, UseGuards, Request, Param } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, Like } from 'typeorm';
+import { CustomerEntity } from './entities/customer.entity';
+import { CustomerActivityProjection } from './entities/customer-activity.projection';
+import { BusinessAvailabilityProjection } from './entities/business-availability.projection';
+
+@Controller('customers')
+export class CustomerController {
+    constructor(
+        @InjectRepository(CustomerEntity)
+        private readonly customerRepository: Repository<CustomerEntity>,
+        @InjectRepository(CustomerActivityProjection)
+        private readonly activityRepo: Repository<CustomerActivityProjection>,
+        @InjectRepository(BusinessAvailabilityProjection)
+        private readonly availabilityRepo: Repository<BusinessAvailabilityProjection>,
+    ) { }
+
+    @Get()
+    async search(
+        @Query('businessId') businessId: string,
+        @Query('query') query: string,
+    ) {
+        if (!businessId) {
+            return { data: [] };
+        }
+
+        const customers = await this.customerRepository.find({
+            where: [
+                { businessId, name: Like(`%${query}%`) },
+                { businessId, phoneNumber: Like(`%${query}%`) },
+            ],
+            take: 10,
+        });
+
+        return { data: customers };
+    }
+
+    @Get('me/activity/:businessId')
+    async getMyActivity(
+        @Param('businessId') businessId: string,
+        @Query('customerId') customerId: string, // In real app, get from Auth user
+    ) {
+        const activity = await this.activityRepo.findOne({
+            where: { businessId, customerId }
+        });
+        return { data: activity };
+    }
+
+    @Get('businesses/availability')
+    async getBusinessAvailability() {
+        const availabilities = await this.availabilityRepo.find();
+        return { data: availabilities };
+    }
+}

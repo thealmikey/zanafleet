@@ -37,7 +37,7 @@ import {
   requestBusinessDelivery,
 } from '../../services/dashboardApi';
 
-type BusinessTab = 'overview' | 'deliveries' | 'request' | 'active' | 'billing';
+type BusinessTab = 'overview' | 'deliveries' | 'request' | 'active' | 'billing' | 'customers';
 
 const TAB_PATHS: Record<BusinessTab, string> = {
   overview: '/dashboard/business',
@@ -45,6 +45,7 @@ const TAB_PATHS: Record<BusinessTab, string> = {
   request: '/dashboard/business/request',
   active: '/dashboard/business/active',
   billing: '/dashboard/business/billing',
+  customers: '/dashboard/business/customers',
 };
 
 const DELIVERY_STATUS_OPTIONS = [
@@ -61,6 +62,7 @@ function getTabFromPath(pathname: string): BusinessTab {
   if (pathname.includes('/request')) return 'request';
   if (pathname.includes('/active')) return 'active';
   if (pathname.includes('/billing')) return 'billing';
+  if (pathname.includes('/customers')) return 'customers';
   return 'overview';
 }
 
@@ -273,6 +275,15 @@ function DeliveriesTab({
               <MenuItem value="FAILED">Failed</MenuItem>
             </TextField>
           </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="Search Customers or Items"
+              placeholder="Enter name, phone, or item summary..."
+              value={filters.search ?? ''}
+              onChange={(e) => onFilterChange({ search: e.target.value || undefined })}
+            />
+          </Grid>
         </Grid>
       )}
 
@@ -408,6 +419,48 @@ function RequestTab({
   );
 }
 
+function CustomersTab({
+  businessId,
+}: {
+  businessId: string;
+}): React.ReactElement {
+  const [customers, setCustomers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setLoading(true);
+    fetch(`/api/customers?businessId=${businessId}`)
+      .then(res => res.json())
+      .then(body => setCustomers(body.data || []))
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [businessId]);
+
+  return (
+    <Box>
+      <Typography variant="h6" gutterBottom>My Customers</Typography>
+      {error && <Alert severity="error">{error}</Alert>}
+      <ListWithPagination
+        items={customers}
+        page={1}
+        totalPages={1}
+        onPageChange={() => { }}
+        getItemKey={(item) => item.id}
+        renderItem={(item) => (
+          <Card sx={{ mb: 1 }}>
+            <CardContent>
+              <Typography variant="subtitle1">{item.name}</Typography>
+              <Typography variant="body2" color="text.secondary">{item.phoneNumber}</Typography>
+              {item.email && <Typography variant="body2">{item.email}</Typography>}
+            </CardContent>
+          </Card>
+        )}
+      />
+    </Box>
+  );
+}
+
 function BillingTab({
   token,
   businessId,
@@ -473,6 +526,7 @@ function BusinessDashboardShell(): React.ReactElement {
     if (tab === 'deliveries') return <DeliveriesTab token={token} businessId={business.businessId} />;
     if (tab === 'request') return <RequestTab token={token} businessId={business.businessId} />;
     if (tab === 'active') return <DeliveriesTab token={token} businessId={business.businessId} activeOnly />;
+    if (tab === 'customers') return <CustomersTab businessId={business.businessId} />;
     return <BillingTab token={token} businessId={business.businessId} />;
   }, [token, business.businessId, tab]);
 
@@ -491,6 +545,7 @@ function BusinessDashboardShell(): React.ReactElement {
           <Tab label="Deliveries" value="deliveries" />
           <Tab label="New Request" value="request" />
           <Tab label="Active" value="active" />
+          <Tab label="Customers" value="customers" />
           <Tab label="Billing" value="billing" />
         </Tabs>
 
@@ -507,6 +562,7 @@ export function BusinessDashboard(): React.ReactElement {
       <Route path="/deliveries" element={<BusinessDashboardShell />} />
       <Route path="/request" element={<BusinessDashboardShell />} />
       <Route path="/active" element={<BusinessDashboardShell />} />
+      <Route path="/customers" element={<BusinessDashboardShell />} />
       <Route path="/billing" element={<BusinessDashboardShell />} />
       <Route path="*" element={<Navigate to="/dashboard/business" replace />} />
     </Routes>

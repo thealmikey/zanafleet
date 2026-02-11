@@ -18,6 +18,7 @@ import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { useAuth } from '../../hooks/useAuth';
 import { requestDelivery } from '../../services/deliveryApi';
 import { searchAddress, Address } from '../../services/geoApi';
+import { searchCustomers, Customer } from '../../services/customerApi';
 
 interface LocationState {
     address: string | null;
@@ -45,6 +46,7 @@ export const RequestDeliveryPage: React.FC = () => {
     // Search State
     const [pickupOptions, setPickupOptions] = useState<Address[]>([]);
     const [dropoffOptions, setDropoffOptions] = useState<Address[]>([]);
+    const [customerOptions, setCustomerOptions] = useState<Customer[]>([]);
 
     const handleAddressSearch = async (query: string, setOptions: (options: Address[]) => void) => {
         if (query.length < 3) return;
@@ -53,6 +55,16 @@ export const RequestDeliveryPage: React.FC = () => {
             setOptions(results);
         } catch (err) {
             console.error('Address search failed', err);
+        }
+    };
+
+    const handleCustomerSearch = async (query: string) => {
+        if (!user?.activeWorkspaceId || query.length < 2) return;
+        try {
+            const results = await searchCustomers(user.activeWorkspaceId, query);
+            setCustomerOptions(results);
+        } catch (err) {
+            console.error('Customer search failed', err);
         }
     };
 
@@ -216,12 +228,28 @@ export const RequestDeliveryPage: React.FC = () => {
                                 <Typography variant="h6" gutterBottom>Recipient Details</Typography>
                             </Grid>
                             <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Recipient Name"
-                                    value={recipientName}
-                                    onChange={(e) => setRecipientName(e.target.value)}
-                                    required
+                                <Autocomplete
+                                    freeSolo
+                                    options={customerOptions}
+                                    getOptionLabel={(option) => typeof option === 'string' ? option : `${option.name} (${option.phoneNumber})`}
+                                    onInputChange={(_, value) => {
+                                        setRecipientName(value);
+                                        handleCustomerSearch(value);
+                                    }}
+                                    onChange={(_, value) => {
+                                        if (value && typeof value !== 'string') {
+                                            setRecipientName(value.name);
+                                            setRecipientPhone(value.phoneNumber);
+                                        }
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Recipient Name"
+                                            required
+                                            placeholder="Search existing or type new"
+                                        />
+                                    )}
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>

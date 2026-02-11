@@ -66,6 +66,7 @@ export enum ActorType {
   SaccoAdmin = 'SaccoAdmin',
   Business = 'Business',
   BusinessOwner = 'BusinessOwner',
+  Customer = 'Customer',
   Internal = 'Internal',
   AIService = 'AIService',
 }
@@ -589,6 +590,7 @@ export enum PolicyTrigger {
   STATUS_TRANSITION = 'STATUS_TRANSITION',
   SLA_CHECK = 'SLA_CHECK',
   REVENUE_DISTRIBUTION = 'REVENUE_DISTRIBUTION',
+  ORDER_PLACEMENT = 'ORDER_PLACEMENT',
 }
 
 /**

@@ -21,7 +21,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 
 
 import { CreateOrderCommand } from '../commands/create-order.command';
@@ -91,8 +91,20 @@ export class OrdersController {
 
     const order = sort ? { [sort.field]: sort.order } : undefined;
 
+    // Handle search parameter
+    const search = query.search as string;
+    let where: any = filter;
+
+    if (search) {
+      where = [
+        { ...filter, customerName: ILike(`%${search}%`) },
+        { ...filter, customerPhone: ILike(`%${search}%`) },
+        { ...filter, itemSummary: ILike(`%${search}%`) },
+      ];
+    }
+
     const [entities, total] = await this.orderRepository.findAndCount({
-      where: filter,
+      where,
       order,
       skip: pagination.offset,
       take: pagination.limit,
