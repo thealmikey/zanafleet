@@ -116,6 +116,20 @@ export enum VehicleType {
   Van = 'Van',
 }
 
+export enum AssetType {
+  VEHICLE = 'VEHICLE',
+  EQUIPMENT = 'EQUIPMENT',
+  WAREHOUSE = 'WAREHOUSE',
+  OTHER = 'OTHER',
+}
+
+export enum AssetStatus {
+  ACTIVE = 'ACTIVE',
+  MAINTENANCE = 'MAINTENANCE',
+  OUT_OF_SERVICE = 'OUT_OF_SERVICE',
+  ARCHIVED = 'ARCHIVED',
+}
+
 export enum BusinessType {
   Retail = 'Retail',
   Restaurant = 'Restaurant',
@@ -448,6 +462,8 @@ export enum OwnerEntityType {
   Delivery = 'Delivery',
   Sacco = 'Sacco',
   Order = 'Order',
+  Asset = 'Asset',
+  Operator = 'Operator',
 }
 
 export interface MediaAssetMetadata {
@@ -556,6 +572,8 @@ export enum PolicyScope {
   SACCO = 'SACCO',
   BUSINESS = 'BUSINESS',
   RIDER = 'RIDER',
+  ASSET = 'ASSET',
+  OPERATOR = 'OPERATOR',
 }
 
 /**
@@ -645,6 +663,8 @@ export enum CalendarScope {
   SACCO = 'SACCO',
   BUSINESS = 'BUSINESS',
   RIDER = 'RIDER',
+  ASSET = 'ASSET',
+  OPERATOR = 'OPERATOR',
 }
 
 /**
@@ -694,6 +714,8 @@ export enum BindingTargetType {
   SACCO = 'SACCO',
   RIDER = 'RIDER',
   WORKSPACE = 'WORKSPACE',
+  ASSET = 'ASSET',
+  OPERATOR = 'OPERATOR',
 }
 
 /**

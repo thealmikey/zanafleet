@@ -1,3 +1,8 @@
+// Polyfill for TextEncoder/TextDecoder (required for MSW in Jest)
+import { TextEncoder, TextDecoder } from 'util';
+global.TextEncoder = TextEncoder as any;
+global.TextDecoder = TextDecoder as any;
+
 import '@testing-library/jest-dom';
 
 import { resetMockSessions } from './mocks/handlers';

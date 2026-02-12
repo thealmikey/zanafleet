@@ -26,6 +26,7 @@ import {
   Gavel as DisputesIcon,
   History as HistoryIcon,
   Home as HomeIcon,
+  LocalShipping as FleetIcon,
   Logout as LogoutIcon,
   Mail as MessagesIcon,
   Menu as MenuIcon,
@@ -94,6 +95,7 @@ const ROLE_NAV_CONFIG: Record<DashboardRole, { title: string; icon: React.ReactN
       { label: 'Queue', icon: <ManagementIcon />, path: '/dashboard/operator/queue' },
       { label: 'Candidates', icon: <RiderIcon />, path: '/dashboard/operator/candidates' },
       { label: 'Route', icon: <HistoryIcon />, path: '/dashboard/operator/route' },
+      { label: 'Assets', icon: <FleetIcon />, path: '/assets' },
     ],
   },
   business: {
@@ -105,6 +107,7 @@ const ROLE_NAV_CONFIG: Record<DashboardRole, { title: string; icon: React.ReactN
       { label: 'New Request', icon: <SettlementsIcon />, path: '/dashboard/business/request' },
       { label: 'Active', icon: <RiderIcon />, path: '/dashboard/business/active' },
       { label: 'Billing', icon: <EarningsIcon />, path: '/dashboard/business/billing' },
+      { label: 'Fleet Assets', icon: <FleetIcon />, path: '/assets' },
     ],
   },
   rider: {
@@ -114,6 +117,7 @@ const ROLE_NAV_CONFIG: Record<DashboardRole, { title: string; icon: React.ReactN
       { label: 'Active', icon: <MetricsIcon />, path: '/dashboard/rider' },
       { label: 'History', icon: <HistoryIcon />, path: '/dashboard/rider/history' },
       { label: 'Earnings', icon: <EarningsIcon />, path: '/dashboard/rider/earnings' },
+      { label: 'My Assets', icon: <FleetIcon />, path: '/assets' },
     ],
   },
   shopper: {

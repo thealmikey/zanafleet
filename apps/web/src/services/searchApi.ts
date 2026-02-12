@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { ApiError } from './signupApi';
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || '/api';
 
@@ -33,13 +33,36 @@ export interface SearchParams {
     sort?: 'relevance' | 'distance' | 'newest';
 }
 
+function buildQueryString(params: Record<string, string | number | undefined>): string {
+    const entries = Object.entries(params).filter(
+        (entry): entry is [string, string | number] => entry[1] !== undefined
+    );
+    if (entries.length === 0) return '';
+    return '?' + entries.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+}
+
 /**
  * Performs a unified search across the platform.
  */
 export async function search(params: SearchParams, token?: string): Promise<SearchResults> {
-    const response = await axios.get<SearchResults>(`${API_BASE_URL}/search`, {
-        params,
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+    const qs = buildQueryString(params as any);
+    const response = await fetch(`${API_BASE_URL}/search${qs}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
     });
-    return response.data;
+
+    if (!response.ok) {
+        let body: unknown;
+        try {
+            body = await response.json();
+        } catch {
+            // Response body is not JSON
+        }
+        throw new ApiError(response.status, response.statusText, body);
+    }
+
+    return response.json();
 }

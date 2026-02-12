@@ -4,13 +4,12 @@ import {
     Box,
     InputBase,
     IconButton,
-    Paper,
     alpha,
     styled,
 } from '@mui/material';
 import { Search as SearchIcon, Close as CloseIcon } from '@mui/icons-material';
 
-const SearchContainer = styled(Paper)(({ theme }) => ({
+const SearchContainer = styled(Box)(({ theme }) => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius * 2,
     backgroundColor: alpha(theme.palette.common.white, 0.15),
@@ -29,7 +28,6 @@ const SearchContainer = styled(Paper)(({ theme }) => ({
     alignItems: 'center',
     padding: theme.spacing(0.5, 1),
     transition: theme.transitions.create(['width', 'background-color']),
-    boxShadow: 'none',
     border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
 }));
 
@@ -63,7 +61,7 @@ export const SearchBar: React.FC = () => {
     };
 
     return (
-        <SearchContainer component="form" onSubmit={handleSearch} elevation={0}>
+        <SearchContainer component="form" onSubmit={handleSearch}>
             <Box sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: '100%' }}>
                 <IconButton sx={{ p: '10px' }} aria-label="search" onClick={() => handleSearch()}>
                     <SearchIcon />

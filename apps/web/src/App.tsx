@@ -26,6 +26,11 @@ import { ShopPage } from './pages/Shop';
 import { OrderTrackingPage } from './pages/OrderTracking';
 import { ShopperDashboard } from './pages/ShopperDashboard';
 import { SearchResultsPage } from './pages/Search/SearchResults';
+import FleetDashboard from './pages/AssetPlatform/FleetDashboard';
+import OperatorProfile from './pages/AssetPlatform/OperatorProfile';
+import AssetMarketplace from './pages/AssetPlatform/AssetMarketplace';
+import EventDashboard from './pages/EventDashboard';
+import AssetManagement from './pages/AssetManagement';
 
 const theme = createTheme();
 
@@ -162,10 +167,50 @@ function App(): React.ReactElement {
                 }
               />
               <Route
+                path="/dashboard/fleet"
+                element={
+                  <ProtectedRoute>
+                    <FleetDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/operator/:id"
+                element={
+                  <ProtectedRoute>
+                    <OperatorProfile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/marketplace/assets"
+                element={
+                  <ProtectedRoute>
+                    <AssetMarketplace />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/search"
                 element={
                   <ProtectedRoute>
                     <SearchResultsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/events/:bundleId"
+                element={
+                  <ProtectedRoute>
+                    <EventDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/assets"
+                element={
+                  <ProtectedRoute>
+                    <AssetManagement />
                   </ProtectedRoute>
                 }
               />

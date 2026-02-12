@@ -19,6 +19,7 @@ export enum LedgerCategory {
   REFUND = 'REFUND',
   PAYOUT = 'PAYOUT',
   ADJUSTMENT = 'ADJUSTMENT',
+  ASSET_UTILIZATION = 'ASSET_UTILIZATION',
 }
 
 export enum LedgerReferenceType {
@@ -26,6 +27,7 @@ export enum LedgerReferenceType {
   INVOICE = 'INVOICE',
   SETTLEMENT = 'SETTLEMENT',
   DELIVERY = 'DELIVERY',
+  TRIP = 'TRIP',
 }
 
 export enum DeliveryType {
