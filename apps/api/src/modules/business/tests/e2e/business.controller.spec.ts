@@ -25,7 +25,7 @@ describe('BusinessController (e2e)', () => {
 
   const createMockBusinessEntity = (overrides: Partial<BusinessEntity> = {}): BusinessEntity => {
     const entity = new BusinessEntity();
-    entity.id = overrides.id ?? 'business-123';
+    entity.id = overrides.id ?? '11111111-1111-4111-8111-111111111111';
     entity.businessName = overrides.businessName ?? 'Test Business';
     entity.phone = overrides.phone ?? '+254700000000';
     entity.location = overrides.location ?? {
@@ -112,11 +112,11 @@ describe('BusinessController (e2e)', () => {
       mockRepository.findOne.mockResolvedValue(mockEntity);
 
       const response = await request(app.getHttpServer())
-        .get('/businesses/business-123')
+        .get('/businesses/11111111-1111-4111-8111-111111111111')
         .expect(200);
 
       expect(response.body).toMatchObject({
-        businessId: 'business-123',
+        businessId: '11111111-1111-4111-8111-111111111111',
         businessName: 'Test Business',
         phone: '+254700000000',
         businessType: BusinessType.Retail,
@@ -127,14 +127,17 @@ describe('BusinessController (e2e)', () => {
       mockRepository.findOne.mockResolvedValue(null);
 
       await request(app.getHttpServer())
-        .get('/businesses/non-existent')
+        .get('/businesses/11111111-1111-4111-8111-999999999999')
         .expect(404);
     });
   });
 
   describe('GET /businesses', () => {
     it('should return 200 with data and meta respecting pagination', async () => {
-      const mockEntities = [createMockBusinessEntity({ id: 'business-1' }), createMockBusinessEntity({ id: 'business-2' })];
+      const mockEntities = [
+        createMockBusinessEntity({ id: '11111111-1111-4111-8111-111111111111' }),
+        createMockBusinessEntity({ id: '22222222-2222-4222-8222-222222222222' }),
+      ];
       mockRepository.findAndCount.mockResolvedValue([mockEntities, 2]);
 
       const response = await request(app.getHttpServer())

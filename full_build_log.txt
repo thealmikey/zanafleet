@@ -1,0 +1,312 @@
+[96mapps/api/src/core/messaging/services/messaging.service.ts[0m:[93m24[0m:[93m12[0m - [91merror[0m[90m TS2678: [0mType '"email"' is not comparable to type 'MessageChannel'.
+
+[7m24[0m       case 'email':
+[7m  [0m [91m           ~~~~~~~[0m
+[96mapps/api/src/core/messaging/services/messaging.service.ts[0m:[93m27[0m:[93m12[0m - [91merror[0m[90m TS2678: [0mType '"sms"' is not comparable to type 'MessageChannel'.
+
+[7m27[0m       case 'sms':
+[7m  [0m [91m           ~~~~~[0m
+[96mapps/api/src/core/messaging/services/messaging.service.ts[0m:[93m30[0m:[93m12[0m - [91merror[0m[90m TS2678: [0mType '"push"' is not comparable to type 'MessageChannel'.
+
+[7m30[0m       case 'push':
+[7m  [0m [91m           ~~~~~~[0m
+[96mapps/api/src/modules/actor/services/test-account-seeder.service.ts[0m:[93m4[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '@zanafleet/utils' or its corresponding type declarations.
+
+[7m4[0m import { hashPassword } from '@zanafleet/utils';
+[7m [0m [91m                             ~~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/auth/handlers/login.handler.ts[0m:[93m8[0m:[93m32[0m - [91merror[0m[90m TS2307: [0mCannot find module '@zanafleet/utils' or its corresponding type declarations.
+
+[7m8[0m import { verifyPassword } from '@zanafleet/utils';
+[7m [0m [91m                               ~~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/billing/commands/issue-invoice.command.ts[0m:[93m1[0m:[93m10[0m - [91merror[0m[90m TS2305: [0mModule '"@api/modules/payment"' has no exported member 'PaymentMethod'.
+
+[7m1[0m import { PaymentMethod } from '@api/modules/payment';
+[7m [0m [91m         ~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/billing/commands/issue-invoice.command.ts[0m:[93m28[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'unknown' is not assignable to type 'string'.
+
+[7m28[0m     this.invoiceId = input.invoiceId;
+[7m  [0m [91m    ~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/billing/commands/issue-invoice.command.ts[0m:[93m30[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'unknown' is not assignable to type 'string'.
+
+[7m30[0m     this.providerId = input.providerId;
+[7m  [0m [91m    ~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/billing/commands/issue-invoice.command.ts[0m:[93m31[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'unknown' is not assignable to type 'string | undefined'.
+
+[7m31[0m     this.correlationId = input.correlationId;
+[7m  [0m [91m    ~~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/billing/tests/unit/issue-invoice.handler.spec.ts[0m:[93m2[0m:[93m10[0m - [91merror[0m[90m TS2305: [0mModule '"@api/modules/payment"' has no exported member 'PaymentMethod'.
+
+[7m2[0m import { PaymentMethod, CreatePaymentIntentCommand } from '@api/modules/payment';
+[7m [0m [91m         ~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/calendar/services/calendar-policy-bridge.service.ts[0m:[93m433[0m:[93m11[0m - [91merror[0m[90m TS2739: [0mType '{ GLOBAL: PolicyScope.GLOBAL; NATIONAL: PolicyScope.NATIONAL; SACCO: PolicyScope.SACCO; BUSINESS: PolicyScope.BUSINESS; RIDER: PolicyScope.RIDER; }' is missing the following properties from type 'Record<CalendarScope, PolicyScope>': ASSET, OPERATOR
+
+[7m433[0m     const mapping: Record<CalendarScope, PolicyScope> = {
+[7m   [0m [91m          ~~~~~~~[0m
+[96mapps/api/src/modules/calendar/services/calendar-policy-bridge.service.ts[0m:[93m491[0m:[93m11[0m - [91merror[0m[90m TS2739: [0mType '{ BUSINESS: CalendarScope.BUSINESS; SACCO: CalendarScope.SACCO; RIDER: CalendarScope.RIDER; WORKSPACE: CalendarScope.GLOBAL; }' is missing the following properties from type 'Record<BindingTargetType, CalendarScope>': ASSET, OPERATOR
+
+[7m491[0m     const mapping: Record<BindingTargetType, CalendarScope> = {
+[7m   [0m [91m          ~~~~~~~[0m
+[96mapps/api/src/modules/communication/communication.module.ts[0m:[93m16[0m:[93m31[0m - [91merror[0m[90m TS6133: [0m'createNoOpProviders' is declared but its value is never read.
+
+[7m16[0m import { NoOpChannelProvider, createNoOpProviders } from './providers/noop-channel.provider';
+[7m  [0m [91m                              ~~~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/customer/customer.controller.ts[0m:[93m1[0m:[93m34[0m - [91merror[0m[90m TS6133: [0m'UseGuards' is declared but its value is never read.
+
+[7m1[0m import { Controller, Get, Query, UseGuards, Request, Param } from '@nestjs/common';
+[7m [0m [91m                                 ~~~~~~~~~[0m
+[96mapps/api/src/modules/customer/customer.controller.ts[0m:[93m1[0m:[93m45[0m - [91merror[0m[90m TS6133: [0m'Request' is declared but its value is never read.
+
+[7m1[0m import { Controller, Get, Query, UseGuards, Request, Param } from '@nestjs/common';
+[7m [0m [91m                                            ~~~~~~~[0m
+[96mapps/api/src/modules/dashboard/services/business-owner-dashboard.service.ts[0m:[93m618[0m:[93m18[0m - [91merror[0m[90m TS2304: [0mCannot find name 'FindOptionsWhere'.
+
+[7m618[0m     const where: FindOptionsWhere<InvoiceEntity>[] = [];
+[7m   [0m [91m                 ~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/delivery/controllers/delivery-tracking.controller.ts[0m:[93m186[0m:[93m56[0m - [91merror[0m[90m TS7006: [0mParameter 'r' implicitly has an 'any' type.
+
+[7m186[0m     const stops: DeliveryTrackingStopDto[] = rows.map((r) => ({
+[7m   [0m [91m                                                       ~[0m
+[96mapps/api/src/modules/delivery/handlers/cancel-delivery.handler.ts[0m:[93m43[0m:[93m7[0m - [91merror[0m[90m TS2322: [0mType 'string | undefined' is not assignable to type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+
+[7m43[0m       reason,
+[7m  [0m [91m      ~~~~~~[0m
+
+  [96mapps/api/src/modules/delivery/events/delivery-cancelled.event.ts[0m:[93m33[0m:[93m5[0m
+    [7m33[0m     reason: string;
+    [7m  [0m [96m    ~~~~~~[0m
+    The expected type comes from property 'reason' which is declared here on type '{ eventId: string; deliveryId: string; reason: string; cancelledBy?: string | undefined; previousState: string; ledgerReservationReleased: boolean; cancelledAt: Date; occurredAt?: Date | undefined; correlationId?: string | undefined; causationId?: string | undefined; }'
+[96mapps/api/src/modules/delivery/tests/unit/candidate-selection.service.spec.ts[0m:[93m7[0m:[93m3[0m - [91merror[0m[90m TS2459: [0mModule '"../../services/candidate-selection.service"' declares 'haversineDistanceMeters' locally, but it is not exported.
+
+[7m7[0m   haversineDistanceMeters,
+[7m [0m [91m  ~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/delivery/services/candidate-selection.service.ts[0m:[93m4[0m:[93m10[0m
+    [7m4[0m import { haversineDistanceMeters, GeoPoint } from '../../../core/utils/geo.utils';
+    [7m [0m [96m         ~~~~~~~~~~~~~~~~~~~~~~~[0m
+    'haversineDistanceMeters' is declared here.
+[96mapps/api/src/modules/order/coordinators/customer-order.orchestrator.ts[0m:[93m11[0m:[93m38[0m - [91merror[0m[90m TS6133: [0m'RequestDeliveryInput' is declared but its value is never read.
+
+[7m11[0m import { DeliveryRequestCoordinator, RequestDeliveryInput } from '../../delivery/coordinators/delivery-request.coordinator';
+[7m  [0m [91m                                     ~~~~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/order/coordinators/customer-order.orchestrator.ts[0m:[93m12[0m:[93m35[0m - [91merror[0m[90m TS6133: [0m'PaymentInitiationInput' is declared but its value is never read.
+
+[7m12[0m import { PaymentFlowOrchestrator, PaymentInitiationInput } from '../../payment/coordinators/payment-flow.orchestrator';
+[7m  [0m [91m                                  ~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/order/services/activity-seeder.service.ts[0m:[93m4[0m:[93m5[0m - [91merror[0m[90m TS6133: [0m'ActorType' is declared but its value is never read.
+
+[7m4[0m     ActorType,
+[7m [0m [91m    ~~~~~~~~~[0m
+[96mapps/api/src/modules/order/services/activity-seeder.service.ts[0m:[93m9[0m:[93m5[0m - [91merror[0m[90m TS6133: [0m'TEST_WORKSPACE_ID' is declared but its value is never read.
+
+[7m9[0m     TEST_WORKSPACE_ID
+[7m [0m [91m    ~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/order/services/activity-seeder.service.ts[0m:[93m23[0m:[93m22[0m - [91merror[0m[90m TS6133: [0m'TEST_CUSTOMER_ID' is declared but its value is never read.
+
+[7m23[0m     private readonly TEST_CUSTOMER_ID = '550e8400-e29b-41d4-a716-446655440007';
+[7m  [0m [91m                     ~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/payment/commands/create-payment-intent.command.ts[0m:[93m3[0m:[93m27[0m - [91merror[0m[90m TS2459: [0mModule '"../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m3[0m import { PaymentFlowType, PaymentMethod } from '../dto/payment.enums';
+[7m [0m [91m                          ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/payment/commands/create-payment-intent.command.ts[0m:[93m43[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'unknown' is not assignable to type 'string'.
+
+[7m43[0m     this.payerAccountId = input.payerAccountId;
+[7m  [0m [91m    ~~~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/payment/commands/create-payment-intent.command.ts[0m:[93m44[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'unknown' is not assignable to type 'string'.
+
+[7m44[0m     this.payeeAccountId = input.payeeAccountId;
+[7m  [0m [91m    ~~~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/payment/commands/create-payment-intent.command.ts[0m:[93m45[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'unknown' is not assignable to type 'PaymentFlowType'.
+
+[7m45[0m     this.flowType = input.flowType;
+[7m  [0m [91m    ~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/payment/commands/create-payment-intent.command.ts[0m:[93m46[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'unknown' is not assignable to type 'number'.
+
+[7m46[0m     this.amount = input.amount;
+[7m  [0m [91m    ~~~~~~~~~~~[0m
+[96mapps/api/src/modules/payment/commands/create-payment-intent.command.ts[0m:[93m47[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'unknown' is not assignable to type 'string'.
+
+[7m47[0m     this.currency = input.currency;
+[7m  [0m [91m    ~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/payment/commands/create-payment-intent.command.ts[0m:[93m49[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'unknown' is not assignable to type 'string'.
+
+[7m49[0m     this.providerId = input.providerId;
+[7m  [0m [91m    ~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/payment/commands/create-payment-intent.command.ts[0m:[93m50[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'unknown' is not assignable to type 'string | undefined'.
+
+[7m50[0m     this.invoiceId = input.invoiceId;
+[7m  [0m [91m    ~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/payment/commands/create-payment-intent.command.ts[0m:[93m51[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'unknown' is not assignable to type 'string'.
+
+[7m51[0m     this.idempotencyKey = input.idempotencyKey;
+[7m  [0m [91m    ~~~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/payment/commands/create-payment-intent.command.ts[0m:[93m52[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'unknown' is not assignable to type 'Record<string, unknown> | undefined'.
+
+[7m52[0m     this.metadata = input.metadata;
+[7m  [0m [91m    ~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/payment/commands/create-payment-intent.command.ts[0m:[93m53[0m:[93m5[0m - [91merror[0m[90m TS2322: [0mType 'unknown' is not assignable to type 'Date | undefined'.
+
+[7m53[0m     this.expiresAt = input.expiresAt;
+[7m  [0m [91m    ~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/payment/controllers/payment.controller.ts[0m:[93m24[0m:[93m3[0m - [91merror[0m[90m TS2459: [0mModule '"../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m24[0m   PaymentMethod,
+[7m  [0m [91m  ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/payment/coordinators/payment-flow.orchestrator.spec.ts[0m:[93m7[0m:[93m48[0m - [91merror[0m[90m TS2459: [0mModule '"../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m7[0m import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../dto/payment.enums';
+[7m [0m [91m                                               ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/payment/coordinators/payment-flow.orchestrator.ts[0m:[93m8[0m:[93m48[0m - [91merror[0m[90m TS2459: [0mModule '"../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m8[0m import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../dto/payment.enums';
+[7m [0m [91m                                               ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m1[0m - [91merror[0m[90m TS6133: [0m'PaymentMethod' is declared but its value is never read.
+
+[7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+[7m [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/payment/entities/payment-intent.entity.ts[0m:[93m3[0m:[93m48[0m - [91merror[0m[90m TS2459: [0mModule '"../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m3[0m import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../dto/payment.enums';
+[7m [0m [91m                                               ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/payment/events/payment-intent-created.event.ts[0m:[93m1[0m:[93m48[0m - [91merror[0m[90m TS2459: [0mModule '"../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m1[0m import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../dto/payment.enums';
+[7m [0m [91m                                               ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/payment/tests/e2e/payment.controller.spec.ts[0m:[93m11[0m:[93m3[0m - [91merror[0m[90m TS2459: [0mModule '"../../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m11[0m   PaymentMethod,
+[7m  [0m [91m  ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/payment/tests/unit/create-payment-intent.command.spec.ts[0m:[93m4[0m:[93m27[0m - [91merror[0m[90m TS2459: [0mModule '"../../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m4[0m import { PaymentFlowType, PaymentMethod } from '../../dto/payment.enums';
+[7m [0m [91m                          ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/payment/tests/unit/create-payment-intent.handler.spec.ts[0m:[93m6[0m:[93m48[0m - [91merror[0m[90m TS2459: [0mModule '"../../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m6[0m import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../../dto/payment.enums';
+[7m [0m [91m                                               ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/payment/tests/unit/fraud-check.service.spec.ts[0m:[93m5[0m:[93m48[0m - [91merror[0m[90m TS2459: [0mModule '"../../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m5[0m import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../../dto/payment.enums';
+[7m [0m [91m                                               ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/payment/tests/unit/payment-intent.entity.spec.ts[0m:[93m4[0m:[93m3[0m - [91merror[0m[90m TS2459: [0mModule '"../../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m4[0m   PaymentMethod,
+[7m [0m [91m  ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/payment/tests/unit/payment.enums.spec.ts[0m:[93m4[0m:[93m3[0m - [91merror[0m[90m TS2459: [0mModule '"../../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m4[0m   PaymentMethod,
+[7m [0m [91m  ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/payment/tests/unit/process-payment.handler.spec.ts[0m:[93m8[0m:[93m48[0m - [91merror[0m[90m TS2459: [0mModule '"../../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m8[0m import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../../dto/payment.enums';
+[7m [0m [91m                                               ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/payment/tests/unit/refund-dispute.coordinator.spec.ts[0m:[93m21[0m:[93m3[0m - [91merror[0m[90m TS2459: [0mModule '"../../dto/payment.enums"' declares 'PaymentMethod' locally, but it is not exported.
+
+[7m21[0m   PaymentMethod,
+[7m  [0m [91m  ~~~~~~~~~~~~~[0m
+
+  [96mapps/api/src/modules/payment/dto/payment.enums.ts[0m:[93m1[0m:[93m10[0m
+    [7m1[0m import { PaymentMethod } from '@zanafleet/contracts';
+    [7m [0m [96m         ~~~~~~~~~~~~~[0m
+    'PaymentMethod' is declared here.
+[96mapps/api/src/modules/policy/services/policy-evaluation-engine.service.ts[0m:[93m360[0m:[93m11[0m - [91merror[0m[90m TS2739: [0mType '{ RIDER: number; BUSINESS: number; SACCO: number; NATIONAL: number; GLOBAL: number; }' is missing the following properties from type 'Record<PolicyScope, number>': ASSET, OPERATOR
+
+[7m360[0m     const priorities: Record<PolicyScope, number> = {
+[7m   [0m [91m          ~~~~~~~~~~[0m
+[96mapps/api/src/modules/policy/tests/unit/policy-enforcement.adapter.spec.ts[0m:[93m10[0m:[93m3[0m - [91merror[0m[90m TS6133: [0m'EvaluationContext' is declared but its value is never read.
+
+[7m10[0m   EvaluationContext,
+[7m  [0m [91m  ~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/search/entities/search-document.entity.ts[0m:[93m6[0m:[93m5[0m - [91merror[0m[90m TS6133: [0m'Index' is declared but its value is never read.
+
+[7m6[0m     Index,
+[7m [0m [91m    ~~~~~[0m
+[96mapps/api/src/modules/search/providers/postgres-search-provider.integration.spec.ts[0m:[93m5[0m:[93m38[0m - [91merror[0m[90m TS2307: [0mCannot find module '../../entities/search-document.entity' or its corresponding type declarations.
+
+[7m5[0m import { SearchDocumentEntity } from '../../entities/search-document.entity';
+[7m [0m [91m                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/search/providers/postgres-search.provider.ts[0m:[93m3[0m:[93m22[0m - [91merror[0m[90m TS6133: [0m'SelectQueryBuilder' is declared but its value is never read.
+
+[7m3[0m import { Repository, SelectQueryBuilder } from 'typeorm';
+[7m [0m [91m                     ~~~~~~~~~~~~~~~~~~[0m
+[96mapps/api/src/modules/search/providers/postgres-search.provider.ts[0m:[93m11[0m:[93m22[0m - [91merror[0m[90m TS6133: [0m'logger' is declared but its value is never read.
+
+[7m11[0m     private readonly logger = new Logger(PostgresSearchProvider.name);
+[7m  [0m [91m                     ~~~~~~[0m
+[96mapps/api/src/modules/search/providers/postgres-search.provider.ts[0m:[93m54[0m:[93m95[0m - [91merror[0m[90m TS2554: [0mExpected 1-2 arguments, but got 3.
+
+[7m54[0m             qb.addSelect("ts_rank(doc.tsv, websearch_to_tsquery('english', :query))", 'rank', { query });
+[7m  [0m [91m                                                                                              ~~~~~~~~~[0m
+[96mapps/api/src/modules/signup/handlers/update-signup-step.handler.ts[0m:[93m11[0m:[93m30[0m - [91merror[0m[90m TS2307: [0mCannot find module '@zanafleet/utils' or its corresponding type declarations.
+
+[7m11[0m import { hashPassword } from '@zanafleet/utils';
+[7m  [0m [91m                             ~~~~~~~~~~~~~~~~~~[0m
+
+Found 57 error(s).
+

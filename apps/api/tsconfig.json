@@ -4,9 +4,22 @@
     "baseUrl": "./src",
     "outDir": "../../dist/apps/api",
     "paths": {
-      "@api/*": ["./*"]
+      "@api/*": [
+        "./*"
+      ],
+      "@zanafleet/contracts": [
+        "../../packages/contracts/src"
+      ],
+      "@zanafleet/contracts/*": [
+        "../../packages/contracts/src/*"
+      ]
     }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

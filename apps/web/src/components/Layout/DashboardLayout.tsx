@@ -26,6 +26,7 @@ import {
   Gavel as DisputesIcon,
   History as HistoryIcon,
   Home as HomeIcon,
+  LocalShipping as FleetIcon,
   Logout as LogoutIcon,
   Mail as MessagesIcon,
   Menu as MenuIcon,
@@ -46,6 +47,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { DashboardRole, getHighestPriorityRole } from '../../utils/roleRouting';
 import { NotificationList, NotificationItem } from '../common/NotificationList';
 import { getNotifications, markNotificationRead } from '../../services/notificationsApi';
+import { SearchBar } from '../Search/SearchBar';
 
 const DRAWER_WIDTH = 240;
 
@@ -93,16 +95,19 @@ const ROLE_NAV_CONFIG: Record<DashboardRole, { title: string; icon: React.ReactN
       { label: 'Queue', icon: <ManagementIcon />, path: '/dashboard/operator/queue' },
       { label: 'Candidates', icon: <RiderIcon />, path: '/dashboard/operator/candidates' },
       { label: 'Route', icon: <HistoryIcon />, path: '/dashboard/operator/route' },
+      { label: 'Assets', icon: <FleetIcon />, path: '/assets' },
     ],
   },
   business: {
     title: 'Business Dashboard',
     icon: <BusinessIcon />,
     items: [
-      { label: 'Metrics', icon: <MetricsIcon />, path: '/dashboard/business' },
-      { label: 'Orders', icon: <SettlementsIcon />, path: '/dashboard/business/orders' },
+      { label: 'Overview', icon: <MetricsIcon />, path: '/dashboard/business' },
       { label: 'Deliveries', icon: <HistoryIcon />, path: '/dashboard/business/deliveries' },
-      { label: 'Invoices', icon: <EarningsIcon />, path: '/dashboard/business/invoices' },
+      { label: 'New Request', icon: <SettlementsIcon />, path: '/dashboard/business/request' },
+      { label: 'Active', icon: <RiderIcon />, path: '/dashboard/business/active' },
+      { label: 'Billing', icon: <EarningsIcon />, path: '/dashboard/business/billing' },
+      { label: 'Fleet Assets', icon: <FleetIcon />, path: '/assets' },
     ],
   },
   rider: {
@@ -112,6 +117,16 @@ const ROLE_NAV_CONFIG: Record<DashboardRole, { title: string; icon: React.ReactN
       { label: 'Active', icon: <MetricsIcon />, path: '/dashboard/rider' },
       { label: 'History', icon: <HistoryIcon />, path: '/dashboard/rider/history' },
       { label: 'Earnings', icon: <EarningsIcon />, path: '/dashboard/rider/earnings' },
+      { label: 'My Assets', icon: <FleetIcon />, path: '/assets' },
+    ],
+  },
+  shopper: {
+    title: 'Shopper Dashboard',
+    icon: <HistoryIcon />,
+    items: [
+      { label: 'Overview', icon: <MetricsIcon />, path: '/dashboard/shopper' },
+      { label: 'Orders', icon: <HistoryIcon />, path: '/dashboard/shopper/orders' },
+      { label: 'Insights', icon: <EarningsIcon />, path: '/dashboard/shopper/insights' },
     ],
   },
 };
@@ -318,9 +333,13 @@ export function DashboardLayout({ children, title }: DashboardLayoutProps): Reac
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" noWrap component="div" sx={{ display: { xs: 'none', md: 'block' }, fontWeight: 600 }}>
             {title ?? roleConfig?.title ?? 'Dashboard'}
           </Typography>
+
+          <Box sx={{ flexGrow: 1, px: 2, display: 'flex', justifyContent: 'center' }}>
+            <SearchBar />
+          </Box>
           {user && (
             <>
               <IconButton

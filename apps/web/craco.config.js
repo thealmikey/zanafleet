@@ -11,6 +11,13 @@ module.exports = {
         (plugin) => plugin.constructor.name !== 'ModuleScopePlugin'
       );
 
+      webpackConfig.module.rules.push({
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false,
+        },
+      });
+
       const contractsSrc = path.resolve(__dirname, '../../packages/contracts/src');
 
       const babelLoaderRule = webpackConfig.module.rules

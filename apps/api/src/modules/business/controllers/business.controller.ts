@@ -28,6 +28,9 @@ import { Repository } from 'typeorm';
 import { CreateBusinessCommand } from '../commands/create-business.command';
 import { BusinessEntity } from '../entities/business.entity';
 
+const UUID_V4_ROUTE_SEGMENT =
+  ':id([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})';
+
 export class CreateBusinessDto {
   businessName!: string;
   phone!: string;
@@ -62,7 +65,7 @@ export class BusinessController {
     return { id };
   }
 
-  @Get(':id')
+  @Get(UUID_V4_ROUTE_SEGMENT)
   async findOne(@Param('id') id: string): Promise<ReturnType<BusinessEntity['toDomain']>> {
     const entity = await this.businessRepository.findOne({ where: { id } });
     if (!entity) {
@@ -93,7 +96,7 @@ export class BusinessController {
     };
   }
 
-  @Patch(':id')
+  @Patch(UUID_V4_ROUTE_SEGMENT)
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateBusinessDto
@@ -109,7 +112,7 @@ export class BusinessController {
     return updated!.toDomain();
   }
 
-  @Delete(':id')
+  @Delete(UUID_V4_ROUTE_SEGMENT)
   @HttpCode(HttpStatus.OK)
   async remove(@Param('id') id: string): Promise<{ deleted: boolean }> {
     const result = await this.businessRepository.delete(id);

@@ -18,6 +18,8 @@ export interface DeliveryCardProps {
   status: string;
   pickupAddress: string;
   dropoffAddress: string;
+  recipientName?: string | null;
+  recipientPhone?: string | null;
   assignedRider?: string | null;
   createdAt?: Date;
   completedAt?: Date | null;
@@ -44,6 +46,8 @@ export function DeliveryCard({
   status,
   pickupAddress,
   dropoffAddress,
+  recipientName,
+  recipientPhone,
   assignedRider,
   createdAt,
   completedAt,
@@ -85,6 +89,25 @@ export function DeliveryCard({
           <Typography variant="body2">{dropoffAddress}</Typography>
         </Box>
       </Box>
+
+      {(recipientName || recipientPhone) && (
+        <Box sx={{ mt: 2, display: 'flex', alignItems: 'flex-start', gap: 1, p: 1, bgcolor: 'action.hover', borderRadius: 1 }}>
+          <PersonIcon fontSize="small" color="action" />
+          <Box>
+            <Typography variant="caption" color="text.secondary" display="block">
+              Customer
+            </Typography>
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              {recipientName || 'Customer'}
+            </Typography>
+            {recipientPhone && (
+              <Typography variant="body2" color="primary" sx={{ cursor: 'pointer', fontWeight: 500 }}>
+                {recipientPhone}
+              </Typography>
+            )}
+          </Box>
+        </Box>
+      )}
 
       {assignedRider && (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>

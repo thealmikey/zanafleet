@@ -101,6 +101,8 @@ function ActiveTab(): React.ReactElement {
       <DeliveryCard
         deliveryId={delivery.deliveryId}
         status={delivery.status}
+        recipientName={delivery.recipientName}
+        recipientPhone={delivery.recipientPhone}
         pickupAddress={delivery.pickupAddress}
         dropoffAddress={delivery.dropoffAddress}
         estimatedEarnings={delivery.estimatedEarnings}
@@ -232,41 +234,41 @@ function EarningsTab(): React.ReactElement {
 
   const kpiItems: KPIGridItem[] = earnings
     ? [
-        {
-          title: 'Total Earnings',
-          value: formatCurrency(earnings.totalEarnings),
-          icon: <EarningsIcon fontSize="large" />,
-          color: 'success',
-          loading,
-        },
-        {
-          title: 'Pending Payout',
-          value: formatCurrency(earnings.pendingPayout),
-          icon: <PayoutIcon fontSize="large" />,
-          color: 'warning',
-          loading,
-        },
-        {
-          title: 'Completed Deliveries',
-          value: earnings.completedDeliveries.toLocaleString(),
-          icon: <DeliveriesIcon fontSize="large" />,
-          color: 'primary',
-          loading,
-        },
-        {
-          title: 'Avg Per Delivery',
-          value: formatCurrency(earnings.averagePerDelivery),
-          icon: <AverageIcon fontSize="large" />,
-          color: 'secondary',
-          loading,
-        },
-      ]
+      {
+        title: 'Total Earnings',
+        value: formatCurrency(earnings.totalEarnings),
+        icon: <EarningsIcon fontSize="large" />,
+        color: 'success',
+        loading,
+      },
+      {
+        title: 'Pending Payout',
+        value: formatCurrency(earnings.pendingPayout),
+        icon: <PayoutIcon fontSize="large" />,
+        color: 'warning',
+        loading,
+      },
+      {
+        title: 'Completed Deliveries',
+        value: earnings.completedDeliveries.toLocaleString(),
+        icon: <DeliveriesIcon fontSize="large" />,
+        color: 'primary',
+        loading,
+      },
+      {
+        title: 'Avg Per Delivery',
+        value: formatCurrency(earnings.averagePerDelivery),
+        icon: <AverageIcon fontSize="large" />,
+        color: 'secondary',
+        loading,
+      },
+    ]
     : [
-        { title: 'Total Earnings', value: '-', loading: true },
-        { title: 'Pending Payout', value: '-', loading: true },
-        { title: 'Completed Deliveries', value: '-', loading: true },
-        { title: 'Avg Per Delivery', value: '-', loading: true },
-      ];
+      { title: 'Total Earnings', value: '-', loading: true },
+      { title: 'Pending Payout', value: '-', loading: true },
+      { title: 'Completed Deliveries', value: '-', loading: true },
+      { title: 'Avg Per Delivery', value: '-', loading: true },
+    ];
 
   return (
     <Box>

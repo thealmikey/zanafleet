@@ -42,6 +42,7 @@ export interface RawQueryParams {
   limit?: string | number;
   sort?: string;
   filter?: string | Record<string, unknown>;
+  search?: string;
 }
 
 const DEFAULT_PAGE = 1;
@@ -224,4 +225,20 @@ export function createPaginationMeta(
     hasNextPage: pagination.page < totalPages,
     hasPreviousPage: pagination.page > 1,
   };
+}
+
+/**
+ * Extract a trimmed string filter value by key.
+ */
+export function getStringFilterValue(
+  filter: Record<string, unknown>,
+  key: string
+): string | undefined {
+  const raw = filter[key];
+  if (typeof raw !== 'string') {
+    return undefined;
+  }
+
+  const trimmed = raw.trim();
+  return trimmed.length > 0 ? trimmed : undefined;
 }

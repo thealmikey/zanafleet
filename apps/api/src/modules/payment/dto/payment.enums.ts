@@ -1,7 +1,4 @@
-/**
- * Payment Enums
- * Type definitions for payment intent and transaction entities
- */
+import { PaymentMethod } from '@zanafleet/contracts';
 
 export enum PaymentIntentStatus {
   CREATED = 'CREATED',
@@ -18,13 +15,6 @@ export enum PaymentFlowType {
   B2B = 'B2B',
   C2C = 'C2C',
   PLATFORM_PAYOUT = 'PLATFORM_PAYOUT',
-}
-
-export enum PaymentMethod {
-  CARD = 'CARD',
-  MOBILE_MONEY = 'MOBILE_MONEY',
-  BANK_TRANSFER = 'BANK_TRANSFER',
-  WALLET_BALANCE = 'WALLET_BALANCE',
 }
 
 export enum DisputeStatus {

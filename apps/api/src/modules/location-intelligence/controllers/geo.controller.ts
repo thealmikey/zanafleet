@@ -9,7 +9,7 @@ import {
   BadRequestException,
   Header,
 } from '@nestjs/common';
-import { GeoPoint, GeoBounds, ETAResult, DistanceResult, ZoneCluster } from '@zanafleet/contracts';
+import { GeoPoint, GeoBounds, ETAResult, DistanceResult, ZoneCluster, Address } from '@zanafleet/contracts';
 
 
 import { GeoQueryCoordinator } from '../coordinators/geo-query.coordinator';
@@ -20,7 +20,7 @@ import { RiderCandidate } from '../types/rider-candidate.types';
 @UseGuards(CapabilityGuard)
 @RequireCapability('geo.read')
 export class GeoController {
-  constructor(private readonly geoQueryCoordinator: GeoQueryCoordinator) {}
+  constructor(private readonly geoQueryCoordinator: GeoQueryCoordinator) { }
 
   @Get('nearby-riders')
   @Header('Cache-Control', 'public, max-age=30')
@@ -41,6 +41,17 @@ export class GeoController {
       radiusMeters: radius,
       limit,
     });
+  }
+
+  @Get('search')
+  @Header('Cache-Control', 'public, max-age=300')
+  async searchAddress(
+    @Query('q') query: string
+  ): Promise<Address[]> {
+    if (!query || query.length < 3) {
+      return [];
+    }
+    return this.geoQueryCoordinator.searchAddress(query);
   }
 
   @Get('heatmap')

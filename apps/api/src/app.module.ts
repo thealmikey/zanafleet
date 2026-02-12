@@ -12,16 +12,19 @@ import { ActorModule } from './modules/actor/actor.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BillingModule } from './modules/billing/billing.module';
 import { BusinessModule } from './modules/business/business.module';
+import { CustomerModule } from './modules/customer/customer.module';
 import { CalendarModule } from './modules/calendar/calendar.module';
 import { CapabilityModule } from './modules/capability/capability.module';
 import { CommitmentsModule } from './modules/commitments/commitments.module';
 import { CommunicationModule } from './modules/communication/communication.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { DeliveryModule } from './modules/delivery/delivery.module';
 import { EvidenceModule } from './modules/evidence/evidence.module';
 import { FormationModule } from './modules/formation/formation.module';
 import { IncentiveModule } from './modules/incentive/incentive.module';
 import { LedgerModule } from './modules/ledger/ledger.module';
 import { OrganizationModule } from './modules/organization/organization.module';
+import { OrderModule } from './modules/order/order.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { PersonaModule } from './modules/persona/persona.module';
 import { RiderModule } from './modules/rider/rider.module';
@@ -29,9 +32,13 @@ import { RoleModule } from './modules/role/role.module';
 import { SaccoModule } from './modules/sacco/sacco.module';
 import { SettlementModule } from './modules/settlement/settlement.module';
 import { SignUpModule } from './modules/signup/signup.module';
+import { SearchModule } from './modules/search/search.module';
 import { TransactionModule } from './modules/transaction/transaction.module';
 import { WalletModule } from './modules/wallet/wallet.module';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
+import { AssetModule } from './modules/asset/asset.module';
+import { OperatorModule } from './modules/operator/operator.module';
+import { SeedModule } from './modules/seed/seed.module';
 
 /**
  * AppModule
@@ -65,14 +72,18 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     AuthModule,
     BillingModule,
     BusinessModule,
+    CustomerModule,
     CalendarModule,
     CapabilityModule,
     CommitmentsModule,
     CommunicationModule,
+    DashboardModule,
+    DeliveryModule,
     EvidenceModule,
     FormationModule,
     IncentiveModule,
     LedgerModule,
+    OrderModule,
     PaymentModule,
     SettlementModule,
     OrganizationModule,
@@ -84,7 +95,10 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     TransactionModule,
     WalletModule,
     WorkspaceModule,
-    DashboardModule,
+    SearchModule,
+    AssetModule,
+    OperatorModule,
+    SeedModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

@@ -98,6 +98,7 @@ export const NatsSubjects = {
     ALL: 'order.events.*',
   },
   Delivery: {
+    REQUESTED_V1: 'delivery.events.requested-v1',
     CREATED_V1: 'delivery.events.created-v1',
     SCHEDULED_V1: 'delivery.events.scheduled-v1',
     ASSIGNED_V1: 'delivery.events.assigned-v1',

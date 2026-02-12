@@ -6,6 +6,7 @@ import {
   ETAResult,
   DistanceResult,
   NearbyRidersParams,
+  Address,
 } from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,6 +16,7 @@ import { HeatmapService } from '../services/heatmap.service';
 import { LocationIntelligenceService } from '../services/location-intelligence.service';
 import { HeatmapCell, HeatmapParams } from '../types/heatmap.types';
 import { RiderCandidate } from '../types/rider-candidate.types';
+import { GeoProviderRegistry } from '../providers/geo-provider-registry.service';
 
 /**
  * Cache entry with TTL tracking
@@ -56,8 +58,9 @@ export class GeoQueryCoordinator {
   constructor(
     private readonly locationIntelligenceService: LocationIntelligenceService,
     private readonly heatmapService: HeatmapService,
+    private readonly registry: GeoProviderRegistry,
     @Optional() private readonly eventBusService?: EventBusService,
-  ) {}
+  ) { }
 
   /**
    * Find nearby riders within the specified radius.
@@ -84,6 +87,51 @@ export class GeoQueryCoordinator {
     await this.emitQueryExecutedEvent('findNearbyRiders', params);
 
     return riders;
+  }
+
+  /**
+   * Search for an address or place.
+   */
+  async searchAddress(query: string): Promise<Address[]> {
+    const cacheKey = this.buildCacheKey('search-address', { query });
+    const cached = this.getFromCache<Address[]>(cacheKey);
+
+    if (cached) {
+      this.logger.debug(`Cache hit for address search: ${cacheKey}`);
+      return cached;
+    }
+
+    const provider = this.registry.getDefault();
+
+    if (!provider) {
+      this.logger.warn('No geo provider available for address search');
+      return [];
+    }
+    // Assuming the provider has a method for searching, or we default to geocoding
+    // In a real scenario, we might want a specific 'search' or 'autocomplete' method
+    // For now, we'll try to use geocode if available, or just return empty if not supported
+    // The GeoProvider interface currently only has geocode(address: string): Promise<GeoPoint | null>
+    // We might need to extend it to support searching returning multiple addresses
+
+    // For this implementation, let's just use geocode and return a single result if found
+    const point = await provider.geocode(query);
+    const results: Address[] = [];
+
+    if (point) {
+      // If we got a point, try to reverse geocode it to get the full address details if needed, 
+      // or construct a basic Address object. 
+      // Ideally, geocode should return Address details. 
+      // Let's rely on reverseGeocode for now to get the details from the point
+      const address = await provider.reverseGeocode(point);
+      if (address) {
+        results.push(address);
+      }
+    }
+
+    this.setCache(cacheKey, results);
+    await this.emitQueryExecutedEvent('searchAddress', { query });
+
+    return results;
   }
 
   /**

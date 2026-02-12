@@ -21,6 +21,16 @@ import { MessagingPage } from './pages/Messaging';
 import { AIAssistantPage } from './pages/AIAssistant';
 import { HistoryCalendarPage } from './pages/HistoryCalendar';
 import { ComponentsDemo } from './pages/Demo/ComponentsDemo';
+import { RequestDeliveryPage } from './pages/RequestDelivery';
+import { ShopPage } from './pages/Shop';
+import { OrderTrackingPage } from './pages/OrderTracking';
+import { ShopperDashboard } from './pages/ShopperDashboard';
+import { SearchResultsPage } from './pages/Search/SearchResults';
+import FleetDashboard from './pages/AssetPlatform/FleetDashboard';
+import OperatorProfile from './pages/AssetPlatform/OperatorProfile';
+import AssetMarketplace from './pages/AssetPlatform/AssetMarketplace';
+import EventDashboard from './pages/EventDashboard';
+import AssetManagement from './pages/AssetManagement';
 
 const theme = createTheme();
 
@@ -121,6 +131,86 @@ function App(): React.ReactElement {
                 element={
                   <ProtectedRoute>
                     <RiderDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/shopper/*"
+                element={
+                  <ProtectedRoute>
+                    <ShopperDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/delivery/request"
+                element={
+                  <ProtectedRoute>
+                    <RequestDeliveryPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/shop"
+                element={
+                  <ProtectedRoute>
+                    <ShopPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/order/:id/track"
+                element={
+                  <ProtectedRoute>
+                    <OrderTrackingPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/fleet"
+                element={
+                  <ProtectedRoute>
+                    <FleetDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/operator/:id"
+                element={
+                  <ProtectedRoute>
+                    <OperatorProfile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/marketplace/assets"
+                element={
+                  <ProtectedRoute>
+                    <AssetMarketplace />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/search"
+                element={
+                  <ProtectedRoute>
+                    <SearchResultsPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/events/:bundleId"
+                element={
+                  <ProtectedRoute>
+                    <EventDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/assets"
+                element={
+                  <ProtectedRoute>
+                    <AssetManagement />
                   </ProtectedRoute>
                 }
               />

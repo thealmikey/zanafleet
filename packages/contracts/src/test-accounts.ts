@@ -7,7 +7,7 @@
 
 // Re-declare ActorType values to avoid circular import with index.ts
 // These must match the ActorType enum values in index.ts
-type TestActorType = 'Rider' | 'Driver' | 'Admin' | 'Support' | 'SaccoAdmin' | 'BusinessOwner';
+type TestActorType = 'Rider' | 'Driver' | 'Admin' | 'Support' | 'SaccoAdmin' | 'BusinessOwner' | 'Customer';
 
 export interface TestAccount {
   readonly id: string;
@@ -69,6 +69,14 @@ export const TEST_ACCOUNTS: readonly TestAccount[] = [
     username: 'test-saccoadmin',
     type: 'SaccoAdmin',
     roles: ['SaccoAdmin'],
+    workspaceId: TEST_WORKSPACE_ID,
+  },
+  {
+    id: '550e8400-e29b-41d4-a716-446655440007',
+    email: 'test-customer@zanafleet.dev',
+    username: 'test-customer',
+    type: 'Customer',
+    roles: ['Customer'],
     workspaceId: TEST_WORKSPACE_ID,
   },
 ] as const;

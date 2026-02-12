@@ -87,6 +87,38 @@ export interface BusinessMetrics {
   periodDays: number;
 }
 
+export interface BusinessOverview {
+  monthStart: string;
+  monthEnd: string;
+  totalDeliveries: number;
+  activeDeliveries: number;
+  successfulDeliveries: number;
+  cancelledDeliveries: number;
+  spendThisMonth: number;
+  currency: string;
+}
+
+export interface BusinessDeliveryRequest {
+  pickupLocationId: string;
+  dropoffLocationId: string;
+  recipientName: string;
+  recipientPhone: string;
+  itemDescription: string;
+  scheduledPickupTime?: string;
+  declaredItemValue?: number;
+  specialInstructions?: string;
+  distanceKm?: number;
+}
+
+export interface DeliveryRequestResult {
+  deliveryId: string;
+  orderId: string;
+  estimatedCharges: number;
+  currency: string;
+  matchingTriggered: boolean;
+  assignedRiderId: string | null;
+}
+
 export interface OrderSummary {
   orderId: string;
   status: string;
@@ -98,19 +130,75 @@ export interface OrderSummary {
 export interface DeliveryHistorySummary {
   deliveryId: string;
   status: string;
-  pickupAddress: string;
-  dropoffAddress: string;
-  assignedRider: string | null;
+  orderId: string | null;
+  customerName: string | null;
+  customerPhone: string | null;
+  pickupLocationId: string | null;
+  dropoffLocationId: string | null;
+  assignedRiderId: string | null;
+  assignedRiderName: string | null;
+  assignedRiderPhone: string | null;
+  price: number | null;
+  currency: string | null;
+  scheduledPickupTime: string | null;
+  paymentStatus: string | null;
+  itemSummary: string | null;
   createdAt: Date;
-  completedAt: Date | null;
+}
+
+export interface DeliveryTimelineItem {
+  type: string;
+  title: string;
+  timestamp: string;
+  payload?: Record<string, unknown>;
+}
+
+export interface DeliveryDetail {
+  deliveryId: string;
+  status: string;
+  riderId: string | null;
+  riderName: string | null;
+  riderPhone: string | null;
+  scheduledPickupTime: string | null;
+  scheduledDropoffTime: string | null;
+  eta: string | null;
+  paymentStatus: string | null;
+  timeline: DeliveryTimelineItem[];
 }
 
 export interface InvoiceSummary {
   invoiceId: string;
   status: string;
-  totalAmount: number;
-  dueDate: Date;
-  paidAt: Date | null;
+  grandTotal: number;
+  currency: string;
+  dueDate: string | null;
+  paidAt: string | null;
+  createdAt: string;
+}
+
+export interface BillingSummary {
+  currency: string;
+  totalSpend: number;
+  pendingCharges: number;
+  paidDeliveries: number;
+  campaignSubsidyDiscounts: number;
+  invoiceHistory: InvoiceSummary[];
+}
+
+export interface BusinessIdentity {
+  businessId: string;
+  businessName: string;
+}
+
+export interface BusinessDeliveriesQuery extends PaginationParams {
+  status?: string;
+  from?: string;
+  to?: string;
+  locationId?: string;
+  riderId?: string;
+  paymentState?: 'UNPAID' | 'PENDING' | 'PAID' | 'FAILED';
+  activeOnly?: boolean;
+  search?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -120,6 +208,8 @@ export interface InvoiceSummary {
 export interface ActiveDeliverySummary {
   deliveryId: string;
   status: string;
+  recipientName: string | null;
+  recipientPhone: string | null;
   pickupAddress: string;
   dropoffAddress: string;
   estimatedEarnings: number;
@@ -151,6 +241,8 @@ export interface AssignmentQueueItem {
   status: string;
   pickupAddress: string;
   dropoffAddress: string;
+  customerName?: string;
+  customerPhone?: string;
   priority: number;
   createdAt: Date;
   attempts: number;
@@ -294,36 +386,130 @@ export async function getBusinessOrders(
   return handleResponse<PaginatedResponse<OrderSummary>>(response);
 }
 
+function normalizeMeta(meta: Record<string, unknown>): PaginationMeta {
+  return {
+    page: Number(meta.page ?? 1),
+    limit: Number(meta.limit ?? 10),
+    total: Number(meta.total ?? meta.totalItems ?? 0),
+    totalPages: Number(meta.totalPages ?? 0),
+  };
+}
+
+export async function getMyBusinesses(token: string): Promise<BusinessIdentity[]> {
+  const response = await fetch(`${API_BASE_URL}/businesses/mine`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const payload = await handleResponse<{ data: BusinessIdentity[] }>(response);
+  return payload.data;
+}
+
+export async function getBusinessOverview(
+  token: string,
+  businessId: string
+): Promise<BusinessOverview> {
+  const response = await fetch(`${API_BASE_URL}/businesses/${businessId}/stats/overview`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return handleResponse<BusinessOverview>(response);
+}
+
 export async function getBusinessDeliveries(
   token: string,
   businessId: string,
-  params?: PaginationParams
+  params?: BusinessDeliveriesQuery
 ): Promise<PaginatedResponse<DeliveryHistorySummary>> {
-  const qs = buildQueryString({ page: params?.page, limit: params?.limit });
-  const response = await fetch(`${API_BASE_URL}/dashboard/business/${businessId}/deliveries${qs}`, {
+  const qs = buildQueryString({
+    page: params?.page,
+    limit: params?.limit,
+    status: params?.status,
+    from: params?.from,
+    to: params?.to,
+    locationId: params?.locationId,
+    riderId: params?.riderId,
+    paymentState: params?.paymentState,
+    activeOnly: params?.activeOnly ? 'true' : undefined,
+    search: params?.search,
+  });
+  const response = await fetch(`${API_BASE_URL}/businesses/${businessId}/deliveries${qs}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
-  return handleResponse<PaginatedResponse<DeliveryHistorySummary>>(response);
+  const payload = await handleResponse<{
+    data: DeliveryHistorySummary[];
+    meta: Record<string, unknown>;
+  }>(response);
+  return { data: payload.data, meta: normalizeMeta(payload.meta) };
 }
 
-export async function getBusinessInvoices(
+export async function requestBusinessDelivery(
   token: string,
   businessId: string,
-  params?: PaginationParams
-): Promise<PaginatedResponse<InvoiceSummary>> {
-  const qs = buildQueryString({ page: params?.page, limit: params?.limit });
-  const response = await fetch(`${API_BASE_URL}/dashboard/business/${businessId}/invoices${qs}`, {
+  request: BusinessDeliveryRequest
+): Promise<DeliveryRequestResult> {
+  const response = await fetch(`${API_BASE_URL}/businesses/${businessId}/deliveries/request`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(request),
+  });
+  return handleResponse<DeliveryRequestResult>(response);
+}
+
+export async function getBusinessDeliveryDetail(
+  token: string,
+  businessId: string,
+  deliveryId: string
+): Promise<DeliveryDetail> {
+  const response = await fetch(`${API_BASE_URL}/businesses/${businessId}/deliveries/${deliveryId}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
-  return handleResponse<PaginatedResponse<InvoiceSummary>>(response);
+  return handleResponse<DeliveryDetail>(response);
+}
+
+export async function getDeliveryTimeline(
+  token: string,
+  deliveryId: string
+): Promise<DeliveryTimelineItem[]> {
+  const response = await fetch(`${API_BASE_URL}/deliveries/${deliveryId}/timeline`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  const payload = await handleResponse<{ data: DeliveryTimelineItem[] }>(response);
+  return payload.data;
+}
+
+export async function getBusinessBillingSummary(
+  token: string,
+  businessId: string,
+): Promise<BillingSummary> {
+  const response = await fetch(`${API_BASE_URL}/businesses/${businessId}/billing/summary`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  return handleResponse<BillingSummary>(response);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

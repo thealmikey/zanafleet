@@ -27,6 +27,7 @@ import { Repository } from 'typeorm';
 import { DeliveryExecutionCoordinator } from '../coordinators/delivery-execution.coordinator';
 import { DeliveryLifecycleCoordinator } from '../coordinators/delivery-lifecycle.coordinator';
 import { DeliveryMatchingCoordinator } from '../coordinators/delivery-matching.coordinator';
+import { DeliveryRequestCoordinator, LocationPinInput } from '../coordinators/delivery-request.coordinator';
 import { DeliveryEntity } from '../entities/delivery.entity';
 
 export class CreateDeliveryDto {
@@ -41,6 +42,24 @@ export class CreateDeliveryDto {
   distanceKm?: number;
 }
 
+export class RequestDeliveryDto {
+  businessId!: string;
+  workspaceId!: string;
+  actorId!: string;
+  pickup!: LocationPinInput;
+  dropoff!: LocationPinInput;
+  recipientName!: string;
+  recipientPhone!: string;
+  itemId?: string;
+  itemDescription?: string;
+  scheduledPickupTime?: Date;
+  declaredItemValue?: number;
+  specialInstructions?: string;
+  distanceKm?: number;
+}
+
+
+
 export class UpdateDeliveryDto {
   assignedRiderId?: string;
   status?: DeliveryStatus;
@@ -48,7 +67,7 @@ export class UpdateDeliveryDto {
   scheduledDropoffTime?: Date;
 }
 
-export class AssignRiderDto {}
+export class AssignRiderDto { }
 
 export class PickupDto {
   riderId!: string;
@@ -82,8 +101,10 @@ export class DeliveriesController {
     private readonly deliveryRepository: Repository<DeliveryEntity>,
     private readonly lifecycleCoordinator: DeliveryLifecycleCoordinator,
     private readonly matchingCoordinator: DeliveryMatchingCoordinator,
-    private readonly executionCoordinator: DeliveryExecutionCoordinator
-  ) {}
+    private readonly executionCoordinator: DeliveryExecutionCoordinator,
+    private readonly requestCoordinator: DeliveryRequestCoordinator,
+
+  ) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -104,6 +125,36 @@ export class DeliveriesController {
     return { id: result.deliveryId, estimatedCharges: result.estimatedCharges };
   }
 
+  @Post('request')
+  @HttpCode(HttpStatus.CREATED)
+  async request(
+    @Body() dto: RequestDeliveryDto
+  ): Promise<{ deliveryId: string; orderId: string; estimatedCharges: number; assignedRiderId: string | null }> {
+    const result = await this.requestCoordinator.requestDelivery({
+      businessId: dto.businessId,
+      workspaceId: dto.workspaceId,
+      actorId: dto.actorId,
+      pickup: dto.pickup,
+      dropoff: dto.dropoff,
+      recipientName: dto.recipientName,
+      recipientPhone: dto.recipientPhone,
+      itemId: dto.itemId,
+      itemDescription: dto.itemDescription,
+      scheduledPickupTime: dto.scheduledPickupTime,
+      declaredItemValue: dto.declaredItemValue,
+      specialInstructions: dto.specialInstructions,
+      distanceKm: dto.distanceKm,
+    });
+    return {
+      deliveryId: result.deliveryId,
+      orderId: result.orderId,
+      estimatedCharges: result.estimatedCharges,
+      assignedRiderId: result.assignedRiderId,
+    };
+  }
+
+
+
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<ReturnType<DeliveryEntity['toDomain']>> {
     const entity = await this.deliveryRepository.findOne({ where: { id } });
@@ -123,7 +174,7 @@ export class DeliveriesController {
     const order = sort ? { [sort.field]: sort.order } : undefined;
 
     const [entities, total] = await this.deliveryRepository.findAndCount({
-      where: filter ,
+      where: filter,
       order,
       skip: pagination.offset,
       take: pagination.limit,

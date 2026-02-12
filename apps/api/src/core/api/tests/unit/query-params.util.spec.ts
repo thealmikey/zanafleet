@@ -3,6 +3,7 @@ import { BadRequestException } from '@nestjs/common';
 import {
   parseQueryParams,
   createPaginationMeta,
+  getStringFilterValue,
 } from '../../utils/query-params.util';
 
 describe('parseQueryParams', () => {
@@ -288,5 +289,21 @@ describe('createPaginationMeta', () => {
       hasNextPage: false,
       hasPreviousPage: true,
     });
+  });
+});
+
+describe('getStringFilterValue', () => {
+  it('should return a trimmed string value when key exists', () => {
+    expect(getStringFilterValue({ status: '  active  ' }, 'status')).toBe('active');
+  });
+
+  it('should return undefined for non-string values', () => {
+    expect(getStringFilterValue({ status: 1 }, 'status')).toBeUndefined();
+    expect(getStringFilterValue({ status: true }, 'status')).toBeUndefined();
+  });
+
+  it('should return undefined for missing or empty string values', () => {
+    expect(getStringFilterValue({}, 'status')).toBeUndefined();
+    expect(getStringFilterValue({ status: '   ' }, 'status')).toBeUndefined();
   });
 });

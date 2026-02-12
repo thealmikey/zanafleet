@@ -21,10 +21,11 @@ import {
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, ILike } from 'typeorm';
 
 
 import { CreateOrderCommand } from '../commands/create-order.command';
+import { CustomerOrderOrchestrator, PlaceCustomerOrderInput } from '../coordinators/customer-order.orchestrator';
 import { OrderEntity } from '../entities/order.entity';
 
 export class CreateOrderDto {
@@ -47,23 +48,32 @@ export class UpdateOrderDto {
 
 @Controller('orders')
 @UseGuards(CapabilityGuard)
-@RequireCapability('order.manage')
 export class OrdersController {
   constructor(
     private readonly commandBus: CommandBus,
+    private readonly customerOrderOrchestrator: CustomerOrderOrchestrator,
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>
-  ) {}
+  ) { }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @RequireCapability('order.manage')
   async create(@Body() dto: CreateOrderDto): Promise<{ id: string }> {
     const validated = CreateOrderCommand.validate(dto);
     const id = await this.commandBus.execute(new CreateOrderCommand(validated));
     return { id };
   }
 
+  @Post('customer')
+  @HttpCode(HttpStatus.CREATED)
+  @RequireCapability('order.place')
+  async placeCustomerOrder(@Body() dto: PlaceCustomerOrderInput): Promise<any> {
+    return this.customerOrderOrchestrator.placeOrder(dto);
+  }
+
   @Get(':id')
+  @RequireCapability('order.manage')
   async findOne(@Param('id') id: string): Promise<ReturnType<OrderEntity['toDomain']>> {
     const entity = await this.orderRepository.findOne({ where: { id } });
     if (!entity) {
@@ -81,8 +91,20 @@ export class OrdersController {
 
     const order = sort ? { [sort.field]: sort.order } : undefined;
 
+    // Handle search parameter
+    const search = query.search as string;
+    let where: any = filter;
+
+    if (search) {
+      where = [
+        { ...filter, customerName: ILike(`%${search}%`) },
+        { ...filter, customerPhone: ILike(`%${search}%`) },
+        { ...filter, itemSummary: ILike(`%${search}%`) },
+      ];
+    }
+
     const [entities, total] = await this.orderRepository.findAndCount({
-      where: filter ,
+      where,
       order,
       skip: pagination.offset,
       take: pagination.limit,

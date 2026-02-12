@@ -66,6 +66,7 @@ export enum ActorType {
   SaccoAdmin = 'SaccoAdmin',
   Business = 'Business',
   BusinessOwner = 'BusinessOwner',
+  Customer = 'Customer',
   Internal = 'Internal',
   AIService = 'AIService',
 }
@@ -115,6 +116,20 @@ export enum VehicleType {
   Van = 'Van',
 }
 
+export enum AssetType {
+  VEHICLE = 'VEHICLE',
+  EQUIPMENT = 'EQUIPMENT',
+  WAREHOUSE = 'WAREHOUSE',
+  OTHER = 'OTHER',
+}
+
+export enum AssetStatus {
+  ACTIVE = 'ACTIVE',
+  MAINTENANCE = 'MAINTENANCE',
+  OUT_OF_SERVICE = 'OUT_OF_SERVICE',
+  ARCHIVED = 'ARCHIVED',
+}
+
 export enum BusinessType {
   Retail = 'Retail',
   Restaurant = 'Restaurant',
@@ -122,6 +137,22 @@ export enum BusinessType {
   Wholesale = 'Wholesale',
   Services = 'Services',
   Other = 'Other',
+}
+
+export enum PaymentStatus {
+  Pending = 'Pending',
+  Processing = 'Processing',
+  Succeeded = 'Succeeded',
+  Failed = 'Failed',
+  Cancelled = 'Cancelled',
+  Refunded = 'Refunded',
+}
+
+export enum PaymentMethod {
+  CARD = 'CARD',
+  MOBILE_MONEY = 'MOBILE_MONEY',
+  BANK_TRANSFER = 'BANK_TRANSFER',
+  WALLET_BALANCE = 'WALLET_BALANCE',
 }
 
 // ============================================================================
@@ -255,6 +286,15 @@ export interface CreateLocationInput {
   country?: string;
 }
 
+export interface Address {
+  formattedAddress: string;
+  street?: string;
+  city?: string;
+  region?: string;
+  postalCode?: string;
+  country?: string;
+}
+
 // ============================================================================
 // Sacco Contracts
 // ============================================================================
@@ -324,37 +364,37 @@ export interface BusinessResponse {
   updatedAt: Date;
 }
 
- // ============================================================================
- // Delivery Contracts
- // ============================================================================
- 
- export enum DeliveryStatus {
-   Requested = 'Requested',
-   Assigned = 'Assigned',
-   PickedUp = 'PickedUp',
-   InTransit = 'InTransit',
-   Delivered = 'Delivered',
-   Cancelled = 'Cancelled',
- }
- 
- export interface DeliveryResponse {
-   deliveryId: string;
-   businessId: string;
-   pickupLocationId: string;
-   dropoffLocationId: string;
-   assignedRiderId: string | null;
-   status: DeliveryStatus;
-   // Scheduling (optional)
-   scheduledPickupTime?: Date | null;
-   scheduledDropoffTime?: Date | null;
-   isScheduled?: boolean;
-   createdAt: Date;
-   updatedAt: Date;
- }
- 
- // ============================================================================
- // Test Account Definitions (Dev/Test Only)
- // ============================================================================
+// ============================================================================
+// Delivery Contracts
+// ============================================================================
+
+export enum DeliveryStatus {
+  Requested = 'Requested',
+  Assigned = 'Assigned',
+  PickedUp = 'PickedUp',
+  InTransit = 'InTransit',
+  Delivered = 'Delivered',
+  Cancelled = 'Cancelled',
+}
+
+export interface DeliveryResponse {
+  deliveryId: string;
+  businessId: string;
+  pickupLocationId: string;
+  dropoffLocationId: string;
+  assignedRiderId: string | null;
+  status: DeliveryStatus;
+  // Scheduling (optional)
+  scheduledPickupTime?: Date | null;
+  scheduledDropoffTime?: Date | null;
+  isScheduled?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// ============================================================================
+// Test Account Definitions (Dev/Test Only)
+// ============================================================================
 
 /**
  * ============================================================================
@@ -376,6 +416,8 @@ export interface CreateOrderInput {
   customerName?: string;
   customerPhone?: string;
   scheduledTime?: Date;
+  totalAmount?: number;
+  currency?: string;
 }
 
 export interface OrderResponse {
@@ -388,6 +430,9 @@ export interface OrderResponse {
   customerPhone: string | null;
   scheduledTime: Date | null;
   status: OrderStatus;
+  totalAmount: number | null;
+  currency: string | null;
+  paymentStatus: PaymentStatus;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -417,6 +462,8 @@ export enum OwnerEntityType {
   Delivery = 'Delivery',
   Sacco = 'Sacco',
   Order = 'Order',
+  Asset = 'Asset',
+  Operator = 'Operator',
 }
 
 export interface MediaAssetMetadata {
@@ -525,6 +572,8 @@ export enum PolicyScope {
   SACCO = 'SACCO',
   BUSINESS = 'BUSINESS',
   RIDER = 'RIDER',
+  ASSET = 'ASSET',
+  OPERATOR = 'OPERATOR',
 }
 
 /**
@@ -559,6 +608,7 @@ export enum PolicyTrigger {
   STATUS_TRANSITION = 'STATUS_TRANSITION',
   SLA_CHECK = 'SLA_CHECK',
   REVENUE_DISTRIBUTION = 'REVENUE_DISTRIBUTION',
+  ORDER_PLACEMENT = 'ORDER_PLACEMENT',
 }
 
 /**
@@ -613,6 +663,8 @@ export enum CalendarScope {
   SACCO = 'SACCO',
   BUSINESS = 'BUSINESS',
   RIDER = 'RIDER',
+  ASSET = 'ASSET',
+  OPERATOR = 'OPERATOR',
 }
 
 /**
@@ -662,6 +714,8 @@ export enum BindingTargetType {
   SACCO = 'SACCO',
   RIDER = 'RIDER',
   WORKSPACE = 'WORKSPACE',
+  ASSET = 'ASSET',
+  OPERATOR = 'OPERATOR',
 }
 
 /**

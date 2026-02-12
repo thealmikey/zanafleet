@@ -106,13 +106,11 @@ export const DevAccountSwitcher: React.FC = () => {
                     key={account.id}
                     onClick={() => handleAccountSelect(account.email)}
                     disabled={isLoading}
-                    className={`w-full text-left p-3 rounded-md transition-all ${
-                      isCurrentAccount
+                    className={`w-full text-left p-3 rounded-md transition-all ${isCurrentAccount
                         ? 'bg-blue-100 border-2 border-blue-400 text-blue-900'
                         : 'bg-slate-50 border border-slate-200 text-slate-900 hover:bg-slate-100'
-                    } disabled:opacity-50 disabled:cursor-not-allowed ${
-                      !isLoading ? 'cursor-pointer' : ''
-                    }`}
+                      } disabled:opacity-50 disabled:cursor-not-allowed ${!isLoading ? 'cursor-pointer' : ''
+                      }`}
                   >
                     <div className="flex items-center gap-2">
                       {isCurrentAccount && <span className="text-sm">✓</span>}
@@ -126,14 +124,18 @@ export const DevAccountSwitcher: React.FC = () => {
                     </div>
                     {account.roles.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
-                        {account.roles.map(role => (
-                          <span
-                            key={role}
-                            className="inline-flex text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded"
-                          >
-                            {role}
-                          </span>
-                        ))}
+                        {account.roles.map(role => {
+                          const isConsumer = role === 'Customer' || role === 'Shopper';
+                          return (
+                            <span
+                              key={role}
+                              className={`inline-flex text-xs ${isConsumer ? 'bg-pink-100 text-pink-800' : 'bg-green-100 text-green-800'
+                                } px-2 py-0.5 rounded`}
+                            >
+                              {isConsumer ? 'CONSUMER' : role}
+                            </span>
+                          );
+                        })}
                       </div>
                     )}
                   </button>
