@@ -4,9 +4,9 @@ import {
   InMemoryRiderCandidateRepository,
   RiderCandidate,
   TimeWindow,
-  haversineDistanceMeters,
   rankCandidates,
 } from '../../services/candidate-selection.service';
+import { haversineDistanceMeters } from '@api/core/utils/geo.utils';
 
 function offsetPointMeters(origin: GeoPoint, northMeters: number, eastMeters: number): GeoPoint {
   const latDegreeMeters = 111_111; // approximate

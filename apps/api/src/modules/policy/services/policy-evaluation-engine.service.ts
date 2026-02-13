@@ -361,6 +361,8 @@ export class PolicyEvaluationEngineService {
       [PolicyScope.RIDER]: 5,
       [PolicyScope.BUSINESS]: 4,
       [PolicyScope.SACCO]: 3,
+      [PolicyScope.ASSET]: 3.5,
+      [PolicyScope.OPERATOR]: 2.5,
       [PolicyScope.NATIONAL]: 2,
       [PolicyScope.GLOBAL]: 1,
     };

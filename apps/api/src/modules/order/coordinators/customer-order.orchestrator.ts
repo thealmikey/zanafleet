@@ -8,8 +8,8 @@ import {
     PaymentMethod,
 } from '@zanafleet/contracts';
 
-import { DeliveryRequestCoordinator, RequestDeliveryInput } from '../../delivery/coordinators/delivery-request.coordinator';
-import { PaymentFlowOrchestrator, PaymentInitiationInput } from '../../payment/coordinators/payment-flow.orchestrator';
+import { DeliveryRequestCoordinator } from '../../delivery/coordinators/delivery-request.coordinator';
+import { PaymentFlowOrchestrator } from '../../payment/coordinators/payment-flow.orchestrator';
 import { PaymentFlowType } from '../../payment/dto/payment.enums';
 import { OrderEntity } from '../entities/order.entity';
 import { CustomerEntity } from '../../customer/entities/customer.entity';

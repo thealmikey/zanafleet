@@ -18,16 +18,18 @@ describe('LedgerEnums', () => {
       expect(LedgerCategory.DELIVERY_FEE).toBe('DELIVERY_FEE');
       expect(LedgerCategory.PLATFORM_FEE).toBe('PLATFORM_FEE');
       expect(LedgerCategory.RIDER_EARNING).toBe('RIDER_EARNING');
+      expect(LedgerCategory.SACCO_COMMISSION).toBe('SACCO_COMMISSION');
       expect(LedgerCategory.TIP).toBe('TIP');
       expect(LedgerCategory.SUBSIDY).toBe('SUBSIDY');
+      expect(LedgerCategory.CAMPAIGN_SUBSIDY).toBe('CAMPAIGN_SUBSIDY');
       expect(LedgerCategory.REFUND).toBe('REFUND');
       expect(LedgerCategory.PAYOUT).toBe('PAYOUT');
       expect(LedgerCategory.ADJUSTMENT).toBe('ADJUSTMENT');
     });
 
-    it('should have exactly 8 categories', () => {
+    it('should have exactly 11 categories', () => {
       const values = Object.values(LedgerCategory);
-      expect(values).toHaveLength(8);
+      expect(values).toHaveLength(11);
     });
   });
 
@@ -36,11 +38,13 @@ describe('LedgerEnums', () => {
       expect(LedgerReferenceType.PAYMENT).toBe('PAYMENT');
       expect(LedgerReferenceType.INVOICE).toBe('INVOICE');
       expect(LedgerReferenceType.SETTLEMENT).toBe('SETTLEMENT');
+      expect(LedgerReferenceType.DELIVERY).toBe('DELIVERY');
+      expect(LedgerReferenceType.TRIP).toBe('TRIP');
     });
 
-    it('should have exactly 3 reference types', () => {
+    it('should have exactly 5 reference types', () => {
       const values = Object.values(LedgerReferenceType);
-      expect(values).toHaveLength(3);
+      expect(values).toHaveLength(5);
     });
   });
 });

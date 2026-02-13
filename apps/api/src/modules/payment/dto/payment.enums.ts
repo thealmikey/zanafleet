@@ -1,5 +1,8 @@
 import { PaymentMethod } from '@zanafleet/contracts';
 
+// Re-export PaymentMethod for convenience
+export { PaymentMethod };
+
 export enum PaymentIntentStatus {
   CREATED = 'CREATED',
   PENDING = 'PENDING',

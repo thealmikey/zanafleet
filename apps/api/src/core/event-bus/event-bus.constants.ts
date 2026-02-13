@@ -173,6 +173,14 @@ export const NatsSubjects = {
     BUDGET_EXHAUSTED_V1: 'incentive.events.budget-exhausted-v1',
     ALL: 'incentive.events.*',
   },
+  Movers: {
+    MediaInsight: {
+      GENERATED_V1: 'movers.media-insight.events.generated-v1',
+      FAILED_V1: 'movers.media-insight.events.failed-v1',
+      ALL: 'movers.media-insight.events.*',
+    },
+    ALL: 'movers.events.*',
+  },
 } as const;
 
 /**

@@ -436,6 +436,8 @@ export class CalendarPolicyBridgeService {
       [CalendarScope.SACCO]: PolicyScope.SACCO,
       [CalendarScope.BUSINESS]: PolicyScope.BUSINESS,
       [CalendarScope.RIDER]: PolicyScope.RIDER,
+      [CalendarScope.ASSET]: PolicyScope.ASSET,
+      [CalendarScope.OPERATOR]: PolicyScope.OPERATOR,
     };
     return mapping[calendarScope] ?? PolicyScope.GLOBAL;
   }
@@ -493,6 +495,8 @@ export class CalendarPolicyBridgeService {
       [BindingTargetType.SACCO]: CalendarScope.SACCO,
       [BindingTargetType.RIDER]: CalendarScope.RIDER,
       [BindingTargetType.WORKSPACE]: CalendarScope.GLOBAL,
+      [BindingTargetType.ASSET]: CalendarScope.ASSET,
+      [BindingTargetType.OPERATOR]: CalendarScope.OPERATOR,
     };
     return mapping[targetType] ?? CalendarScope.GLOBAL;
   }

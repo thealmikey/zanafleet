@@ -4,12 +4,11 @@ import { AssetEntity } from '../entities/asset.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { SEARCH_PROVIDER } from '../../search/providers/search-provider.interface';
-import { AssetType, AssetStatus } from '@zanafleet/contracts';
+import { AssetType } from '@zanafleet/contracts';
 
 describe('MatchingService', () => {
     let service: MatchingService;
     let assetRepository: Repository<AssetEntity>;
-    let searchProvider: any;
 
     beforeEach(async () => {
         const mockSearchProvider = {
@@ -34,7 +33,6 @@ describe('MatchingService', () => {
 
         service = module.get<MatchingService>(MatchingService);
         assetRepository = module.get<Repository<AssetEntity>>(getRepositoryToken(AssetEntity));
-        searchProvider = module.get(SEARCH_PROVIDER);
     });
 
     it('should be defined', () => {

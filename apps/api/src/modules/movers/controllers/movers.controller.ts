@@ -5,10 +5,14 @@ import {
   LocationSuggestion,
   QuotePreAuthorizationRequest,
   QuotePreAuthorizationResponse,
+  MoversEstimateRequestDto,
+  validateMoversEstimateRequest,
 } from '../dto';
 import { LOCATION_AUTOCOMPLETE_PROVIDER, LocationAutocompleteProvider } from '../providers';
 import { VehicleRecommendationService } from '../services/vehicle-recommendation.service';
 import { MoversPricingService } from '../services/movers-pricing.service';
+import { MoversQuoteOrchestrator } from '../orchestrators/movers-quote.orchestrator';
+import { MoversEstimateResponseDto, createEstimateSuccessResponse, createEstimateErrorResponse } from '../dto/movers-estimate-response.dto';
 
 /**
  * Movers Controller
@@ -23,6 +27,7 @@ export class MoversController {
     @Inject(LOCATION_AUTOCOMPLETE_PROVIDER) private readonly locationProvider: LocationAutocompleteProvider,
     private readonly vehicleRecommendationService: VehicleRecommendationService,
     private readonly pricingService: MoversPricingService,
+    private readonly quoteOrchestrator: MoversQuoteOrchestrator,
   ) {}
 
   /**
@@ -60,7 +65,7 @@ export class MoversController {
   /**
    * POST /mover/quote
    * 
-   * Calculate a moving quote
+   * Calculate a moving quote (legacy endpoint)
    */
   @Post('quote')
   async calculateQuote(
@@ -108,6 +113,47 @@ export class MoversController {
         'Failed to calculate quote. Please try again.',
         HttpStatus.INTERNAL_SERVER_ERROR
       );
+    }
+  }
+
+  /**
+   * POST /mover/estimate
+   * 
+   * Create a comprehensive moving estimate using the orchestration layer
+   * This is the new AI-powered estimate endpoint
+   */
+  @Post('estimate')
+  async createEstimate(
+    @Body() request: MoversEstimateRequestDto,
+  ): Promise<MoversEstimateResponseDto> {
+    const startTime = Date.now();
+    this.logger.log(
+      `Creating estimate from ${request.fromLocation?.formattedAddress} → ${request.toLocation?.formattedAddress}`
+    );
+
+    // Validate request
+    const validationErrors = validateMoversEstimateRequest(request);
+    if (validationErrors.length > 0) {
+      this.logger.warn(`Estimate request validation failed: ${validationErrors.join(', ')}`);
+      return createEstimateErrorResponse(validationErrors);
+    }
+
+    try {
+      // Delegate to orchestrator
+      const estimate = await this.quoteOrchestrator.createEstimate(request);
+      const processingTimeMs = Date.now() - startTime;
+
+      this.logger.log(
+        `Estimate ${estimate.quoteId} created in ${processingTimeMs}ms. ` +
+        `Total: ${estimate.priceBreakdown.currency} ${estimate.priceBreakdown.total}`
+      );
+
+      return createEstimateSuccessResponse(estimate, processingTimeMs);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Estimate creation failed: ${errorMessage}`);
+
+      return createEstimateErrorResponse(['Failed to create estimate. Please try again.']);
     }
   }
 
