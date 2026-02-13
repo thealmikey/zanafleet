@@ -37,6 +37,7 @@ import { TransactionModule } from './modules/transaction/transaction.module';
 import { WalletModule } from './modules/wallet/wallet.module';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
 import { AssetModule } from './modules/asset/asset.module';
+import { MoversModule } from './modules/movers/movers.module';
 import { OperatorModule } from './modules/operator/operator.module';
 import { SeedModule } from './modules/seed/seed.module';
 
@@ -97,6 +98,7 @@ import { SeedModule } from './modules/seed/seed.module';
     WorkspaceModule,
     SearchModule,
     AssetModule,
+    MoversModule,
     OperatorModule,
     SeedModule,
   ],
