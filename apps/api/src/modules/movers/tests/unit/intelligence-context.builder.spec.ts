@@ -7,7 +7,6 @@ import { MediaPerceptionAdapter } from '../../media-insight/services/media-perce
 import { MediaPerceptionFeatureService } from '../../media-insight/services/media-perception-feature.service';
 import { MoveProfile } from '../../domain/move-profile';
 import { VehicleCapabilityProfile } from '../../domain/vehicle-capability-profile';
-import type { MediaInsight } from '../../media-insight/interfaces';
 
 describe('IntelligenceContextBuilder', () => {
   let builder: IntelligenceContextBuilder;
@@ -79,12 +78,25 @@ describe('IntelligenceContextBuilder', () => {
       normalize: jest.fn().mockResolvedValue(mockNormalizedLocation),
     };
 
+    const mockMediaPerceptionAdapter = {
+      analyzeMedia: jest.fn(),
+    };
+
+    const mockMediaPerceptionFeatureService = {
+      isEnabled: jest.fn(),
+      getConfidenceThreshold: jest.fn(),
+      shouldProcessMedia: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         IntelligenceContextBuilder,
         { provide: VehicleMatchingService, useValue: mockVehicleMatchingService },
         { provide: AIMoveProfileService, useValue: mockAIMoveProfileService },
         { provide: LocationNormalizationService, useValue: mockLocationNormalizationService },
+        { provide: MediaPerceptionAdapter, useValue: mockMediaPerceptionAdapter },
+        { provide: MediaPerceptionFeatureService, useValue: mockMediaPerceptionFeatureService },
+        { provide: 'CONFIG', useValue: { confidenceThreshold: 0.7 } },
       ],
     }).compile();
 

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MoveProfile } from '../domain/move-profile';
 import { VehicleCapabilityProfile } from '../domain/vehicle-capability-profile';
-import { PolicyAdjustment, calculateDemandMultiplier } from '../domain/move-estimate';
+// import { PolicyAdjustment, calculateDemandMultiplier } from '../domain/move-estimate';
 import {
   IntelligenceContext,
   MoveRecommendation,
@@ -208,7 +208,7 @@ export class MoveIntelligenceEngine {
    */
   private scoreVehicles(
     moveProfile: MoveProfile,
-    availableVehicles: VehicleCapabilityProfile[],
+    _availableVehicles: VehicleCapabilityProfile[],
     demandSignals: DemandSignals,
     capableVehicles: Array<{ vehicle: VehicleCapabilityProfile; requirements: string[] }>
   ): {

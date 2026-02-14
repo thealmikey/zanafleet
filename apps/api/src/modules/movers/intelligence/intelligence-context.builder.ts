@@ -41,7 +41,7 @@ export class IntelligenceContextBuilder {
     private readonly locationNormalizationService: LocationNormalizationService,
     @Optional() private readonly mediaPerceptionAdapter: MediaPerceptionAdapter,
     @Optional() private readonly featureService: MediaPerceptionFeatureService,
-    private readonly config: { confidenceThreshold: number } = { confidenceThreshold: DEFAULT_MEDIA_PERCEPTION_CONFIG.confidenceThreshold }
+    @Optional() private readonly config: { confidenceThreshold: number } = { confidenceThreshold: DEFAULT_MEDIA_PERCEPTION_CONFIG.confidenceThreshold }
   ) {}
 
   /**
