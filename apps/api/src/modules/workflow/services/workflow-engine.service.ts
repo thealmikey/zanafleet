@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EventBus } from '@nestjs/cqrs';
@@ -162,7 +162,10 @@ export class WorkflowEngineService {
     });
 
     if (!instance) {
-      throw new NotFoundException(`Process instance not found: ${instanceId}`);
+      return {
+        success: false,
+        error: `Process instance not found: ${instanceId}`,
+      };
     }
 
     if (instance.status !== ProcessInstanceStatus.ACTIVE) {

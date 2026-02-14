@@ -135,7 +135,7 @@ export class ProcessInstanceEntity {
   updatedAt!: Date;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  completedAt!: Date;
+  completedAt!: Date | null;
 
   /**
    * Convert entity to domain representation
@@ -156,7 +156,7 @@ export class ProcessInstanceEntity {
     history: ProcessHistoryEntry[];
     createdAt: Date;
     updatedAt: Date;
-    completedAt: Date | undefined;
+    completedAt: Date | null;
   } {
     return {
       instanceId: this.instanceId,
@@ -196,7 +196,7 @@ export class ProcessInstanceEntity {
     transitionCount?: number;
     history?: ProcessHistoryEntry[];
     createdAt: Date;
-    completedAt?: Date;
+    completedAt?: Date | null;
   }): ProcessInstanceEntity {
     const e = new ProcessInstanceEntity();
     e.instanceId = data.instanceId;
@@ -213,7 +213,7 @@ export class ProcessInstanceEntity {
     e.transitionCount = data.transitionCount ?? 0;
     e.history = data.history ?? [];
     e.createdAt = data.createdAt;
-    e.completedAt = data.completedAt;
+    e.completedAt = data.completedAt ?? null;
     return e;
   }
 }

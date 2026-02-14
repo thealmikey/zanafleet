@@ -9,7 +9,7 @@ import {
 } from '../../entities/process-definition.entity';
 import { ProcessInstanceEntity, ProcessInstanceStatus } from '../../entities/process-instance.entity';
 import { ProcessTransitionEntity, TransitionTriggerType, GuardType } from '../../entities/process-transition.entity';
-import { WorkflowEngineService, TransitionResult } from '../../services/workflow-engine.service';
+import { WorkflowEngineService } from '../../services/workflow-engine.service';
 
 describe('WorkflowEngineService', () => {
   let service: WorkflowEngineService;
@@ -71,6 +71,7 @@ describe('WorkflowEngineService', () => {
           provide: getRepositoryToken(ProcessInstanceEntity),
           useValue: {
             findOne: jest.fn(),
+            find: jest.fn(),
             save: jest.fn(),
           },
         },
