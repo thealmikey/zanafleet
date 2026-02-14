@@ -16,7 +16,8 @@ import {
 import { CapabilityRepository } from './repositories/capability.repository';
 import { CapabilityAccessController } from './services/capability-access.controller';
 import { CapabilityOrchestrator } from './services/capability-orchestrator';
-import { CapabilityAuditProjection, CapabilityAuditService } from './projections/capability-audit.projection';
+import { CapabilityAuditService } from './services/capability-audit.service';
+import { CapabilityAuditProjection } from './projections/capability-audit.projection';
 import { CapabilityQueryHandlers } from './queries/capability.query-handlers';
 import { EventBusService } from '@api/core/event-bus/event-bus.service';
 import { CapabilityController } from './controllers/capability.controller';
@@ -26,7 +27,7 @@ export { CapabilityOrchestrator } from './services/capability-orchestrator';
 export { ICapabilityOrchestrator, OrchestrationRequest, OrchestrationResult } from './services/capability-orchestrator';
 export { CapabilityAccessController } from './services/capability-access.controller';
 export { CapabilityRepository } from './repositories/capability.repository';
-export { CapabilityAuditService } from './projections/capability-audit.projection';
+export { CapabilityAuditService } from './services/capability-audit.service';
 export { CapabilityExecutionResult, CapabilityUsedEventV1 } from './events/capability-used.event';
 
 // Register command handlers

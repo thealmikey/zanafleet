@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { CommandBus, ICommand, ICommandHandler, CommandHandlerType } from '@nestjs/cqrs';
+import { CommandBus, ICommand, CommandHandlerType } from '@nestjs/cqrs';
 
 /**
  * InternalCommandBus Options
@@ -114,8 +114,7 @@ export class InternalCommandBus {
    * Useful for logging, metrics, etc.
    */
   onCommandExecuted(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    callback: (command: ICommand, result: unknown) => void
+    _callback: (command: ICommand, result: unknown) => void
   ): void {
     // This would need to be implemented based on NestJS CQRS internals
     this.logger.warn('InternalCommandBus: onCommandExecuted not fully implemented');
