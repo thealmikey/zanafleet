@@ -1,13 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { TripEntity } from '../entities/trip.entity';
-import { PolicyTrigger } from '@zanafleet/contracts';
-import { v4 as uuidv4 } from 'uuid';
-import { PolicyEvaluationEngineService } from '../../policy/services/policy-evaluation-engine.service';
 import { CommandBus } from '@nestjs/cqrs';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PolicyTrigger } from '@zanafleet/contracts';
+import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
+
 import { RecordLedgerEntryCommand } from '../../ledger/commands/record-ledger-entry.command';
 import { LedgerEntryType, LedgerCategory, LedgerReferenceType } from '../../ledger/dto/ledger.enums';
+import { PolicyEvaluationEngineService } from '../../policy/services/policy-evaluation-engine.service';
+import { TripEntity } from '../entities/trip.entity';
 
 @Injectable()
 export class TripService {

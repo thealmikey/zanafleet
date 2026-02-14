@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { SearchDocumentEntity } from '../entities/search-document.entity';
 import { SearchDocument, SearchOptions, SearchResults } from '../dto/search.dto';
+import { SearchDocumentEntity } from '../entities/search-document.entity';
+
 import { ISearchProvider } from './search-provider.interface';
 
 @Injectable()

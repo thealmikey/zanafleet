@@ -1,21 +1,20 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
-import { MoversController } from './controllers/movers.controller';
-import { VehicleRecommendationService } from './services/vehicle-recommendation.service';
-import { MoversPricingService } from './services/movers-pricing.service';
-import { LocationNormalizationService } from './services/location-normalization.service';
-import { AIMoveProfileService } from './services/ai-move-profile.service';
-import { VehicleMatchingService } from './services/vehicle-matching.service';
-import { MoversQuoteOrchestrator } from './orchestrators/movers-quote.orchestrator';
-import { IntelligenceContextBuilder, MoveIntelligenceEngine } from './intelligence';
-
-import { LocationIntelligenceModule } from '../location-intelligence/location-intelligence.module';
-import { AssetModule } from '../asset/asset.module';
-import { PolicyModule } from '../policy/policy.module';
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
+import { AssetModule } from '../asset/asset.module';
+import { LocationIntelligenceModule } from '../location-intelligence/location-intelligence.module';
+import { PolicyModule } from '../policy/policy.module';
 
+import { MoversController } from './controllers/movers.controller';
+import { IntelligenceContextBuilder, MoveIntelligenceEngine } from './intelligence';
+import { MoversQuoteOrchestrator } from './orchestrators/movers-quote.orchestrator';
 import { DefaultLocationAutocompleteProvider, LOCATION_AUTOCOMPLETE_PROVIDER } from './providers';
+import { AIMoveProfileService } from './services/ai-move-profile.service';
+import { LocationNormalizationService } from './services/location-normalization.service';
+import { MoversPricingService } from './services/movers-pricing.service';
+import { VehicleMatchingService } from './services/vehicle-matching.service';
+import { VehicleRecommendationService } from './services/vehicle-recommendation.service';
 
 /**
  * Movers Module

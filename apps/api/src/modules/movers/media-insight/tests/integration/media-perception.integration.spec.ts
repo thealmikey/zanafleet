@@ -1,10 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
+
+import { mediaPerceptionConfig } from '../../config/media-perception.config';
+import { NoopVisionProvider } from '../../providers/noop-vision.provider';
 import { IntelligenceSnapshotService } from '../../services/intelligence-snapshot.service';
 import { MediaPerceptionAdapter } from '../../services/media-perception-adapter.service';
 import { MediaPerceptionFeatureService } from '../../services/media-perception-feature.service';
-import { mediaPerceptionConfig } from '../../config/media-perception.config';
-import { NoopVisionProvider } from '../../providers/noop-vision.provider';
 
 describe('Media Perception Feature - Integration', () => {
   let module: TestingModule;

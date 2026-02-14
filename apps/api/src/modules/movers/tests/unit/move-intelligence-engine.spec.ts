@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MoveIntelligenceEngine, INTELLIGENCE_VERSION } from '../../intelligence/move-intelligence-engine';
+
 import { MoveProfile } from '../../domain/move-profile';
 import { VehicleCapabilityProfile } from '../../domain/vehicle-capability-profile';
 import { IntelligenceContext } from '../../intelligence/intelligence-context';
+import { MoveIntelligenceEngine, INTELLIGENCE_VERSION } from '../../intelligence/move-intelligence-engine';
 
 describe('MoveIntelligenceEngine', () => {
   let engine: MoveIntelligenceEngine;

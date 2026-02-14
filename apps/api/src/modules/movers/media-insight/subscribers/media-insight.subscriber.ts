@@ -15,8 +15,8 @@ import { BaseEvent, SerializedEvent } from '../../../../core/event-bus/interface
 import { EventLoggerService } from '../../../../core/event-bus/services/event-logger.service';
 import { IdempotencyService } from '../../../../core/event-bus/services/idempotency.service';
 import { MediaInsightEvents } from '../events/media-insight.events';
-import { IntelligenceSnapshotService } from '../services/intelligence-snapshot.service';
 import type { MediaInsight } from '../interfaces';
+import { IntelligenceSnapshotService } from '../services/intelligence-snapshot.service';
 
 /**
  * MediaInsightSubscriber

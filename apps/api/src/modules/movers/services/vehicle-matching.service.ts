@@ -1,4 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
+
+import { VehicleRecommendation } from '../domain/move-estimate';
 import { MoveProfile } from '../domain/move-profile';
 import {
   VehicleCapabilityProfile,
@@ -7,7 +9,7 @@ import {
   VEHICLE_CAPABILITY_DEFAULTS,
   VehicleType,
 } from '../domain/vehicle-capability-profile';
-import { VehicleRecommendation } from '../domain/move-estimate';
+
 import { NormalizedLocation } from './location-normalization.service';
 
 /**
@@ -32,7 +34,7 @@ export class VehicleMatchingService {
   async findMatchingVehicles(
     moveProfile: MoveProfile,
     _origin?: NormalizedLocation,
-    _radiusKm: number = 50
+    _radiusKm = 50
   ): Promise<VehicleRecommendation[]> {
     this.logger.debug(
       `Finding vehicles for move profile: ${moveProfile.estimatedVolumeM3}m3, ` +

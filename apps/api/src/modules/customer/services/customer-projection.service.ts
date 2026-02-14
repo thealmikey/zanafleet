@@ -1,9 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { OrderStatus } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
+
 import { CustomerActivityProjection } from '../entities/customer-activity.projection';
 import { MarketDensityProjection } from '../entities/market-density.projection';
-import { OrderStatus } from '@zanafleet/contracts';
 
 @Injectable()
 export class CustomerProjectionService {

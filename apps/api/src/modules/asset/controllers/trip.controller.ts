@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, Query, HttpCode, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { TripEntity } from '../entities/trip.entity';
 
 export class CreateTripDto {

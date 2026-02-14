@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MoveIntelligenceEngine } from '../../intelligence/move-intelligence-engine';
+
 import { IntelligenceContextBuilder } from '../../intelligence/intelligence-context.builder';
-import { VehicleMatchingService } from '../../services/vehicle-matching.service';
+import { MoveIntelligenceEngine } from '../../intelligence/move-intelligence-engine';
 import { AIMoveProfileService } from '../../services/ai-move-profile.service';
 import { LocationNormalizationService } from '../../services/location-normalization.service';
+import { VehicleMatchingService } from '../../services/vehicle-matching.service';
 
 /**
  * Integration tests for the Move Intelligence Layer

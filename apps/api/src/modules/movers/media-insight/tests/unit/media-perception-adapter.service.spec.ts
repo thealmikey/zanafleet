@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { MediaInsight } from '../../interfaces';
+import { NoopVisionProvider } from '../../providers/noop-vision.provider';
 import { MediaPerceptionAdapter, MediaReference } from '../../services/media-perception-adapter.service';
 import { MediaPerceptionFeatureService } from '../../services/media-perception-feature.service';
-import { NoopVisionProvider } from '../../providers/noop-vision.provider';
-import { MediaInsight } from '../../interfaces';
 
 describe('MediaPerceptionAdapter', () => {
   let adapter: MediaPerceptionAdapter;

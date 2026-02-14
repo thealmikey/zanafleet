@@ -1,11 +1,11 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigModule } from '@nestjs/config';
 import { IntelligenceContextBuilder } from '@api/modules/movers/intelligence/intelligence-context.builder';
-import { MediaPerceptionFeatureService } from '@api/modules/movers/media-insight/services/media-perception-feature.service';
 import { MediaPerceptionAdapter } from '@api/modules/movers/media-insight/services/media-perception-adapter.service';
-import { VehicleMatchingService } from '@api/modules/movers/services/vehicle-matching.service';
+import { MediaPerceptionFeatureService } from '@api/modules/movers/media-insight/services/media-perception-feature.service';
 import { AIMoveProfileService } from '@api/modules/movers/services/ai-move-profile.service';
 import { LocationNormalizationService } from '@api/modules/movers/services/location-normalization.service';
+import { VehicleMatchingService } from '@api/modules/movers/services/vehicle-matching.service';
+import { ConfigModule } from '@nestjs/config';
+import { Test, TestingModule } from '@nestjs/testing';
 
 describe('Intelligence Context with Media Insight - Integration', () => {
   let module: TestingModule;

@@ -1,6 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
+
 import { AppModule } from '../src/app.module';
 
 /**
@@ -10,9 +11,9 @@ import { AppModule } from '../src/app.module';
 describe('Concert Event Logistics (e2e)', () => {
     let app: INestApplication;
     let bundleId: string;
-    let assetIds: string[] = [];
-    let operatorIds: string[] = [];
-    let tripIds: string[] = [];
+    const assetIds: string[] = [];
+    const operatorIds: string[] = [];
+    const tripIds: string[] = [];
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({

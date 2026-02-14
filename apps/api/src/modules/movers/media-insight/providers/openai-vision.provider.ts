@@ -8,14 +8,16 @@
  */
 
 import { Injectable, Logger } from '@nestjs/common';
+
+import type { MediaInsight } from '../interfaces';
+import { validateMediaInsight, createEmptyMediaInsight } from '../utils';
+
 import type {
   IVisionProvider,
   VisionProviderConfig,
   VisionAnalysisRequest,
   VisionAnalysisResponse,
 } from './vision-provider.interface';
-import type { MediaInsight } from '../interfaces';
-import { validateMediaInsight, createEmptyMediaInsight } from '../utils';
 
 /**
  * Default prompt for vision analysis.

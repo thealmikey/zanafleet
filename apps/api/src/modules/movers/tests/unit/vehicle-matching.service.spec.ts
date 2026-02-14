@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { VehicleMatchingService } from '../../services/vehicle-matching.service';
+
 import { MoveProfile } from '../../domain/move-profile';
+import { VehicleMatchingService } from '../../services/vehicle-matching.service';
 
 describe('VehicleMatchingService', () => {
   let service: VehicleMatchingService;

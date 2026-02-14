@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { AssetEntity } from '../entities/asset.entity';
+
 import { CreateAssetDto, AssetResponseDto } from '../dto/asset-platform.dto';
+import { AssetEntity } from '../entities/asset.entity';
 
 /**
  * Asset Service

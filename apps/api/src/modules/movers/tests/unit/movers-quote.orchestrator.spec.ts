@@ -1,10 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MoversQuoteOrchestrator } from '../../orchestrators/movers-quote.orchestrator';
-import { LocationNormalizationService } from '../../services/location-normalization.service';
-import { AIMoveProfileService } from '../../services/ai-move-profile.service';
-import { VehicleMatchingService } from '../../services/vehicle-matching.service';
+
 import { EventBusService } from '../../../../core/event-bus/event-bus.service';
 import { MoversEstimateRequestDto, HouseSizeEnum } from '../../dto/movers-estimate-request.dto';
+import { MoversQuoteOrchestrator } from '../../orchestrators/movers-quote.orchestrator';
+import { AIMoveProfileService } from '../../services/ai-move-profile.service';
+import { LocationNormalizationService } from '../../services/location-normalization.service';
+import { VehicleMatchingService } from '../../services/vehicle-matching.service';
 
 describe('MoversQuoteOrchestrator', () => {
   let orchestrator: MoversQuoteOrchestrator;

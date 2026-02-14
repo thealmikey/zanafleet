@@ -11,9 +11,9 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import type { MoveRecommendation } from '../../intelligence/intelligence-context';
 import { IntelligenceSnapshotEntity, ProfileSource } from '../entities/intelligence-snapshot.entity';
 import type { MediaInsight } from '../interfaces';
-import type { MoveRecommendation } from '../../intelligence/intelligence-context';
 
 /**
  * Summary of a snapshot for API responses.

@@ -8,13 +8,15 @@
  */
 
 import { Injectable, Logger } from '@nestjs/common';
+
+import { createEmptyMediaInsight } from '../utils';
+
 import type {
   IVisionProvider,
   VisionProviderConfig,
   VisionAnalysisRequest,
   VisionAnalysisResponse,
 } from './vision-provider.interface';
-import { createEmptyMediaInsight } from '../utils';
 
 /**
  * No-op vision provider for when AI integration is not configured.

@@ -1,11 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { SearchProjectionService } from './search-projection.service';
-import { SEARCH_PROVIDER } from '../providers/search-provider.interface';
-import { OrderCreatedEventV1 } from '../../order/events/order-created.event';
+import { OrderStatus, PaymentStatus, BusinessType, DeliveryStatus } from '@zanafleet/contracts';
+
 import { BusinessOnboardedEventV1 } from '../../business/events/business-onboarded.event';
 import { DeliveryCreatedEventV1 } from '../../delivery/events/delivery-created.event';
 import { DeliveryStateTransitionedEventV1 } from '../../delivery/events/delivery-state-transitioned.event';
-import { OrderStatus, PaymentStatus, BusinessType, DeliveryStatus } from '@zanafleet/contracts';
+import { OrderCreatedEventV1 } from '../../order/events/order-created.event';
+import { SEARCH_PROVIDER } from '../providers/search-provider.interface';
+
+import { SearchProjectionService } from './search-projection.service';
+
 
 describe('SearchProjectionService', () => {
     let service: SearchProjectionService;

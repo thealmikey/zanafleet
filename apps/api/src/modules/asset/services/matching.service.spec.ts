@@ -1,10 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { MatchingService } from './matching.service';
-import { AssetEntity } from '../entities/asset.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { SEARCH_PROVIDER } from '../../search/providers/search-provider.interface';
 import { AssetType } from '@zanafleet/contracts';
+import { Repository } from 'typeorm';
+
+import { SEARCH_PROVIDER } from '../../search/providers/search-provider.interface';
+import { AssetEntity } from '../entities/asset.entity';
+
+import { MatchingService } from './matching.service';
 
 describe('MatchingService', () => {
     let service: MatchingService;

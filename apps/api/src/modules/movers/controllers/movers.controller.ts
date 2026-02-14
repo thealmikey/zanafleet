@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Query, HttpException, HttpStatus, Logger, Inject } from '@nestjs/common';
+
 import { 
   MovingQuoteRequest, 
   MovingQuote,
@@ -8,11 +9,11 @@ import {
   MoversEstimateRequestDto,
   validateMoversEstimateRequest,
 } from '../dto';
-import { LOCATION_AUTOCOMPLETE_PROVIDER, LocationAutocompleteProvider } from '../providers';
-import { VehicleRecommendationService } from '../services/vehicle-recommendation.service';
-import { MoversPricingService } from '../services/movers-pricing.service';
-import { MoversQuoteOrchestrator } from '../orchestrators/movers-quote.orchestrator';
 import { MoversEstimateResponseDto, createEstimateSuccessResponse, createEstimateErrorResponse } from '../dto/movers-estimate-response.dto';
+import { MoversQuoteOrchestrator } from '../orchestrators/movers-quote.orchestrator';
+import { LOCATION_AUTOCOMPLETE_PROVIDER, LocationAutocompleteProvider } from '../providers';
+import { MoversPricingService } from '../services/movers-pricing.service';
+import { VehicleRecommendationService } from '../services/vehicle-recommendation.service';
 
 /**
  * Movers Controller

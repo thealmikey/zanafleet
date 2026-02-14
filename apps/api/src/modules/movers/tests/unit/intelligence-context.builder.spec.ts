@@ -1,12 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IntelligenceContextBuilder } from '../../intelligence/intelligence-context.builder';
-import { VehicleMatchingService } from '../../services/vehicle-matching.service';
-import { AIMoveProfileService } from '../../services/ai-move-profile.service';
-import { LocationNormalizationService } from '../../services/location-normalization.service';
-import { MediaPerceptionAdapter } from '../../media-insight/services/media-perception-adapter.service';
-import { MediaPerceptionFeatureService } from '../../media-insight/services/media-perception-feature.service';
+
 import { MoveProfile } from '../../domain/move-profile';
 import { VehicleCapabilityProfile } from '../../domain/vehicle-capability-profile';
+import { IntelligenceContextBuilder } from '../../intelligence/intelligence-context.builder';
+import { MediaPerceptionAdapter } from '../../media-insight/services/media-perception-adapter.service';
+import { MediaPerceptionFeatureService } from '../../media-insight/services/media-perception-feature.service';
+import { AIMoveProfileService } from '../../services/ai-move-profile.service';
+import { LocationNormalizationService } from '../../services/location-normalization.service';
+import { VehicleMatchingService } from '../../services/vehicle-matching.service';
 
 describe('IntelligenceContextBuilder', () => {
   let builder: IntelligenceContextBuilder;

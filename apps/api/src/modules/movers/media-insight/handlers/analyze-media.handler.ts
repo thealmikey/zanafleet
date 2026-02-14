@@ -7,14 +7,14 @@
  * @module media-insight/handlers
  */
 
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Logger } from '@nestjs/common';
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
 
-import { AnalyzeMediaCommand } from '../commands/analyze-media.command';
-import { MediaPerceptionAdapter, MediaReference } from '../services/media-perception-adapter.service';
-import { MediaInsightEvents } from '../events/media-insight.events';
 import { EventBusService } from '../../../../core/event-bus/event-bus.service';
+import { AnalyzeMediaCommand } from '../commands/analyze-media.command';
+import { MediaInsightEvents } from '../events/media-insight.events';
+import { MediaPerceptionAdapter, MediaReference } from '../services/media-perception-adapter.service';
 
 /**
  * AnalyzeMediaHandler

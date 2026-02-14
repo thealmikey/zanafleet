@@ -146,7 +146,7 @@ export function createPriceBreakdown(params: {
 /**
  * Format price for display
  */
-export function formatPrice(amount: number, currency: string = 'KES'): string {
+export function formatPrice(amount: number, currency = 'KES'): string {
   return new Intl.NumberFormat('en-KE', {
     style: 'currency',
     currency,

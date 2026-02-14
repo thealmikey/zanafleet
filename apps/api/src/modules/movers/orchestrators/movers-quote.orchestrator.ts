@@ -1,10 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { MoversEstimateRequestDto } from '../dto/movers-estimate-request.dto';
+
+import { Injectable, Logger } from '@nestjs/common';
+
 import { MoveEstimate, calculateDemandMultiplier, PolicyAdjustment } from '../domain/move-estimate';
 import { MoveProfile } from '../domain/move-profile';
-import { LocationNormalizationService, NormalizedLocation } from '../services/location-normalization.service';
+import { MoversEstimateRequestDto } from '../dto/movers-estimate-request.dto';
 import { AIMoveProfileService } from '../services/ai-move-profile.service';
+import { LocationNormalizationService, NormalizedLocation } from '../services/location-normalization.service';
 import { VehicleMatchingService } from '../services/vehicle-matching.service';
 
 /**

@@ -9,8 +9,8 @@ import request from 'supertest';
 
 
 import { OrdersController } from '../../controllers/orders.controller';
-import { OrderEntity } from '../../entities/order.entity';
 import { CustomerOrderOrchestrator } from '../../coordinators/customer-order.orchestrator';
+import { OrderEntity } from '../../entities/order.entity';
 
 describe('OrdersController (e2e)', () => {
   let app: INestApplication;

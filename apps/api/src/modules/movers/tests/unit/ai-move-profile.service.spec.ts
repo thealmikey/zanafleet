@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { AIMoveProfileService } from '../../services/ai-move-profile.service';
+
 import { HouseSizeEnum } from '../../dto/movers-estimate-request.dto';
+import { AIMoveProfileService } from '../../services/ai-move-profile.service';
 
 describe('AIMoveProfileService', () => {
   let service: AIMoveProfileService;

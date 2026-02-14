@@ -23,7 +23,7 @@ export class MoversEstimateResponseDto {
  */
 export function createEstimateSuccessResponse(
   estimate: MoveEstimate,
-  processingTimeMs: number = 0
+  processingTimeMs = 0
 ): MoversEstimateResponseDto {
   return {
     success: true,

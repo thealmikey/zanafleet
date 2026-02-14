@@ -1,5 +1,7 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
+
+import { GEO_PROVIDER, GeoPoint } from '../../location-intelligence/providers/geo-provider.interface';
 import { 
   MovingQuoteRequest, 
   MovingQuote, 
@@ -8,7 +10,6 @@ import {
   HOUSE_SIZE_CONFIG,
   HouseSize,
 } from '../dto';
-import { GEO_PROVIDER, GeoPoint } from '../../location-intelligence/providers/geo-provider.interface';
 
 /**
  * Movers Pricing Service

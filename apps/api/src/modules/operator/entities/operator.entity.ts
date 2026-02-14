@@ -8,6 +8,7 @@ import {
     JoinColumn,
     Index,
 } from 'typeorm';
+
 import { ActorEntity } from '../../actor/entities/actor.entity';
 
 /**

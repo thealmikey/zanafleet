@@ -1,9 +1,10 @@
 import { Controller, Get, Query, UseGuards, Request, Param } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
-import { CustomerEntity } from './entities/customer.entity';
-import { CustomerActivityProjection } from './entities/customer-activity.projection';
+
 import { BusinessAvailabilityProjection } from './entities/business-availability.projection';
+import { CustomerActivityProjection } from './entities/customer-activity.projection';
+import { CustomerEntity } from './entities/customer.entity';
 
 @Controller('customers')
 export class CustomerController {

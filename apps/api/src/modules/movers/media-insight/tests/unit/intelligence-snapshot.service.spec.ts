@@ -1,9 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { IntelligenceSnapshotService } from '../../services/intelligence-snapshot.service';
-import { IntelligenceSnapshotEntity, ProfileSource } from '../../entities/intelligence-snapshot.entity';
+
 import type { MoveRecommendation } from '../../../../movers/intelligence/intelligence-context';
+import { IntelligenceSnapshotEntity, ProfileSource } from '../../entities/intelligence-snapshot.entity';
+import { IntelligenceSnapshotService } from '../../services/intelligence-snapshot.service';
 
 describe('IntelligenceSnapshotService', () => {
   let service: IntelligenceSnapshotService;

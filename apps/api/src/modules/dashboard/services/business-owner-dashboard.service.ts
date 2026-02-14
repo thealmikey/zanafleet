@@ -1,5 +1,5 @@
-import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 import { createPaginationMeta, PaginationParams } from '@api/core/api/utils';
+import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 import { Injectable, ForbiddenException, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ChargeType } from '../../billing/dto/billing.enums';
 import { ChargeEntity } from '../../billing/entities/charge.entity';
 import { InvoiceEntity } from '../../billing/entities/invoice.entity';
+import { BusinessEntity } from '../../business/entities/business.entity';
 import { DeliveryLifecycleCoordinator } from '../../delivery/coordinators/delivery-lifecycle.coordinator';
 import { DeliveryMatchingCoordinator } from '../../delivery/coordinators/delivery-matching.coordinator';
 import { DeliveryEntity } from '../../delivery/entities/delivery.entity';
@@ -20,7 +21,6 @@ import { OrderEntity } from '../../order/entities/order.entity';
 import { PaymentIntentStatus } from '../../payment/dto/payment.enums';
 import { PaymentIntentEntity } from '../../payment/entities/payment-intent.entity';
 import { RiderEntity } from '../../rider/entities/rider.entity';
-import { BusinessEntity } from '../../business/entities/business.entity';
 import {
   BillingSummaryDto,
   BusinessDeliveriesQueryDto,
@@ -31,6 +31,7 @@ import {
   DeliveryTimelineItemDto,
   PaymentStateFilter,
 } from '../dto';
+
 import { AdminScopeService } from './admin-scope.service';
 
 const ACTIVE_DELIVERY_STATUSES: DeliveryStatus[] = [
@@ -110,7 +111,7 @@ export class BusinessOwnerDashboardService {
       monthEnd: now,
       totalDeliveries: deliveries.length,
       activeDeliveries: deliveries.filter((d) =>
-        ACTIVE_DELIVERY_STATUSES.includes(d.status as DeliveryStatus)
+        ACTIVE_DELIVERY_STATUSES.includes(d.status )
       ).length,
       successfulDeliveries: deliveries.filter(
         (d) => d.status === DeliveryStatus.Delivered

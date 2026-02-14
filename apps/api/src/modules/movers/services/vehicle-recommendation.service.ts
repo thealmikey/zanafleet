@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+
 import { HOUSE_SIZE_CONFIG, HouseSize, VehicleRecommendation } from '../dto';
 
 /**

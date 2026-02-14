@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { SearchDocumentEntity } from '../entities/search-document.entity';
+
 import { PostgresSearchProvider } from './postgres-search.provider';
 
 const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';

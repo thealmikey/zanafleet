@@ -3,9 +3,9 @@ import { VehicleType } from '@zanafleet/contracts';
 
 import { EventBusService } from '../../../../core/event-bus/event-bus.service';
 import { GeoQueryCoordinator } from '../../coordinators/geo-query.coordinator';
+import { GeoProviderRegistry } from '../../providers/geo-provider-registry.service';
 import { HeatmapService } from '../../services/heatmap.service';
 import { LocationIntelligenceService } from '../../services/location-intelligence.service';
-import { GeoProviderRegistry } from '../../providers/geo-provider-registry.service';
 import { HeatmapCell } from '../../types/heatmap.types';
 import { RiderCandidate } from '../../types/rider-candidate.types';
 

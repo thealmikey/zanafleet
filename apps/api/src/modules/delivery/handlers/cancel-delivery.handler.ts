@@ -1,7 +1,8 @@
+import { randomUUID } from 'node:crypto'
+
 import { Logger } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { InjectRepository } from '@nestjs/typeorm'
-import { randomUUID } from 'node:crypto'
 import { DeliveryStatus } from '@zanafleet/contracts'
 import { Repository } from 'typeorm'
 

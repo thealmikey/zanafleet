@@ -1,8 +1,8 @@
+import { PolicyAdjustment } from '../domain/move-estimate';
 import { MoveProfile } from '../domain/move-profile';
 import { VehicleCapabilityProfile } from '../domain/vehicle-capability-profile';
-import { PolicyAdjustment } from '../domain/move-estimate';
-import { NormalizedLocation } from '../services/location-normalization.service';
 import type { MediaInsight } from '../media-insight';
+import { NormalizedLocation } from '../services/location-normalization.service';
 
 /**
  * Demand signals containing temporal and contextual demand indicators

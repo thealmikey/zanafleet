@@ -1,7 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
-import { MediaPerceptionFeatureService } from '../../services/media-perception-feature.service';
+import { Test, TestingModule } from '@nestjs/testing';
+
 import { MediaPerceptionConfig } from '../../config/media-perception.config';
+import { MediaPerceptionFeatureService } from '../../services/media-perception-feature.service';
 
 describe('MediaPerceptionFeatureService', () => {
   const createMockConfig = (overrides?: Partial<MediaPerceptionConfig>): MediaPerceptionConfig => ({

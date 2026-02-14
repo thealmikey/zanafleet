@@ -2,9 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { BundleEntity, BundleStatus } from '../entities/bundle.entity';
-import { TripEntity } from '../entities/trip.entity';
-import { AssetEntity } from '../entities/asset.entity';
+
 import {
     CreateBundleDto,
     BundleResponseDto,
@@ -12,6 +10,9 @@ import {
     UpdateBundleStatusDto,
     BundleInvoiceDto,
 } from '../dto/asset-platform.dto';
+import { AssetEntity } from '../entities/asset.entity';
+import { BundleEntity, BundleStatus } from '../entities/bundle.entity';
+import { TripEntity } from '../entities/trip.entity';
 
 /**
  * Bundle Service
