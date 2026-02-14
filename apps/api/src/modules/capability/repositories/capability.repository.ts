@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -31,8 +31,6 @@ export interface ActorCapabilityContext {
  */
 @Injectable()
 export class CapabilityRepository {
-  private readonly logger = new Logger(CapabilityRepository.name);
-
   constructor(
     @InjectRepository(CapabilityEntity)
     private readonly capabilityRepository: Repository<CapabilityEntity>,

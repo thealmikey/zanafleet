@@ -161,6 +161,14 @@ export class UIComposerService {
     // Get all capability names for the actor
     const capabilities = await this.capabilityAccessController.getCapabilitiesForActor(actorId);
 
+    // Handle null/undefined capabilities response
+    if (!capabilities) {
+      return {
+        capabilities: [],
+        capabilityMetadata: new Map(),
+      };
+    }
+
     // Get metadata for each capability (requiresConsent)
     const capabilityMetadata = new Map<string, { name: string; requiresConsent: boolean }>();
 
@@ -243,11 +251,18 @@ export class UIComposerService {
       const hasCapability = actorCapabilities.capabilities.includes(definition.capability);
       const capabilityMetadata = actorCapabilities.capabilityMetadata.get(definition.capability);
 
+      // Check requiresConsent from multiple sources:
+      // 1. Capability metadata (if actor has the capability)
+      // 2. Action definition
+      // 3. Inherent consent requirement based on capability name
+      const inherentRequiresConsent = this.determineRequiresConsent(definition.capability);
+      const requiresConsent = capabilityMetadata?.requiresConsent ?? definition.requiresConsent ?? inherentRequiresConsent;
+
       return {
         id: definition.id,
         label: definition.label,
         capability: definition.capability,
-        requiresConsent: capabilityMetadata?.requiresConsent ?? definition.requiresConsent,
+        requiresConsent: requiresConsent === true ? true : undefined,
         requiresConfirmation: definition.requiresConfirmation,
         confirmationMessage: definition.confirmationMessage,
         style: definition.style,
