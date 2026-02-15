@@ -13,7 +13,7 @@ import { TemplateEntity } from './entities/template.entity';
 import { SendNotificationCommandHandler } from './handlers/send-notification.handler';
 import { NotificationNeo4jProjection } from './projections/notification-neo4j.projection';
 import { ChannelProviderRegistry } from './providers/channel-provider.interface';
-import { NoOpChannelProvider, createNoOpProviders } from './providers/noop-channel.provider';
+import { NoOpChannelProvider } from './providers/noop-channel.provider';
 import { MessageBuilderService } from './services/message-builder.service';
 import { PreferenceService } from './services/preference.service';
 import { TemplateService } from './services/template.service';

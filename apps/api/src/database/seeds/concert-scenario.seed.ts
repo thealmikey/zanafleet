@@ -1,5 +1,6 @@
-import { v4 as uuidv4 } from 'uuid';
 import { AssetType, AssetStatus, OwnerType } from '@zanafleet/contracts';
+import { v4 as uuidv4 } from 'uuid';
+
 import { BundleStatus } from '../modules/asset/dto/asset-platform.dto';
 /**
  * Nairobi Music Festival 2026 - Seed Data

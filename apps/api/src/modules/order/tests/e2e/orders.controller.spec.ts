@@ -9,6 +9,7 @@ import request from 'supertest';
 
 
 import { OrdersController } from '../../controllers/orders.controller';
+import { CustomerOrderOrchestrator } from '../../coordinators/customer-order.orchestrator';
 import { OrderEntity } from '../../entities/order.entity';
 
 describe('OrdersController (e2e)', () => {
@@ -22,6 +23,7 @@ describe('OrdersController (e2e)', () => {
     delete: jest.Mock;
   };
   let mockCapabilityAccessController: { hasCapability: jest.Mock };
+  let mockCustomerOrderOrchestrator: { placeCustomerOrder: jest.Mock };
 
   const createMockOrderEntity = (overrides: Partial<OrderEntity> = {}): OrderEntity => {
     const entity = new OrderEntity();
@@ -49,6 +51,7 @@ describe('OrdersController (e2e)', () => {
       delete: jest.fn(),
     };
     mockCapabilityAccessController = { hasCapability: jest.fn().mockResolvedValue(true) };
+    mockCustomerOrderOrchestrator = { placeCustomerOrder: jest.fn() };
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [OrdersController],
@@ -56,6 +59,7 @@ describe('OrdersController (e2e)', () => {
         Reflector,
         { provide: getRepositoryToken(OrderEntity), useValue: mockRepository },
         { provide: CommandBus, useValue: mockCommandBus },
+        { provide: CustomerOrderOrchestrator, useValue: mockCustomerOrderOrchestrator },
       ],
     })
       .overrideGuard(CapabilityGuard)

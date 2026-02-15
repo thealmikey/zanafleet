@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { NotificationChannel } from '../../../modules/communication/dto/notification.enums';
 import { MessagePayload, SendResult } from '../interfaces/message-payload.interface';
 import { EmailProvider } from '../providers/email.provider';
 import { PushProvider } from '../providers/push.provider';
@@ -21,13 +22,13 @@ export class MessagingService {
     );
 
     switch (message.channel) {
-      case 'email':
+      case NotificationChannel.EMAIL:
         return this.emailProvider.send(message);
 
-      case 'sms':
+      case NotificationChannel.SMS:
         return this.smsProvider.send(message);
 
-      case 'push':
+      case NotificationChannel.PUSH:
         return this.pushProvider.send(message);
 
       default: {

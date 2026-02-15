@@ -3,6 +3,7 @@ import { VehicleType } from '@zanafleet/contracts';
 
 import { EventBusService } from '../../../../core/event-bus/event-bus.service';
 import { GeoQueryCoordinator } from '../../coordinators/geo-query.coordinator';
+import { GeoProviderRegistry } from '../../providers/geo-provider-registry.service';
 import { HeatmapService } from '../../services/heatmap.service';
 import { LocationIntelligenceService } from '../../services/location-intelligence.service';
 import { HeatmapCell } from '../../types/heatmap.types';
@@ -55,11 +56,20 @@ describe('GeoQueryCoordinator', () => {
       publishEvent: jest.fn().mockResolvedValue(undefined),
     };
 
+    const mockGeoProviderRegistry = {
+      getDefaultId: jest.fn().mockReturnValue('noop'),
+      getProvider: jest.fn().mockReturnValue({
+        geocode: jest.fn(),
+        reverseGeocode: jest.fn(),
+      }),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         GeoQueryCoordinator,
         { provide: LocationIntelligenceService, useValue: mockLocationIntelligenceService },
         { provide: HeatmapService, useValue: mockHeatmapService },
+        { provide: GeoProviderRegistry, useValue: mockGeoProviderRegistry },
         { provide: EventBusService, useValue: mockEventBusService },
       ],
     }).compile();

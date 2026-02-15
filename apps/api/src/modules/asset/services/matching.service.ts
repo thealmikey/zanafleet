@@ -1,11 +1,11 @@
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { AssetEntity } from '../entities/asset.entity';
 import { AssetType, AssetStatus } from '@zanafleet/contracts';
-import { In } from 'typeorm';
-import { SEARCH_PROVIDER, ISearchProvider } from '../../search/providers/search-provider.interface';
+import { Repository , In } from 'typeorm';
+
 import { SearchDocument } from '../../search/dto/search.dto';
+import { SEARCH_PROVIDER, ISearchProvider } from '../../search/providers/search-provider.interface';
+import { AssetEntity } from '../entities/asset.entity';
 
 export interface MatchingRequirements {
     suggestedType: AssetType;

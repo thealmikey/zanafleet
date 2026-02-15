@@ -25,10 +25,10 @@ export class IssueInvoiceCommand {
   readonly correlationId?: string;
 
   constructor(input: IssueInvoiceCommandInput) {
-    this.invoiceId = input.invoiceId;
-    this.paymentMethod = input.paymentMethod;
-    this.providerId = input.providerId;
-    this.correlationId = input.correlationId;
+    this.invoiceId = input.invoiceId ;
+    this.paymentMethod = input.paymentMethod as PaymentMethod;
+    this.providerId = input.providerId ;
+    this.correlationId = input.correlationId ;
   }
 
   static validate(input: unknown): IssueInvoiceCommandInput {

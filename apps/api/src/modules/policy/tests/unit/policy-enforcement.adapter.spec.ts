@@ -7,7 +7,6 @@ import {
   PolicyScope,
   EvaluationResult,
   PolicyDecision,
-  EvaluationContext,
 } from '../../dto';
 import {
   PolicyEnforcementAdapter,

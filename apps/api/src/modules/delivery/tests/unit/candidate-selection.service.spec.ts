@@ -1,10 +1,11 @@
+import { haversineDistanceMeters } from '@api/core/utils/geo.utils';
+
 import {
   CandidateSelectionService,
   GeoPoint,
   InMemoryRiderCandidateRepository,
   RiderCandidate,
   TimeWindow,
-  haversineDistanceMeters,
   rankCandidates,
 } from '../../services/candidate-selection.service';
 

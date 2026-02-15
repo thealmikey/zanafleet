@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto'
+
 import { Logger } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -34,13 +36,16 @@ export class CancelDeliveryHandler implements ICommandHandler<CancelDeliveryComm
     const cancelledAt = new Date()
     await this.deliveryService.updateStatus(deliveryId, DeliveryStatus.Cancelled, { cancelledAt })
 
-    const after = await this.deliveryRepo.findOneByOrFail({ id: deliveryId })
+    // Get delivery state after update
+    await this.deliveryRepo.findOneByOrFail({ id: deliveryId })
 
     const event = new DeliveryCancelledEventV1({
+      eventId: randomUUID(),
       deliveryId,
-      businessId: after.businessId,
+      reason: reason ?? 'Not specified',
+      previousState: existing.status,
+      ledgerReservationReleased: false,
       cancelledAt,
-      reason,
       correlationId,
       causationId,
     })

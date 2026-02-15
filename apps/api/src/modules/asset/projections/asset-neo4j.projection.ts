@@ -1,6 +1,7 @@
 import { Neo4jService } from '@api/core/neo4j';
 import { Injectable, Logger } from '@nestjs/common';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+
 import { AssetCreatedEventV1 } from '../events/asset-created.event';
 
 /**

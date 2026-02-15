@@ -1,9 +1,9 @@
+import { CapabilityGuard } from '@api/core/api/guards';
 import { Controller, Get, Query, Inject, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
-import { CapabilityGuard } from '@api/core/api/guards';
 
-import { SEARCH_PROVIDER, ISearchProvider } from '../providers/search-provider.interface';
 import { SearchOptions, SearchResults } from '../dto/search.dto';
+import { SEARCH_PROVIDER, ISearchProvider } from '../providers/search-provider.interface';
 
 @ApiTags('Search')
 @Controller('search')

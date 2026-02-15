@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { BindingTargetType, PolicyTrigger, PolicyEffect } from '@zanafleet/contracts';
+import { Repository } from 'typeorm';
+
 import { SchedulingConstraintService } from '../../calendar/services/scheduling-constraint.service';
-import { PolicyEvaluationEngineService } from '../../policy/services/policy-evaluation-engine.service';
 import { CustomerEntity } from '../../customer/entities/customer.entity';
+import { PolicyEvaluationEngineService } from '../../policy/services/policy-evaluation-engine.service';
 import { BusinessAvailabilityProjection } from '../entities/business-availability.projection';
 
 export interface CommerceEvaluationResult {

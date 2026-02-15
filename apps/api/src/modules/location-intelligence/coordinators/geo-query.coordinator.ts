@@ -12,11 +12,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
+import { GeoProviderRegistry } from '../providers/geo-provider-registry.service';
 import { HeatmapService } from '../services/heatmap.service';
 import { LocationIntelligenceService } from '../services/location-intelligence.service';
 import { HeatmapCell, HeatmapParams } from '../types/heatmap.types';
 import { RiderCandidate } from '../types/rider-candidate.types';
-import { GeoProviderRegistry } from '../providers/geo-provider-registry.service';
 
 /**
  * Cache entry with TTL tracking

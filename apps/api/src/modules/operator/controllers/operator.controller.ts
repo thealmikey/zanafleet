@@ -1,9 +1,10 @@
 import { Controller, Get, Post, Body, Param, NotFoundException, HttpCode, HttpStatus } from '@nestjs/common';
+import { EventBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { OperatorEntity } from '../entities/operator.entity';
 import { v4 as uuidv4 } from 'uuid';
-import { EventBus } from '@nestjs/cqrs';
+
+import { OperatorEntity } from '../entities/operator.entity';
 import { OperatorOnboardedEventV1 } from '../events/operator-onboarded.event';
 
 export class CreateOperatorDto {

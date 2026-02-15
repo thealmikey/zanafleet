@@ -8,6 +8,7 @@ import {
     JoinColumn,
     Index,
 } from 'typeorm';
+
 import { AssetEntity } from './asset.entity';
 
 /**

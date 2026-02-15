@@ -12,9 +12,10 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { AssetType, AssetStatus, OwnerType } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { AssetType, AssetStatus, OwnerType } from '@zanafleet/contracts';
+
 import { AssetEntity } from './entities/asset.entity';
 
 export interface SeedAssetData {

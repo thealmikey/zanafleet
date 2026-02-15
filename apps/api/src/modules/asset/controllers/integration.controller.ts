@@ -1,15 +1,16 @@
 import { Controller, Get, Post, Body, Query, Param, Headers, HttpCode, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { AssetEntity } from '../entities/asset.entity';
-import { BundleEntity } from '../entities/bundle.entity';
-import { TripEntity } from '../entities/trip.entity';
+
 import {
     BatchCreateAssetsDto,
     WebhookSubscriptionDto,
     AvailabilityRequestDto,
     AvailabilityResponseDto,
 } from '../dto/asset-platform.dto';
+import { AssetEntity } from '../entities/asset.entity';
+import { BundleEntity } from '../entities/bundle.entity';
+import { TripEntity } from '../entities/trip.entity';
 
 @Controller('integrations')
 export class IntegrationController {

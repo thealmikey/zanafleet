@@ -1,4 +1,5 @@
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm';
+
 import { TripEntity } from './trip.entity';
 
 export enum BundleStatus {

@@ -18,11 +18,13 @@ describe('Policy Enums', () => {
       expect(PolicyScope.SACCO).toBe('SACCO');
       expect(PolicyScope.BUSINESS).toBe('BUSINESS');
       expect(PolicyScope.RIDER).toBe('RIDER');
+      expect(PolicyScope.ASSET).toBe('ASSET');
+      expect(PolicyScope.OPERATOR).toBe('OPERATOR');
     });
 
-    it('should have exactly 5 scope values', () => {
+    it('should have exactly 7 scope values', () => {
       const values = Object.values(PolicyScope);
-      expect(values).toHaveLength(5);
+      expect(values).toHaveLength(7);
     });
   });
 
@@ -60,11 +62,13 @@ describe('Policy Enums', () => {
       expect(PolicyTrigger.RIDER_ASSIGNMENT).toBe('RIDER_ASSIGNMENT');
       expect(PolicyTrigger.STATUS_TRANSITION).toBe('STATUS_TRANSITION');
       expect(PolicyTrigger.SLA_CHECK).toBe('SLA_CHECK');
+      expect(PolicyTrigger.REVENUE_DISTRIBUTION).toBe('REVENUE_DISTRIBUTION');
+      expect(PolicyTrigger.ORDER_PLACEMENT).toBe('ORDER_PLACEMENT');
     });
 
-    it('should have exactly 4 trigger values', () => {
+    it('should have exactly 6 trigger values', () => {
       const values = Object.values(PolicyTrigger);
-      expect(values).toHaveLength(4);
+      expect(values).toHaveLength(6);
     });
   });
 });

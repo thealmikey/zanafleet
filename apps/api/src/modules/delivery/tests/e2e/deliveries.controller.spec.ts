@@ -13,6 +13,7 @@ import { DeliveriesController } from '../../controllers/deliveries.controller';
 import { DeliveryExecutionCoordinator } from '../../coordinators/delivery-execution.coordinator';
 import { DeliveryLifecycleCoordinator } from '../../coordinators/delivery-lifecycle.coordinator';
 import { DeliveryMatchingCoordinator } from '../../coordinators/delivery-matching.coordinator';
+import { DeliveryRequestCoordinator } from '../../coordinators/delivery-request.coordinator';
 import { DeliveryEntity } from '../../entities/delivery.entity';
 
 describe('DeliveriesController (e2e)', () => {
@@ -36,6 +37,7 @@ describe('DeliveriesController (e2e)', () => {
     confirmPickup: jest.Mock;
     confirmDropoff: jest.Mock;
   };
+  let mockRequestCoordinator: { createDelivery: jest.Mock };
   let mockCapabilityAccessController: { hasCapability: jest.Mock };
   let mockPolicyEngine: { evaluate: jest.Mock };
 
@@ -89,6 +91,7 @@ describe('DeliveriesController (e2e)', () => {
       confirmPickup: jest.fn(),
       confirmDropoff: jest.fn(),
     };
+    mockRequestCoordinator = { createDelivery: jest.fn() };
     mockCapabilityAccessController = { hasCapability: jest.fn().mockResolvedValue(true) };
     mockPolicyEngine = {
       evaluate: jest.fn().mockResolvedValue({
@@ -113,6 +116,7 @@ describe('DeliveriesController (e2e)', () => {
         { provide: DeliveryLifecycleCoordinator, useValue: mockLifecycleCoordinator },
         { provide: DeliveryMatchingCoordinator, useValue: mockMatchingCoordinator },
         { provide: DeliveryExecutionCoordinator, useValue: mockExecutionCoordinator },
+        { provide: DeliveryRequestCoordinator, useValue: mockRequestCoordinator },
         { provide: PolicyEvaluationEngineService, useValue: mockPolicyEngine },
       ],
     })

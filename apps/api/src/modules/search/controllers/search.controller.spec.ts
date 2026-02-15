@@ -1,6 +1,7 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
+
 import { SearchController } from '../controllers/search.controller';
 import { SEARCH_PROVIDER } from '../providers/search-provider.interface';
 

@@ -5,7 +5,7 @@ import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { AuthProvider } from './contexts/AuthContext';
 import { SignupWizardProvider } from './contexts/SignupWizardContext';
 import { DevAccountSwitcher } from './components/DevAccountSwitcher';
-import { HomePage } from './components/HomePage';
+import { MoversHomePage } from './pages/MoversHomePage';
 import { SignIn } from './components/SignIn';
 import { SignupWizard } from './components/SignupWizard';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -42,7 +42,7 @@ function App(): React.ReactElement {
         <SignupWizardProvider>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<HomePage />} />
+              <Route path="/" element={<MoversHomePage />} />
               <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignupWizard />} />
               <Route path="/demo/components" element={<ComponentsDemo />} />

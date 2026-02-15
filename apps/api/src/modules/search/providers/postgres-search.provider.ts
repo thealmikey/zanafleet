@@ -1,14 +1,14 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository } from 'typeorm';
 
-import { SearchDocumentEntity } from '../entities/search-document.entity';
 import { SearchDocument, SearchOptions, SearchResults } from '../dto/search.dto';
+import { SearchDocumentEntity } from '../entities/search-document.entity';
+
 import { ISearchProvider } from './search-provider.interface';
 
 @Injectable()
 export class PostgresSearchProvider implements ISearchProvider {
-    private readonly logger = new Logger(PostgresSearchProvider.name);
 
     constructor(
         @InjectRepository(SearchDocumentEntity)
@@ -51,7 +51,7 @@ export class PostgresSearchProvider implements ISearchProvider {
             qb.orderBy('doc.createdAt', 'DESC');
         } else if (query) {
             // Sort by rank
-            qb.addSelect("ts_rank(doc.tsv, websearch_to_tsquery('english', :query))", 'rank', { query });
+            qb.addSelect("ts_rank(doc.tsv, websearch_to_tsquery('english', :query))", 'rank');
             qb.orderBy('rank', 'DESC');
         } else {
             qb.orderBy('doc.createdAt', 'DESC');

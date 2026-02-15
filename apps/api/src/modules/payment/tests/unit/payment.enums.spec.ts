@@ -14,9 +14,9 @@ describe('PaymentEnums', () => {
       expect(PaymentIntentStatus.CANCELLED).toBe('CANCELLED');
     });
 
-    it('should have exactly 5 statuses', () => {
+    it('should have exactly 6 statuses', () => {
       const values = Object.values(PaymentIntentStatus);
-      expect(values).toHaveLength(5);
+      expect(values).toHaveLength(6);
     });
   });
 
