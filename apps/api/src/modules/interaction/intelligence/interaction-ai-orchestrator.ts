@@ -2,7 +2,6 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { IEventHandler, EventsHandler, EventBus } from '@nestjs/cqrs';
 
 import { InteractionEventEntity, InteractionEventType } from '../entities/interaction-event.entity';
-import { InteractionStreamEntity } from '../entities/interaction-stream.entity';
 import { InteractionEventCreatedEventV1 } from '../events/interaction-event-created.event';
 import { InteractionEventRepository } from '../repositories/interaction-event.repository';
 import { InteractionStreamRepository } from '../repositories/interaction-stream.repository';
@@ -10,7 +9,6 @@ import { InteractionStreamRepository } from '../repositories/interaction-stream.
 import {
   InteractionIntelligenceContext,
   AIRecommendation,
-  AIActionType,
   IntentType,
   SentimentType,
   InteractionIntelligenceConfig,
@@ -163,7 +161,7 @@ export class InteractionEventAIOHandler implements IEventHandler<InteractionEven
       await this.processRecommendation(context, recommendation);
 
     } catch (error) {
-      this.logger.error(`Error in AI orchestration: ${error}`, error);
+      this.logger.error(`Error in AI orchestration: ${error instanceof Error ? error.message : String(error)}`, error);
       // Don't throw - AI failures should not break the main flow
     }
   }
@@ -230,7 +228,10 @@ export class InteractionEventAIOHandler implements IEventHandler<InteractionEven
     recommendation: AIRecommendation,
   ): Promise<void> {
     const streamId = context.stream.id;
-    const eventId = context.currentEvent!.id;
+    if (!context.currentEvent) {
+      return; // Cannot process without current event
+    }
+    const eventId = context.currentEvent.id;
 
     // Emit AI response generated event
     if (recommendation.response) {

@@ -1,5 +1,5 @@
-import { Injectable, Inject, Logger, ForbiddenException, NotFoundException } from '@nestjs/common';
-import { CommandBus, QueryBus, ICommand } from '@nestjs/cqrs';
+import { Injectable, Logger } from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
 
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
@@ -408,7 +408,7 @@ export class CapabilityOrchestrator implements ICapabilityOrchestrator {
     // This would integrate with WorkflowEngine
     // For now, it's a no-op placeholder
     this.logger.debug(
-      `CapabilityOrchestrator: Workflow validation skipped for ${_request.contextType}:${_request.contextId}`
+      `CapabilityOrchestrator: Workflow validation skipped for ${_request.contextType ?? ''}:${_request.contextId ?? ''}`
     );
   }
 

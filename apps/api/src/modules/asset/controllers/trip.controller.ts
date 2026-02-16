@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Body, Param, Query, HttpCode, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 
 import { TripEntity } from '../entities/trip.entity';
 
@@ -25,7 +26,7 @@ export class TripController {
     @HttpCode(HttpStatus.CREATED)
     async create(@Body() dto: CreateTripDto) {
         const trip = this.tripRepository.create({
-            id: require('uuid').v4(),
+            id: uuidv4(),
             assetId: dto.assetId,
             operatorId: dto.operatorId,
             bundleId: dto.bundleId,

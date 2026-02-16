@@ -23,7 +23,7 @@ export class CustomerProjectionService {
         customerId: string;
         status: OrderStatus;
         totalAmount: number;
-        items: any[];
+        items: Array<{ description?: string | null; quantity?: number }>;
         location?: { lat: number; lng: number };
     }) {
         // 1. Update Customer Activity
@@ -49,9 +49,11 @@ export class CustomerProjectionService {
 
             // Update frequent items
             const items = (projection.frequentItems as Record<string, number>) || {};
-            data.items.forEach(item => {
-                const desc = item.description || 'Unknown Item';
-                items[desc] = (items[desc] || 0) + 1;
+            data.items.forEach((item) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                const desc = (item.description as string) || 'Unknown Item';
+                const itemCount = items[desc] || 0;
+                items[desc] = itemCount + 1;
             });
             projection.frequentItems = items;
         } else if (data.status === OrderStatus.Cancelled) {

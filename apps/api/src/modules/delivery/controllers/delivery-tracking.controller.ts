@@ -14,6 +14,15 @@ import { DataSource } from 'typeorm'
 
 import { DeliveryService } from '../services/delivery.service'
 
+interface DeliveryStopRow {
+  sequence: string | number
+  type: string
+  locationId: string
+  scheduledTime: string | Date | null
+  actualTime: string | Date | null
+  notes: string | null
+}
+
 class DeliveryTrackingStopDto {
   @ApiProperty({ description: 'Stop sequence number starting from 0', example: 0 })
   sequence!: number
@@ -167,7 +176,7 @@ export class DeliveryTrackingController {
       throw new NotFoundException('Delivery not found')
     }
 
-    const rows = (await this.dataSource.query(
+    const rows = await this.dataSource.query<DeliveryStopRow[]>(
       `
       SELECT
         "sequence",
@@ -181,11 +190,11 @@ export class DeliveryTrackingController {
       ORDER BY "sequence" ASC
     `,
       [base.deliveryId],
-    ))
+    )
 
-    const stops: DeliveryTrackingStopDto[] = rows.map((r) => ({
+    const stops: DeliveryTrackingStopDto[] = rows.map((r): DeliveryTrackingStopDto => ({
       sequence: Number(r.sequence),
-      type: r.type,
+      type: r.type as 'pickup' | 'dropoff' | 'waypoint',
       locationId: r.locationId,
       scheduledTime: r.scheduledTime ? new Date(r.scheduledTime) : null,
       actualTime: r.actualTime ? new Date(r.actualTime) : null,

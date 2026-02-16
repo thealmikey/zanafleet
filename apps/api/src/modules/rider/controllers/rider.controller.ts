@@ -25,7 +25,7 @@ import { VehicleType, LocationData } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 
 
-import { CreateRiderCommand } from '../commands/create-rider.command';
+import { CreateRiderCommand, CreateRiderCommandInput } from '../commands/create-rider.command';
 import { RiderEntity } from '../entities/rider.entity';
 
 export class CreateRiderDto {
@@ -61,8 +61,8 @@ export class RiderController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateRiderDto): Promise<{ id: string }> {
-    const validated = CreateRiderCommand.validate(dto);
-    const id = await this.commandBus.execute(new CreateRiderCommand(validated));
+    const validated: CreateRiderCommandInput = CreateRiderCommand.validate(dto);
+    const id = await this.commandBus.execute<CreateRiderCommand, string>(new CreateRiderCommand(validated));
     return { id };
   }
 
@@ -110,7 +110,10 @@ export class RiderController {
     await this.riderRepository.update(id, dto as Partial<RiderEntity> as Record<string, unknown>);
 
     const updated = await this.riderRepository.findOne({ where: { id } });
-    return updated!.toDomain();
+    if (!updated) {
+      throw new NotFoundException('Failed to retrieve updated rider');
+    }
+    return updated.toDomain();
   }
 
   @Delete(':id')

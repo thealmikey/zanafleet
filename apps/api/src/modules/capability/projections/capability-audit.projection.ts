@@ -150,7 +150,7 @@ export class CapabilityAuditService {
       .addSelect('COUNT(*)', 'count')
       .where('audit.capabilityName = :capabilityName', { capabilityName })
       .groupBy('audit.result')
-      .getRawMany();
+      .getRawMany<{ result: string; count: string }>();
 
     const result = {
       total: 0,

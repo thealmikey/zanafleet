@@ -68,7 +68,7 @@ export class CapabilityAccessController implements ICapabilityAccessController {
     }
 
     this.logger.log(
-      `CapabilityAccessController initialized with cache: ${this.options.enableCache}`
+      `CapabilityAccessController initialized with cache: ${this.options.enableCache ?? false}`
     );
   }
 
@@ -119,7 +119,7 @@ export class CapabilityAccessController implements ICapabilityAccessController {
       try {
         await this.redisService
           .getClient()
-          .setex(cacheKey, this.options.cacheTtlSeconds!, hasCapability ? '1' : '0');
+          .setex(cacheKey, this.options.cacheTtlSeconds ?? 300, hasCapability ? '1' : '0');
       } catch (error) {
         this.logger.warn(`Cache write failed: ${(error as Error).message}`);
       }

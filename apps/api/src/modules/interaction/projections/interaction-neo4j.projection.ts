@@ -1,6 +1,7 @@
 import { Neo4jService } from '@api/core/neo4j';
 import { Injectable, Logger } from '@nestjs/common';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
+import { Session } from 'neo4j-driver';
 
 import { InteractionEventCreatedEventV1 } from '../events/interaction-event-created.event';
 import { InteractionStreamCreatedEventV1 } from '../events/interaction-stream-created.event';
@@ -167,7 +168,7 @@ export class InteractionNeo4jProjection
    * Create context-specific relationship
    */
   private async createContextRelationship(
-    session: any,
+    session: Session,
     event: InteractionStreamCreatedEventV1,
   ): Promise<void> {
     const contextType = event.contextType;

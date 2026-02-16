@@ -227,7 +227,10 @@ export class ConsentConfirmationService {
 
       case ConfirmationAction.MODIFY:
       case ConfirmationAction.EDIT:
-        return await this.modifyProposal(proposal, confirmation, modifiedInputs!);
+        if (!modifiedInputs) {
+          throw new Error('Modified inputs are required for MODIFY/EDIT actions');
+        }
+        return await this.modifyProposal(proposal, confirmation, modifiedInputs);
 
       case ConfirmationAction.CANCEL:
         return await this.cancelProposal(proposal, confirmation);

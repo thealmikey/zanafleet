@@ -116,18 +116,18 @@ export class PaymentFlowOrchestrator {
 
       if (fraudResult.decision === FraudDecision.BLOCK) {
         await this.updateIntentStatus(intentId, PaymentIntentStatus.FAILED);
-        await this.emitPaymentFailedEvent(intent, `Fraud check blocked: ${fraudResult.blockReason}`);
+        await this.emitPaymentFailedEvent(intent, `Fraud check blocked: ${fraudResult.blockReason ?? ''}`);
 
         return this.createFailedResult(
           intentId,
-          `Payment blocked by fraud check: ${fraudResult.blockReason}`,
+          `Payment blocked by fraud check: ${fraudResult.blockReason ?? ''}`,
           PaymentIntentStatus.FAILED,
         );
       }
 
       if (fraudResult.decision === FraudDecision.REVIEW) {
         await this.updateIntentStatus(intentId, PaymentIntentStatus.PENDING);
-        this.logger.warn(`Payment ${intentId} flagged for review: ${fraudResult.riskLevel}`);
+        this.logger.warn(`Payment ${intentId} flagged for review: ${fraudResult.riskLevel ?? ''}`);
       }
 
       await this.emitPaymentIntentCreatedEvent(intent);

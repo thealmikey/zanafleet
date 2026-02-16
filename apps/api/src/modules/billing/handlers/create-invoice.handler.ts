@@ -106,8 +106,9 @@ export class CreateInvoiceCommandHandler implements ICommandHandler<CreateInvoic
     if (this.eventBusService) {
       this.eventBusService
         .publish(NatsSubjects.Billing.INVOICE_CREATED_V1, event)
-        .catch((error) => {
-          this.logger.error(`Failed to publish InvoiceCreatedEvent to NATS: ${error.message}`);
+        .catch((error: unknown) => {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          this.logger.error(`Failed to publish InvoiceCreatedEvent to NATS: ${errorMessage}`);
         });
     }
 

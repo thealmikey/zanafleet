@@ -28,7 +28,7 @@ export class SearchDocumentEntity {
     description!: string | null;
 
     @Column('jsonb', { default: {} })
-    metadata!: Record<string, any>;
+    metadata!: Record<string, unknown>;
 
     @Column({
         type: 'geometry',

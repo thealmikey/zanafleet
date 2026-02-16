@@ -483,8 +483,8 @@ export class RevenueDistributionEngine {
 
     await this.eventBusService
       .publish(NatsSubjects.Ledger.REVENUE_DISTRIBUTED_V1, revenueDistributedEvent)
-      .catch((error) => {
-        this.logger.error(`Failed to publish RevenueDistributedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish RevenueDistributedEvent: ${(error as Error).message}`);
       });
 
     for (const entry of ledgerEntries.filter((e) => e.entryType === 'CREDIT')) {
@@ -505,8 +505,8 @@ export class RevenueDistributionEngine {
 
       await this.eventBusService
         .publish(NatsSubjects.Ledger.EARNINGS_ACCRUED_V1, earningsEvent)
-        .catch((error) => {
-          this.logger.error(`Failed to publish EarningsAccruedEvent: ${error.message}`);
+        .catch((error: unknown) => {
+          this.logger.error(`Failed to publish EarningsAccruedEvent: ${(error as Error).message}`);
         });
     }
   }

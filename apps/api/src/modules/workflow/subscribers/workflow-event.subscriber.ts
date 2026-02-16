@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+/* eslint-disable @typescript-eslint/restrict-template-expressions */
 import { WorkflowEngineService } from '../services/workflow-engine.service';
 
 /**

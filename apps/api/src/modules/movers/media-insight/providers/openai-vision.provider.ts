@@ -123,7 +123,7 @@ export class OpenAIVisionProvider implements IVisionProvider {
 
     if (this._isAvailable) {
       this.logger.log(
-        `OpenAI Vision provider initialized with model: ${this.config.model}`
+        `OpenAI Vision provider initialized with model: ${this.config.model ?? ''}`
       );
     } else {
       this.logger.warn(
@@ -183,17 +183,17 @@ export class OpenAIVisionProvider implements IVisionProvider {
     try {
       // Make a minimal API call to check connectivity
       // In production, you might use a dedicated health endpoint
-      const response = await fetch(`${this.config.endpoint}/models`, {
+      const response = await fetch(`${this.config.endpoint ?? ''}/models`, {
         method: 'GET',
         headers: {
-          Authorization: `Bearer ${this.config.apiKey}`,
+          Authorization: `Bearer ${this.config.apiKey ?? ''}`,
         },
         signal: AbortSignal.timeout(5000),
       });
 
       return response.ok;
     } catch (error) {
-      this.logger.warn(`OpenAI health check failed: ${error}`);
+      this.logger.warn(`OpenAI health check failed: ${error instanceof Error ? error.message : String(error)}`);
       return false;
     }
   }
@@ -239,11 +239,11 @@ export class OpenAIVisionProvider implements IVisionProvider {
 
     const timeout = this.config.timeout || DEFAULT_TIMEOUT;
 
-    const response = await fetch(`${this.config.endpoint}/chat/completions`, {
+    const response = await fetch(`${this.config.endpoint ?? ''}/chat/completions`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.config.apiKey}`,
+        Authorization: `Bearer ${this.config.apiKey ?? ''}`,
       },
       body: JSON.stringify(requestBody),
       signal: AbortSignal.timeout(timeout),
@@ -293,7 +293,7 @@ export class OpenAIVisionProvider implements IVisionProvider {
 
       return insight;
     } catch (error) {
-      this.logger.warn(`Failed to parse OpenAI response: ${error}`);
+      this.logger.warn(`Failed to parse OpenAI response: ${error instanceof Error ? error.message : String(error)}`);
       return null;
     }
   }

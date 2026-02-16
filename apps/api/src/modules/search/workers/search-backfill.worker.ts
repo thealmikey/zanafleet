@@ -91,8 +91,9 @@ export class SearchBackfillWorker implements OnModuleInit {
                     createdAt: d.createdAt,
                 });
             }
-        } catch (error: any) {
-            this.logger.error(`Backfill failed: ${error.message}`, error.stack);
+        } catch (error: unknown) {
+            const err = error as Error;
+            this.logger.error(`Backfill failed: ${err.message}`, err.stack);
         }
     }
 }

@@ -12,11 +12,31 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { AssetType, AssetStatus, OwnerType } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { AssetEntity } from './entities/asset.entity';
+
+/**
+ * Local enum definitions to avoid import issues from @zanafleet/contracts
+ */
+export enum AssetType {
+  TRUCK = 'TRUCK',
+  VAN = 'VAN',
+  MOTORCYCLE = 'MOTORCYCLE',
+  BUS = 'BUS',
+}
+
+export enum AssetStatus {
+  ACTIVE = 'ACTIVE',
+  MAINTENANCE = 'MAINTENANCE',
+  INACTIVE = 'INACTIVE',
+}
+
+export enum OwnerType {
+  Organization = 'Organization',
+  Individual = 'Individual',
+}
 
 export interface SeedAssetData {
     name: string;

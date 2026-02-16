@@ -109,7 +109,7 @@ export class LedgerService {
     totalDebit: number;
     totalCredit: number;
   }> {
-    const result = await this.ledgerEntryRepository
+    const result: Array<{ entryType: string; total: string }> = await this.ledgerEntryRepository
       .createQueryBuilder('entry')
       .select('entry.entryType', 'entryType')
       .addSelect('SUM(CAST(entry.amount AS DECIMAL))', 'total')

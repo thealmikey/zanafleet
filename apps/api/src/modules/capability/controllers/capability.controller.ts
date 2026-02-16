@@ -3,14 +3,10 @@ import { CapabilityGuard } from '@api/core/api/guards/capability.guard';
 import {
   Controller,
   Get,
-  Post,
-  Body,
   Param,
   Query,
   UseGuards,
   Req,
-  HttpCode,
-  HttpStatus,
 } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 

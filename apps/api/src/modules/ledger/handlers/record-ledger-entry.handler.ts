@@ -112,9 +112,9 @@ export class RecordLedgerEntryCommandHandler
     if (this.eventBusService) {
       this.eventBusService
         .publish(NatsSubjects.Ledger.ENTRY_RECORDED_V1, event)
-        .catch((error) => {
+        .catch((error: unknown) => {
           this.logger.error(
-            `Failed to publish LedgerEntryRecordedEvent to NATS: ${error.message}`,
+            `Failed to publish LedgerEntryRecordedEvent to NATS: ${(error as Error).message}`,
           );
         });
     }

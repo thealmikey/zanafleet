@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/restrict-template-expressions */
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request, { SuperTest, Test as SuperTestAgent, Response } from 'supertest';
 
 import { AppModule } from '../src/app.module';
 
@@ -10,9 +11,10 @@ import { AppModule } from '../src/app.module';
  */
 describe('Concert Event Logistics (e2e)', () => {
     let app: INestApplication;
+    let httpRequest: SuperTest<SuperTestAgent>;
     let bundleId: string;
-    const assetIds: string[] = [];
-    const operatorIds: string[] = [];
+    const _assetIds: string[] = [];
+    const _operatorIds: string[] = [];
     const tripIds: string[] = [];
 
     beforeEach(async () => {
@@ -22,6 +24,7 @@ describe('Concert Event Logistics (e2e)', () => {
 
         app = moduleFixture.createNestApplication();
         await app.init();
+        httpRequest = request(app.getHttpServer());
     });
 
     afterEach(async () => {
@@ -30,7 +33,7 @@ describe('Concert Event Logistics (e2e)', () => {
 
     describe('Phase 1: Pre-Event Planning', () => {
         it('[Story 1] should create a concert event bundle', async () => {
-            const response = await request(app.getHttpServer())
+            const response: Response = await httpRequest
                 .post('/bundles')
                 .send({
                     name: 'Nairobi Music Festival 2026',
@@ -53,7 +56,7 @@ describe('Concert Event Logistics (e2e)', () => {
         });
 
         it('[Story 2] should find operators with Event Setup skills', async () => {
-            const response = await request(app.getHttpServer())
+            const response: Response = await httpRequest
                 .post('/assets/match')
                 .send({ input: 'Need operators with Event Setup and Heavy Lifting skills' })
                 .expect(200);
@@ -71,7 +74,7 @@ describe('Concert Event Logistics (e2e)', () => {
             ];
 
             for (const pickup of pickups) {
-                const response = await request(app.getHttpServer())
+                const response: Response = await httpRequest
                     .patch(`/bundles/${bundleId}/trips`)
                     .send({
                         assetId: 'mock-asset-id',
@@ -87,7 +90,7 @@ describe('Concert Event Logistics (e2e)', () => {
         });
 
         it('[Story 4] should retrieve bundle with cost estimation', async () => {
-            const response = await request(app.getHttpServer())
+            const response: Response = await httpRequest
                 .get(`/bundles/${bundleId}/invoice`)
                 .expect(200);
 
@@ -99,7 +102,7 @@ describe('Concert Event Logistics (e2e)', () => {
 
     describe('Phase 2: Execution & Real-Time Coordination', () => {
         it('[Story 6] should add emergency generator trip to existing bundle', async () => {
-            const response = await request(app.getHttpServer())
+            const response: Response = await httpRequest
                 .patch(`/bundles/${bundleId}/trips`)
                 .send({
                     assetId: 'emergency-generator-asset',
@@ -120,7 +123,7 @@ describe('Concert Event Logistics (e2e)', () => {
 
     describe('Phase 3: Post-Event Reconciliation', () => {
         it('[Story 10] should track partial bundle completion', async () => {
-            const response = await request(app.getHttpServer())
+            const response: Response = await httpRequest
                 .get(`/bundles/${bundleId}/invoice`)
                 .expect(200);
 
@@ -131,7 +134,7 @@ describe('Concert Event Logistics (e2e)', () => {
         });
 
         it('[Story 12] should generate final invoice with cost breakdown', async () => {
-            const response = await request(app.getHttpServer())
+            const response: Response = await httpRequest
                 .get(`/bundles/${bundleId}/invoice`)
                 .expect(200);
 
@@ -143,7 +146,7 @@ describe('Concert Event Logistics (e2e)', () => {
         });
 
         it('[Story 11] should update bundle status to COMPLETED', async () => {
-            const response = await request(app.getHttpServer())
+            const response: Response = await httpRequest
                 .patch(`/bundles/${bundleId}/status`)
                 .send({ status: 'COMPLETED' })
                 .expect(200);

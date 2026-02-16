@@ -1,12 +1,11 @@
-import { Controller, Get, Post, Body, Query, Param, Headers, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Param, HttpCode, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 
 import {
     BatchCreateAssetsDto,
     WebhookSubscriptionDto,
-    AvailabilityRequestDto,
-    AvailabilityResponseDto,
 } from '../dto/asset-platform.dto';
 import { AssetEntity } from '../entities/asset.entity';
 import { BundleEntity } from '../entities/bundle.entity';
@@ -53,7 +52,7 @@ export class IntegrationController {
             try {
                 const assetData = dto.assets[i];
                 const asset = this.assetRepository.create({
-                    id: require('uuid').v4(),
+                    id: uuidv4(),
                     ...assetData,
                 });
                 await this.assetRepository.save(asset);
@@ -134,7 +133,7 @@ export class IntegrationController {
     async subscribeWebhook(@Body() dto: WebhookSubscriptionDto) {
         // In production, this would register the webhook in a database
         return {
-            subscriptionId: require('uuid').v4(),
+            subscriptionId: uuidv4(),
             url: dto.url,
             events: dto.events,
             status: 'active',

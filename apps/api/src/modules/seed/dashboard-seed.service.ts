@@ -47,12 +47,10 @@ export class DashboardSeedService implements OnModuleInit {
         }
 
         // Small delay to ensure DB is fully ready and other migrations/seeds finished
-        setTimeout(async () => {
-            try {
-                await this.runSeeder();
-            } catch (error) {
+        setTimeout(() => {
+            this.runSeeder().catch((error) => {
                 this.logger.error('Dashboard seeding failed', error);
-            }
+            });
         }, 10000);
     }
 
@@ -255,7 +253,7 @@ export class DashboardSeedService implements OnModuleInit {
                 entityType: 'Order',
                 workspaceId: biz.id,
                 title: `Order #${orderId.slice(0, 8).toUpperCase()}`,
-                description: order.itemSummary!,
+                description: order.itemSummary ?? 'N/A',
                 metadata: {
                     status: order.status,
                     customer: order.customerName,

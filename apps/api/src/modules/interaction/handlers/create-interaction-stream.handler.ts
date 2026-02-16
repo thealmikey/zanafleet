@@ -70,7 +70,7 @@ export class CreateInteractionStreamCommandHandler
 
     try {
       // Step 2: Create stream entity
-      const stream = await this.streamRepository.create({
+      const _stream = await this.streamRepository.create({
         id: streamId,
         contextType: command.contextType,
         contextId: command.contextId,

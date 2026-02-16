@@ -56,7 +56,7 @@ export class InternalCommandBus {
    * @returns The command result
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async execute(command: ICommand, options?: {
+  async execute<T = unknown>(command: ICommand, options?: {
     /**
      * Correlation ID for tracing
      */
@@ -69,7 +69,7 @@ export class InternalCommandBus {
      * Actor ID executing this command
      */
     actorId?: string;
-  }): Promise<any> {
+  }): Promise<T> {
     const correlationId = options?.correlationId ?? crypto.randomUUID();
 
     this.logger.debug(
@@ -77,7 +77,7 @@ export class InternalCommandBus {
     );
 
     try {
-      const result = await this.commandBus.execute(command);
+      const result = await this.commandBus.execute(command) as T;
 
       if (this.options.enableAuditLogging) {
         this.logger.debug(

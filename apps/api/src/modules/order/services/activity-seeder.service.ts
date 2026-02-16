@@ -1,12 +1,12 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
-    ActorType,
+    ActorType as _ActorType,
     BusinessType,
     DeliveryStatus,
     OrderStatus,
     PaymentStatus,
-    TEST_WORKSPACE_ID
+    TEST_WORKSPACE_ID as _TEST_WORKSPACE_ID
 } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -39,12 +39,10 @@ export class ActivitySeederService implements OnModuleInit {
         }
 
         // Small delay to ensure other seeders (like TestAccountSeeder) might have run
-        setTimeout(async () => {
-            try {
-                await this.seedActivity();
-            } catch (error) {
+        setTimeout(() => {
+            this.seedActivity().catch((error) => {
                 this.logger.error('Failed to seed activity history', error);
-            }
+            });
         }, 5000);
     }
 

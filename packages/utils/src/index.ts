@@ -127,7 +127,7 @@ export function deepFreeze<T extends object>(obj: T): Readonly<T> {
   Object.keys(obj).forEach((key) => {
     const value = (obj as Record<string, unknown>)[key];
     if (value && typeof value === 'object') {
-      deepFreeze(value as object);
+      deepFreeze(value );
     }
   });
   return Object.freeze(obj);

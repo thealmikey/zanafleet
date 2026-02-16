@@ -127,10 +127,10 @@ export class PayoutOrchestrator {
     try {
       const kycResult = await this.checkKycVerification(riderAccountId);
       if (!kycResult.verified) {
-        this.logger.warn(`KYC verification failed for ${riderAccountId}: ${kycResult.reason}`);
+        this.logger.warn(`KYC verification failed for ${riderAccountId}: ${kycResult.reason ?? ''}`);
         return this.createFailedResult(
           payoutId,
-          `KYC verification failed: ${kycResult.reason}`,
+          `KYC verification failed: ${kycResult.reason ?? ''}`,
           PayoutStatus.KYC_BLOCKED,
         );
       }
@@ -167,7 +167,7 @@ export class PayoutOrchestrator {
           await this.emitPayoutFailedEvent(batch, riskResult.holdReason ?? 'Risk check blocked', correlationId);
           return this.createFailedResult(
             payoutId,
-            `Risk check blocked: ${riskResult.holdReason}`,
+            `Risk check blocked: ${riskResult.holdReason ?? ''}`,
             PayoutStatus.RISK_BLOCKED,
             batch.id,
           );
@@ -628,7 +628,7 @@ export class PayoutOrchestrator {
 
         lastResult = result;
         this.logger.warn(
-          `Payout attempt ${attempt}/${config.maxRetries} failed: ${result.errorMessage}`,
+          `Payout attempt ${attempt}/${config.maxRetries} failed: ${result.errorMessage ?? ''}`,
         );
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
@@ -692,7 +692,7 @@ export class PayoutOrchestrator {
       updates.processedAt = new Date();
     }
 
-    await this.batchRepository.update(batchId, updates as any);
+    await this.batchRepository.update(batchId, updates as unknown as Record<string, unknown>);
   }
 
   private updateRetryState(
@@ -778,8 +778,8 @@ export class PayoutOrchestrator {
 
     await this.eventBusService
       .publish(NatsSubjects.Settlement.PAYOUT_INITIATED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish PayoutInitiatedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish PayoutInitiatedEvent: ${(error as Error).message}`);
       });
   }
 
@@ -814,8 +814,8 @@ export class PayoutOrchestrator {
 
     await this.eventBusService
       .publish(NatsSubjects.Settlement.PAYOUT_COMPLETED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish PayoutCompletedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish PayoutCompletedEvent: ${(error as Error).message}`);
       });
   }
 
@@ -849,8 +849,8 @@ export class PayoutOrchestrator {
 
     await this.eventBusService
       .publish(NatsSubjects.Settlement.PAYOUT_FAILED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish PayoutFailedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish PayoutFailedEvent: ${(error as Error).message}`);
       });
   }
 }

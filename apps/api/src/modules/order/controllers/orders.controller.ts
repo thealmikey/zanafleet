@@ -24,7 +24,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
 
 
-import { CreateOrderCommand } from '../commands/create-order.command';
+import { CreateOrderCommand, CreateOrderCommandInput } from '../commands/create-order.command';
 import { CustomerOrderOrchestrator, PlaceCustomerOrderInput } from '../coordinators/customer-order.orchestrator';
 import { OrderEntity } from '../entities/order.entity';
 
@@ -60,15 +60,15 @@ export class OrdersController {
   @HttpCode(HttpStatus.CREATED)
   @RequireCapability('order.manage')
   async create(@Body() dto: CreateOrderDto): Promise<{ id: string }> {
-    const validated = CreateOrderCommand.validate(dto);
-    const id = await this.commandBus.execute(new CreateOrderCommand(validated));
+    const validated: CreateOrderCommandInput = CreateOrderCommand.validate(dto);
+    const id = await this.commandBus.execute<CreateOrderCommand, string>(new CreateOrderCommand(validated));
     return { id };
   }
 
   @Post('customer')
   @HttpCode(HttpStatus.CREATED)
   @RequireCapability('order.place')
-  async placeCustomerOrder(@Body() dto: PlaceCustomerOrderInput): Promise<any> {
+  async placeCustomerOrder(@Body() dto: PlaceCustomerOrderInput): Promise<unknown> {
     return this.customerOrderOrchestrator.placeOrder(dto);
   }
 
@@ -93,7 +93,7 @@ export class OrdersController {
 
     // Handle search parameter
     const search = query.search as string;
-    let where: any = filter;
+    let where: Record<string, unknown> | Record<string, unknown>[] = filter;
 
     if (search) {
       where = [
@@ -129,7 +129,10 @@ export class OrdersController {
     await this.orderRepository.update(id, dto as Record<string, unknown>);
 
     const updated = await this.orderRepository.findOne({ where: { id } });
-    return updated!.toDomain();
+    if (!updated) {
+      throw new NotFoundException(`Order with ID "${id}" not found`);
+    }
+    return updated.toDomain();
   }
 
   @Delete(':id')

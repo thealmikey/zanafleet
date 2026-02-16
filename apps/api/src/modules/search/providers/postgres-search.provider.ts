@@ -63,7 +63,7 @@ export class PostgresSearchProvider implements ISearchProvider {
             .getManyAndCount();
 
         return {
-            items: items.map(this.mapToDto),
+            items: items.map((item) => this.mapToDto(item)),
             total,
             query: query || '',
             processingTimeMs: Date.now() - startTime,

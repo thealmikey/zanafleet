@@ -85,7 +85,7 @@ export class GetAllCapabilitiesQueryHandler implements IQueryHandler<GetAllCapab
     const limit = Math.min(options.limit ?? 50, 100);
     const skip = (page - 1) * limit;
 
-    this.logger.debug(`Getting capabilities: page=${page}, limit=${limit}, category=${options.category}`);
+    this.logger.debug(`Getting capabilities: page=${page}, limit=${limit}, category=${String(options.category)}`);
 
     let capabilities;
     let total;

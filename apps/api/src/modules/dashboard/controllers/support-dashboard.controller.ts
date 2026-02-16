@@ -16,6 +16,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThanOrEqual } from 'typeorm';
 
 
+import { DisputeStatus } from '../../payment/dto/payment.enums';
 import { DisputeEntity } from '../../payment/entities/dispute.entity';
 import { PaymentIntentEntity } from '../../payment/entities/payment-intent.entity';
 import { RefundEntity } from '../../payment/entities/refund.entity';
@@ -168,7 +169,7 @@ export class SupportDashboardController {
     const order = sort ? { [sort.field]: sort.order } : { escalatedAt: 'DESC' as const };
 
     const [entities, total] = await this.disputeRepository.findAndCount({
-      where: { status: 'ESCALATED' as any },
+      where: { status: DisputeStatus.ESCALATED },
       order,
       skip: pagination.offset,
       take: pagination.limit,

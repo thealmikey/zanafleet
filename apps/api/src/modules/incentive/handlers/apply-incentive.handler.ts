@@ -86,8 +86,8 @@ export class ApplyIncentiveCommandHandler implements ICommandHandler<ApplyIncent
     if (this.eventBusService) {
       this.eventBusService
         .publish(NatsSubjects.Incentive.INCENTIVE_APPLIED_V1, appliedEvent)
-        .catch((error) => {
-          this.logger.error(`Failed to publish IncentiveAppliedEvent to NATS: ${error.message}`);
+        .catch((error: unknown) => {
+          this.logger.error(`Failed to publish IncentiveAppliedEvent to NATS: ${(error as Error).message}`);
         });
     }
 
@@ -102,7 +102,10 @@ export class ApplyIncentiveCommandHandler implements ICommandHandler<ApplyIncent
       );
 
       const updatedCampaign = await this.incentiveEngine.getCampaign(command.campaignId);
-      const updatedDomain = updatedCampaign!.toDomain();
+      if (!updatedCampaign) {
+        throw new NotFoundException('Failed to retrieve updated campaign');
+      }
+      const updatedDomain = updatedCampaign.toDomain();
 
       const sponsorshipEvent = new SponsorshipConsumedEventV1({
         eventId: uuidv4(),
@@ -122,15 +125,18 @@ export class ApplyIncentiveCommandHandler implements ICommandHandler<ApplyIncent
       if (this.eventBusService) {
         this.eventBusService
           .publish(NatsSubjects.Incentive.SPONSORSHIP_CONSUMED_V1, sponsorshipEvent)
-          .catch((error) => {
-            this.logger.error(`Failed to publish SponsorshipConsumedEvent to NATS: ${error.message}`);
+          .catch((error: unknown) => {
+            this.logger.error(`Failed to publish SponsorshipConsumedEvent to NATS: ${(error as Error).message}`);
           });
       }
     }
 
     if (result.budgetExhausted) {
       const updatedCampaign = await this.incentiveEngine.getCampaign(command.campaignId);
-      const updatedDomain = updatedCampaign!.toDomain();
+      if (!updatedCampaign) {
+        throw new NotFoundException('Failed to retrieve updated campaign');
+      }
+      const updatedDomain = updatedCampaign.toDomain();
 
       const exhaustedEvent = new BudgetExhaustedEventV1({
         eventId: uuidv4(),
@@ -149,8 +155,8 @@ export class ApplyIncentiveCommandHandler implements ICommandHandler<ApplyIncent
       if (this.eventBusService) {
         this.eventBusService
           .publish(NatsSubjects.Incentive.BUDGET_EXHAUSTED_V1, exhaustedEvent)
-          .catch((error) => {
-            this.logger.error(`Failed to publish BudgetExhaustedEvent to NATS: ${error.message}`);
+          .catch((error: unknown) => {
+            this.logger.error(`Failed to publish BudgetExhaustedEvent to NATS: ${(error as Error).message}`);
           });
       }
     }

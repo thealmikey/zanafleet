@@ -1,5 +1,3 @@
-import { CapabilityCategory } from '../entities/capability.entity';
-
 /**
  * Capability Metadata DTO
  * Read-only representation of capability metadata for introspection

@@ -75,8 +75,8 @@ export class CreateCampaignCommandHandler implements ICommandHandler<CreateCampa
     if (this.eventBusService) {
       this.eventBusService
         .publish(NatsSubjects.Incentive.CAMPAIGN_CREATED_V1, event)
-        .catch((error) => {
-          this.logger.error(`Failed to publish CampaignCreatedEvent to NATS: ${error.message}`);
+        .catch((error: unknown) => {
+          this.logger.error(`Failed to publish CampaignCreatedEvent to NATS: ${(error as Error).message}`);
         });
     }
 

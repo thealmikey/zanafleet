@@ -122,11 +122,12 @@ export class AISuggestionStoreService {
    * Find pending suggestions for an actor
    */
   async findPendingByActor(actorId: string): Promise<AISuggestionEntity[]> {
+    const now = new Date();
     return this.suggestionRepository.find({
       where: {
         actorId,
         status: AISuggestionStatus.PENDING,
-        expiresAt: MoreThan(new Date()) as any,
+        expiresAt: MoreThan(now),
       },
       order: { createdAt: 'DESC' },
     });

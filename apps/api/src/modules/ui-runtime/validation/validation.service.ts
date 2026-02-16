@@ -146,14 +146,15 @@ export class ValidationService {
       case 'match':
         // Field must match another field
         return { valid: true }; // Handled separately
-      
-      default:
+
+      default: {
         // Check custom validators
         const customValidator = this.validators.get(ruleSet.type);
         if (customValidator) {
           return customValidator(value, ruleSet.value);
         }
         return { valid: true };
+      }
     }
   }
 

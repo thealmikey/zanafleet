@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
-import { OrderStatus, PaymentStatus } from '@zanafleet/contracts';
+import { OrderStatus, PaymentStatus as _PaymentStatus } from '@zanafleet/contracts';
 
 import { InMemoryStoreBase } from '../../../core/sandbox/in-memory-store.base';
 import { OrderEntity } from '../entities/order.entity';

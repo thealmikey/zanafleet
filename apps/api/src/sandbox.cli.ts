@@ -4,6 +4,7 @@
  * CLI command to run the API in sandbox mode with in-memory storage.
  * Usage: pnpm sandbox --scenario=<name>
  */
+/* eslint-disable no-console */
 
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -195,14 +196,8 @@ async function main(): Promise<void> {
     `);
 
     // Handle graceful shutdown
-    const shutdown = async (): Promise<void> => {
-      logger.log('Shutting down sandbox...');
-      await app.close();
-      process.exit(0);
-    };
-
-    process.on('SIGINT', shutdown);
-    process.on('SIGTERM', shutdown);
+    process.on('SIGINT', () => void app.close().then(() => process.exit(0)));
+    process.on('SIGTERM', () => void app.close().then(() => process.exit(0)));
   } catch (error) {
     logger.error('Failed to start sandbox:', error);
     console.error('\n❌ Failed to start sandbox:', (error as Error).message);

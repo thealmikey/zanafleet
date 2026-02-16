@@ -442,8 +442,9 @@ export class GeoQueryCoordinator {
 
     await this.eventBusService
       .publish(NatsSubjects.Location.QUERY_EXECUTED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish QueryExecutedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        this.logger.error(`Failed to publish QueryExecutedEvent: ${errorMessage}`);
       });
   }
 }

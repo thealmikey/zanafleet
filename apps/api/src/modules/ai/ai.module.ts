@@ -1,9 +1,8 @@
 import { EventBusModule } from '@api/core/event-bus';
 import { Neo4jModule } from '@api/core/neo4j';
 import { Module, Type } from '@nestjs/common';
-import { CqrsModule } from '@nestjs/cqrs';
+import { CqrsModule, ICommandHandler, IEventHandler } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
 
 import { AIFeedbackEntity } from './entities/ai-feedback.entity';
 import { AISuggestionEntity } from './entities/ai-suggestion.entity';
@@ -27,10 +26,10 @@ export * from './events';
 export * from './interfaces';
 
 // Command handlers - none in Phase 1 (suggestions are auto-generated)
-const CommandHandlers: Type<any>[] = [];
+const CommandHandlers: Type<ICommandHandler>[] = [];
 
 // Event handlers
-const EventHandlers: Type<any>[] = [
+const EventHandlers: Type<IEventHandler>[] = [
   AISuggestionNeo4jProjection,
 ];
 

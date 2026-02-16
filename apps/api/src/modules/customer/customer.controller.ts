@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards, Request, Param } from '@nestjs/common';
+import { Controller, Get, Query, Param } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 

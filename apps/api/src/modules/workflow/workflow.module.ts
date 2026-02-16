@@ -18,7 +18,7 @@ import { WorkflowEventSubscriber } from './subscribers/workflow-event.subscriber
 /**
  * Command handlers
  */
-const CommandHandlers: Type<any>[] = [];
+const CommandHandlers: Type<unknown>[] = [];
 
 /**
  * Event handlers

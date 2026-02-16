@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/restrict-template-expressions */
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import * as request from 'supertest';
+import request, { SuperTest, Test as SuperTestAgent, Response } from 'supertest';
 
 import { AppModule } from '../src/app.module';
 
@@ -10,10 +11,11 @@ import { AppModule } from '../src/app.module';
  */
 describe('3rd Party Integration - Asset Platform API (e2e)', () => {
     let app: INestApplication;
+    let httpRequest: SuperTest<SuperTestAgent>;
     let createdAssetId: string;
     let createdBundleId: string;
     let createdTripId: string;
-    let createdOperatorId: string;
+    let _createdOperatorId: string;
 
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -23,6 +25,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
         app = moduleFixture.createNestApplication();
         app.useGlobalPipes(new ValidationPipe());
         await app.init();
+        httpRequest = request(app.getHttpServer());
     });
 
     afterAll(async () => {
@@ -32,7 +35,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
     // ==================== ASSET MANAGEMENT TESTS ====================
     describe('Asset Management', () => {
         it('01: Should create a new vehicle asset', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets')
                 .send({
                     name: 'Isuzu FRR Truck - 3PL Test',
@@ -44,14 +47,14 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
                     metadata: { licensePlate: 'KCB 123X', color: 'white' },
                 })
                 .expect(201)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.assetId).toBeDefined();
                     createdAssetId = res.body.assetId;
                 });
         });
 
         it('02: Should create a warehouse asset', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets')
                 .send({
                     name: 'Secure Storage Unit A7',
@@ -65,7 +68,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
         });
 
         it('03: Should create an equipment asset', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets')
                 .send({
                     name: 'Forklift FL-500',
@@ -78,33 +81,33 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
         });
 
         it('04: Should retrieve asset by ID', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .get(`/assets/${createdAssetId}`)
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.assetId).toBe(createdAssetId);
                     expect(res.body.name).toContain('Isuzu FRR');
                 });
         });
 
         it('05: Should list assets by owner', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .get('/assets/owner/3pl-partner-001')
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(Array.isArray(res.body)).toBe(true);
                     expect(res.body.length).toBeGreaterThan(0);
                 });
         });
 
         it('06: Should return 404 for non-existent asset', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .get('/assets/non-existent-id')
                 .expect(404);
         });
 
         it('07: Should reject asset creation without required fields', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets')
                 .send({
                     name: 'Incomplete Asset',
@@ -117,7 +120,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
     // ==================== BUNDLE MANAGEMENT TESTS ====================
     describe('Bundle Management', () => {
         it('08: Should create a project bundle', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/bundles')
                 .send({
                     name: 'Enterprise Logistics Project',
@@ -129,24 +132,24 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
                     metadata: { clientName: 'ABC Corp', projectCode: 'ABC-2026-Q2' },
                 })
                 .expect(201)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.bundleId).toBeDefined();
                     createdBundleId = res.body.bundleId;
                 });
         });
 
         it('09: Should retrieve bundle details', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .get(`/bundles/${createdBundleId}`)
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.bundleId).toBe(createdBundleId);
                     expect(res.body.name).toBe('Enterprise Logistics Project');
                 });
         });
 
         it('10: Should add a trip to bundle', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .patch(`/bundles/${createdBundleId}/trips`)
                 .send({
                     assetId: createdAssetId,
@@ -154,17 +157,17 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
                     startTime: '2026-04-02T08:00:00Z',
                 })
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.bundleId).toBe(createdBundleId);
                     createdTripId = res.body.tripId;
                 });
         });
 
         it('11: Should generate bundle invoice', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .get(`/bundles/${createdBundleId}/invoice`)
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.bundleId).toBe(createdBundleId);
                     expect(res.body).toHaveProperty('summary');
                     expect(res.body.summary).toHaveProperty('totalTrips');
@@ -172,24 +175,24 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
         });
 
         it('12: Should update bundle status to IN_PROGRESS', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .patch(`/bundles/${createdBundleId}/status`)
                 .send({ status: 'IN_PROGRESS' })
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.status).toBe('IN_PROGRESS');
                 });
         });
 
         it('13: Should update bundle status to COMPLETED', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .patch(`/bundles/${createdBundleId}/status`)
                 .send({ status: 'COMPLETED' })
                 .expect(200);
         });
 
         it('14: Should reject bundle creation with past dates', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/bundles')
                 .send({
                     name: 'Invalid Bundle',
@@ -202,7 +205,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
         });
 
         it('15: Should reject adding trip to non-existent bundle', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .patch('/bundles/non-existent-bundle/trips')
                 .send({
                     assetId: createdAssetId,
@@ -216,7 +219,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
     // ==================== TRIP MANAGEMENT TESTS ====================
     describe('Trip Management', () => {
         it('16: Should create a standalone trip', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets/trips')
                 .send({
                     assetId: createdAssetId,
@@ -227,23 +230,23 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
         });
 
         it('17: Should retrieve trip by ID', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .get(`/assets/trips/${createdTripId}`)
                 .expect(200);
         });
 
         it('18: Should query trips by bundleId', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .get(`/assets/trips?bundleId=${createdBundleId}`)
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.data).toBeDefined();
                     expect(Array.isArray(res.body.data)).toBe(true);
                 });
         });
 
         it('19: Should reject trip without assetId', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets/trips')
                 .send({
                     operatorId: 'operator-001',
@@ -256,62 +259,62 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
     // ==================== AI MATCHING ENGINE TESTS ====================
     describe('AI Matching & Discovery', () => {
         it('20: Should match assets for house move', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets/match')
                 .send({ input: 'Need to move a 4-bedroom house' })
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.estimatedRequirements).toBeDefined();
                     expect(res.body.estimatedRequirements.suggestedType).toBe('VEHICLE');
                 });
         });
 
         it('21: Should detect refrigerated requirement', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets/match')
                 .send({ input: 'Transport perishable goods with refrigeration' })
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.estimatedRequirements.requiredSkills).toContain('Cold Chain');
                 });
         });
 
         it('22: Should suggest warehouse for storage needs', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets/match')
                 .send({ input: 'Need warehouse space for 3 months' })
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.estimatedRequirements.suggestedType).toBe('WAREHOUSE');
                 });
         });
 
         it('23: Should detect bundle requirement for office move', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets/match')
                 .send({ input: 'Moving my entire office to a new building' })
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.bundleSuggested).toBe(true);
                 });
         });
 
         it('24: Should detect heavy lifting skill', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets/match')
                 .send({ input: 'Need movers for heavy furniture' })
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.estimatedRequirements.requiredSkills).toContain('Heavy Lifting');
                 });
         });
 
         it('25: Should detect cross-border skill', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets/match')
                 .send({ input: 'Transport goods from Nairobi to Kampala' })
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.estimatedRequirements.requiredSkills).toContain('Cross-Border Transit');
                 });
         });
@@ -320,7 +323,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
     // ==================== ERROR HANDLING & VALIDATION ====================
     describe('Error Handling & Validation', () => {
         it('26: Should return 400 for invalid asset type', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets')
                 .send({
                     name: 'Invalid Asset',
@@ -332,19 +335,19 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
         });
 
         it('27: Should return 404 for non-existent bundle', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .get('/bundles/non-existent-bundle-id')
                 .expect(404);
         });
 
         it('28: Should return 404 for non-existent trip', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .get('/assets/trips/non-existent-trip-id')
                 .expect(404);
         });
 
         it('29: Should validate date formats in bundle creation', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/bundles')
                 .send({
                     name: 'Test Bundle',
@@ -357,7 +360,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
         });
 
         it('30: Should reject negative budget amounts', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/bundles')
                 .send({
                     name: 'Negative Budget Bundle',
@@ -380,7 +383,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
             ];
 
             for (const asset of assets) {
-                await request(app.getHttpServer())
+                await httpRequest
                     .post('/assets')
                     .send(asset)
                     .expect(201);
@@ -388,10 +391,10 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
         });
 
         it('32: Should retrieve all batch-created assets', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .get('/assets/owner/batch-owner')
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.length).toBeGreaterThanOrEqual(3);
                 });
         });
@@ -402,7 +405,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
         let advancedBundleId: string;
 
         it('33: Should create a multi-day event bundle', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/bundles')
                 .send({
                     name: 'Trade Fair 2026',
@@ -414,14 +417,14 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
                     metadata: { eventType: 'Trade Fair', booths: 50 },
                 })
                 .expect(201)
-                .expect((res) => {
+                .expect((res: Response) => {
                     advancedBundleId = res.body.bundleId;
                 });
         });
 
         it('34: Should add 10 trips to the event bundle', async () => {
             for (let i = 0; i < 10; i++) {
-                await request(app.getHttpServer())
+                await httpRequest
                     .patch(`/bundles/${advancedBundleId}/trips`)
                     .send({
                         assetId: createdAssetId,
@@ -433,19 +436,19 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
         });
 
         it('35: Should verify bundle has 10 trips', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .get(`/bundles/${advancedBundleId}/invoice`)
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.summary.totalTrips).toBe(10);
                 });
         });
 
         it('36: Should track bundle completion percentage', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .get(`/bundles/${advancedBundleId}/invoice`)
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     const percent = (res.body.summary.completedTrips / res.body.summary.totalTrips) * 100;
                     expect(percent).toBeGreaterThanOrEqual(0);
                     expect(percent).toBeLessThanOrEqual(100);
@@ -456,7 +459,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
     // ==================== EDGE CASES ====================
     describe('Edge Cases & Boundary Tests', () => {
         it('37: Should handle empty match query', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets/match')
                 .send({ input: '' })
                 .expect(200);
@@ -464,7 +467,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
 
         it('38: Should handle very long asset names', () => {
             const longName = 'A'.repeat(300);
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets')
                 .send({
                     name: longName,
@@ -476,7 +479,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
         });
 
         it('39: Should handle special characters in bundle name', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/bundles')
                 .send({
                     name: 'Project @2026 #1 (Special & Test)',
@@ -492,7 +495,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
             const promises = [];
             for (let i = 0; i < 5; i++) {
                 promises.push(
-                    request(app.getHttpServer())
+                    httpRequest
                         .post('/assets/trips')
                         .send({
                             assetId: createdAssetId,
@@ -509,7 +512,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
     // ==================== PERFORMANCE & PAGINATION ====================
     describe('Performance & Scalability', () => {
         it('41: Should handle large bundle with many trips', async () => {
-            const largeBundleRes = await request(app.getHttpServer())
+            const largeBundleRes: Response = await httpRequest
                 .post('/bundles')
                 .send({
                     name: 'Large Scale Project',
@@ -524,7 +527,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
 
             // Add 50 trips
             for (let i = 0; i < 50; i++) {
-                await request(app.getHttpServer())
+                await httpRequest
                     .patch(`/bundles/${largeBundleId}/trips`)
                     .send({
                         assetId: createdAssetId,
@@ -534,10 +537,10 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
             }
 
             // Verify invoice generation still works
-            return request(app.getHttpServer())
+            return httpRequest
                 .get(`/bundles/${largeBundleId}/invoice`)
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.summary.totalTrips).toBe(50);
                 });
         }, 60000); // 60 second timeout for this test
@@ -546,7 +549,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
     // ==================== DATA INTEGRITY ====================
     describe('Data Integrity & Consistency', () => {
         it('42: Should maintain referential integrity for bundle-trip relationship', async () => {
-            const bundleRes = await request(app.getHttpServer())
+            const bundleRes: Response = await httpRequest
                 .post('/bundles')
                 .send({
                     name: 'Integrity Test Bundle',
@@ -559,7 +562,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
 
             const testBundleId = bundleRes.body.bundleId;
 
-            await request(app.getHttpServer())
+            await httpRequest
                 .patch(`/bundles/${testBundleId}/trips`)
                 .send({
                     assetId: createdAssetId,
@@ -568,10 +571,10 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
                 })
                 .expect(200);
 
-            return request(app.getHttpServer())
+            return httpRequest
                 .get(`/assets/trips?bundleId=${testBundleId}`)
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.data.length).toBeGreaterThan(0);
                     expect(res.body.data[0].bundleId).toBe(testBundleId);
                 });
@@ -589,13 +592,13 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
                 metadata: { uniqueRef: 'IDEM-001' },
             };
 
-            const firstRes = await request(app.getHttpServer())
+            const firstRes: Response = await httpRequest
                 .post('/assets')
                 .send(assetData)
                 .expect(201);
 
             // Second creation with same data (in real system, should check uniqueRef)
-            const secondRes = await request(app.getHttpServer())
+            const secondRes: Response = await httpRequest
                 .post('/assets')
                 .send(assetData)
                 .expect(201);
@@ -608,18 +611,18 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
     // ==================== SEARCH & FILTERING ====================
     describe('Search & Filtering Capabilities', () => {
         it('44: Should find assets with specific capacity', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets/match')
                 .send({ input: 'Vehicle with 10 ton capacity' })
                 .expect(200);
         });
 
         it('45: Should filter by asset type implicitly', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets/match')
                 .send({ input: 'Looking for storage space' })
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.estimatedRequirements.suggestedType).toBe('WAREHOUSE');
                 });
         });
@@ -628,7 +631,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
     // ==================== COST CALCULATION & BILLING ====================
     describe('Cost Calculation & Billing', () => {
         it('46: Should calculate total cost for completed trips', async () => {
-            const billingBundleRes = await request(app.getHttpServer())
+            const billingBundleRes: Response = await httpRequest
                 .post('/bundles')
                 .send({
                     name: 'Billing Test Bundle',
@@ -643,7 +646,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
 
             // Add multiple trips
             for (let i = 0; i < 5; i++) {
-                await request(app.getHttpServer())
+                await httpRequest
                     .patch(`/bundles/${billingBundleId}/trips`)
                     .send({
                         assetId: createdAssetId,
@@ -652,20 +655,20 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
                     });
             }
 
-            return request(app.getHttpServer())
+            return httpRequest
                 .get(`/bundles/${billingBundleId}/invoice`)
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.summary.totalCost).toBeDefined();
                     expect(typeof res.body.summary.totalCost).toBe('number');
                 });
         });
 
         it('47: Should track budget variance', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .get(`/bundles/${createdBundleId}/invoice`)
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.variance).toBeDefined();
                     expect(typeof res.body.variance).toBe('number');
                 });
@@ -675,7 +678,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
     // ==================== METADATA & CUSTOM FIELDS ====================
     describe('Metadata & Custom Fields', () => {
         it('48: Should store and retrieve custom metadata on assets', async () => {
-            const assetRes = await request(app.getHttpServer())
+            const assetRes: Response = await httpRequest
                 .post('/assets')
                 .send({
                     name: 'Metadata Test Asset',
@@ -690,17 +693,17 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
                 })
                 .expect(201);
 
-            return request(app.getHttpServer())
+            return httpRequest
                 .get(`/assets/${assetRes.body.assetId}`)
                 .expect(200)
-                .expect((res) => {
+                .expect((res: Response) => {
                     expect(res.body.metadata).toBeDefined();
                     expect(res.body.metadata.customField1).toBe('value1');
                 });
         });
 
         it('49: Should store complex metadata on bundles', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/bundles')
                 .send({
                     name: 'Complex Metadata Bundle',
@@ -718,7 +721,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
         });
 
         it('50: Should handle null metadata gracefully', () => {
-            return request(app.getHttpServer())
+            return httpRequest
                 .post('/assets')
                 .send({
                     name: 'No Metadata Asset',
@@ -733,7 +736,7 @@ describe('3rd Party Integration - Asset Platform API (e2e)', () => {
     // ==================== WEBHOOK & EVENTS ====================
     describe('Webhook & Event System', () => {
         it('51: Should create bundle and trigger implicit event', async () => {
-            const webhookBundleRes = await request(app.getHttpServer())
+            const webhookBundleRes: Response = await httpRequest
                 .post('/bundles')
                 .send({
                     name: 'Webhook Test Bundle',

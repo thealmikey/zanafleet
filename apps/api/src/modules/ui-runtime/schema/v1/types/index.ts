@@ -561,7 +561,7 @@ export interface ComponentProps {
 /**
  * Forward declaration for complex types to avoid circular reference
  */
-type ComponentNodeRef = ComponentNode;
+type _ComponentNodeRef = ComponentNode;
 
 /**
  * Prop value types - simplified to avoid circular reference

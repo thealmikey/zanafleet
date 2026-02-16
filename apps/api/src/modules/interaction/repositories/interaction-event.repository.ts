@@ -182,8 +182,9 @@ export class InteractionEventRepository {
       const savedEvent = await manager.save(event);
 
       // Add participant if not already present
-      if (!stream.participantIds.includes(eventData.actorId!)) {
-        stream.participantIds = [...stream.participantIds, eventData.actorId!];
+      const actorId = eventData.actorId;
+      if (actorId && !stream.participantIds.includes(actorId)) {
+        stream.participantIds = [...stream.participantIds, actorId];
         await manager.save(stream);
       }
 

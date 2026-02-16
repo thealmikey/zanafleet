@@ -1,6 +1,7 @@
 import { CapabilityGuard } from '@api/core/api/guards';
 import { Controller, Get, Query, Inject, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { Request } from 'express';
 
 import { SearchOptions, SearchResults } from '../dto/search.dto';
 import { SEARCH_PROVIDER, ISearchProvider } from '../providers/search-provider.interface';
@@ -24,7 +25,7 @@ export class SearchController {
     @ApiQuery({ name: 'offset', required: false, type: Number })
     @ApiQuery({ name: 'sort', required: false, enum: ['relevance', 'distance', 'newest'] })
     async search(
-        @Req() req: any,
+        @Req() req: Request,
         @Query('q') q?: string,
         @Query('type') type?: string,
         @Query('lat') lat?: number,
@@ -34,12 +35,13 @@ export class SearchController {
         @Query('offset') offset = 0,
         @Query('sort') sort: 'relevance' | 'distance' | 'newest' = 'relevance',
     ): Promise<SearchResults> {
-        const workspaceId = req.user?.workspaceId || req.user?.businessId; // Fallback to businessId if workspaceId not in token
+        const user = req.user as { workspaceId?: string; businessId?: string } | undefined;
+        const workspaceId = user?.workspaceId ?? user?.businessId ?? '00000000-0000-0000-0000-000000000000';
 
         const options: SearchOptions = {
             query: q,
             entityTypes: type ? type.split(',') : undefined,
-            workspaceId: workspaceId || '00000000-0000-0000-0000-000000000000', // Default or fail?
+            workspaceId: workspaceId ?? '00000000-0000-0000-0000-000000000000',
             limit: Number(limit),
             offset: Number(offset),
             sortBy: sort,

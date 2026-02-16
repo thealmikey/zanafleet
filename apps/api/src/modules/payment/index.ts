@@ -3,7 +3,6 @@ export * from './entities/payment-intent.entity';
 export * from './entities/payment-transaction.entity';
 export * from './entities/dispute.entity';
 export * from './entities/refund.entity';
-export { PaymentIntentEntity } from './entities/payment-intent.entity';
 export * from './commands/create-payment-intent.command';
 export * from './commands/process-payment.command';
 export * from './events/payment-intent-created.event';

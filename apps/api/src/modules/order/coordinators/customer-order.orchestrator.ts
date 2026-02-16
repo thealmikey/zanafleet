@@ -168,7 +168,7 @@ export class CustomerOrderOrchestrator {
             });
 
             if (!paymentResult.success) {
-                throw new Error(`Payment initiation failed: ${paymentResult.error}`);
+                throw new Error(`Payment initiation failed: ${paymentResult.error ?? 'unknown'}`);
             }
 
             // 5. Update Order with Payment Info
@@ -184,8 +184,10 @@ export class CustomerOrderOrchestrator {
                 status: OrderStatus.Pending,
             };
 
-        } catch (error: any) {
-            this.logger.error(`Failed to place customer order: ${error.message}`, error.stack);
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            const errorStack = error instanceof Error ? error.stack : undefined;
+            this.logger.error(`Failed to place customer order: ${errorMessage}`, errorStack);
 
             // Update Projection for Cancellation
             if (customer) {
@@ -196,13 +198,13 @@ export class CustomerOrderOrchestrator {
                     status: OrderStatus.Cancelled,
                     totalAmount: totalAmount,
                     items: input.items,
-                }).catch(e => this.logger.warn(`Failed to update projection on error: ${e.message}`));
+                }).catch((_e: unknown) => this.logger.warn(`Failed to update projection on error: ${errorMessage}`));
             }
 
             // Rollback order status if needed
             await this.orderRepository.update(orderId, {
                 status: OrderStatus.Cancelled,
-                itemSummary: `${itemSummary} (Failed: ${error.message})`,
+                itemSummary: `${itemSummary} (Failed: ${errorMessage})`,
             });
 
             throw error;
@@ -220,7 +222,10 @@ export class CustomerOrderOrchestrator {
                     location: input.dropoff.latitude && input.dropoff.longitude
                         ? { lat: input.dropoff.latitude, lng: input.dropoff.longitude }
                         : undefined,
-                }).catch(e => this.logger.warn(`Failed to update projection: ${e.message}`));
+                }).catch((err: unknown) => {
+                    const errMsg = err instanceof Error ? err.message : 'Unknown error';
+                    this.logger.warn(`Failed to update projection: ${errMsg}`);
+                });
             }
         }
     }

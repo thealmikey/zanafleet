@@ -205,7 +205,7 @@ export class DeliveryLifecycleCoordinator {
         businessId: input.businessId,
         pickupLocationId: input.pickupLocationId,
         dropoffLocationId: input.dropoffLocationId,
-        scheduledPickupTime: input.scheduledPickupTime!,
+        scheduledPickupTime: input.scheduledPickupTime ?? new Date(),
         scheduledDropoffTime: input.scheduledDropoffTime,
         recipientName: input.recipientName,
         recipientPhone: input.recipientPhone,

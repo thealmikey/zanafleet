@@ -70,7 +70,7 @@ export class RiderMismatchError extends Error {
     public readonly actualRiderId: string,
   ) {
     super(
-      `Rider ${actualRiderId} is not assigned to delivery ${deliveryId}. Expected: ${expectedRiderId}`,
+      `Rider ${actualRiderId} is not assigned to delivery ${deliveryId}. Expected: ${expectedRiderId ?? 'none'}`,
     );
     this.name = 'RiderMismatchError';
   }
@@ -305,7 +305,7 @@ export class DeliveryExecutionCoordinator {
           estimatedArrival = new Date(now.getTime() + estimatedTimeHours * 60 * 60 * 1000);
         }
       } catch (error) {
-        this.logger.warn(`Could not get rider path for ETA calculation: ${error}`);
+        this.logger.warn(`Could not get rider path for ETA calculation: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
 

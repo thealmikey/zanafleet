@@ -136,9 +136,9 @@ export class CreateSettlementBatchCommandHandler
     if (this.eventBusService) {
       this.eventBusService
         .publish(NatsSubjects.Settlement.BATCH_CREATED_V1, event)
-        .catch((error) => {
+        .catch((error: unknown) => {
           this.logger.error(
-            `Failed to publish SettlementBatchCreatedEvent to NATS: ${error.message}`,
+            `Failed to publish SettlementBatchCreatedEvent to NATS: ${(error as Error).message}`,
           );
         });
     }

@@ -14,14 +14,14 @@ import { ISearchProvider, SEARCH_PROVIDER } from '../providers/search-provider.i
     DeliveryCreatedEventV1,
     DeliveryStateTransitionedEventV1
 )
-export class SearchProjectionService implements IEventHandler<any> {
+export class SearchProjectionService implements IEventHandler<OrderCreatedEventV1 | BusinessOnboardedEventV1 | DeliveryCreatedEventV1 | DeliveryStateTransitionedEventV1> {
     private readonly logger = new Logger(SearchProjectionService.name);
 
     constructor(
         @Inject(SEARCH_PROVIDER) private readonly searchProvider: ISearchProvider,
     ) { }
 
-    async handle(event: any): Promise<void> {
+    async handle(event: OrderCreatedEventV1 | BusinessOnboardedEventV1 | DeliveryCreatedEventV1 | DeliveryStateTransitionedEventV1): Promise<void> {
         try {
             if (event instanceof OrderCreatedEventV1) {
                 await this.handleOrderCreated(event);
@@ -32,10 +32,12 @@ export class SearchProjectionService implements IEventHandler<any> {
             } else if (event instanceof DeliveryStateTransitionedEventV1) {
                 await this.handleDeliveryStatusChanged(event);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const err = error as Error;
+            const eventName = (event as unknown as Record<string, unknown>).constructor?.name ?? 'Unknown';
             this.logger.error(
-                `Failed to process event ${event.constructor.name} for search indexing: ${error.message}`,
-                error.stack
+                `Failed to process event ${eventName} for search indexing: ${err.message}`,
+                err.stack
             );
         }
     }

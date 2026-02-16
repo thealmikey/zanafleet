@@ -199,7 +199,10 @@ export class DeliveriesController {
     await this.deliveryRepository.update(id, dto as Record<string, unknown>);
 
     const updated = await this.deliveryRepository.findOne({ where: { id } });
-    return updated!.toDomain();
+    if (!updated) {
+      throw new NotFoundException('Failed to retrieve updated delivery');
+    }
+    return updated.toDomain();
   }
 
   @Delete(':id')

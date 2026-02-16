@@ -12,7 +12,7 @@ export interface CommerceEvaluationResult {
     allowed: boolean;
     reason: string;
     suggestedReschedule?: Date;
-    modifications?: Record<string, any>;
+    modifications?: Record<string, unknown>;
 }
 
 @Injectable()
@@ -30,7 +30,7 @@ export class CommerceContextEngine {
         context: {
             workspaceId: string;
             timestamp: Date;
-            items: any[];
+            items: unknown[];
             totalAmount: number;
         }
     ): Promise<CommerceEvaluationResult> {

@@ -381,7 +381,15 @@ export class WorkflowEngineService {
     for (const guard of guardConditions) {
       if (guard.guardType === GuardType.EXPRESSION) {
         // Evaluate expression
-        const passed = this.evaluateExpression(guard.expression!, {
+        if (!guard.expression) {
+          results.push({
+            guardName: guard.guardName,
+            passed: false,
+            reason: 'Expression guard missing expression',
+          });
+          continue;
+        }
+        const passed = this.evaluateExpression(guard.expression, {
           context: instance.context,
           eventData,
           currentState: instance.currentState,
@@ -422,7 +430,7 @@ export class WorkflowEngineService {
     context: { context: Record<string, unknown>; eventData: Record<string, unknown>; currentState: string },
   ): boolean {
     try {
-      // Simple expression evaluation
+      // eslint-disable-next-line @typescript-eslint/no-implied-eval
       const fn = new Function('context', 'eventData', 'currentState', `return ${expression}`);
       return fn(context.context, context.eventData, context.currentState) as boolean;
     } catch {
@@ -469,9 +477,10 @@ export class WorkflowEngineService {
     for (const action of actions) {
       if (action.async) {
         // Execute asynchronously
-        this.executeAction(action, instance).catch((err) =>
-          this.logger.error(`Action ${action.actionName} failed: ${err.message}`),
-        );
+        this.executeAction(action, instance).catch((err: unknown) => {
+          const errMsg = err instanceof Error ? err.message : 'Unknown error';
+          this.logger.error(`Action ${action.actionName} failed: ${errMsg}`);
+        });
       } else {
         await this.executeAction(action, instance);
       }

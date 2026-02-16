@@ -1,7 +1,70 @@
-import { AssetType, AssetStatus, OwnerType } from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
 
-import { BundleStatus } from '../modules/asset/dto/asset-platform.dto';
+/**
+ * Bundle status enum (local definition to avoid import issues)
+ */
+export enum BundleStatus {
+  DRAFT = 'DRAFT',
+  CONFIRMED = 'CONFIRMED',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+}
+
+/**
+ * Owner type enum (local definition)
+ */
+export enum SeedOwnerType {
+  Organization = 'Organization',
+  Individual = 'Individual',
+}
+
+/**
+ * Asset type values (local definition)
+ */
+export const AssetType = {
+  VEHICLE: 'VEHICLE',
+  WAREHOUSE: 'WAREHOUSE',
+} as const;
+
+/**
+ * Asset status values (local definition)
+ */
+export const AssetStatus = {
+  ACTIVE: 'ACTIVE',
+  INACTIVE: 'INACTIVE',
+} as const;
+
+/**
+ * Interface for concert bundle seed data
+ */
+interface ConcertBundleSeed {
+  id: string;
+  name: string;
+  description: string;
+  ownerId: string;
+  status: BundleStatus;
+  startDate: Date;
+  endDate: Date;
+  budgetAmount: number;
+  metadata: Record<string, unknown>;
+}
+
+/**
+ * Interface for asset seed data
+ */
+interface AssetSeed {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  ownerId: string;
+  ownerType: string;
+  capacity: Record<string, unknown>;
+  metadata: Record<string, unknown>;
+  homeBase: { latitude: number; longitude: number; label: string };
+}
+
 /**
  * Nairobi Music Festival 2026 - Seed Data
  * Demonstrates complex event logistics with 12 asset movements
@@ -11,7 +74,7 @@ import { BundleStatus } from '../modules/asset/dto/asset-platform.dto';
 export const EventCoId = 'org-eventco-2026';
 
 // Concert Bundle
-export const NairobiMusicFestivalBundle = {
+export const NairobiMusicFestivalBundle: ConcertBundleSeed = {
     id: 'bundle-nairobi-music-fest-2026',
     name: 'Nairobi Music Festival 2026',
     description: '2-day outdoor concert at Uhuru Park - 10,000 attendees',
@@ -31,14 +94,14 @@ export const NairobiMusicFestivalBundle = {
 };
 
 // Assets: Trucks, Vans, Storage
-export const ConcertAssets = [
+export const ConcertAssets: AssetSeed[] = [
     {
         id: uuidv4(),
         name: 'Isuzu FXZ 28-330 - KDB 829C',
         type: AssetType.VEHICLE,
         status: AssetStatus.ACTIVE,
         ownerId: 'owner-westside-logistics',
-        ownerType: OwnerType.Organization,
+        ownerType: SeedOwnerType.Organization,
         capacity: { volumeCBM: 45, weightKG: 8000 },
         metadata: { purpose: 'Stage Equipment Transport', dailyRate: 35000 },
         homeBase: { latitude: -1.2674, longitude: 36.8078, label: 'Westlands, Nairobi' },
@@ -49,7 +112,7 @@ export const ConcertAssets = [
         type: AssetType.VEHICLE,
         status: AssetStatus.ACTIVE,
         ownerId: 'owner-industrial-movers',
-        ownerType: OwnerType.Organization,
+        ownerType: SeedOwnerType.Organization,
         capacity: { volumeCBM: 30, weightKG: 5000 },
         metadata: { purpose: 'Scaffolding Transport', dailyRate: 25000 },
         homeBase: { latitude: -1.3167, longitude: 36.8833, label: 'Industrial Area, Nairobi' },
@@ -60,7 +123,7 @@ export const ConcertAssets = [
         type: AssetType.VEHICLE,
         status: AssetStatus.ACTIVE,
         ownerId: 'owner-fresh-express',
-        ownerType: OwnerType.Organization,
+        ownerType: SeedOwnerType.Organization,
         capacity: { volumeCBM: 12, temperatureC: 4 },
         metadata: { purpose: 'Catering Supplies', dailyRate: 18000, coldChain: true },
         homeBase: { latitude: -1.3029, longitude: 36.7072, label: 'Karen, Nairobi' },
@@ -71,7 +134,7 @@ export const ConcertAssets = [
         type: AssetType.VEHICLE,
         status: AssetStatus.ACTIVE,
         ownerId: 'owner-embakasi-rentals',
-        ownerType: OwnerType.Individual,
+        ownerType: SeedOwnerType.Individual,
         capacity: { volumeCBM: 20, weightKG: 3000 },
         metadata: { purpose: 'Portable Toilets', dailyRate: 22000 },
         homeBase: { latitude: -1.3188, longitude: 36.9278, label: 'Embakasi, Nairobi' },
@@ -82,7 +145,7 @@ export const ConcertAssets = [
         type: AssetType.WAREHOUSE,
         status: AssetStatus.ACTIVE,
         ownerId: 'owner-uhuru-storage',
-        ownerType: OwnerType.Organization,
+        ownerType: SeedOwnerType.Organization,
         capacity: { areaSquareFeet: 500 },
         metadata: { purpose: 'Equipment Holding', dailyRate: 8000, security24h: true },
         homeBase: { latitude: -1.2833, longitude: 36.8167, label: 'Near Uhuru Park, Nairobi' },

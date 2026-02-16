@@ -177,10 +177,8 @@ describe('MoveIntelligenceEngine Integration', () => {
         specialItems: ['piano', 'art'],
         distanceKm: 50,
       });
-      console.log('Context:', JSON.stringify(context, null, 2));
 
       const recommendation = await engine.generateRecommendation(context);
-      console.log('Recommendation:', JSON.stringify(recommendation, null, 2));
 
       expect(recommendation.pricingAdjustment.demandAdjustment).toBeGreaterThan(0);
       expect(recommendation.pricingAdjustment.complexityAdjustment).toBeGreaterThan(0);
@@ -239,7 +237,6 @@ describe('MoveIntelligenceEngine Integration', () => {
       });
 
       const recommendation = await engine.generateRecommendation(context);
-      console.log('Recommendation:', JSON.stringify(recommendation, null, 2));
 
       expect(recommendation.riskAssessment.riskFactors.length).toBeGreaterThan(0);
       // expect(recommendation.riskAssessment.requiredPrecautions.length).toBeGreaterThan(0); // Not always present

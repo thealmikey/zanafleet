@@ -24,7 +24,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 
-import { CreateActorCommand } from '../commands/create-actor.command';
+import { CreateActorCommand, CreateActorCommandInput } from '../commands/create-actor.command';
 import { ActorType } from '../dto/actor.enums';
 import { ActorEntity } from '../entities/actor.entity';
 
@@ -63,8 +63,8 @@ export class ActorController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateActorDto): Promise<{ id: string }> {
-    const validated = CreateActorCommand.validate(dto);
-    const id = await this.commandBus.execute(new CreateActorCommand(validated));
+    const validated: CreateActorCommandInput = CreateActorCommand.validate(dto);
+    const id = await this.commandBus.execute<CreateActorCommand, string>(new CreateActorCommand(validated));
     return { id };
   }
 
@@ -112,7 +112,10 @@ export class ActorController {
     await this.actorRepository.update(id, dto);
 
     const updated = await this.actorRepository.findOne({ where: { id } });
-    return updated!.toDomain();
+    if (!updated) {
+      throw new NotFoundException(`Actor with ID "${id}" not found`);
+    }
+    return updated.toDomain();
   }
 
   @Delete(':id')

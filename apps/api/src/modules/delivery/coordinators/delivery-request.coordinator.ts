@@ -168,7 +168,8 @@ export class DeliveryRequestCoordinator {
       return `${normalizedItemId}: ${normalizedDescription}`;
     }
 
-    return normalizedDescription ?? normalizedItemId!;
+    // At this point, one of them is guaranteed to be defined
+    return normalizedDescription || normalizedItemId || '';
   }
 
   private async resolveLocationPin(input: LocationPinInput): Promise<{

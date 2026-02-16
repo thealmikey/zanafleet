@@ -1,7 +1,6 @@
-import { EventBusService } from '@api/core/event-bus/event-bus.service';
 import { PersonaEntity } from '@api/modules/persona/entities/persona.entity';
 import { Module, OnModuleInit } from '@nestjs/common';
-import { CqrsModule, QueryBus, CommandBus } from '@nestjs/cqrs';
+import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CapabilityController } from './controllers/capability.controller';

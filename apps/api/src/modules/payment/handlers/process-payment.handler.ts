@@ -59,7 +59,7 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
 
       if (fraudResult.decision === FraudDecision.BLOCK) {
         this.logger.warn(
-          `Payment intent ${intent.id} blocked by fraud check: ${fraudResult.blockReason}`,
+          `Payment intent ${intent.id} blocked by fraud check: ${fraudResult.blockReason ?? ''}`,
         );
 
         await intentRepo.update(intent.id, { status: PaymentIntentStatus.FAILED });
@@ -87,9 +87,9 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
         if (this.eventBusService) {
           this.eventBusService
             .publish(NatsSubjects.Payment.FAILED_V1, failedEvent)
-            .catch((error) => {
+            .catch((error: unknown) => {
               this.logger.error(
-                `Failed to publish PaymentFailedEvent to NATS: ${error.message}`,
+                `Failed to publish PaymentFailedEvent to NATS: ${(error as Error).message}`,
               );
             });
         }
@@ -185,9 +185,9 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
       if (this.eventBusService) {
         this.eventBusService
           .publish(NatsSubjects.Payment.COMPLETED_V1, completedEvent)
-          .catch((error) => {
+          .catch((error: unknown) => {
             this.logger.error(
-              `Failed to publish PaymentCompletedEvent to NATS: ${error.message}`,
+              `Failed to publish PaymentCompletedEvent to NATS: ${(error as Error).message}`,
             );
           });
       }
@@ -218,15 +218,15 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
       if (this.eventBusService) {
         this.eventBusService
           .publish(NatsSubjects.Payment.FAILED_V1, failedEvent)
-          .catch((error) => {
+          .catch((error: unknown) => {
             this.logger.error(
-              `Failed to publish PaymentFailedEvent to NATS: ${error.message}`,
+              `Failed to publish PaymentFailedEvent to NATS: ${(error as Error).message}`,
             );
           });
       }
 
       this.logger.warn(
-        `Payment failed: ${intent.id}, error: ${providerResult.errorCode} - ${providerResult.errorMessage}`,
+        `Payment failed: ${intent.id}, error: ${providerResult.errorCode ?? ''} - ${providerResult.errorMessage ?? ''}`,
       );
     }
 

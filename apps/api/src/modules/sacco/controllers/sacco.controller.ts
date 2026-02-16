@@ -25,7 +25,7 @@ import { LocationData } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 
 
-import { CreateSaccoCommand } from '../commands/create-sacco.command';
+import { CreateSaccoCommand, CreateSaccoCommandInput } from '../commands/create-sacco.command';
 import { SaccoEntity } from '../entities/sacco.entity';
 
 export class CreateSaccoDto {
@@ -53,8 +53,8 @@ export class SaccoController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateSaccoDto): Promise<{ id: string }> {
-    const validated = CreateSaccoCommand.validate(dto);
-    const id = await this.commandBus.execute(new CreateSaccoCommand(validated));
+    const validated: CreateSaccoCommandInput = CreateSaccoCommand.validate(dto);
+    const id = await this.commandBus.execute<CreateSaccoCommand, string>(new CreateSaccoCommand(validated));
     return { id };
   }
 
@@ -102,7 +102,10 @@ export class SaccoController {
     await this.saccoRepository.update(id, dto);
 
     const updated = await this.saccoRepository.findOne({ where: { id } });
-    return updated!.toDomain();
+    if (!updated) {
+      throw new NotFoundException('Failed to retrieve updated sacco');
+    }
+    return updated.toDomain();
   }
 
   @Delete(':id')

@@ -97,7 +97,7 @@ export class AnalyzeMediaHandler implements ICommandHandler<AnalyzeMediaCommand>
         );
 
         this.logger.warn(
-          `Media analysis failed for order ${orderId}: ${result.errorCode} - ${result.errorMessage}`,
+          `Media analysis failed for order ${orderId}: ${result.errorCode ?? ''} - ${result.errorMessage ?? ''}`,
         );
       }
     } catch (error) {

@@ -43,7 +43,7 @@ export class MoversController {
     @Query('lng') longitude?: string,
     @Query('limit') limit?: string,
   ): Promise<LocationSuggestion[]> {
-    this.logger.debug(`Location search: ${query} (lat: ${latitude}, lng: ${longitude})`);
+    this.logger.debug(`Location search: ${query} (lat: ${latitude ?? ''}, lng: ${longitude ?? ''})`);
     
     if (!query || query.length < 2) {
       return [];

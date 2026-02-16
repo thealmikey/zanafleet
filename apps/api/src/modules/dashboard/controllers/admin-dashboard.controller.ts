@@ -16,6 +16,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThanOrEqual } from 'typeorm';
 
 
+import { PolicyStatus } from '../../policy/dto/policy.enums';
 import { PolicyEntity } from '../../policy/entities/policy.entity';
 import { SettlementBatchEntity } from '../../settlement/entities/settlement-batch.entity';
 
@@ -73,7 +74,7 @@ export class AdminDashboardController {
 
     const [, totalPolicies] = await this.policyRepository.findAndCount();
     const [, activePolicies] = await this.policyRepository.findAndCount({
-      where: { status: 'ACTIVE' as any },
+      where: { status: PolicyStatus.ACTIVE },
     });
 
     return {

@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+
 import {
   UISchema,
   DataSource,
@@ -24,7 +25,10 @@ import {
 export class UISchemaCompilerService {
   private readonly logger = new Logger(UISchemaCompilerService.name);
 
+  // Empty constructor for NestJS dependency injection
+  /* eslint-disable @typescript-eslint/no-empty-function */
   constructor() {}
+  /* eslint-enable @typescript-eslint/no-empty-function */
 
   /**
    * Compile UISchema from request

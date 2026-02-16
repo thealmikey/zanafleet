@@ -11,7 +11,7 @@ export interface SearchDocument {
     workspaceId: string;
     title: string;
     description: string;
-    metadata: Record<string, any>;
+    metadata: Record<string, unknown>;
     location?: GeoPoint;
     createdAt?: Date;
     updatedAt?: Date;

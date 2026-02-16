@@ -64,7 +64,7 @@ export class PolicyEvaluatedListener implements IEventHandler<PolicyEvaluatedV1>
     for (const policy of event.matchedPolicies) {
       if (policy.outputs?.surgeMultiplier !== undefined) {
         this.logger.debug(
-          `Policy ${policy.policyId} (${policy.name}) applied surge multiplier: ${policy.outputs.surgeMultiplier}`,
+          `Policy ${policy.policyId} (${policy.name}) applied surge multiplier: ${String(policy.outputs.surgeMultiplier)}`,
         );
       }
 

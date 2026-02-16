@@ -1,6 +1,7 @@
 import { EventBusService, NatsSubjects } from '@api/core/event-bus';
 import {
   CreatePaymentIntentCommand,
+  CreatePaymentIntentResult,
   PaymentFlowType,
 } from '@api/modules/payment';
 import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
@@ -51,7 +52,7 @@ export class IssueInvoiceCommandHandler implements ICommandHandler<IssueInvoiceC
 
     const invoiceDomain = invoice.toDomain();
 
-    const paymentResult = await this.commandBus.execute(
+    const paymentResult: CreatePaymentIntentResult = await this.commandBus.execute(
       new CreatePaymentIntentCommand({
         payerAccountId: invoiceDomain.payerAccountId,
         payeeAccountId: invoiceDomain.payeeAccountId,
@@ -91,8 +92,9 @@ export class IssueInvoiceCommandHandler implements ICommandHandler<IssueInvoiceC
     if (this.eventBusService) {
       this.eventBusService
         .publish(NatsSubjects.Billing.INVOICE_ISSUED_V1, event)
-        .catch((error) => {
-          this.logger.error(`Failed to publish InvoiceIssuedEvent to NATS: ${error.message}`);
+        .catch((error: unknown) => {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          this.logger.error(`Failed to publish InvoiceIssuedEvent to NATS: ${errorMessage}`);
         });
     }
 

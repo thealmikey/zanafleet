@@ -25,7 +25,7 @@ import { BusinessType, LocationData } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 
 
-import { CreateBusinessCommand } from '../commands/create-business.command';
+import { CreateBusinessCommand, CreateBusinessCommandInput } from '../commands/create-business.command';
 import { BusinessEntity } from '../entities/business.entity';
 
 const UUID_V4_ROUTE_SEGMENT =
@@ -60,8 +60,8 @@ export class BusinessController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() dto: CreateBusinessDto): Promise<{ id: string }> {
-    const validated = CreateBusinessCommand.validate(dto);
-    const id = await this.commandBus.execute(new CreateBusinessCommand(validated));
+    const validated: CreateBusinessCommandInput = CreateBusinessCommand.validate(dto);
+    const id = await this.commandBus.execute<CreateBusinessCommand, string>(new CreateBusinessCommand(validated));
     return { id };
   }
 
@@ -109,7 +109,10 @@ export class BusinessController {
     await this.businessRepository.update(id, dto);
 
     const updated = await this.businessRepository.findOne({ where: { id } });
-    return updated!.toDomain();
+    if (!updated) {
+      throw new NotFoundException(`Business with ID "${id}" not found`);
+    }
+    return updated.toDomain();
   }
 
   @Delete(UUID_V4_ROUTE_SEGMENT)

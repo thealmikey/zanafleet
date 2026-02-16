@@ -554,8 +554,9 @@ export class CalendarPolicyBridgeService {
 
     await this.eventBusService
       .publish(NatsSubjects.Calendar.POLICY_BINDING_CREATED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish PolicyBindingCreatedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        this.logger.error(`Failed to publish PolicyBindingCreatedEvent: ${errorMessage}`);
       });
   }
 
@@ -583,8 +584,9 @@ export class CalendarPolicyBridgeService {
 
     await this.eventBusService
       .publish(NatsSubjects.Calendar.POLICY_BINDING_ACTIVATED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish PolicyBindingActivatedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        this.logger.error(`Failed to publish PolicyBindingActivatedEvent: ${errorMessage}`);
       });
   }
 }

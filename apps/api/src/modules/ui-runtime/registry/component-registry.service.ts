@@ -46,7 +46,10 @@ export class ComponentRegistryService {
     if (!this.categories.has(component.category)) {
       this.categories.set(component.category, new Set());
     }
-    this.categories.get(component.category)!.add(component.type);
+    const categorySet = this.categories.get(component.category);
+    if (categorySet) {
+      categorySet.add(component.type);
+    }
     
     // Index by tags
     if (component.tags) {
@@ -54,7 +57,10 @@ export class ComponentRegistryService {
         if (!this.tags.has(tag)) {
           this.tags.set(tag, new Set());
         }
-        this.tags.get(tag)!.add(component.type);
+        const tagSet = this.tags.get(tag);
+        if (tagSet) {
+          tagSet.add(component.type);
+        }
       }
     }
     

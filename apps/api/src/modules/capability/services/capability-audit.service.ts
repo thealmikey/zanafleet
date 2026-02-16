@@ -185,9 +185,9 @@ export class CapabilityAuditService {
     if (capabilityName) baseWhere.capabilityName = capabilityName;
     if (startDate) baseWhere.createdAt = MoreThanOrEqual(new Date(startDate));
     if (endDate) {
-      if (baseWhere.createdAt) {
-        // Combine with between
-        baseWhere.createdAt = Between(new Date(startDate!), new Date(endDate));
+      if (baseWhere.createdAt && startDate) {
+        // Combine with between - startDate is guaranteed to be defined here
+        baseWhere.createdAt = Between(new Date(startDate), new Date(endDate));
       } else {
         baseWhere.createdAt = LessThanOrEqual(new Date(endDate));
       }

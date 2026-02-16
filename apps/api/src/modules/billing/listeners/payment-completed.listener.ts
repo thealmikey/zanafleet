@@ -77,8 +77,9 @@ export class PaymentCompletedListener implements IEventHandler<PaymentCompletedE
     if (this.eventBusService) {
       this.eventBusService
         .publish(NatsSubjects.Billing.INVOICE_PAID_V1, paidEvent)
-        .catch((error) => {
-          this.logger.error(`Failed to publish InvoicePaidEvent to NATS: ${error.message}`);
+        .catch((error: unknown) => {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          this.logger.error(`Failed to publish InvoicePaidEvent to NATS: ${errorMessage}`);
         });
     }
 

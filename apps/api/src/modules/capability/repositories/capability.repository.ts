@@ -24,6 +24,27 @@ export interface ActorCapabilityContext {
 }
 
 /**
+ * Raw query result for persona ID lookups
+ */
+interface PersonaIdResult {
+  personaId: string;
+}
+
+/**
+ * Raw query result for capability name lookups
+ */
+interface CapabilityNameResult {
+  name: string;
+}
+
+/**
+ * Raw query result for count lookups
+ */
+interface CountResult {
+  count: string;
+}
+
+/**
  * CapabilityRepository
  *
  * Provides data access methods for capability lookups.
@@ -92,7 +113,7 @@ export class CapabilityRepository {
       query.andWhere('pc.workspaceId = :workspaceId', { workspaceId });
     }
 
-    const result = await query.getRawMany();
+    const result = await query.getRawMany<PersonaIdResult>();
     return result.map((r) => r.personaId);
   }
 
@@ -119,7 +140,7 @@ export class CapabilityRepository {
       .innerJoin('capabilities', 'c', 'c.id = pc.capabilityId')
       .select('c.name', 'name')
       .where('pc.personaId = :personaId', { personaId })
-      .getRawMany();
+      .getRawMany<CapabilityNameResult>();
 
     return result.map((r) => r.name);
   }
@@ -169,7 +190,7 @@ export class CapabilityRepository {
       .select('COUNT(*)', 'count')
       .where('pc.personaId IN (:...personaIds)', { personaIds })
       .andWhere('c.name = :capabilityName', { capabilityName })
-      .getRawOne();
+      .getRawOne<CountResult>();
 
     return parseInt(result?.count || '0', 10) > 0;
   }

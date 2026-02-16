@@ -3,8 +3,6 @@
 // Triggers: Event-driven (on commitment created/updated) + Scheduled
 // =============================================================================
 
-import { v4 as uuidv4 } from 'uuid';
-
 import {
   Agent,
   AgentType,

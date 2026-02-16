@@ -7,6 +7,8 @@
  * @module media-insight/events
  */
 
+/* eslint-disable @typescript-eslint/no-namespace */
+
 import { BaseEvent } from '../../../../core/event-bus/interfaces/base-event.interface';
 import type { MediaInsight } from '../interfaces';
 

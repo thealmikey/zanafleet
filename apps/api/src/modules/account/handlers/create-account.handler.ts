@@ -59,8 +59,9 @@ export class CreateAccountCommandHandler implements ICommandHandler<CreateAccoun
     if (this.eventBusService) {
       this.eventBusService
         .publish(NatsSubjects.Account.CREATED_V1, event)
-        .catch((error) => {
-          this.logger.error(`Failed to publish AccountCreatedEvent to NATS: ${error.message}`);
+        .catch((error: unknown) => {
+          const errorMessage = error instanceof Error ? error.message : String(error);
+          this.logger.error(`Failed to publish AccountCreatedEvent to NATS: ${errorMessage}`);
         });
     }
 

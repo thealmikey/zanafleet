@@ -172,7 +172,7 @@ export class NotificationDispatchCoordinator {
       if (!rateLimitCheck.allowed) {
         const skippedResult = this.createSkippedResult(
           notificationId,
-          `Rate limit exceeded: ${rateLimitCheck.reason}`,
+          `Rate limit exceeded: ${rateLimitCheck.reason ?? ''}`,
         );
         await this.emitSkippedEvent(input, skippedResult);
         return skippedResult;
@@ -481,7 +481,7 @@ export class NotificationDispatchCoordinator {
 
     return {
       ...primaryResult,
-      error: `Primary channel failed and all fallbacks exhausted. Last error: ${primaryResult.error}`,
+      error: `Primary channel failed and all fallbacks exhausted. Last error: ${primaryResult.error ?? ''}`,
     };
   }
 
@@ -542,7 +542,7 @@ export class NotificationDispatchCoordinator {
 
         lastError = new Error(sendResult.errorMessage ?? 'Send failed');
         this.logger.warn(
-          `Send attempt ${attempt}/${this.config.maxRetries} failed: ${sendResult.errorMessage}`,
+          `Send attempt ${attempt}/${this.config.maxRetries} failed: ${sendResult.errorMessage ?? ''}`,
         );
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
@@ -720,8 +720,8 @@ export class NotificationDispatchCoordinator {
 
     await this.eventBusService
       .publish(NatsSubjects.Notification.SENT_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish NotificationSentEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish NotificationSentEvent: ${(error as Error).message}`);
       });
   }
 
@@ -756,8 +756,8 @@ export class NotificationDispatchCoordinator {
 
     await this.eventBusService
       .publish(NatsSubjects.Notification.FAILED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish NotificationFailedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish NotificationFailedEvent: ${(error as Error).message}`);
       });
   }
 
@@ -792,8 +792,8 @@ export class NotificationDispatchCoordinator {
 
     await this.eventBusService
       .publish(NatsSubjects.Notification.SKIPPED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish NotificationSkippedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish NotificationSkippedEvent: ${(error as Error).message}`);
       });
   }
 

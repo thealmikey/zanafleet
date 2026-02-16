@@ -89,9 +89,9 @@ export class CreatePaymentIntentCommandHandler
     if (this.eventBusService) {
       this.eventBusService
         .publish(NatsSubjects.Payment.INTENT_CREATED_V1, event)
-        .catch((error) => {
+        .catch((error: unknown) => {
           this.logger.error(
-            `Failed to publish PaymentIntentCreatedEvent to NATS: ${error.message}`,
+            `Failed to publish PaymentIntentCreatedEvent to NATS: ${(error as Error).message}`,
           );
         });
     }

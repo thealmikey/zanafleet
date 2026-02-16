@@ -13,7 +13,8 @@ import { GeoPoint, GeoBounds, ETAResult, DistanceResult, ZoneCluster, Address } 
 
 
 import { GeoQueryCoordinator } from '../coordinators/geo-query.coordinator';
-import { HeatmapCell } from '../types/heatmap.types';
+import { H3_RESOLUTION_MEDIUM } from '../types/h3.types';
+import { HeatmapCell, HeatmapParams, H3Resolution } from '../types/heatmap.types';
 import { RiderCandidate } from '../types/rider-candidate.types';
 
 @Controller('geo')
@@ -67,18 +68,19 @@ export class GeoController {
     const maxLat = this.parseFloatOrThrow('maxLat', maxLatStr);
     const minLng = this.parseFloatOrThrow('minLng', minLngStr);
     const maxLng = this.parseFloatOrThrow('maxLng', maxLngStr);
-    const resolution = resolutionStr ? this.parseIntOrThrow('resolution', resolutionStr) : 9;
+    const resolution: H3Resolution = resolutionStr ? this.parseIntOrThrow('resolution', resolutionStr) as H3Resolution : H3_RESOLUTION_MEDIUM;
 
-    return this.geoQueryCoordinator.getDemandHeatmap({
-      bounds: {
+    const params: HeatmapParams = {
+      boundingBox: {
         minLat,
         maxLat,
         minLng,
         maxLng,
       },
-      // Cast entire object to any to satisfy HeatmapParams structural typing
-      resolution: resolution as any,
-    } as any);
+      resolution,
+    };
+
+    return this.geoQueryCoordinator.getDemandHeatmap(params);
   }
 
   @Get('zones')

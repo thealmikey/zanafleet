@@ -164,7 +164,7 @@ export class MoversQuoteOrchestrator {
         type: 'surcharge',
         name: 'Floor Premium',
         amount: (moveProfile.floorCount ?? 1) * 200,
-        description: `Additional labor cost for floor ${moveProfile.floorCount}`,
+        description: `Additional labor cost for floor ${moveProfile.floorCount ?? 1}`,
       });
     }
 

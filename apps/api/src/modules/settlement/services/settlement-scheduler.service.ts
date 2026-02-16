@@ -89,7 +89,7 @@ export class SettlementSchedulerService {
       return;
     }
 
-    const batchResult = await this.commandBus.execute(
+    const batchResult: { batchId: string; itemCount: number; netPayout: number } = await this.commandBus.execute(
       new CreateSettlementBatchCommand({
         riderAccountId,
         periodStart,
@@ -112,7 +112,7 @@ export class SettlementSchedulerService {
     );
 
     this.logger.log(
-      `Processed settlement for rider ${riderAccountId}: ${batchResult.netPayout} ${balance.currency}`,
+      `Processed settlement for rider ${riderAccountId}: ${batchResult.netPayout} ${balance?.currency ?? 'USD'}`,
     );
   }
 

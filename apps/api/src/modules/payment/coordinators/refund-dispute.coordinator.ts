@@ -522,7 +522,7 @@ export class RefundDisputeCoordinator {
       updates.assignedTo = assignedTo;
     }
 
-    await this.disputeRepository.update(disputeId, updates as any);
+    await this.disputeRepository.update(disputeId, updates as unknown as Record<string, unknown>);
   }
 
   updateConfig(config: Partial<RefundDisputeConfig>): void {
@@ -712,8 +712,8 @@ export class RefundDisputeCoordinator {
 
     await this.eventBusService
       .publish(NatsSubjects.Payment.DISPUTE_OPENED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish DisputeOpenedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish DisputeOpenedEvent: ${(error as Error).message}`);
       });
   }
 
@@ -746,8 +746,8 @@ export class RefundDisputeCoordinator {
 
     await this.eventBusService
       .publish(NatsSubjects.Payment.DISPUTE_RESOLVED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish DisputeResolvedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish DisputeResolvedEvent: ${(error as Error).message}`);
       });
   }
 
@@ -779,8 +779,8 @@ export class RefundDisputeCoordinator {
 
     await this.eventBusService
       .publish(NatsSubjects.Payment.DISPUTE_ESCALATED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish DisputeEscalatedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish DisputeEscalatedEvent: ${(error as Error).message}`);
       });
   }
 
@@ -813,8 +813,8 @@ export class RefundDisputeCoordinator {
 
     await this.eventBusService
       .publish(NatsSubjects.Payment.REFUND_REQUESTED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish RefundRequestedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish RefundRequestedEvent: ${(error as Error).message}`);
       });
   }
 
@@ -845,8 +845,8 @@ export class RefundDisputeCoordinator {
 
     await this.eventBusService
       .publish(NatsSubjects.Payment.REFUND_APPROVED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish RefundApprovedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish RefundApprovedEvent: ${(error as Error).message}`);
       });
   }
 
@@ -880,8 +880,8 @@ export class RefundDisputeCoordinator {
 
     await this.eventBusService
       .publish(NatsSubjects.Payment.REFUND_PROCESSED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish RefundProcessedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish RefundProcessedEvent: ${(error as Error).message}`);
       });
   }
 
@@ -912,8 +912,8 @@ export class RefundDisputeCoordinator {
 
     await this.eventBusService
       .publish(NatsSubjects.Payment.REFUND_FAILED_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish RefundFailedEvent: ${error.message}`);
+      .catch((error: unknown) => {
+        this.logger.error(`Failed to publish RefundFailedEvent: ${(error as Error).message}`);
       });
   }
 }

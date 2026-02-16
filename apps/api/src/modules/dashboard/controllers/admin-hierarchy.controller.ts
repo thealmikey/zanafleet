@@ -366,7 +366,10 @@ export class AdminHierarchyController {
 
     await this.businessRepository.update(id, dto as Record<string, unknown>);
     const updated = await this.businessRepository.findOne({ where: { id } });
-    return updated!.toDomain();
+    if (!updated) {
+      throw new NotFoundException('Failed to retrieve updated business');
+    }
+    return updated.toDomain();
   }
 
   @Patch('saccos/:id')
@@ -391,7 +394,10 @@ export class AdminHierarchyController {
 
     await this.saccoRepository.update(id, dto as Record<string, unknown>);
     const updated = await this.saccoRepository.findOne({ where: { id } });
-    return updated!.toDomain();
+    if (!updated) {
+      throw new NotFoundException('Failed to retrieve updated sacco');
+    }
+    return updated.toDomain();
   }
 
   @Patch('riders/:id')
@@ -416,7 +422,10 @@ export class AdminHierarchyController {
 
     await this.riderRepository.update(id, dto as Partial<RiderEntity> as Record<string, unknown>);
     const updated = await this.riderRepository.findOne({ where: { id } });
-    return updated!.toDomain();
+    if (!updated) {
+      throw new NotFoundException('Failed to retrieve updated rider');
+    }
+    return updated.toDomain();
   }
 
   @Patch('orders/:id')
@@ -445,7 +454,10 @@ export class AdminHierarchyController {
 
     await this.orderRepository.update(id, dto as Record<string, unknown>);
     const updated = await this.orderRepository.findOne({ where: { id } });
-    return updated!.toDomain();
+    if (!updated) {
+      throw new NotFoundException('Failed to retrieve updated order');
+    }
+    return updated.toDomain();
   }
 
   @Patch('deliveries/:id')
@@ -484,6 +496,9 @@ export class AdminHierarchyController {
 
     await this.deliveryRepository.update(id, dto as Record<string, unknown>);
     const updated = await this.deliveryRepository.findOne({ where: { id } });
-    return updated!.toDomain();
+    if (!updated) {
+      throw new NotFoundException('Failed to retrieve updated delivery');
+    }
+    return updated.toDomain();
   }
 }
