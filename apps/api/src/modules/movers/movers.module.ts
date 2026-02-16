@@ -4,6 +4,8 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { AssetModule } from '../asset/asset.module';
 import { LocationIntelligenceModule } from '../location-intelligence/location-intelligence.module';
+import { GEO_PROVIDER } from '../location-intelligence/providers/geo-provider.interface';
+import { NoOpGeoProvider } from '../location-intelligence/providers/noop-geo.provider';
 import { PolicyModule } from '../policy/policy.module';
 
 import { MoversController } from './controllers/movers.controller';
@@ -49,6 +51,10 @@ import { VehicleRecommendationService } from './services/vehicle-recommendation.
     {
       provide: LOCATION_AUTOCOMPLETE_PROVIDER,
       useExisting: DefaultLocationAutocompleteProvider,
+    },
+    {
+      provide: GEO_PROVIDER,
+      useExisting: NoOpGeoProvider,
     },
   ],
   exports: [

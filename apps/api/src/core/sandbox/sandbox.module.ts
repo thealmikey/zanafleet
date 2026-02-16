@@ -16,6 +16,7 @@ import { ConfigModule } from '@nestjs/config';
 import { createConcertScenario } from '../../database/seeds/scenarios/concert.scenario';
 import { createDashboardScenario } from '../../database/seeds/scenarios/dashboard.scenario';
 import { createMinimalScenario } from '../../database/seeds/scenarios/minimal.scenario';
+import { UIComposerModule } from '../../modules/ui-composer/ui-composer.module';
 
 import { InMemoryStoreFactoryService, createSandboxOptions } from './in-memory-store.factory';
 import { SandboxProductionGuard, assertSandboxAllowed } from './sandbox-production.guard';
@@ -43,7 +44,7 @@ import { SeedScenarioRegistry } from './seed-scenario.registry';
  * - Health indicator for monitoring
  */
 @Module({
-  imports: [ConfigModule],
+  imports: [ConfigModule, UIComposerModule],
   providers: [
     InMemoryStoreFactoryService,
     SeedScenarioRegistry,

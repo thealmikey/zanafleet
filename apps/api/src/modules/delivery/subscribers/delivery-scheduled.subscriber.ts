@@ -8,9 +8,9 @@ import { NatsSubjects } from '../../../core/event-bus/event-bus.constants'
 import { LocationResolverService } from '../../../core/location/location-resolver.service'
 import { SendNotificationCommand } from '../../communication/commands/send-notification.command'
 import { NotificationChannel, RecipientType } from '../../communication/dto/notification.enums'
+import { LocationIntelligenceService } from '../../location-intelligence/services/location-intelligence.service'
 import { DeliveryEntity } from '../entities/delivery.entity'
 import { AssignmentRulesService } from '../services/assignment-rules.service'
-import { CandidateSelectionService } from '../services/candidate-selection.service'
 
 @Controller()
 export class DeliveryScheduledSubscriber {
@@ -19,7 +19,7 @@ export class DeliveryScheduledSubscriber {
   constructor(
     @InjectRepository(DeliveryEntity)
     private readonly deliveryRepo: Repository<DeliveryEntity>,
-    private readonly candidateSelection: CandidateSelectionService,
+    private readonly locationIntelligence: LocationIntelligenceService,
     private readonly rules: AssignmentRulesService,
     private readonly commandBus: CommandBus,
     private readonly locationResolver: LocationResolverService,
@@ -65,7 +65,7 @@ export class DeliveryScheduledSubscriber {
       }
 
       // Discover and rank candidates near the pickup location
-      const ranked = await this.candidateSelection.findAndRankCandidates({
+      const ranked = await this.locationIntelligence.findAndRankCandidates({
         pickup: { latitude: pickupPoint.latitude, longitude: pickupPoint.longitude },
         scheduledPickupTime,
         scheduledDropoffTime,

@@ -11,8 +11,9 @@ import { MatchingTimeoutEventV1 } from '../events/matching-timeout.event';
 import { RiderAssignedEventV1 } from '../events/rider-assigned.event';
 import { RiderRejectedEventV1 } from '../events/rider-rejected.event';
 import { AssignmentRulesService } from '../services/assignment-rules.service';
-import { CandidateSelectionService, GeoPoint } from '../services/candidate-selection.service';
+import { GeoPoint } from '../services/candidate-selection.service';
 import { DeliveryService } from '../services/delivery.service';
+import { LocationIntelligenceService } from '../../location-intelligence/services/location-intelligence.service';
 
 /**
  * Represents a ranked rider candidate for matching.
@@ -105,7 +106,7 @@ export class DeliveryMatchingCoordinator {
   constructor(
     @InjectRepository(DeliveryEntity)
     private readonly deliveryRepository: Repository<DeliveryEntity>,
-    private readonly candidateSelectionService: CandidateSelectionService,
+    private readonly locationIntelligenceService: LocationIntelligenceService,
     private readonly assignmentRulesService: AssignmentRulesService,
     private readonly policyEngine: PolicyEvaluationEngineService,
     private readonly deliveryService: DeliveryService,
@@ -361,7 +362,7 @@ export class DeliveryMatchingCoordinator {
     // Use a default pickup location - in production this would be resolved from pickupLocationId
     const pickup: GeoPoint = { latitude: -1.2921, longitude: 36.8219 }; // Default Nairobi coordinates
 
-    const candidates = await this.candidateSelectionService.findAndRankCandidates({
+    const candidates = await this.locationIntelligenceService.findAndRankCandidates({
       pickup,
       scheduledPickupTime: delivery.scheduledPickupTime,
       scheduledDropoffTime: delivery.scheduledDropoffTime,

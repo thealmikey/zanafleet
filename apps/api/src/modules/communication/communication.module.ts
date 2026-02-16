@@ -13,7 +13,7 @@ import { TemplateEntity } from './entities/template.entity';
 import { SendNotificationCommandHandler } from './handlers/send-notification.handler';
 import { NotificationNeo4jProjection } from './projections/notification-neo4j.projection';
 import { ChannelProviderRegistry } from './providers/channel-provider.interface';
-import { NoOpChannelProvider } from './providers/noop-channel.provider';
+import { createNoOpProviders } from './providers/noop-channel.provider';
 import { MessageBuilderService } from './services/message-builder.service';
 import { PreferenceService } from './services/preference.service';
 import { TemplateService } from './services/template.service';
@@ -47,7 +47,15 @@ import { NotificationSubscriber } from './subscribers/notification.subscriber';
     NotificationSubscriber,
     NotificationDispatchCoordinator,
     ChannelProviderRegistry,
-    NoOpChannelProvider,
+    {
+      provide: 'NO_OP_PROVIDERS',
+      useFactory: (registry: ChannelProviderRegistry) => {
+        const providers = createNoOpProviders();
+        providers.forEach((provider) => registry.register(provider));
+        return providers;
+      },
+      inject: [ChannelProviderRegistry],
+    },
   ],
   exports: [
     TemplateService,

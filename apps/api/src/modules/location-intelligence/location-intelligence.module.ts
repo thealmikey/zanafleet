@@ -1,5 +1,6 @@
 import { Module, OnModuleInit } from '@nestjs/common';
-import { CqrsModule } from '@nestjs/cqrs';
+import { ConfigModule } from '@nestjs/config';
+import { CommandBus, CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
@@ -38,6 +39,7 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
  */
 @Module({
   imports: [
+    ConfigModule,
     TypeOrmModule.forFeature([RiderLocationSnapshotEntity, RiderLocationHistoryEntity]),
     CqrsModule,
     EventBusModule.forFeature(),
@@ -54,7 +56,11 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
     RiderLocationRepository,
     Neo4jRiderCandidateRepository,
     UpdateRiderLocationHandler,
-    RiderTelemetrySubscriber,
+    {
+      provide: RiderTelemetrySubscriber,
+      useFactory: (commandBus: any) => new RiderTelemetrySubscriber(commandBus),
+      inject: [CommandBus],
+    },
     GeoQueryCoordinator,
   ],
   exports: [

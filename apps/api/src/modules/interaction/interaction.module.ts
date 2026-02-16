@@ -68,8 +68,27 @@ export const EventHandlers = [
     InteractionNeo4jProjection,
     InteractionNeo4jInitializer,
     // Intelligence
-    InteractionIntelligenceEngine,
-    InteractionAIOrchestratorService,
+    {
+      provide: InteractionIntelligenceEngine,
+      useFactory: () => new InteractionIntelligenceEngine(),
+    },
+    {
+      provide: InteractionAIOrchestratorService,
+      useFactory: (
+        intelligenceEngine: InteractionIntelligenceEngine,
+        eventRepository: InteractionEventRepository,
+        streamRepository: InteractionStreamRepository,
+      ) => new InteractionAIOrchestratorService(
+        intelligenceEngine,
+        eventRepository,
+        streamRepository,
+      ),
+      inject: [
+        InteractionIntelligenceEngine,
+        InteractionEventRepository,
+        InteractionStreamRepository,
+      ],
+    },
     // Adapters
     SlackAdapter,
     WebChatAdapter,

@@ -4,6 +4,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { BusinessEntity } from '../business/entities/business.entity';
+import { CustomerModule } from '../customer/customer.module';
 import { CustomerEntity } from '../customer/entities/customer.entity';
 import { DeliveryModule } from '../delivery/delivery.module';
 import { DeliveryEntity } from '../delivery/entities/delivery.entity';
@@ -22,6 +23,7 @@ import { ActivitySeederService } from './services/activity-seeder.service';
     EventBusModule.forFeature(),
     forwardRef(() => DeliveryModule),
     forwardRef(() => PaymentModule),
+    CustomerModule,
   ],
   controllers: [OrdersController],
   providers: [CreateOrderCommandHandler, CustomerOrderOrchestrator, ActivitySeederService],

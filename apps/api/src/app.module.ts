@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventBusModule } from './core/event-bus';
 import { MediaModule } from './core/media';
 import { Neo4jModule } from './core/neo4j';
+import { SandboxModule } from './core/sandbox/sandbox.module';
 import { AccountModule } from './modules/account/account.module';
 import { ActorModule } from './modules/actor/actor.module';
 import { AssetModule } from './modules/asset/asset.module';
@@ -68,6 +69,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     Neo4jModule.forRoot({
       isGlobal: true,
     }),
+    SandboxModule.forRoot(),
     ScheduleModule.forRoot(),
     MediaModule,
     AccountModule,

@@ -8,6 +8,7 @@ import { BillingModule } from '../billing/billing.module';
 import { CalendarModule } from '../calendar/calendar.module';
 import { LedgerModule } from '../ledger/ledger.module';
 import { LocationIntelligenceModule } from '../location-intelligence/location-intelligence.module';
+import { OrderModule } from '../order/order.module';
 import { PolicyModule } from '../policy/policy.module';
 
 import { DeliveriesController } from './controllers/deliveries.controller';
@@ -16,6 +17,7 @@ import { DeliveryExecutionCoordinator } from './coordinators/delivery-execution.
 import { DeliveryLifecycleCoordinator } from './coordinators/delivery-lifecycle.coordinator';
 import { DeliveryMatchingCoordinator } from './coordinators/delivery-matching.coordinator';
 import { DeliveryRequestCoordinator } from './coordinators/delivery-request.coordinator';
+import { DeliveryLocationEntity } from './entities/delivery-location.entity';
 import { DeliveryEntity } from './entities/delivery.entity';
 import { AcceptDeliveryAssignmentHandler } from './handlers/accept-delivery-assignment.handler';
 import { AssignRiderToDeliveryHandler } from './handlers/assign-rider-to-delivery.handler';
@@ -25,14 +27,13 @@ import { MarkDeliveryInTransitHandler } from './handlers/mark-delivery-in-transi
 import { MarkDeliveryPickedUpHandler } from './handlers/mark-delivery-picked-up.handler';
 import { RecordDeliveryAttemptFailedHandler } from './handlers/record-delivery-attempt-failed.handler';
 import { AssignmentRulesService } from './services/assignment-rules.service';
-import { CandidateSelectionService } from './services/candidate-selection.service';
 import { DeliveryService } from './services/delivery.service';
 import { DeliveryScheduledSubscriber } from './subscribers/delivery-scheduled.subscriber';
 import { OrderCreatedSubscriber } from './subscribers/order-created.subscriber';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([DeliveryEntity]),
+    TypeOrmModule.forFeature([DeliveryEntity, DeliveryLocationEntity]),
     CqrsModule,
     EventBusModule.forFeature(),
     forwardRef(() => PolicyModule),
@@ -40,6 +41,7 @@ import { OrderCreatedSubscriber } from './subscribers/order-created.subscriber';
     forwardRef(() => CalendarModule),
     forwardRef(() => LedgerModule),
     forwardRef(() => LocationIntelligenceModule),
+    forwardRef(() => OrderModule),
   ],
   controllers: [DeliveriesController, DeliveryTrackingController],
   providers: [
@@ -50,7 +52,8 @@ import { OrderCreatedSubscriber } from './subscribers/order-created.subscriber';
     DeliveryRequestCoordinator,
     OrderCreatedSubscriber,
     DeliveryScheduledSubscriber,
-    CandidateSelectionService,
+    // CandidateSelectionService - commented out due to interface mismatch with LocationIntelligence
+    // CandidateSelectionService,
     AssignmentRulesService,
     LocationResolverService,
     // Command Handlers
@@ -70,4 +73,4 @@ import { OrderCreatedSubscriber } from './subscribers/order-created.subscriber';
     DeliveryRequestCoordinator,
   ],
 })
-export class DeliveryModule { }
+export class DeliveryModule {}
