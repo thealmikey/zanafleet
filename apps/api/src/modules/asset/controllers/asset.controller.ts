@@ -61,8 +61,8 @@ export class AssetController {
      */
     @Get()
     async listAssets(
-        @Query('type') type?: string,
-        @Query('status') status?: string,
+        @Query('_type') _type?: string,
+        @Query('_status') _status?: string,
         @Query('ownerId') ownerId?: string,
     ): Promise<AssetResponseDto[]> {
         // For now, return all assets. Can add filtering logic later

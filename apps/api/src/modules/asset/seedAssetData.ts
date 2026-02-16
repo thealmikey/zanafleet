@@ -12,13 +12,14 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { AssetEntity } from './entities/asset.entity';
 
 /**
- * Local enum definitions to avoid import issues from @zanafleet/contracts
+ * Local enum definitions
+ * Note: These should match the values in @zanafleet/contracts
  */
 export enum AssetType {
   TRUCK = 'TRUCK',
@@ -488,22 +489,22 @@ export class AssetSeederService {
                 const asset = this.assetRepository.create({
                     id: uuidv4(),
                     name: assetData.name,
-                    type: assetData.type,
-                    status: assetData.status,
+                    type: assetData.type as any,
+                    status: assetData.status as any,
                     ownerId: assetData.ownerId,
-                    ownerType: assetData.ownerType,
+                    ownerType: assetData.ownerType as any,
                     capacity: assetData.capacity,
                     metadata: assetData.metadata,
                     homeBase: assetData.homeBase,
                     imageIds: assetData.imageIds,
-                });
+                } as unknown as DeepPartial<AssetEntity>);
 
-                await this.assetRepository.save(asset);
+                const savedAsset = await this.assetRepository.save(asset);
 
                 const operatorName = getOperatorName(assetData.operatorId);
                 this.logger.log(`✅ Created asset: ${assetData.name} (${assetData.type}) - Operator: ${operatorName}`);
                 results.push({
-                    assetId: asset.id,
+                    assetId: savedAsset.id,
                     name: assetData.name,
                     status: 'created',
                 });

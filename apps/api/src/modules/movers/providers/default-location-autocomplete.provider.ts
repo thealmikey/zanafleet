@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { LocationSuggestion, LocationSearchOptions } from '../dto';
-
-import { LocationAutocompleteProvider } from './location-autocomplete.interface';
+import { LocationSuggestion } from '../dto';
+import {
+    LocationAutocompleteProvider,
+    LocationSearchOptions,
+} from './location-autocomplete.interface';
 
 /**
  * Default Location Autocomplete Provider

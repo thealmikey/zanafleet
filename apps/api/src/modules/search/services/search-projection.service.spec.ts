@@ -193,7 +193,7 @@ describe('SearchProjectionService', () => {
     });
 
     it('10. should ignore unknown event types (Schema Evolution)', async () => {
-        const unknownEvent = { constructor: { name: 'UnknownEvent' } };
+        const unknownEvent = { constructor: { name: 'UnknownEvent' } } as any;
 
         await service.handle(unknownEvent);
 

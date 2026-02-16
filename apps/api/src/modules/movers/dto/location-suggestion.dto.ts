@@ -14,6 +14,15 @@ export interface LocationSuggestion {
 }
 
 /**
+ * Search options for location autocomplete
+ */
+export interface LocationSearchOptions {
+  latitude?: number;
+  longitude?: number;
+  limit?: number;
+}
+
+/**
  * Request DTO for getting location suggestions
  */
 export interface LocationSearchParams {

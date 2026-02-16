@@ -6,7 +6,7 @@
  */
 
 import { Injectable, Logger } from '@nestjs/common';
-import { HealthIndicator, HealthCheckError, HealthCheckResult, HealthIndicatorResult } from '@nestjs/terminus';
+import { HealthIndicator, HealthCheckError, HealthCheckResult, HealthIndicatorResult, HealthCheckStatus } from '@nestjs/terminus';
 
 import { SANDBOX_ENV_VAR } from './sandbox.constants';
 
@@ -36,7 +36,7 @@ export class SandboxHealthIndicator extends HealthIndicator {
     });
 
     const result: HealthCheckResult = {
-      status: isHealthy ? ('up' as const) : ('down' as const),
+      status: (isHealthy ? 'up' : 'down') as HealthCheckStatus,
       details,
     };
 

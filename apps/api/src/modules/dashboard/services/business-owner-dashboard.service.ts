@@ -4,7 +4,7 @@ import { Injectable, ForbiddenException, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeliveryStatus } from '@zanafleet/contracts';
-import { Between, In, Repository } from 'typeorm';
+import { Between, FindOptionsWhere, In, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { ChargeType } from '../../billing/dto/billing.enums';

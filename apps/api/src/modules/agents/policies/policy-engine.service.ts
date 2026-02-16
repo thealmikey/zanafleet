@@ -53,7 +53,7 @@ export class PolicyEngine {
    */
   async evaluate(
     agent: Agent,
-    context: AgentContext,
+    _context: AgentContext,
     aiResult?: AIResult,
   ): Promise<AgentDecision> {
     const policy = await this.getPolicy(agent.policyId);

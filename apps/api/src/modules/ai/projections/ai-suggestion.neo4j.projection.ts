@@ -28,7 +28,7 @@ export class AISuggestionNeo4jProjection
   constructor(
     private readonly neo4j: Neo4jService,
     @InjectRepository(AISuggestionEntity)
-    private readonly suggestionRepository: Repository<AISuggestionEntity>
+    private readonly _suggestionRepository: Repository<AISuggestionEntity>
   ) {}
 
   /**

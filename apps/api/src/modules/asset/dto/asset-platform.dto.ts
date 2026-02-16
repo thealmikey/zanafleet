@@ -3,6 +3,8 @@
  * Centralized data transfer objects for API requests and responses
  */
 
+import { AssetType, AssetStatus, OwnerType } from '@zanafleet/contracts';
+
 export enum BundleStatus {
     DRAFT = 'DRAFT',
     CONFIRMED = 'CONFIRMED',
@@ -14,9 +16,9 @@ export enum BundleStatus {
 // Asset DTOs
 export class CreateAssetDto {
     name!: string;
-    type!: string;
+    type!: AssetType;
     ownerId!: string;
-    ownerType!: string;
+    ownerType!: OwnerType;
     homeBase?: {
         latitude: number;
         longitude: number;
@@ -34,10 +36,10 @@ export class CreateAssetDto {
 export class AssetResponseDto {
     assetId!: string;
     name!: string;
-    type!: string;
-    status!: string;
+    type!: AssetType;
+    status!: AssetStatus;
     ownerId!: string;
-    ownerType!: string;
+    ownerType!: OwnerType;
     homeBase?: {
         latitude: number;
         longitude: number;

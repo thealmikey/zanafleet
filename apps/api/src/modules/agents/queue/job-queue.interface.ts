@@ -82,10 +82,10 @@ export interface JobQueue {
  * BullMQ-based implementation
  */
 export class BullMQJobQueue implements JobQueue {
-  private options: JobQueueOptions;
+  private _options: JobQueueOptions;
 
   constructor(options: JobQueueOptions) {
-    this.options = options;
+    this._options = options;
   }
 
   async initialize(): Promise<void> {

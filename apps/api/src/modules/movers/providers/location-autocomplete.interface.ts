@@ -1,4 +1,11 @@
+/**
+ * Location Autocomplete Provider Interface
+ * Defines the contract for location suggestion services
+ */
+
 import { LocationSuggestion } from '../dto';
+
+export { LocationSuggestion } from '../dto';
 
 /**
  * Injection token for location autocomplete providers

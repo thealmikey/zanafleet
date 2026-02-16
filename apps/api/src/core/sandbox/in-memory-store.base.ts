@@ -33,11 +33,18 @@ export interface InMemoryStoreOptions {
 }
 
 /**
+ * Type for entities that can be stored in the in-memory store
+ * Uses a generic approach to allow any entity with an id field
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type StorableEntity = any;
+
+/**
  * Base In-Memory Store
  *
  * Generic implementation of InMemoryEntityStore using Maps for O(1) lookups.
  */
-export class InMemoryStoreBase<T extends BaseEntity = BaseEntity> implements InMemoryEntityStore<T> {
+export class InMemoryStoreBase<T = StorableEntity> implements InMemoryEntityStore<T> {
   /**
    * Internal storage using Map for O(1) lookups
    */
@@ -88,16 +95,15 @@ export class InMemoryStoreBase<T extends BaseEntity = BaseEntity> implements InM
    * Save a single entity
    * Auto-generates ID if not present
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
   async save(entity: T): Promise<T> {
     // Generate ID if not present
     const entityToSave = this.ensureId(entity);
 
     // Clone to prevent external mutations
-    const cloned = this.clone(entityToSave);
+    const cloned = this.clone(entityToSave) as T & { id: string };
 
     this.store.set(cloned.id, cloned);
-    return cloned ;
+    return cloned;
   }
 
   /**
@@ -115,7 +121,6 @@ export class InMemoryStoreBase<T extends BaseEntity = BaseEntity> implements InM
   /**
    * Update an entity
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
   async update(id: string, data: Partial<T>): Promise<T | null> {
     const existing = await this.findById(id);
     if (!existing) {
@@ -125,8 +130,8 @@ export class InMemoryStoreBase<T extends BaseEntity = BaseEntity> implements InM
     const updated: T = {
       ...existing,
       ...data,
-      id: existing.id,
-    };
+      id: (existing as Record<string, unknown>).id,
+    } as T;
 
     this.store.set(id, updated);
     return updated;
@@ -156,9 +161,7 @@ export class InMemoryStoreBase<T extends BaseEntity = BaseEntity> implements InM
   /**
    * Find entities by a filter function
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   async findByFilter(filter: (entity: T) => boolean): Promise<T[]> {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return Array.from(this.store.values()).filter(filter);
   }
 
@@ -184,19 +187,19 @@ export class InMemoryStoreBase<T extends BaseEntity = BaseEntity> implements InM
   /**
    * Ensure entity has an ID
    */
-  protected ensureId(entity: T): T {
-    if (!entity.id && this.options.autoGenerateIds) {
-      return { ...entity, id: uuidv4() } as T;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected ensureId(entity: T): T & { id: string } {
+    const entityAny = entity as any;
+    if (!entityAny.id && this.options.autoGenerateIds) {
+      return { ...entity, id: uuidv4() } as T & { id: string };
     }
-    return entity;
+    return entity as T & { id: string };
   }
 
   /**
    * Deep clone an entity to prevent external mutations
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-return
   protected clone(entity: T): T {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return JSON.parse(JSON.stringify(entity)) as T;
   }
 
@@ -211,7 +214,6 @@ export class InMemoryStoreBase<T extends BaseEntity = BaseEntity> implements InM
   /**
    * Seed initial data
    */
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
   async seed(entities: T[]): Promise<void> {
     for (const entity of entities) {
       const withId = this.ensureId(entity);

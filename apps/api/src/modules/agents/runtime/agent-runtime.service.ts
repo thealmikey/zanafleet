@@ -32,7 +32,7 @@ export class AgentRuntime implements OnModuleInit {
   private readonly executionTimestamps: Map<string, number> = new Map();
 
   constructor(
-    private readonly eventBus: EventBusService,
+    private readonly _eventBus: EventBusService,
     private readonly policyEngine: PolicyEngine,
     private readonly telemetry: AgentTelemetry,
     private readonly jobQueue: JobQueue,

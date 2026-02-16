@@ -5,7 +5,7 @@
  * without requiring actual AI API calls.
  */
 
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 /**
  * Stub AI Response
@@ -46,8 +46,6 @@ export interface AIRiskAnalysisResult {
  */
 @Injectable()
 export class StubAIProvider {
-  private readonly logger = new Logger(StubAIProvider.name);
-
   /**
    * Counter for deterministic responses
    */

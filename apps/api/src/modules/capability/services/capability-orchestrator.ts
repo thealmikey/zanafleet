@@ -176,7 +176,7 @@ export class CapabilityOrchestrator implements ICapabilityOrchestrator {
     private readonly capabilityAccessController: CapabilityAccessController,
     private readonly capabilityRepository: CapabilityRepository,
     private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus,
+    private readonly _queryBus: QueryBus,
     private readonly eventBusService: EventBusService
   ) {}
 
