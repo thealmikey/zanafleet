@@ -1,8 +1,8 @@
 import { Logger } from '@nestjs/common';
 
-import { AbstractStateRenderer } from '../../strategies/state-renderer.base';
-import { ComponentRegistryService } from '../../services/component-registry.service';
 import { UIComponent, UIActionDefinition, ScreenConfig } from '../../interfaces/ui-composer.interfaces';
+import { ComponentRegistryService } from '../../services/component-registry.service';
+import { AbstractStateRenderer } from '../../strategies/state-renderer.base';
 
 /**
  * Concrete implementation of AbstractStateRenderer for testing

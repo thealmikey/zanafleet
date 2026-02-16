@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 
-import { AbstractStateRenderer } from './state-renderer.base';
-import { ComponentRegistryService } from '../services/component-registry.service';
 import {
   UIComponent,
   UIActionDefinition,
   ScreenConfig,
 } from '../interfaces/ui-composer.interfaces';
+import { ComponentRegistryService } from '../services/component-registry.service';
+
+import { AbstractStateRenderer } from './state-renderer.base';
 
 /**
  * MoveBookingStateRenderer

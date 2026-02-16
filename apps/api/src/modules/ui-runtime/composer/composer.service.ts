@@ -1,8 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+
 import { UISchemaCompilerService } from '../compiler/compiler.service';
-import { ComponentRegistryService } from '../registry/component-registry.service';
-import { ValidationService } from '../validation/validation.service';
-import { TelemetryService } from '../telemetry/telemetry.service';
 import {
   UISchema,
   UIComposeRequest,
@@ -10,6 +8,7 @@ import {
   ActionInvocationRequest,
   ActionInvocationResult,
 } from '../schema/v1/types';
+import { TelemetryService } from '../telemetry/telemetry.service';
 
 /**
  * UI Composer Service
@@ -17,12 +16,9 @@ import {
  */
 @Injectable()
 export class UIComposerService {
-  private readonly logger = new Logger(UIComposerService.name);
 
   constructor(
     private readonly compiler: UISchemaCompilerService,
-    private readonly componentRegistry: ComponentRegistryService,
-    private readonly validation: ValidationService,
     private readonly telemetry: TelemetryService,
   ) {}
 
@@ -129,7 +125,7 @@ export class UIComposerService {
   /**
    * Resolve component bindings
    */
-  resolveBindings(schema: UISchema, data: Record<string, unknown>): UISchema {
+  resolveBindings(schema: UISchema, _data: Record<string, unknown>): UISchema {
     // TODO: Implement binding resolution
     return schema;
   }

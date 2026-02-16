@@ -4,10 +4,11 @@
  */
 
 import { Test, TestingModule } from '@nestjs/testing';
-import { UIRuntimeModule } from '../../ui-runtime.module';
-import { UIComposerService } from '../../composer/composer.service';
+
 import { UISchemaCompilerService } from '../../compiler/compiler.service';
+import { UIComposerService } from '../../composer/composer.service';
 import { ComponentRegistryService } from '../../registry/component-registry.service';
+import { UIRuntimeModule } from '../../ui-runtime.module';
 import { ValidationService } from '../../validation/validation.service';
 import {
   createComposeRequest,

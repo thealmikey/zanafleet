@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
-import { AISuggestionStoreService } from '../../services/ai-suggestion-store.service';
 import { AISuggestionEntity } from '../../entities/ai-suggestion.entity';
 import { AISuggestionStatus } from '../../interfaces/ai-suggestion.interface';
-import { createMockSuggestionEntity, createMockPendingSuggestions, testUuid, createFutureDate } from '../utils/test-helpers';
+import { AISuggestionStoreService } from '../../services/ai-suggestion-store.service';
 import { createMockRepository, MockRepository } from '../utils/mocks/repository.mock';
+import { createMockSuggestionEntity, createMockPendingSuggestions, testUuid, createFutureDate } from '../utils/test-helpers';
 
 describe('AISuggestionStoreService', () => {
   let service: AISuggestionStoreService;

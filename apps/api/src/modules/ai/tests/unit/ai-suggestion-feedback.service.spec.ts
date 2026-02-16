@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
-import { AISuggestionFeedbackService } from '../../services/ai-suggestion-feedback.service';
 import { AIFeedbackEntity, AIFeedbackType } from '../../entities/ai-feedback.entity';
 import { AISuggestionEntity } from '../../entities/ai-suggestion.entity';
 import { AISuggestionStatus } from '../../interfaces/ai-suggestion.interface';
-import { createMockFeedbackEntity, createMockSuggestionEntity, testUuid } from '../utils/test-helpers';
+import { AISuggestionFeedbackService } from '../../services/ai-suggestion-feedback.service';
 import { createMockRepository, MockRepository } from '../utils/mocks/repository.mock';
+import { createMockFeedbackEntity, createMockSuggestionEntity, testUuid } from '../utils/test-helpers';
 
 describe('AISuggestionFeedbackService', () => {
   let service: AISuggestionFeedbackService;

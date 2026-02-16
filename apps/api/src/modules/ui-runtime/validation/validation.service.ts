@@ -1,11 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
+
 import {
   ValidationRule,
   ValidationRuleSet,
   ValidationResult,
   ValidationError,
   ValidationWarning,
-  ValidatorDefinition,
 } from '../schema/v1/types';
 
 /**

@@ -2,7 +2,6 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 
 import { CapabilityAccessController } from '../../capability/services/capability-access.controller';
 import { WorkflowEngineService } from '../../workflow/services/workflow-engine.service';
-import { AbstractStateRenderer } from '../strategies/state-renderer.base';
 import {
   UIComposeRequest,
   UIResponse,
@@ -10,6 +9,7 @@ import {
   ActorCapabilities,
   ProcessContext,
 } from '../interfaces/ui-composer.interfaces';
+import { AbstractStateRenderer } from '../strategies/state-renderer.base';
 
 /**
  * UIComposerService

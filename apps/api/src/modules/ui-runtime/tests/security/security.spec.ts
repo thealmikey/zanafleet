@@ -4,18 +4,19 @@
  */
 
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { UISchemaCompilerService } from '../../compiler/compiler.service';
-import { ComponentRegistryService } from '../../registry/component-registry.service';
 import { UIComposerService } from '../../composer/composer.service';
-import { ValidationService } from '../../validation/validation.service';
+import { ComponentRegistryService } from '../../registry/component-registry.service';
+import { UISchema, ComponentDefinition } from '../../schema/v1/types';
 import { TelemetryService } from '../../telemetry/telemetry.service';
+import { ValidationService } from '../../validation/validation.service';
 import {
   createComposeRequest,
   createActionRequest,
   createUISchema,
   createCapabilityRequirement,
 } from '../utils/test-fixtures';
-import { UISchema, ComponentDefinition } from '../../schema/v1/types';
 
 describe('SDUI Runtime Security', () => {
   let compiler: UISchemaCompilerService;

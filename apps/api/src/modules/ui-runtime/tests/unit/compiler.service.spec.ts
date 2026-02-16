@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { UISchemaCompilerService } from '../../compiler/compiler.service';
 import { ComponentRegistryService } from '../../registry/component-registry.service';
+import { Condition } from '../../schema/v1/types';
 import {
   createComposeRequest,
   createUISchema,
@@ -11,7 +13,6 @@ import {
   createBinding,
   INVALID_CONDITIONS,
 } from '../utils/test-fixtures';
-import { Condition } from '../../schema/v1/types';
 
 describe('UISchemaCompilerService', () => {
   let service: UISchemaCompilerService;

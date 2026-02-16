@@ -5,8 +5,9 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { AISuggestionEntity } from '../../entities/ai-suggestion.entity';
+
 import { AIFeedbackEntity, AIFeedbackType } from '../../entities/ai-feedback.entity';
+import { AISuggestionEntity } from '../../entities/ai-suggestion.entity';
 import { AISuggestionStatus } from '../../interfaces/ai-suggestion.interface';
 
 /**

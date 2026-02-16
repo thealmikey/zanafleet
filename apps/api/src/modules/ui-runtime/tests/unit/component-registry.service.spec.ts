@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { ComponentRegistryService } from '../../registry/component-registry.service';
 import { ComponentDefinition } from '../../schema/v1/types';
 

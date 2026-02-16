@@ -5,9 +5,12 @@
 // =============================================================================
 
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import { v4 as uuidv4 } from 'uuid';
 
+import { EventBusService } from '../../../core/event-bus/event-bus.service';
+import { PolicyEngine } from '../policies/policy-engine.service';
+import { JobQueue } from '../queue/job-queue.interface';
+import { AgentTelemetry } from '../telemetry/agent-telemetry.service';
 import {
   Agent,
   AgentContext,
@@ -18,14 +21,9 @@ import {
   PolicyDecision,
   RetryPolicy,
   DeadLetterMessage,
-  BackgroundJob,
   AIResult,
-  AgentTelemetryEvent,
   AgentTelemetryEventType,
 } from '../types';
-import { PolicyEngine } from '../policies/policy-engine.service';
-import { AgentTelemetry } from '../telemetry/agent-telemetry.service';
-import { JobQueue } from '../queue/job-queue.interface';
 
 @Injectable()
 export class AgentRuntime implements OnModuleInit {
@@ -167,7 +165,7 @@ export class AgentRuntime implements OnModuleInit {
     }
 
     // All retries exhausted - send to dead letter
-    await this.handleDeadLetter(agent, context, lastError!);
+    await this.handleDeadLetter(agent, context, lastError ?? new Error('Unknown error'));
   }
 
   /**
@@ -402,7 +400,8 @@ export class AgentRuntime implements OnModuleInit {
    * Generate idempotency key
    */
   private generateIdempotencyKey(agentId: string, event: Record<string, unknown>): string {
-    return `agent:${agentId}:${event['eventId'] ?? JSON.stringify(event)}`;
+    const eventKey = event['eventId'] ?? JSON.stringify(event);
+    return `agent:${agentId}:${String(eventKey)}`;
   }
 
   /**

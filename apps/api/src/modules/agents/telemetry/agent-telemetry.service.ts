@@ -52,7 +52,7 @@ export class AgentTelemetry {
         break;
       case AgentTelemetryEventType.DECISION_MADE:
         this.logger.debug(
-          `[TELEMETRY] Decision made: ${event.payload['decision']} for ${event.agentName}`,
+          `[TELEMETRY] Decision made: ${String(event.payload['decision'] ?? 'unknown')} for ${event.agentName}`,
         );
         break;
       case AgentTelemetryEventType.EXECUTION_STARTED:
@@ -67,12 +67,12 @@ export class AgentTelemetry {
         break;
       case AgentTelemetryEventType.EXECUTION_FAILED:
         this.logger.error(
-          `[TELEMETRY] Execution failed: ${event.agentName} (${event.executionId}) - ${event.payload['error']}`,
+          `[TELEMETRY] Execution failed: ${event.agentName} (${event.executionId}) - ${String(event.payload['error'] ?? 'unknown')}`,
         );
         break;
       case AgentTelemetryEventType.BLOCKED:
         this.logger.warn(
-          `[TELEMETRY] Execution blocked: ${event.agentName} (${event.executionId}) - ${event.payload['reason']}`,
+          `[TELEMETRY] Execution blocked: ${event.agentName} (${event.executionId}) - ${String(event.payload['reason'] ?? 'unknown')}`,
         );
         break;
       case AgentTelemetryEventType.CONSENT_REQUESTED:
@@ -110,7 +110,7 @@ export class AgentTelemetry {
   /**
    * Get recent events for debugging
    */
-  getRecentEvents(count: number = 10): TelemetryPayload[] {
+  getRecentEvents(count = 10): TelemetryPayload[] {
     return this.eventBuffer.slice(-count);
   }
 }

@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AIEventListenerService } from '../../services/ai-event-listener.service';
-import { AISuggestionStoreService } from '../../services/ai-suggestion-store.service';
 import { AIRiskAnalyzerService } from '../../services/ai-risk-analyzer.service';
+import { AISuggestionStoreService } from '../../services/ai-suggestion-store.service';
 import { testUuid, createMockSuggestionEntity } from '../utils/test-helpers';
 
 describe('AIEventListenerService', () => {

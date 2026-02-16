@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { UIComposerService } from '../../services/ui-composer.service';
-import { ComponentRegistryService } from '../../services/component-registry.service';
-import { MoveBookingStateRenderer } from '../../strategies/move-booking-renderer';
 import { CapabilityAccessController } from '../../../capability/services/capability-access.controller';
-import { WorkflowEngineService } from '../../../workflow/services/workflow-engine.service';
-import { ProcessInstanceEntity, ProcessInstanceStatus } from '../../../workflow/entities/process-instance.entity';
 import { ProcessState } from '../../../workflow/entities/process-definition.entity';
+import { ProcessInstanceEntity, ProcessInstanceStatus } from '../../../workflow/entities/process-instance.entity';
+import { WorkflowEngineService } from '../../../workflow/services/workflow-engine.service';
 import { UIComposeRequest } from '../../interfaces/ui-composer.interfaces';
+import { ComponentRegistryService } from '../../services/component-registry.service';
+import { UIComposerService } from '../../services/ui-composer.service';
+import { MoveBookingStateRenderer } from '../../strategies/move-booking-renderer';
 
 /**
  * Mock WorkflowEngineService

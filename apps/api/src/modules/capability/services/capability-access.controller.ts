@@ -1,8 +1,8 @@
 import { Injectable, Inject, Logger, Optional } from '@nestjs/common';
 
+import { ICapabilityAccessController } from '../../../core/api/guards/capability.guard';
 import { RedisService } from '../../../core/redis/redis.service';
 import { CapabilityRepository } from '../repositories/capability.repository';
-import { ICapabilityAccessController } from '../../../core/api/guards/capability.guard';
 
 /**
  * Cache TTL in seconds (5 minutes)

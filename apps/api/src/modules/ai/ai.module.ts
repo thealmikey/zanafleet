@@ -1,22 +1,20 @@
+import { EventBusModule } from '@api/core/event-bus';
+import { Neo4jModule } from '@api/core/neo4j';
 import { Module, Type } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '@api/core/event-bus';
-import { Neo4jModule } from '@api/core/neo4j';
 
-import { AISuggestionEntity } from './entities/ai-suggestion.entity';
 import { AIFeedbackEntity } from './entities/ai-feedback.entity';
+import { AISuggestionEntity } from './entities/ai-suggestion.entity';
 import { AITelemetryEntity } from './entities/ai-telemetry.entity';
-
+import { AISuggestionNeo4jProjection } from './projections/ai-suggestion.neo4j.projection';
 import { AIEventListenerService } from './services/ai-event-listener.service';
-import { HangingStateDetectorService } from './services/hanging-state-detector.service';
 import { AIReminderEngineService } from './services/ai-reminder-engine.service';
 import { AIRiskAnalyzerService } from './services/ai-risk-analyzer.service';
-import { AISuggestionStoreService } from './services/ai-suggestion-store.service';
 import { AISuggestionFeedbackService } from './services/ai-suggestion-feedback.service';
-
-import { AISuggestionNeo4jProjection } from './projections/ai-suggestion.neo4j.projection';
+import { AISuggestionStoreService } from './services/ai-suggestion-store.service';
+import { HangingStateDetectorService } from './services/hanging-state-detector.service';
 
 // Re-export for external use
 export { AIEventListenerService } from './services/ai-event-listener.service';

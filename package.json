@@ -20,6 +20,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
+    "sandbox": "nest start api --entryFile sandbox.cli",
     "lint": "eslint \"apps/**/*.ts\" --fix",
     "lint:check": "eslint \"apps/**/*.ts\" --fix --rule \"@typescript-eslint/no-unnecessary-type-assertion: off\" --rule \"import/order: warn\"",
     "format": "prettier --write \"apps/**/*.ts\"",

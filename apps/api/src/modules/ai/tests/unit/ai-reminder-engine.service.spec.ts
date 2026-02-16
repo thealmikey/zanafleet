@@ -1,10 +1,10 @@
+import { EventBusService } from '@api/core/event-bus';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AIReminderEngineService } from '../../services/ai-reminder-engine.service';
-import { AISuggestionStoreService } from '../../services/ai-suggestion-store.service';
-import { AIRiskAnalyzerService } from '../../services/ai-risk-analyzer.service';
-import { EventBusService } from '@api/core/event-bus';
 import { AIHangingStateDetectedEventV1 } from '../../events/ai-hanging-state-detected.event';
+import { AIReminderEngineService } from '../../services/ai-reminder-engine.service';
+import { AIRiskAnalyzerService } from '../../services/ai-risk-analyzer.service';
+import { AISuggestionStoreService } from '../../services/ai-suggestion-store.service';
 import { testUuid, createPastDate } from '../utils/test-helpers';
 
 describe('AIReminderEngineService', () => {

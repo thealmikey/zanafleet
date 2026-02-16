@@ -1,12 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
+
 import {
   ComponentDefinition,
   ComponentCategory,
   PropSchema,
   ComponentSlot,
   ComponentEvent,
-  ComponentStateDefinition,
-  AIComponentConfig,
 } from '../schema/v1/types';
 
 /**

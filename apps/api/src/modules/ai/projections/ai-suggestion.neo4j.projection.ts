@@ -1,12 +1,12 @@
+import { Neo4jService } from '@api/core/neo4j';
 import { Injectable, Logger } from '@nestjs/common';
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Neo4jService } from '@api/core/neo4j';
 import { AISuggestionEntity } from '../entities/ai-suggestion.entity';
-import { AISuggestionGeneratedEventV1 } from '../events/ai-suggestion-generated.event';
 import { AISuggestionAcceptedEventV1 } from '../events/ai-suggestion-accepted.event';
+import { AISuggestionGeneratedEventV1 } from '../events/ai-suggestion-generated.event';
 import { AISuggestionRejectedEventV1 } from '../events/ai-suggestion-rejected.event';
 
 /**

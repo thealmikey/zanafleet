@@ -1,7 +1,7 @@
-import { AISuggestionGeneratedEventV1 } from '../../events/ai-suggestion-generated.event';
-import { AISuggestionAcceptedEventV1 } from '../../events/ai-suggestion-accepted.event';
-import { AISuggestionRejectedEventV1 } from '../../events/ai-suggestion-rejected.event';
 import { AIHangingStateDetectedEventV1 } from '../../events/ai-hanging-state-detected.event';
+import { AISuggestionAcceptedEventV1 } from '../../events/ai-suggestion-accepted.event';
+import { AISuggestionGeneratedEventV1 } from '../../events/ai-suggestion-generated.event';
+import { AISuggestionRejectedEventV1 } from '../../events/ai-suggestion-rejected.event';
 import { testUuid, createFutureDate } from '../utils/test-helpers';
 
 describe('AI Events', () => {

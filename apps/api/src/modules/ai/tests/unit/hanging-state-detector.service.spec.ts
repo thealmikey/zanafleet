@@ -1,7 +1,7 @@
+import { EventBusService } from '@api/core/event-bus';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { HangingStateDetectorService } from '../../services/hanging-state-detector.service';
-import { EventBusService } from '@api/core/event-bus';
 import { testUuid, createPastDate, createPastDateMinutes } from '../utils/test-helpers';
 
 describe('HangingStateDetectorService', () => {

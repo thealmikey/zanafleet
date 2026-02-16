@@ -3,7 +3,7 @@
 // Supports: retry, backoff, idempotency key, correlationId, dead-letter
 // =============================================================================
 
-import { BackgroundJob, RetryPolicy } from '../types';
+import { BackgroundJob } from '../types';
 
 /**
  * Job status
@@ -92,29 +92,29 @@ export class BullMQJobQueue implements JobQueue {
     // Would initialize BullMQ connection
   }
 
-  async enqueue(job: BackgroundJob): Promise<void> {
+  async enqueue(_job: BackgroundJob): Promise<void> {
     // Would use BullMQ to add job to queue
     // Includes: idempotencyKey, retryPolicy, correlationId
   }
 
-  process(handler: (job: BackgroundJob) => Promise<JobResult>): void {
+  process(_handler: (job: BackgroundJob) => Promise<JobResult>): void {
     // Would set up BullMQ worker with handler
   }
 
-  async getStatus(jobId: string): Promise<JobStatus | null> {
+  async getStatus(_jobId: string): Promise<JobStatus | null> {
     // Would query BullMQ for job status
     return null;
   }
 
-  async retry(jobId: string): Promise<void> {
+  async retry(_jobId: string): Promise<void> {
     // Would retry the job
   }
 
-  async moveToDeadLetter(jobId: string, reason: string): Promise<void> {
+  async moveToDeadLetter(_jobId: string, _reason: string): Promise<void> {
     // Would move to dead letter queue
   }
 
-  async cleanOlderThan(date: Date): Promise<number> {
+  async cleanOlderThan(_date: Date): Promise<number> {
     // Would clean old completed jobs
     return 0;
   }

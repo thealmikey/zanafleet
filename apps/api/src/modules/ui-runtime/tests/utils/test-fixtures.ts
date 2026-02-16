@@ -13,7 +13,6 @@ import {
   TabsLayout,
   ModalLayout,
   DrawerLayout,
-  ComponentDefinition,
   DataSource,
   Binding,
   ActionDefinition,
@@ -26,10 +25,7 @@ import {
   ActionInvocationRequest,
   ActionInvocationResult,
   AIAnnotation,
-  TelemetryConfig,
-  ActionHandler,
   ValidationRule,
-  ValidationRuleSet,
   ConditionExpression,
 } from '../../schema/v1/types';
 
@@ -688,14 +684,14 @@ export function createSchemaWithManyAISuggestions(count: number): UISchema {
 /**
  * Generate a unique ID for tests
  */
-export function generateTestId(prefix: string = 'test'): string {
+export function generateTestId(prefix = 'test'): string {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 }
 
 /**
  * Create a timestamp for tests
  */
-export function createTestTimestamp(offsetMs: number = 0): string {
+export function createTestTimestamp(offsetMs = 0): string {
   return new Date(Date.now() + offsetMs).toISOString();
 }
 

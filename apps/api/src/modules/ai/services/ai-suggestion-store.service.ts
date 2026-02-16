@@ -1,8 +1,9 @@
+import { createHash } from 'crypto';
+
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThan, MoreThan } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
-import { createHash } from 'crypto';
 
 import { AISuggestionEntity } from '../entities/ai-suggestion.entity';
 import {

@@ -1,13 +1,13 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { Injectable, Logger } from '@nestjs/common';
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 
-import { CapabilityRepository } from '../repositories/capability.repository';
 import {
   CapabilityResponseDto,
   ActorCapabilitiesDto,
   CapabilityListResponseDto,
   CapabilityListQueryDto,
 } from '../dto/capability.dto';
+import { CapabilityRepository } from '../repositories/capability.repository';
 
 /**
  * GetAllCapabilitiesQuery

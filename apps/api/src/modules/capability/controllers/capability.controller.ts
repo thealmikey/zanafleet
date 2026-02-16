@@ -1,3 +1,5 @@
+import { RequireCapability } from '@api/core/api/decorators/require-capability.decorator';
+import { CapabilityGuard } from '@api/core/api/guards/capability.guard';
 import {
   Controller,
   Get,
@@ -12,9 +14,13 @@ import {
 } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 
-import { RequireCapability } from '@api/core/api/decorators/require-capability.decorator';
-import { CapabilityGuard } from '@api/core/api/guards/capability.guard';
 
+import {
+  CapabilityResponseDto,
+  CapabilityListResponseDto,
+  ActorCapabilitiesDto,
+  CapabilityListQueryDto,
+} from '../dto/capability.dto';
 import {
   GetAllCapabilitiesQuery,
   GetCapabilityByIdQuery,
@@ -23,12 +29,6 @@ import {
   GetCapabilitiesByCategoryQuery,
   GetCapabilitiesRequiringConsentQuery,
 } from '../queries/capability.query-handlers';
-import {
-  CapabilityResponseDto,
-  CapabilityListResponseDto,
-  ActorCapabilitiesDto,
-  CapabilityListQueryDto,
-} from '../dto/capability.dto';
 
 /**
  * CapabilityController

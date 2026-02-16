@@ -8,10 +8,16 @@
         "./*"
       ],
       "@zanafleet/contracts": [
-        "../../packages/contracts/src"
+        "../../packages/contracts/dist"
       ],
       "@zanafleet/contracts/*": [
-        "../../packages/contracts/src/*"
+        "../../packages/contracts/dist/*"
+      ],
+      "@zanafleet/utils": [
+        "../../packages/utils/dist"
+      ],
+      "@zanafleet/utils/*": [
+        "../../packages/utils/dist/*"
       ]
     }
   },

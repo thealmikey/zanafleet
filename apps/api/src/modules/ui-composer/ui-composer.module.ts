@@ -2,6 +2,7 @@ import { Module, OnModuleInit } from '@nestjs/common';
 
 import { CapabilityModule } from '../capability/capability.module';
 import { WorkflowModule } from '../workflow/workflow.module';
+
 import { ComponentRegistryService } from './services/component-registry.service';
 import { UIComposerService } from './services/ui-composer.service';
 import { MoveBookingStateRenderer } from './strategies/move-booking-renderer';

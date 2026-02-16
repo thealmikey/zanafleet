@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { EventBusService } from '@api/core/event-bus';
+import { Injectable, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
 import { AIHangingStateDetectedEventV1 } from '../events/ai-hanging-state-detected.event';

@@ -15,9 +15,9 @@ import { TripEntity } from './entities/trip.entity';
 import { AssetNeo4jInitializer, AssetNeo4jProjection } from './projections/asset-neo4j.projection';
 import { AssetImageService } from './services/asset-image.service';
 import { AssetService } from './services/asset.service';
+import { BundleService } from './services/bundle.service';
 import { MatchingService } from './services/matching.service';
 import { TripService } from './services/trip.service';
-import { BundleService } from './services/bundle.service';
 
 
 

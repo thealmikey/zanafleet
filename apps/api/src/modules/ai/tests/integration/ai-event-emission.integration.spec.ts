@@ -1,12 +1,12 @@
+import { EventBusService } from '@api/core/event-bus';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AIEventListenerService } from '../../services/ai-event-listener.service';
-import { AISuggestionStoreService } from '../../services/ai-suggestion-store.service';
-import { AIRiskAnalyzerService } from '../../services/ai-risk-analyzer.service';
-import { EventBusService } from '@api/core/event-bus';
-import { AISuggestionGeneratedEventV1 } from '../../events/ai-suggestion-generated.event';
 import { AIHangingStateDetectedEventV1 } from '../../events/ai-hanging-state-detected.event';
 import { AIRiskAnalyzedEventV1, AIRiskFactor } from '../../events/ai-risk-analyzed.event';
+import { AISuggestionGeneratedEventV1 } from '../../events/ai-suggestion-generated.event';
+import { AIEventListenerService } from '../../services/ai-event-listener.service';
+import { AIRiskAnalyzerService } from '../../services/ai-risk-analyzer.service';
+import { AISuggestionStoreService } from '../../services/ai-suggestion-store.service';
 import { testUuid, createMockSuggestionEntity, createPastDate } from '../utils/test-helpers';
 
 /**

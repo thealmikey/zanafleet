@@ -17,10 +17,3 @@ export * from './businesses.queries';
 export * from './actors.queries';
 export * from './workspaces.queries';
 export * from './hierarchy.queries';
-
-// Re-export commonly used admin-scoped queries for convenience
-export {
-  ADMIN_SCOPED_BUSINESS_IDS,
-  ADMIN_SCOPED_SACCO_IDS,
-  ADMIN_SCOPED_RIDER_IDS,
-} from './hierarchy.queries';

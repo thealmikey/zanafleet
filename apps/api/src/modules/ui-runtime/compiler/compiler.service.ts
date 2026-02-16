@@ -1,5 +1,4 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ComponentRegistryService } from '../registry/component-registry.service';
 import {
   UISchema,
   DataSource,
@@ -25,9 +24,7 @@ import {
 export class UISchemaCompilerService {
   private readonly logger = new Logger(UISchemaCompilerService.name);
 
-  constructor(
-    private readonly componentRegistry: ComponentRegistryService,
-  ) {}
+  constructor() {}
 
   /**
    * Compile UISchema from request
@@ -51,7 +48,7 @@ export class UISchemaCompilerService {
     const bindings = this.resolveBindings(screenDef.bindings);
 
     // Resolve actions with capability filtering
-    const actions = await this.resolveActions(screenDef.actions, request);
+    const actions = await this.resolveActions(screenDef.actions);
 
     // Resolve validators
     const validators = this.resolveValidators(screenDef.validators);
@@ -207,7 +204,6 @@ export class UISchemaCompilerService {
    */
   private async resolveActions(
     actions: ActionDefinition[],
-    request: UIComposeRequest,
   ): Promise<ActionDefinition[]> {
     // TODO: Filter actions based on actor capabilities
     // For now, return all actions - capability filtering happens at runtime

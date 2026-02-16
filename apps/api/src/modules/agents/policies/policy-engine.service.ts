@@ -4,7 +4,6 @@
 // =============================================================================
 
 import { Injectable, Logger } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
 
 import {
   Agent,
@@ -169,7 +168,7 @@ export class PolicyEngine {
   /**
    * Check if agent is in cooldown window
    */
-  private async isInCooldown(agentId: string, policy: AutomationPolicy): Promise<boolean> {
+  private async isInCooldown(_agentId: string, _policy: AutomationPolicy): Promise<boolean> {
     // Would check Redis/cache for last execution time
     // For now, always return false (not in cooldown)
     return false;

@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AIRiskAnalyzerService } from '../../services/ai-risk-analyzer.service';
 import { AIRiskAnalysisRequest, RiskLevel, getRiskLevel } from '../../interfaces/ai-risk-analysis.interface';
+import { AIRiskAnalyzerService } from '../../services/ai-risk-analyzer.service';
 import { testUuid } from '../utils/test-helpers';
 
 describe('AIRiskAnalyzerService', () => {

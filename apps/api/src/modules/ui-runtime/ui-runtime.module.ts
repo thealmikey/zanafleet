@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ComponentRegistryService } from './registry/component-registry.service';
+
 import { UISchemaCompilerService } from './compiler/compiler.service';
 import { UIComposerService } from './composer/composer.service';
-import { ValidationService } from './validation/validation.service';
+import { ComponentRegistryService } from './registry/component-registry.service';
 import { TelemetryService } from './telemetry/telemetry.service';
+import { ValidationService } from './validation/validation.service';
 
 // Export all types
 export * from './schema/v1/types';

@@ -2,13 +2,14 @@ import { Injectable, Inject, Logger, ForbiddenException, NotFoundException } fro
 import { CommandBus, QueryBus, ICommand } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
 
-import { CapabilityAccessController } from './capability-access.controller';
-import { CapabilityRepository } from '../repositories/capability.repository';
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
 import {
   CapabilityUsedEventV1,
   CapabilityExecutionResult,
 } from '../events/capability-used.event';
+import { CapabilityRepository } from '../repositories/capability.repository';
+
+import { CapabilityAccessController } from './capability-access.controller';
 
 /**
  * Orchestration context - passed through the orchestration flow

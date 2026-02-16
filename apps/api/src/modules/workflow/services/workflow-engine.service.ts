@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { EventBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { EventBus } from '@nestjs/cqrs';
 
 import {
   ProcessDefinitionEntity,
@@ -21,8 +21,8 @@ import {
   TransitionTriggerType,
   GuardType,
 } from '../entities/process-transition.entity';
-import { ProcessStateChangedEventV1 } from '../events/process-state-changed.event';
 import { ProcessCreatedEventV1 } from '../events/process-created.event';
+import { ProcessStateChangedEventV1 } from '../events/process-state-changed.event';
 
 /**
  * Transition Result

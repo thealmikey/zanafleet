@@ -8,11 +8,9 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   Agent,
   AgentType,
-  AgentTrigger,
   AgentTriggerType,
   RetryPolicy,
   ObservabilityConfig,
-  TenantScope,
 } from '../types';
 
 /**

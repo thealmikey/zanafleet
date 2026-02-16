@@ -4,9 +4,8 @@
  * Public exports for the AI Intelligence Layer
  */
 
+// Re-export everything from ai.module (which includes events and interfaces)
 export * from './ai.module';
-export * from './interfaces';
-export * from './events';
 
 // Entities
 export { AISuggestionEntity } from './entities/ai-suggestion.entity';

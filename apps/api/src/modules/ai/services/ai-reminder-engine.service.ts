@@ -1,12 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
 import { EventBusService } from '@api/core/event-bus';
+import { Injectable, Logger } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
-import { AISuggestionStoreService } from './ai-suggestion-store.service';
-import { AIRiskAnalyzerService } from './ai-risk-analyzer.service';
 import { AIHangingStateDetectedEventV1 } from '../events/ai-hanging-state-detected.event';
 import { AISuggestionGeneratedEventV1 } from '../events/ai-suggestion-generated.event';
 import { CreateAISuggestionDTO } from '../interfaces/ai-suggestion.interface';
+
+import { AIRiskAnalyzerService } from './ai-risk-analyzer.service';
+import { AISuggestionStoreService } from './ai-suggestion-store.service';
 
 /**
  * AI Reminder Engine Service
