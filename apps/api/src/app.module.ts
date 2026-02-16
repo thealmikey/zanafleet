@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventBusModule } from './core/event-bus';
 import { MediaModule } from './core/media';
 import { Neo4jModule } from './core/neo4j';
+import { SandboxAuthModule } from './core/sandbox/sandbox-auth.module';
 import { SandboxModule } from './core/sandbox/sandbox.module';
 import { AccountModule } from './modules/account/account.module';
 import { ActorModule } from './modules/actor/actor.module';
@@ -45,12 +46,23 @@ import { WorkflowModule } from './modules/workflow/workflow.module';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
 
 /**
- * AppModule
- *
- * Root application module that configures global services.
+ * Check if sandbox mode is enabled (runs at module load time)
  */
-@Module({
-  imports: [
+const isSandboxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+console.log('[DEBUG] app.module.ts loaded');
+console.log('[DEBUG] USE_IN_MEMORY_DB =', process.env.USE_IN_MEMORY_DB);
+console.log('[DEBUG] isSandboxMode =', isSandboxMode);
+
+/**
+ * Get TypeOrmModule configuration - only when NOT in sandbox mode
+ */
+function getTypeOrmConfig() {
+  if (isSandboxMode) {
+    console.log('[INFO] Sandbox mode enabled: Skipping Postgres connection');
+    return [];
+  }
+  return [
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST || 'localhost',
@@ -63,9 +75,21 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
       migrations: [path.join(__dirname, '../../../infra/db/migrations/*.{ts,js}')],
       migrationsRun: process.env.NODE_ENV === 'production',
     }),
+  ];
+}
+
+/**
+ * AppModule
+ *
+ * Root application module that configures global services.
+ */
+@Module({
+  imports: [
+    ...getTypeOrmConfig(),
     EventBusModule.forRoot({
       isGlobal: true,
     }),
+    // Neo4jModule is always imported - in sandbox mode it will skip connection gracefully
     Neo4jModule.forRoot({
       isGlobal: true,
     }),
@@ -74,7 +98,9 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     MediaModule,
     AccountModule,
     ActorModule,
-    AuthModule,
+    // Auth module: SandboxAuthModule in sandbox mode, AuthModule in production
+    // The env var is set BEFORE this module is loaded (see sandbox.cli.ts)
+    ...(isSandboxMode ? [SandboxAuthModule] : [AuthModule]),
     BillingModule,
     BusinessModule,
     CustomerModule,

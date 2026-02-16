@@ -33,11 +33,12 @@ export interface Neo4jModuleOptions {
 @Injectable()
 export class Neo4jService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(Neo4jService.name);
-  private driver!: Driver;
+  private driver?: Driver;
   private readonly uri: string;
   private readonly user: string | undefined;
   private readonly password: string | undefined;
   private readonly database: string;
+  private readonly isSandbox: boolean;
 
   constructor(
     @Inject(NEO4J_MODULE_OPTIONS)
@@ -47,13 +48,21 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
     this.user = options.user;
     this.password = options.password;
     this.database = options.database || DEFAULT_NEO4J_DATABASE;
+    this.isSandbox = process.env.USE_IN_MEMORY_DB === 'true';
   }
 
   /**
    * Initialize the Neo4j driver and verify connectivity
+   * Skips connection in sandbox mode
    */
   async onModuleInit(): Promise<void> {
-    this.logger.log(`Connecting to Neo4j at ${this.uri}`);
+    this.logger.log(`Neo4j initialization: sandbox mode = ${this.isSandbox}`);
+
+    // In sandbox mode, skip Neo4j connection
+    if (this.isSandbox) {
+      this.logger.warn('[SANDBOX] Neo4j connection skipped - running with in-memory storage');
+      return;
+    }
 
     try {
       const authToken =
@@ -85,11 +94,21 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
+   * Check if Neo4j is connected
+   */
+  isConnected(): boolean {
+    return !!this.driver;
+  }
+
+  /**
    * Get a new session with optional configuration
    * @param options - Optional session configuration
    * @returns Neo4j Session instance
    */
   getSession(options?: SessionConfig): Session {
+    if (!this.driver) {
+      throw new Error('Neo4j driver not initialized. Are you running in sandbox mode?');
+    }
     const sessionOptions: SessionConfig = {
       database: this.database,
       ...options,
@@ -103,6 +122,9 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
    * @returns Neo4j Session with READ access mode
    */
   getReadSession(database?: string): Session {
+    if (!this.driver) {
+      throw new Error('Neo4j driver not initialized. Are you running in sandbox mode?');
+    }
     return this.driver.session({
       database: database || this.database,
       defaultAccessMode: neo4j.session.READ,
@@ -115,6 +137,9 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
    * @returns Neo4j Session with WRITE access mode
    */
   getWriteSession(database?: string): Session {
+    if (!this.driver) {
+      throw new Error('Neo4j driver not initialized. Are you running in sandbox mode?');
+    }
     return this.driver.session({
       database: database || this.database,
       defaultAccessMode: neo4j.session.WRITE,
@@ -126,6 +151,9 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
    * @returns Neo4j Driver instance
    */
   getDriver(): Driver {
+    if (!this.driver) {
+      throw new Error('Neo4j driver not initialized. Are you running in sandbox mode?');
+    }
     return this.driver;
   }
 }

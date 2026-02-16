@@ -16,3 +16,6 @@ export * from './stub-event-bus.service';
 export * from './sandbox.controller';
 export * from './sandbox-production.guard';
 export * from './sandbox.health-indicator';
+export * from './sandbox-auth.module';
+export * from './sandbox-auth.guard';
+export * from './sandbox-keycloak-user-sync.service';

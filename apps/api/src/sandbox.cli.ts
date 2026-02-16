@@ -6,12 +6,17 @@
  */
 /* eslint-disable no-console */
 
+// IMPORTANT: Set sandbox environment variable BEFORE importing any modules
+// that may conditionally load based on this environment variable.
+// This must come before the AppModule import to prevent Keycloak from loading.
+process.env.USE_IN_MEMORY_DB = 'true';
+
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 
 import { AppModule } from './app.module';
 import { InMemoryStoreFactoryService } from './core/sandbox/in-memory-store.factory';
-import { SANDBOX_ENV_VAR, DEFAULT_SCENARIO } from './core/sandbox/sandbox.constants';
+import { DEFAULT_SCENARIO } from './core/sandbox/sandbox.constants';
 import { SeedScenarioRegistry } from './core/sandbox/seed-scenario.registry';
 
 /**
@@ -110,8 +115,8 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
-  // Set sandbox environment variable
-  process.env[SANDBOX_ENV_VAR] = 'true';
+  // Note: USE_IN_MEMORY_DB is already set at the top of this file
+  // before importing AppModule to prevent Keycloak from loading
 
   // Check for list scenarios option (need to bootstrap first)
   if (options.listScenarios) {
