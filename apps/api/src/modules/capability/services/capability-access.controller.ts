@@ -2,7 +2,7 @@ import { Injectable, Inject, Logger, Optional } from '@nestjs/common';
 
 import { ICapabilityAccessController } from '../../../core/api/guards/capability.guard';
 import { RedisService } from '../../../core/redis/redis.service';
-import { CapabilityRepository } from '../repositories/capability.repository';
+import { CAPABILITY_REPOSITORY_TOKEN, ICapabilityRepository } from '../repositories/capability.repository';
 
 /**
  * Cache TTL in seconds (5 minutes)
@@ -54,7 +54,8 @@ export class CapabilityAccessController implements ICapabilityAccessController {
   private readonly redisService: RedisService | null;
 
   constructor(
-    private readonly capabilityRepository: CapabilityRepository,
+    @Inject(CAPABILITY_REPOSITORY_TOKEN)
+    private readonly capabilityRepository: ICapabilityRepository,
     @Optional() @Inject(RedisService) redisService?: RedisService,
     @Optional() options?: CapabilityAccessControllerOptions
   ) {

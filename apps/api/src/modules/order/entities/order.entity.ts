@@ -31,7 +31,7 @@ export class OrderEntity {
   @Column('varchar', { length: 255, nullable: true })
   itemSummary: string | null = null;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   itemMetadata: Record<string, unknown> | null = null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })

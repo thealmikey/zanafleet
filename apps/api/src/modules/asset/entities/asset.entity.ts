@@ -35,20 +35,20 @@ export class AssetEntity {
     @Column('enum', { enum: OwnerType })
     ownerType!: OwnerType;
 
-    @Column('jsonb', { nullable: true })
+    @Column('simple-json', { nullable: true })
     capacity?: Record<string, unknown>;
 
-    @Column('jsonb', { nullable: true })
+    @Column('simple-json', { nullable: true })
     metadata?: Record<string, unknown>;
 
-    @Column('jsonb', { nullable: true })
+    @Column('simple-json', { nullable: true })
     homeBase?: LocationData;
 
     /**
      * Array of Media IDs for asset images
      * Each image stores metadata: { mediaId, purpose, isPrimary, uploadedAt }
      */
-    @Column('jsonb', { nullable: true, default: '[]' })
+    @Column('simple-json', { nullable: true, default: '[]' })
     imageIds?: Array<{
         mediaId: string;
         purpose?: 'exterior' | 'interior' | 'cargo' | 'dashboard' | 'custom';

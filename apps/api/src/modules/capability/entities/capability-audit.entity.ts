@@ -61,7 +61,7 @@ export class CapabilityAuditEntity {
   @Column({ type: 'text', nullable: true })
   reason!: string | null;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   payload!: Record<string, unknown> | null;
 
   @Column({ type: 'boolean', nullable: true })
@@ -79,7 +79,7 @@ export class CapabilityAuditEntity {
   @Column({ type: 'int', nullable: true })
   executionTimeMs!: number | null;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   metadata!: Record<string, unknown> | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

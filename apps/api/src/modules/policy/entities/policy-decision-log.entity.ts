@@ -69,10 +69,10 @@ export class PolicyDecisionLogEntity {
   @Column('uuid')
   subjectId!: string;
 
-  @Column('jsonb')
+  @Column('simple-json')
   contextSnapshot!: EvaluationContext;
 
-  @Column('jsonb')
+  @Column('simple-json')
   evaluatedPolicies!: EvaluatedPolicyLogEntry[];
 
   @Column('enum', { enum: PolicyEffect })
@@ -84,7 +84,7 @@ export class PolicyDecisionLogEntity {
   @Column('text')
   finalReason!: string;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   modifications!: Record<string, unknown> | null;
 
   @Column('int')

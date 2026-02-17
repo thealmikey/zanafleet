@@ -71,7 +71,7 @@ export class AIFeedbackEntity {
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   metadata!: Record<string, unknown> | null;
 
   @Column({ type: 'uuid', nullable: true })

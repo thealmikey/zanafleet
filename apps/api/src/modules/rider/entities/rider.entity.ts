@@ -43,7 +43,7 @@ export class RiderEntity {
   @Column('varchar', { length: 20 })
   phone!: string;
 
-  @Column('jsonb')
+  @Column('simple-json')
   location!: LocationData;
 
   @Column('enum', { enum: VehicleType })

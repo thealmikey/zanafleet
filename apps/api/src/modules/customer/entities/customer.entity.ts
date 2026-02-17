@@ -19,7 +19,7 @@ export class CustomerEntity {
     @Column('varchar', { length: 255, nullable: true })
     email: string | null = null;
 
-    @Column('jsonb', { nullable: true })
+    @Column('simple-json', { nullable: true })
     metadata: Record<string, unknown> | null = null;
 
     @CreateDateColumn({ type: 'timestamp with time zone' })

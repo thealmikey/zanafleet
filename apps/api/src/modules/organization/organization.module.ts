@@ -14,6 +14,20 @@ import {
   OrganizationNeo4jInitializer,
 } from './projections/organization-neo4j.projection';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] OrganizationModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([OrganizationEntity, ActorEntity])];
+}
+
 /**
  * Organization Module
  *
@@ -35,7 +49,7 @@ import {
  * - uuid: ID generation
  */
 @Module({
-  imports: [CqrsModule, TypeOrmModule.forFeature([OrganizationEntity, ActorEntity])],
+  imports: [CqrsModule, ...getTypeOrmImports()],
   controllers: [OrganizationController],
   providers: [
     // Command Handlers

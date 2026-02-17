@@ -35,7 +35,7 @@ export class BusinessEntity {
   @Column('varchar', { length: 20 })
   phone!: string;
 
-  @Column('jsonb')
+  @Column('simple-json')
   location!: LocationData;
 
   @Column('enum', { enum: BusinessType })

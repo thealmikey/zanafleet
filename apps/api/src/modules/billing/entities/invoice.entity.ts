@@ -58,7 +58,7 @@ export class InvoiceEntity {
   @Column({ type: 'timestamp with time zone', nullable: true })
   paidAt!: Date | null;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata!: Record<string, unknown> | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

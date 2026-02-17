@@ -21,7 +21,7 @@ export class CustomerActivityProjection {
     @Column('timestamp with time zone', { nullable: true })
     lastOrderAt: Date | null = null;
 
-    @Column('jsonb', { nullable: true })
+    @Column('simple-json', { nullable: true })
     frequentItems: Record<string, number> | null = null;
 
     @UpdateDateColumn({ type: 'timestamp with time zone' })

@@ -10,6 +10,23 @@ import { UpdateActorCommandHandler } from './handlers/update-actor.handler';
 import { ActorNeo4jProjection, ActorNeo4jInitializer } from './projections/actor-neo4j.projection';
 import { TestAccountSeederService } from './services/test-account-seeder.service';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] ActorModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [
+    TypeOrmModule.forFeature([ActorEntity]),
+    TypeOrmModule.forFeature([WorkspaceEntity]),
+  ];
+}
+
 /**
  * Actor Module
  *
@@ -33,8 +50,7 @@ import { TestAccountSeederService } from './services/test-account-seeder.service
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([ActorEntity]),
-    TypeOrmModule.forFeature([WorkspaceEntity]),
+    ...getTypeOrmImports(),
   ],
   controllers: [ActorController],
   providers: [

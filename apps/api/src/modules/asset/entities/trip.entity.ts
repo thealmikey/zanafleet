@@ -51,7 +51,7 @@ export class TripEntity {
     @Column('float', { nullable: true })
     rating?: number;
 
-    @Column('jsonb', { nullable: true })
+    @Column('simple-json', { nullable: true })
     incidents?: Record<string, unknown>[];
 
     @CreateDateColumn({ type: 'timestamp with time zone' })

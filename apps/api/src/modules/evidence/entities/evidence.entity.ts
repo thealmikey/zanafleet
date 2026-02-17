@@ -37,7 +37,7 @@ export class EvidenceEntity {
   @Column('uuid')
   subjectId!: string;
 
-  @Column('jsonb')
+  @Column('simple-json')
   payload!: Record<string, unknown>;
 
   @Column('enum', { enum: EvidenceSource })

@@ -79,7 +79,7 @@ export class RefundEntity {
   @Column('text', { nullable: true })
   failureReason!: string | null;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata!: Record<string, unknown> | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

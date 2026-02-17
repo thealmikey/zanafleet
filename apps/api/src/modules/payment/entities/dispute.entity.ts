@@ -73,7 +73,7 @@ export class DisputeEntity {
   @Column('text', { nullable: true })
   escalationReason!: string | null;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata!: Record<string, unknown> | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

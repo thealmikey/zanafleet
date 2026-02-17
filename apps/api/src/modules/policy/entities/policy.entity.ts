@@ -52,13 +52,13 @@ export class PolicyEntity {
   @Column('int', { default: 0 })
   priority!: number;
 
-  @Column('jsonb')
+  @Column('simple-json')
   conditions!: PolicyCondition;
 
   @Column('enum', { enum: PolicyEffect })
   effect!: PolicyEffect;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   modifications!: Record<string, unknown> | null;
 
   @Column('varchar', { array: true, nullable: true })

@@ -3,7 +3,6 @@ import { Module, Type } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-
 import { ProcessDefinitionEntity } from './entities/process-definition.entity';
 import { ProcessInstanceEntity } from './entities/process-instance.entity';
 import { ProcessTransitionEntity } from './entities/process-transition.entity';
@@ -14,6 +13,25 @@ import {
 import { WorkflowEngineService } from './services/workflow-engine.service';
 import { WorkflowEventSubscriber } from './subscribers/workflow-event.subscriber';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] WorkflowModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [
+    TypeOrmModule.forFeature([
+      ProcessDefinitionEntity,
+      ProcessInstanceEntity,
+      ProcessTransitionEntity,
+    ]),
+  ];
+}
 
 /**
  * Command handlers
@@ -45,11 +63,7 @@ const EventHandlers = [ProcessInstanceNeo4jProjection, ProcessStateChangedNeo4jP
   imports: [
     CqrsModule,
     EventBusModule.forFeature(),
-    TypeOrmModule.forFeature([
-      ProcessDefinitionEntity,
-      ProcessInstanceEntity,
-      ProcessTransitionEntity,
-    ]),
+    ...getTypeOrmImports(),
   ],
   providers: [
     WorkflowEngineService,

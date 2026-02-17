@@ -51,7 +51,7 @@ export class PaymentIntentEntity {
   @Column('varchar', { length: 128 })
   idempotencyKey!: string;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata!: Record<string, unknown> | null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })

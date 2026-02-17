@@ -56,7 +56,7 @@ export class CampaignEntity {
   @Column('int', { default: 0 })
   usageCount!: number;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   eligibilityRules!: Record<string, unknown> | null;
 
   @Column({ type: 'timestamp with time zone' })
@@ -65,7 +65,7 @@ export class CampaignEntity {
   @Column({ type: 'timestamp with time zone' })
   validUntil!: Date;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata!: Record<string, unknown> | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

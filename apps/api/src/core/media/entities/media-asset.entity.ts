@@ -64,7 +64,7 @@ export class MediaAssetEntity {
   @Column('varchar', { length: 64, nullable: true })
   storageProviderId!: string | null;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata!: MediaAssetMetadata | null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })

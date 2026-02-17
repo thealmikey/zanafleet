@@ -76,7 +76,7 @@ export class AISuggestionEntity {
   @Column({ type: 'varchar', length: 64, nullable: true })
   deduplicationHash!: string | null;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   metadata!: Record<string, unknown> | null;
 
   @Column({ type: 'uuid', nullable: true })

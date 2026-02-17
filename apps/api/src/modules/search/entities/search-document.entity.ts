@@ -27,7 +27,7 @@ export class SearchDocumentEntity {
     @Column('text', { nullable: true })
     description!: string | null;
 
-    @Column('jsonb', { default: {} })
+    @Column('simple-json', { default: {} })
     metadata!: Record<string, unknown>;
 
     @Column({

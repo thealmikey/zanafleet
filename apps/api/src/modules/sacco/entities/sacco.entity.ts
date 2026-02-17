@@ -27,7 +27,7 @@ export class SaccoEntity {
   @Column('varchar', { length: 255 })
   name!: string;
 
-  @Column('jsonb')
+  @Column('simple-json')
   location!: LocationData;
 
   @Column('varchar', { length: 20 })

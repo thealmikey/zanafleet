@@ -102,7 +102,7 @@ export class CapabilityEntity {
   /**
    * Additional metadata as JSON
    */
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   metadata!: Record<string, unknown> | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

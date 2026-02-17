@@ -33,7 +33,7 @@ export class AccountEntity {
   @Column('varchar', { length: 3 })
   currency!: string;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata!: Record<string, unknown> | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

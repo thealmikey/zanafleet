@@ -104,10 +104,10 @@ export class ProcessTransitionEntity {
   @Column({ nullable: true })
   triggerEventType!: string;
 
-  @Column('jsonb', { default: [] })
+  @Column('simple-json', { default: [] })
   guardConditions!: GuardConditionConfig[];
 
-  @Column('jsonb', { default: [] })
+  @Column('simple-json', { default: [] })
   actions!: TransitionActionConfig[];
 
   @Column({ default: true })

@@ -73,13 +73,13 @@ export class CalendarEventEntity {
   @Column('boolean', { default: false })
   allDay!: boolean;
 
-  @Column('jsonb')
+  @Column('simple-json')
   regionScope!: RegionScope;
 
   @Column('enum', { enum: RecurrencePattern })
   recurrencePattern!: RecurrencePattern;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   recurrenceRule!: RecurrenceRule | null;
 
   @Column('int', { default: 0 })
@@ -94,7 +94,7 @@ export class CalendarEventEntity {
   @Column({ name: 'external_source', type: 'varchar', length: 100, nullable: true })
   externalSource!: string | null;
 
-  @Column({ name: 'external_metadata', type: 'jsonb', nullable: true })
+  @Column({ name: 'external_metadata', type: 'simple-json', nullable: true })
   externalMetadata!: Record<string, unknown> | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

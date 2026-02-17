@@ -6,6 +6,32 @@ import { CapabilityEntity } from '../entities/capability.entity';
 import { PersonaCapabilityEntity } from '../entities/persona-capability.entity';
 
 /**
+ * Injection token for CapabilityRepository
+ * Used to support both TypeORM and in-memory implementations
+ */
+export const CAPABILITY_REPOSITORY_TOKEN = 'CAPABILITY_REPOSITORY';
+
+/**
+ * Interface defining capability repository operations
+ * Implemented by both TypeORM and in-memory repositories
+ */
+export interface ICapabilityRepository {
+  findByName(name: string): Promise<CapabilityEntity | null>;
+  findById(id: string): Promise<CapabilityEntity | null>;
+  findAll(): Promise<CapabilityEntity[]>;
+  findByIds(ids: string[]): Promise<CapabilityEntity[]>;
+  findCapabilitiesForPersona(personaId: string): Promise<PersonaCapabilityEntity[]>;
+  findPersonaIdsForActor(actorId: string, workspaceId?: string): Promise<string[]>;
+  personaHasCapability(personaId: string, capabilityName: string): Promise<boolean>;
+  getCapabilityNamesForPersona(personaId: string): Promise<string[]>;
+  getCapabilitiesForActor(actorId: string): Promise<string[]>;
+  actorHasCapabilityViaPersonas(actorId: string, capabilityName: string, workspaceId?: string): Promise<boolean>;
+  findAllWithMetadata(): Promise<CapabilityEntity[]>;
+  findByCategory(category: string): Promise<CapabilityEntity[]>;
+  findRequiringConsent(): Promise<CapabilityEntity[]>;
+}
+
+/**
  * Capability lookup result
  */
 export interface CapabilityLookupResult {
@@ -51,7 +77,7 @@ interface CountResult {
  * Supports both direct capability checks and bulk capability queries.
  */
 @Injectable()
-export class CapabilityRepository {
+export class CapabilityRepository implements ICapabilityRepository {
   constructor(
     @InjectRepository(CapabilityEntity)
     private readonly capabilityRepository: Repository<CapabilityEntity>,

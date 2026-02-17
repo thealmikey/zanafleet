@@ -39,7 +39,7 @@ export class ChargeEntity {
   @Column('decimal', { precision: 18, scale: 2 })
   unitPrice!: string;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata!: Record<string, unknown> | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

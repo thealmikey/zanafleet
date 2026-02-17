@@ -9,6 +9,7 @@ import { Injectable } from '@nestjs/common';
 import { InMemoryStoreBase } from '../../../core/sandbox/in-memory-store.base';
 import { CapabilityEntity } from '../entities/capability.entity';
 import { PersonaCapabilityEntity } from '../entities/persona-capability.entity';
+import { ICapabilityRepository } from './capability.repository';
 
 /**
  * Actor-Persona relationship entity for in-memory store
@@ -28,7 +29,7 @@ interface ActorPersonaEntity {
  * Implements the same interface as the TypeORM-based CapabilityRepository.
  */
 @Injectable()
-export class CapabilityRepositoryInMemory {
+export class CapabilityRepositoryInMemory implements ICapabilityRepository {
   /**
    * Store for capabilities
    */

@@ -44,7 +44,7 @@ export class TimeWindowEntity {
   @Column('int', { nullable: true })
   dayOfWeek!: number | null;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   recurrenceRule!: Record<string, unknown> | null;
 
   @Column('boolean', { default: true })

@@ -32,13 +32,13 @@ export class OperatorEntity {
     @Column('text', { array: true, default: () => 'ARRAY[]::text[]' })
     skills!: string[];
 
-    @Column('jsonb', { nullable: true })
+    @Column('simple-json', { nullable: true })
     certifications?: Record<string, unknown>[];
 
     @Column('float', { default: 0 })
     reputationScore!: number;
 
-    @Column('jsonb', { nullable: true })
+    @Column('simple-json', { nullable: true })
     careerHistory?: Record<string, unknown>;
 
     @CreateDateColumn({ type: 'timestamp with time zone' })

@@ -74,7 +74,7 @@ export class AITelemetryEntity {
   @Column({ type: 'text', nullable: true })
   message!: string | null;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   payload!: Record<string, unknown> | null;
 
   @Column({ type: 'decimal', precision: 3, scale: 2, nullable: true })

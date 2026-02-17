@@ -57,7 +57,7 @@ export class InteractionStreamEntity {
   })
   state!: InteractionStreamState;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata!: Record<string, unknown>;
 
   @Column('text', {

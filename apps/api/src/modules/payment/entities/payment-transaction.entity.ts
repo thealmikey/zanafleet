@@ -44,7 +44,7 @@ export class PaymentTransactionEntity {
   @Column('text', { nullable: true })
   errorMessage!: string | null;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   rawResponse!: Record<string, unknown> | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

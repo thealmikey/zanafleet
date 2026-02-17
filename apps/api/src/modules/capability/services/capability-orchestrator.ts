@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -7,7 +7,7 @@ import {
   CapabilityUsedEventV1,
   CapabilityExecutionResult,
 } from '../events/capability-used.event';
-import { CapabilityRepository } from '../repositories/capability.repository';
+import { CAPABILITY_REPOSITORY_TOKEN, ICapabilityRepository } from '../repositories/capability.repository';
 
 import { CapabilityAccessController } from './capability-access.controller';
 
@@ -174,7 +174,7 @@ export class CapabilityOrchestrator implements ICapabilityOrchestrator {
 
   constructor(
     private readonly capabilityAccessController: CapabilityAccessController,
-    private readonly capabilityRepository: CapabilityRepository,
+    @Inject(CAPABILITY_REPOSITORY_TOKEN) private readonly capabilityRepository: ICapabilityRepository,
     private readonly commandBus: CommandBus,
     private readonly _queryBus: QueryBus,
     private readonly eventBusService: EventBusService

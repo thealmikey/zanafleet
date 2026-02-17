@@ -44,7 +44,7 @@ export class CalendarRuleEntity {
   @Column('int', { default: 0 })
   priority!: number;
 
-  @Column('jsonb')
+  @Column('simple-json')
   conditions!: Record<string, unknown>;
 
   @Column('boolean', { default: true })

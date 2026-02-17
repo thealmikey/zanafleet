@@ -65,7 +65,7 @@ export class CapabilityProposalEntity {
   @Column('varchar', { length: 255 })
   capabilityName!: string;
 
-  @Column('jsonb')
+  @Column('simple-json')
   extractedInputs!: Record<string, unknown>;
 
   @Column('float')
@@ -98,10 +98,10 @@ export class CapabilityProposalEntity {
   @Column('timestamp with time zone', { nullable: true })
   expiresAt!: Date | null;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   reasoning!: ReasoningStep[] | null;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   alternatives!: ProposalAlternative[] | null;
 
   /**

@@ -68,15 +68,15 @@ export class IntelligenceSnapshotEntity {
   orderId!: string;
 
   /** The move recommendation (can be legacy or media-enhanced) */
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   moveRecommendation!: Record<string, unknown> | null;
 
   /** Summary of media insight for quick access */
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   mediaInsightSummary!: MediaInsightSummary | null;
 
   /** Full media insight data */
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   mediaInsightFull!: MediaInsight | null;
 
   /** Overall confidence score for the recommendation */

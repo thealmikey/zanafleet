@@ -21,6 +21,20 @@ import {
   WorkspaceNeo4jInitializer,
 } from './projections/workspace-neo4j.projection';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] WorkspaceModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([WorkspaceEntity, MembershipEntity, OrganizationEntity, ActorEntity])];
+}
+
 /**
  * Workspace Module
  *
@@ -46,7 +60,7 @@ import {
 @Module({
   imports: [
     CqrsModule,
-    TypeOrmModule.forFeature([WorkspaceEntity, MembershipEntity, OrganizationEntity, ActorEntity]),
+    ...getTypeOrmImports(),
   ],
   controllers: [WorkspaceController],
   providers: [
@@ -74,8 +88,8 @@ export class WorkspaceModule implements OnModuleInit {
   private readonly logger = new Logger(WorkspaceModule.name);
 
   constructor(
-    private readonly workspaceNeo4jInitializer: WorkspaceNeo4jInitializer,
-    private readonly membershipNeo4jInitializer: MembershipNeo4jInitializer
+    private readonly workspaceNeo4jQuery: WorkspaceNeo4jQuery,
+    private readonly membershipNeo4jQuery: MembershipNeo4jQuery
   ) {}
 
   /**
@@ -85,8 +99,8 @@ export class WorkspaceModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     try {
       await Promise.all([
-        this.workspaceNeo4jInitializer.initialize(),
-        this.membershipNeo4jInitializer.initialize(),
+        this.workspaceNeo4jQuery.initialize(),
+        this.membershipNeo4jQuery.initialize(),
       ]);
     } catch (error) {
       this.logger.error('Failed to initialize Neo4j constraints', error);

@@ -104,10 +104,10 @@ export class ProcessInstanceEntity {
   })
   status!: ProcessInstanceStatus;
 
-  @Column('jsonb', { default: {} })
+  @Column('simple-json', { default: {} })
   context!: Record<string, unknown>;
 
-  @Column('jsonb', { default: [] })
+  @Column('simple-json', { default: [] })
   relatedEntities!: ProcessRelatedEntity[];
 
   @Column({ nullable: true })
@@ -125,7 +125,7 @@ export class ProcessInstanceEntity {
   @Column({ default: 0 })
   transitionCount!: number;
 
-  @Column('jsonb', { default: [] })
+  @Column('simple-json', { default: [] })
   history!: ProcessHistoryEntry[];
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

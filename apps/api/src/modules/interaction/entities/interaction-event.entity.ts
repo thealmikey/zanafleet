@@ -91,7 +91,7 @@ export class InteractionEventEntity {
   @Column('enum', { enum: InteractionEventType })
   eventType!: InteractionEventType;
 
-  @Column('jsonb')
+  @Column('simple-json')
   payload!: Record<string, unknown>;
 
   @Column('timestamp with time zone')

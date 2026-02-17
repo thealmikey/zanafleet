@@ -52,7 +52,7 @@ export class CalendarOverrideEntity {
   @Column('int', { default: 0 })
   priority!: number;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata!: Record<string, unknown> | null;
 
   @Column('boolean', { default: true })

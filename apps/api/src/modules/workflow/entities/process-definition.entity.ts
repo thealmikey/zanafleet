@@ -71,7 +71,7 @@ export class ProcessDefinitionEntity {
   @Column('simple-array', { nullable: true })
   allowedStates!: string[];
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata!: Record<string, unknown>;
 
   @Column({ nullable: true })

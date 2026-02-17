@@ -48,7 +48,7 @@ export class LedgerEntryEntity {
   @Column('varchar', { length: 500, nullable: true })
   description!: string | null;
 
-  @Column('jsonb', { nullable: true })
+  @Column('simple-json', { nullable: true })
   metadata!: Record<string, unknown> | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

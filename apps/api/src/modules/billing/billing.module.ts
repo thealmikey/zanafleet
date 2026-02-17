@@ -13,16 +13,30 @@ import { PolicyEvaluatedListener } from './listeners/policy-evaluated.listener';
 import { BillingCalculatorService } from './services/billing-calculator.service';
 import { PricingSignalService } from './services/pricing-signal.service';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] BillingModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([InvoiceEntity, ChargeEntity])];
+}
+
 const CommandHandlers = [CreateInvoiceCommandHandler, IssueInvoiceCommandHandler];
 const EventHandlers = [PaymentCompletedListener, PolicyEvaluatedListener];
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([InvoiceEntity, ChargeEntity]),
+    ...getTypeOrmImports(),
     CqrsModule,
     PaymentModule,
   ],
   providers: [BillingCalculatorService, PricingSignalService, ...CommandHandlers, ...EventHandlers],
-  exports: [TypeOrmModule, BillingCalculatorService, PricingSignalService],
+  exports: [BillingCalculatorService, PricingSignalService],
 })
 export class BillingModule {}
