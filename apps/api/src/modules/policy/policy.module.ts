@@ -13,6 +13,20 @@ import { JsonLogicEvaluatorService } from './services/json-logic-evaluator.servi
 import { PolicyEnforcementAdapter } from './services/policy-enforcement.adapter';
 import { PolicyEvaluationEngineService } from './services/policy-evaluation-engine.service';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] PolicyModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([PolicyEntity, PolicyDecisionLogEntity])];
+}
+
 /**
  * PolicyModule
  *
@@ -25,7 +39,7 @@ import { PolicyEvaluationEngineService } from './services/policy-evaluation-engi
  */
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PolicyEntity, PolicyDecisionLogEntity]),
+    ...getTypeOrmImports(),
     CqrsModule,
     EventBusModule.forFeature(),
     CalendarModule,

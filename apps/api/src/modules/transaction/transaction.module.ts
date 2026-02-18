@@ -10,6 +10,20 @@ import {
   TransactionNeo4jInitializer,
 } from './projections/transaction-neo4j.projection';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] TransactionModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([TransactionEntity, WalletEntity])];
+}
+
 /**
  * Transaction Module
  *
@@ -25,7 +39,7 @@ import {
  * 6. Comprehensive unit and integration tests
  */
 @Module({
-  imports: [CqrsModule, TypeOrmModule.forFeature([TransactionEntity, WalletEntity])],
+  imports: [CqrsModule, ...getTypeOrmImports()],
   providers: [
     CreateTransactionCommandHandler,
     TransactionNeo4jProjection,

@@ -19,12 +19,25 @@ import { BundleService } from './services/bundle.service';
 import { MatchingService } from './services/matching.service';
 import { TripService } from './services/trip.service';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] AssetModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([AssetEntity, TripEntity, BundleEntity])];
+}
 
 
 @Module({
     imports: [
         CqrsModule,
-        TypeOrmModule.forFeature([AssetEntity, TripEntity, BundleEntity]),
+        ...getTypeOrmImports(),
         PolicyModule,
         SearchModule,
     ],

@@ -9,8 +9,22 @@ import { EvaluateFormationCommandHandler } from './handlers/evaluate-formation.h
 import { SatisfyRequirementCommandHandler } from './handlers/satisfy-requirement.handler';
 import { FormationService } from './services/formation.service';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] FormationModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([FormationStatusEntity, RequirementEntity])];
+}
+
 @Module({
-  imports: [CqrsModule, TypeOrmModule.forFeature([FormationStatusEntity, RequirementEntity])],
+  imports: [CqrsModule, ...getTypeOrmImports()],
   providers: [
     FormationService,
     EvaluateFormationCommandHandler,

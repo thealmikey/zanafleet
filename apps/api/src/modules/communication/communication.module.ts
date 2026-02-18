@@ -20,6 +20,20 @@ import { TemplateService } from './services/template.service';
 import { CommunicationSubscriber } from './subscribers/communication.subscriber';
 import { NotificationSubscriber } from './subscribers/notification.subscriber';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] CommunicationModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([NotificationEntity, TemplateEntity, NotificationPreferenceEntity])];
+}
+
 /**
  * CommunicationModule
  * Provides notification and messaging capabilities for the application
@@ -34,7 +48,7 @@ import { NotificationSubscriber } from './subscribers/notification.subscriber';
     CqrsModule,
     MessagingModule,
     EventBusModule.forFeature(),
-    TypeOrmModule.forFeature([NotificationEntity, TemplateEntity, NotificationPreferenceEntity]),
+    ...getTypeOrmImports(),
   ],
   controllers: [NotificationsController],
   providers: [

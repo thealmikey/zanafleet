@@ -22,6 +22,20 @@ import {
 import { InteractionEventRepository } from './repositories/interaction-event.repository';
 import { InteractionStreamRepository } from './repositories/interaction-stream.repository';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] InteractionModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([InteractionStreamEntity, InteractionEventEntity])];
+}
+
 // Command handlers
 export const CommandHandlers = [
   CreateInteractionStreamCommandHandler,
@@ -54,7 +68,7 @@ export const EventHandlers = [
     CqrsModule,
     EventBusModule.forFeature(),
     Neo4jModule,
-    TypeOrmModule.forFeature([InteractionStreamEntity, InteractionEventEntity]),
+    ...getTypeOrmImports(),
   ],
   providers: [
     // Repositories

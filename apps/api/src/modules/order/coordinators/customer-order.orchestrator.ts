@@ -1,13 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-    OrderStatus,
-    PaymentStatus,
-    PaymentMethod,
-} from '@zanafleet/contracts';
+import { Inject } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
+import { CUSTOMER_REPOSITORY_TOKEN, CustomerRepositoryInMemory } from '../../customer/repositories/customer.repository.in-memory';
 import { CustomerEntity } from '../../customer/entities/customer.entity';
 import { CommerceContextEngine } from '../../customer/services/commerce-context-engine.service';
 import { CustomerProjectionService } from '../../customer/services/customer-projection.service';
@@ -15,6 +12,7 @@ import { DeliveryRequestCoordinator } from '../../delivery/coordinators/delivery
 import { PaymentFlowOrchestrator } from '../../payment/coordinators/payment-flow.orchestrator';
 import { PaymentFlowType } from '../../payment/dto/payment.enums';
 import { OrderEntity } from '../entities/order.entity';
+import { OrderStatus, PaymentStatus, PaymentMethod } from '@zanafleet/contracts';
 
 export interface PlaceCustomerOrderInput {
     businessId: string;
@@ -60,8 +58,8 @@ export class CustomerOrderOrchestrator {
     constructor(
         @InjectRepository(OrderEntity)
         private readonly orderRepository: Repository<OrderEntity>,
-        @InjectRepository(CustomerEntity)
-        private readonly customerRepository: Repository<CustomerEntity>,
+        @Inject(CUSTOMER_REPOSITORY_TOKEN)
+        private readonly customerRepository: Repository<CustomerEntity> | CustomerRepositoryInMemory,
         private readonly deliveryRequestCoordinator: DeliveryRequestCoordinator,
         private readonly paymentFlowOrchestrator: PaymentFlowOrchestrator,
         private readonly commerceEngine: CommerceContextEngine,

@@ -16,6 +16,20 @@ import { LoginCommandHandler } from './handlers/login.handler';
 import { KeycloakUserSyncService } from './services/keycloak-user-sync.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] AuthModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([ActorEntity])];
+}
+
 /**
  * Auth Module
  *
@@ -27,7 +41,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     ConfigModule.forFeature(authConfig),
     ConfigModule.forFeature(keycloakConfig),
     CqrsModule,
-    TypeOrmModule.forFeature([ActorEntity]),
+    ...getTypeOrmImports(),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

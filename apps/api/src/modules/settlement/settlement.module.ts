@@ -16,11 +16,25 @@ import { ProcessPayoutCommandHandler } from './handlers/process-payout.handler';
 import { PayoutRiskService } from './services/payout-risk.service';
 import { SettlementSchedulerService } from './services/settlement-scheduler.service';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] SettlementModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([SettlementBatchEntity, SettlementItemEntity])];
+}
+
 const CommandHandlers = [CreateSettlementBatchCommandHandler, ProcessPayoutCommandHandler];
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([SettlementBatchEntity, SettlementItemEntity]),
+    ...getTypeOrmImports(),
     CqrsModule,
     EventBusModule,
     AccountModule,

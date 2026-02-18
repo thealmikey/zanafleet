@@ -88,8 +88,8 @@ export class WorkspaceModule implements OnModuleInit {
   private readonly logger = new Logger(WorkspaceModule.name);
 
   constructor(
-    private readonly workspaceNeo4jQuery: WorkspaceNeo4jQuery,
-    private readonly membershipNeo4jQuery: MembershipNeo4jQuery
+    private readonly workspaceNeo4jInitializer: WorkspaceNeo4jInitializer,
+    private readonly membershipNeo4jInitializer: MembershipNeo4jInitializer
   ) {}
 
   /**
@@ -99,8 +99,8 @@ export class WorkspaceModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     try {
       await Promise.all([
-        this.workspaceNeo4jQuery.initialize(),
-        this.membershipNeo4jQuery.initialize(),
+        this.workspaceNeo4jInitializer.initialize(),
+        this.membershipNeo4jInitializer.initialize(),
       ]);
     } catch (error) {
       this.logger.error('Failed to initialize Neo4j constraints', error);

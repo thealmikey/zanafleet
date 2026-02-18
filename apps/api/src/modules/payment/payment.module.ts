@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Type } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -22,14 +22,48 @@ import { FraudCheckService } from './services/fraud-check.service';
 
 const CommandHandlers = [CreatePaymentIntentCommandHandler, ProcessPaymentCommandHandler];
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] PaymentModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([
+    PaymentIntentEntity,
+    PaymentTransactionEntity,
+    DisputeEntity,
+    RefundEntity,
+  ])];
+}
+
+/**
+ * Get exports - conditionally based on mode
+ */
+function getExports(): (Type<unknown> | string)[] {
+  const exports: (Type<unknown> | string)[] = [
+    PaymentProviderRegistry,
+    NoOpPaymentProvider,
+    FraudCheckService,
+    PaymentFlowOrchestrator,
+    RefundDisputeCoordinator,
+  ];
+  
+  // Only export TypeOrmModule when NOT in sandbox mode
+  if (!isSandBoxMode) {
+    exports.push(TypeOrmModule);
+  }
+  
+  return exports;
+}
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      PaymentIntentEntity,
-      PaymentTransactionEntity,
-      DisputeEntity,
-      RefundEntity,
-    ]),
+    ...getTypeOrmImports(),
     CqrsModule,
     EventBusModule,
     LedgerModule,
@@ -44,13 +78,6 @@ const CommandHandlers = [CreatePaymentIntentCommandHandler, ProcessPaymentComman
     RefundDisputeCoordinator,
     ...CommandHandlers,
   ],
-  exports: [
-    PaymentProviderRegistry,
-    NoOpPaymentProvider,
-    FraudCheckService,
-    PaymentFlowOrchestrator,
-    RefundDisputeCoordinator,
-    TypeOrmModule,
-  ],
+  exports: getExports(),
 })
 export class PaymentModule {}

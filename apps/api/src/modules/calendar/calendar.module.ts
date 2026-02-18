@@ -20,16 +20,30 @@ import { CalendarSyncService } from './services/calendar-sync.service';
 import { CalendarService } from './services/calendar.service';
 import { SchedulingConstraintService } from './services/scheduling-constraint.service';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] CalendarModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([
+    CalendarEntity,
+    TimeWindowEntity,
+    CalendarRuleEntity,
+    CalendarEventEntity,
+    CalendarBindingEntity,
+    CalendarOverrideEntity,
+  ])];
+}
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      CalendarEntity,
-      TimeWindowEntity,
-      CalendarRuleEntity,
-      CalendarEventEntity,
-      CalendarBindingEntity,
-      CalendarOverrideEntity,
-    ]),
+    ...getTypeOrmImports(),
     CqrsModule,
     EventBusModule,
   ],

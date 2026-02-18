@@ -16,9 +16,24 @@ import { OrderEntity } from './entities/order.entity';
 import { CreateOrderCommandHandler } from './handlers/create-order.handler';
 import { ActivitySeederService } from './services/activity-seeder.service';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM entities based on sandbox mode
+ * In sandbox mode, CustomerEntity is not available as TypeORM is disabled
+ */
+function getTypeOrmEntities() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] OrderModule: Skipping CustomerEntity in sandbox mode');
+    return [OrderEntity, DeliveryEntity, BusinessEntity];
+  }
+  return [OrderEntity, DeliveryEntity, BusinessEntity, CustomerEntity];
+}
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature([OrderEntity, DeliveryEntity, BusinessEntity, CustomerEntity]),
+    TypeOrmModule.forFeature(getTypeOrmEntities()),
     CqrsModule,
     EventBusModule.forFeature(),
     forwardRef(() => DeliveryModule),

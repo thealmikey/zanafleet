@@ -31,18 +31,34 @@ import { DeliveryService } from './services/delivery.service';
 import { DeliveryScheduledSubscriber } from './subscribers/delivery-scheduled.subscriber';
 import { OrderCreatedSubscriber } from './subscribers/order-created.subscriber';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] DeliveryModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([DeliveryEntity, DeliveryLocationEntity])];
+}
+
+const imports = [
+  ...getTypeOrmImports(),
+  CqrsModule,
+  EventBusModule.forFeature(),
+  forwardRef(() => PolicyModule),
+  forwardRef(() => BillingModule),
+  forwardRef(() => CalendarModule),
+  forwardRef(() => LedgerModule),
+  forwardRef(() => LocationIntelligenceModule),
+  forwardRef(() => OrderModule),
+];
+
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([DeliveryEntity, DeliveryLocationEntity]),
-    CqrsModule,
-    EventBusModule.forFeature(),
-    forwardRef(() => PolicyModule),
-    forwardRef(() => BillingModule),
-    forwardRef(() => CalendarModule),
-    forwardRef(() => LedgerModule),
-    forwardRef(() => LocationIntelligenceModule),
-    forwardRef(() => OrderModule),
-  ],
+  imports,
   controllers: [DeliveriesController, DeliveryTrackingController],
   providers: [
     DeliveryService,
@@ -52,8 +68,6 @@ import { OrderCreatedSubscriber } from './subscribers/order-created.subscriber';
     DeliveryRequestCoordinator,
     OrderCreatedSubscriber,
     DeliveryScheduledSubscriber,
-    // CandidateSelectionService - commented out due to interface mismatch with LocationIntelligence
-    // CandidateSelectionService,
     AssignmentRulesService,
     LocationResolverService,
     // Command Handlers

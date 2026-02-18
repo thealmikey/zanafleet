@@ -9,6 +9,20 @@ import { RiderEntity } from './entities/rider.entity';
 import { CreateRiderCommandHandler } from './handlers/create-rider.handler';
 import { RiderNeo4jInitializer, RiderNeo4jProjection } from './projections/rider-neo4j.projection';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] RiderModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([RiderEntity, SaccoEntity])];
+}
+
 /**
  * RiderModule
  * Encapsulates all Rider-related functionality
@@ -21,7 +35,7 @@ import { RiderNeo4jInitializer, RiderNeo4jProjection } from './projections/rider
  * OnModuleInit triggers Neo4j constraint initialization
  */
 @Module({
-  imports: [CqrsModule, TypeOrmModule.forFeature([RiderEntity, SaccoEntity])],
+  imports: [CqrsModule, ...getTypeOrmImports()],
   controllers: [RiderController],
   providers: [CreateRiderCommandHandler, RiderNeo4jProjection, RiderNeo4jInitializer],
   exports: [RiderNeo4jInitializer],

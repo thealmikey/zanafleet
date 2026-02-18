@@ -10,15 +10,29 @@ import { SearchModule } from '../search/search.module';
 
 import { DashboardSeedService } from './dashboard-seed.service';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] SeedModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([
+    OrderEntity,
+    DeliveryEntity,
+    BusinessEntity,
+    SaccoEntity,
+    RiderEntity,
+  ])];
+}
+
 @Module({
     imports: [
-        TypeOrmModule.forFeature([
-            OrderEntity,
-            DeliveryEntity,
-            BusinessEntity,
-            SaccoEntity,
-            RiderEntity,
-        ]),
+        ...getTypeOrmImports(),
         SearchModule,
     ],
     providers: [DashboardSeedService],

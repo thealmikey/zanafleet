@@ -1,16 +1,18 @@
-import { Controller, Get, Query, Param } from '@nestjs/common';
+import { Controller, Get, Query, Param, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 
+import { CUSTOMER_REPOSITORY_TOKEN } from './customer.module';
 import { BusinessAvailabilityProjection } from './entities/business-availability.projection';
 import { CustomerActivityProjection } from './entities/customer-activity.projection';
 import { CustomerEntity } from './entities/customer.entity';
+import { CustomerRepositoryInMemory } from './repositories/customer.repository.in-memory';
 
 @Controller('customers')
 export class CustomerController {
     constructor(
-        @InjectRepository(CustomerEntity)
-        private readonly customerRepository: Repository<CustomerEntity>,
+        @Inject(CUSTOMER_REPOSITORY_TOKEN)
+        private readonly customerRepository: Repository<CustomerEntity> | CustomerRepositoryInMemory,
         @InjectRepository(CustomerActivityProjection)
         private readonly activityRepo: Repository<CustomerActivityProjection>,
         @InjectRepository(BusinessAvailabilityProjection)

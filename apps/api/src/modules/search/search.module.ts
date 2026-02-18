@@ -13,16 +13,30 @@ import { SEARCH_PROVIDER } from './providers/search-provider.interface';
 import { SearchProjectionService } from './services/search-projection.service';
 import { SearchBackfillWorker } from './workers/search-backfill.worker';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] SearchModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([
+    SearchDocumentEntity,
+    OrderEntity,
+    BusinessEntity,
+    DeliveryEntity,
+  ])];
+}
+
 
 @Module({
     imports: [
         CqrsModule,
-        TypeOrmModule.forFeature([
-            SearchDocumentEntity,
-            OrderEntity,
-            BusinessEntity,
-            DeliveryEntity,
-        ]),
+        ...getTypeOrmImports(),
     ],
     controllers: [SearchController],
     providers: [

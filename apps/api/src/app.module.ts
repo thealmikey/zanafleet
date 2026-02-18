@@ -53,17 +53,19 @@ const isSandboxMode = process.env.USE_IN_MEMORY_DB === 'true';
 console.log('[DEBUG] app.module.ts loaded');
 console.log('[DEBUG] USE_IN_MEMORY_DB =', process.env.USE_IN_MEMORY_DB);
 console.log('[DEBUG] isSandboxMode =', isSandboxMode);
+console.log('[DEBUG] All env keys:',
+  Object.keys(process.env).filter(k => k.includes('DB') || k.includes('MEMORY') || k.includes('SANDBOX')).join(', '));
 
 /**
  * Get TypeOrmModule configuration - completely skipped in sandbox mode
  * In sandbox mode, we use in-memory stores instead of any database
+ * Modules that support sandbox mode use their own in-memory repositories
+ * See CapabilityModule for the pattern
  */
 function getTypeOrmConfig() {
   if (isSandboxMode) {
     console.log('[INFO] Sandbox mode enabled: Skipping TypeORM, using in-memory stores');
-    // In sandbox mode, skip TypeORM entirely
-    // Modules that support sandbox mode use their own in-memory repositories
-    // See CapabilityModule for the pattern
+    console.log('[WARNING] If you see TypeORM errors, ensure USE_IN_MEMORY_DB is not set to "true" in production!');
     return [];
   }
   console.log('[DEBUG] getTypeOrmConfig returning TypeOrmModule.forRoot() with Postgres config');

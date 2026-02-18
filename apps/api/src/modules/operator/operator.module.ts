@@ -9,8 +9,22 @@ import { OperatorEntity } from './entities/operator.entity';
 import { OperatorNeo4jInitializer, OperatorNeo4jProjection } from './projections/operator-neo4j.projection';
 import { OperatorService } from './services/operator.service';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] OperatorModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([OperatorEntity, ActorEntity])];
+}
+
 @Module({
-    imports: [CqrsModule, TypeOrmModule.forFeature([OperatorEntity, ActorEntity])],
+    imports: [CqrsModule, ...getTypeOrmImports()],
     controllers: [OperatorController],
     providers: [OperatorService, OperatorNeo4jProjection, OperatorNeo4jInitializer],
     exports: [TypeOrmModule, OperatorService, OperatorNeo4jInitializer],

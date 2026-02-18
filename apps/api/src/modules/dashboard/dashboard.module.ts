@@ -30,6 +30,33 @@ import { SupportDashboardController } from './controllers/support-dashboard.cont
 import { AdminScopeService } from './services/admin-scope.service';
 import { BusinessOwnerDashboardService } from './services/business-owner-dashboard.service';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] DashboardModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([
+    DeliveryEntity,
+    OrderEntity,
+    InvoiceEntity,
+    ChargeEntity,
+    SettlementBatchEntity,
+    PolicyEntity,
+    DisputeEntity,
+    RefundEntity,
+    PaymentIntentEntity,
+    BusinessEntity,
+    SaccoEntity,
+    RiderEntity,
+  ])];
+}
+
 /**
  * DashboardModule
  *
@@ -47,20 +74,7 @@ import { BusinessOwnerDashboardService } from './services/business-owner-dashboa
  */
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      DeliveryEntity,
-      OrderEntity,
-      InvoiceEntity,
-      ChargeEntity,
-      SettlementBatchEntity,
-      PolicyEntity,
-      DisputeEntity,
-      RefundEntity,
-      PaymentIntentEntity,
-      BusinessEntity,
-      SaccoEntity,
-      RiderEntity,
-    ]),
+    ...getTypeOrmImports(),
     LocationIntelligenceModule,
     Neo4jModule,
     CqrsModule,

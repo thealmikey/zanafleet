@@ -25,6 +25,24 @@ export { AIReminderEngineService } from './services/ai-reminder-engine.service';
 export * from './events';
 export * from './interfaces';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] AIModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([
+    AISuggestionEntity,
+    AIFeedbackEntity,
+    AITelemetryEntity,
+  ])];
+}
+
 // Command handlers - none in Phase 1 (suggestions are auto-generated)
 const CommandHandlers: Type<ICommandHandler>[] = [];
 
@@ -38,11 +56,7 @@ const EventHandlers: Type<IEventHandler>[] = [
     CqrsModule,
     EventBusModule.forFeature(),
     Neo4jModule,
-    TypeOrmModule.forFeature([
-      AISuggestionEntity,
-      AIFeedbackEntity,
-      AITelemetryEntity,
-    ]),
+    ...getTypeOrmImports(),
   ],
   providers: [
     ...CommandHandlers,

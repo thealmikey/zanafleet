@@ -9,6 +9,20 @@ import { CapabilityOrchestrator } from './services/capability-orchestrator.servi
 import { ConfidenceThresholdService } from './services/confidence-threshold.service';
 import { ConsentConfirmationService } from './services/consent-confirmation.service';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] ConsentModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([CapabilityProposalEntity])];
+}
+
 /**
  * ConsentModule
  * 
@@ -32,7 +46,7 @@ import { ConsentConfirmationService } from './services/consent-confirmation.serv
   imports: [
     CqrsModule,
     EventBusModule.forFeature(),
-    TypeOrmModule.forFeature([CapabilityProposalEntity]),
+    ...getTypeOrmImports(),
   ],
   providers: [
     ConsentConfirmationService,

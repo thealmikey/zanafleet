@@ -21,6 +21,20 @@ import { HeatmapService } from './services/heatmap.service';
 import { LocationIntelligenceService } from './services/location-intelligence.service';
 import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscriber';
 
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] LocationIntelligenceModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([RiderLocationSnapshotEntity, RiderLocationHistoryEntity])];
+}
+
 /**
  * Location Intelligence Module
  *
@@ -40,7 +54,7 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([RiderLocationSnapshotEntity, RiderLocationHistoryEntity]),
+    ...getTypeOrmImports(),
     CqrsModule,
     EventBusModule.forFeature(),
     Neo4jModule,

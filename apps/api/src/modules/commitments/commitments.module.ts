@@ -1,6 +1,6 @@
 import { ActorEntity } from '@api/modules/actor/entities/actor.entity';
 import { WorkspaceEntity } from '@api/modules/workspace/entities/workspace.entity';
-import { Logger, Module, OnModuleInit } from '@nestjs/common';
+import { Logger, Module, OnModuleInit, Type } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -11,6 +11,27 @@ import {
   CommitmentNeo4jProjection,
   CommitmentNeo4jInitializer,
 } from './projections/commitment-neo4j.projection';
+
+// Check sandbox mode at module load time
+const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    console.log('[DEBUG] CommitmentsModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
+    return [];
+  }
+  return [TypeOrmModule.forFeature([CommitmentEntity, ActorEntity, WorkspaceEntity])];
+}
+
+/**
+ * Get exports - conditionally based on mode
+ */
+function getExports(): Array<Type<unknown> | string> {
+  return [CreateCommitmentCommandHandler, UpdateCommitmentStatusCommandHandler];
+}
 
 /**
  * Commitments Module
@@ -35,7 +56,7 @@ import {
  * - uuid: ID generation
  */
 @Module({
-  imports: [CqrsModule, TypeOrmModule.forFeature([CommitmentEntity, ActorEntity, WorkspaceEntity])],
+  imports: [CqrsModule, ...getTypeOrmImports()],
   providers: [
     // Command Handlers
     CreateCommitmentCommandHandler,
@@ -45,7 +66,7 @@ import {
     CommitmentNeo4jProjection,
     CommitmentNeo4jInitializer,
   ],
-  exports: [CreateCommitmentCommandHandler, UpdateCommitmentStatusCommandHandler],
+  exports: getExports(),
 })
 export class CommitmentsModule implements OnModuleInit {
   private readonly logger = new Logger(CommitmentsModule.name);
