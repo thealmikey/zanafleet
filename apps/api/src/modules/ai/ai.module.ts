@@ -75,7 +75,6 @@ const EventHandlers: Type<IEventHandler>[] = [
     AISuggestionFeedbackService,
     HangingStateDetectorService,
     AIReminderEngineService,
-    TypeOrmModule,
   ],
 })
 export class AIModule {}

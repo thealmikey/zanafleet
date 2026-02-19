@@ -34,6 +34,8 @@ const CommandHandlers = [CreateCampaignCommandHandler, ApplyIncentiveCommandHand
     LedgerModule,
   ],
   providers: [IncentiveEligibilityService, IncentiveEngineService, ...CommandHandlers],
-  exports: [TypeOrmModule, IncentiveEligibilityService, IncentiveEngineService],
+  exports: isSandBoxMode 
+    ? [IncentiveEligibilityService, IncentiveEngineService]
+    : [IncentiveEligibilityService, IncentiveEngineService],
 })
 export class IncentiveModule {}

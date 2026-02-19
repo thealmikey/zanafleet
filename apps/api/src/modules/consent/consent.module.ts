@@ -57,7 +57,6 @@ function getTypeOrmImports() {
     ConsentConfirmationService,
     CapabilityOrchestrator,
     ConfidenceThresholdService,
-    TypeOrmModule,
   ],
 })
 export class ConsentModule {}

@@ -51,7 +51,9 @@ function getTypeOrmImports() {
         AssetNeo4jProjection,
         AssetNeo4jInitializer,
     ],
-    exports: [TypeOrmModule, MatchingService, TripService, AssetNeo4jInitializer],
+    exports: isSandBoxMode 
+      ? [MatchingService, TripService, AssetNeo4jInitializer]
+      : [MatchingService, TripService, AssetNeo4jInitializer],
 })
 export class AssetModule implements OnModuleInit {
     constructor(private readonly assetNeo4jInitializer: AssetNeo4jInitializer) { }

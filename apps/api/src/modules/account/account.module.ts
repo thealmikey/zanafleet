@@ -24,6 +24,6 @@ const CommandHandlers = [CreateAccountCommandHandler];
 @Module({
   imports: [...getTypeOrmImports(), CqrsModule],
   providers: [...CommandHandlers],
-  exports: [TypeOrmModule],
+  exports: [],
 })
 export class AccountModule {}

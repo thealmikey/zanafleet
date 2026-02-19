@@ -37,6 +37,6 @@ function getTypeOrmImports() {
     FinalizeSignUpCommandHandler,
     GetSignUpSessionQueryHandler,
   ],
-  exports: [TypeOrmModule],
+  exports: [],
 })
 export class SignUpModule {}

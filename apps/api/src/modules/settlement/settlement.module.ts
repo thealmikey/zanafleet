@@ -43,6 +43,8 @@ const CommandHandlers = [CreateSettlementBatchCommandHandler, ProcessPayoutComma
   ],
   controllers: [SettlementsController],
   providers: [SettlementSchedulerService, PayoutRiskService, PayoutOrchestrator, ...CommandHandlers],
-  exports: [TypeOrmModule, SettlementSchedulerService, PayoutRiskService, PayoutOrchestrator],
+  exports: isSandBoxMode 
+    ? [SettlementSchedulerService, PayoutRiskService, PayoutOrchestrator]
+    : [SettlementSchedulerService, PayoutRiskService, PayoutOrchestrator],
 })
 export class SettlementModule {}

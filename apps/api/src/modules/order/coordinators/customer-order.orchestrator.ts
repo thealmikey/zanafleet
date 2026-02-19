@@ -4,7 +4,7 @@ import { Inject } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { CUSTOMER_REPOSITORY_TOKEN, CustomerRepositoryInMemory } from '../../customer/repositories/customer.repository.in-memory';
+import { CUSTOMER_REPOSITORY_TOKEN, CustomerRepositoryInMemory } from '../../customer/customer.module';
 import { CustomerEntity } from '../../customer/entities/customer.entity';
 import { CommerceContextEngine } from '../../customer/services/commerce-context-engine.service';
 import { CustomerProjectionService } from '../../customer/services/customer-projection.service';

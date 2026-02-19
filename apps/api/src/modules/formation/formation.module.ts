@@ -31,7 +31,7 @@ function getTypeOrmImports() {
     CreateRequirementCommandHandler,
     SatisfyRequirementCommandHandler,
   ],
-  exports: [FormationService, TypeOrmModule],
+  exports: [FormationService],
 })
 export class FormationModule implements OnModuleInit {
   private readonly logger = new Logger(FormationModule.name);

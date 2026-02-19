@@ -31,9 +31,19 @@ function getTypeOrmEntities() {
   return [OrderEntity, DeliveryEntity, BusinessEntity, CustomerEntity];
 }
 
+/**
+ * Conditionally get TypeORM imports based on sandbox mode
+ */
+function getTypeOrmImports() {
+  if (isSandBoxMode) {
+    return [];
+  }
+  return [TypeOrmModule.forFeature(getTypeOrmEntities())];
+}
+
 @Module({
   imports: [
-    TypeOrmModule.forFeature(getTypeOrmEntities()),
+    ...getTypeOrmImports(),
     CqrsModule,
     EventBusModule.forFeature(),
     forwardRef(() => DeliveryModule),
@@ -42,6 +52,8 @@ function getTypeOrmEntities() {
   ],
   controllers: [OrdersController],
   providers: [CreateOrderCommandHandler, CustomerOrderOrchestrator, ActivitySeederService],
-  exports: [TypeOrmModule, CreateOrderCommandHandler, CustomerOrderOrchestrator],
+  exports: isSandBoxMode 
+    ? [CreateOrderCommandHandler, CustomerOrderOrchestrator]
+    : [CreateOrderCommandHandler, CustomerOrderOrchestrator],
 })
 export class OrderModule { }

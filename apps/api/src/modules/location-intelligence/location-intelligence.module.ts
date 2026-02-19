@@ -78,7 +78,6 @@ function getTypeOrmImports() {
     GeoQueryCoordinator,
   ],
   exports: [
-    TypeOrmModule,
     GeoProviderRegistry,
     NoOpGeoProvider,
     H3Service,

@@ -10,6 +10,7 @@ import {
   Provider,
   MiddlewareConsumer,
   NestModule,
+  Logger,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
@@ -29,6 +30,85 @@ import { SandboxHealthIndicator } from './sandbox.health-indicator';
 import { SandboxOptions } from './sandbox.types';
 import { SeedScenarioRegistry } from './seed-scenario.registry';
 
+const logger = new Logger('SandboxModule');
+
+/**
+ * List of known handlers that use @InjectRepository and need in-memory alternatives
+ * This helps diagnose which modules are broken in sandbox mode
+ */
+export const SANDBOX_INCOMPATIBLE_HANDLERS = [
+  // SignUp Module (3 handlers)
+  'FinalizeSignupHandler',
+  'GetSignupSessionHandler', 
+  'UpdateSignupStepHandler',
+  // Organization Module (3 handlers)
+  'DeleteOrganizationHandler',
+  'UpdateOrganizationHandler',
+  'CreateOrganizationHandler',
+  // Communication Module (1 handler)
+  'SendNotificationHandler',
+  // Commitments Module (2 handlers)
+  'UpdateCommitmentStatusHandler',
+  'CreateCommitmentHandler',
+  // Role Module (1 handler)
+  'CreateRoleHandler',
+  // Evidence Module (1 handler)
+  'CreateEvidenceHandler',
+  // Actor Module (2 handlers)
+  'CreateActorHandler',
+  'UpdateActorHandler',
+  // Delivery Module (7 handlers)
+  'MarkDeliveryPickedUpHandler',
+  'AcceptDeliveryAssignmentHandler',
+  'RecordDeliveryAttemptFailedHandler',
+  'CancelDeliveryHandler',
+  'AssignRiderToDeliveryHandler',
+  'MarkDeliveryInTransitHandler',
+  'MarkDeliveryDeliveredHandler',
+  // Settlement Module (1 handler)
+  'ProcessPayoutHandler',
+  // Workspace Module (4 handlers)
+  'UpdateWorkspaceHandler',
+  'RemoveActorFromWorkspaceHandler',
+  'AddActorToWorkspaceHandler',
+  'CreateWorkspaceHandler',
+  // Persona Module (2 handlers)
+  'CreatePersonaHandler',
+  'AssignPersonaToActorHandler',
+  // Wallet Module (3 handlers)
+  'DebitWalletHandler',
+  'CreditWalletHandler',
+  'CreateWalletHandler',
+  // Order Module (1 handler)
+  'CreateOrderCommandHandler',
+  // Auth Module (1 handler)
+  'LoginHandler',
+  // Payment Module (1 handler)
+  'CreatePaymentIntentHandler',
+  // Account Module (1 handler)
+  'CreateAccountHandler',
+  // Billing Module (1 handler)
+  'IssueInvoiceHandler',
+  // Incentive Module (1 handler)
+  'CreateCampaignHandler',
+  // Sacco Module (1 handler)
+  'CreateSaccoHandler',
+  // Formation Module (3 handlers)
+  'SatisfyRequirementHandler',
+  'EvaluateFormationHandler',
+  'CreateRequirementHandler',
+] as const;
+
+/**
+ * Logs a warning about sandbox compatibility issues
+ */
+export function logSandboxIncompatibility(handlerName: string, entityName: string): void {
+  logger.warn(
+    `[SANDBOX INCOMPATIBILITY] ${handlerName} uses @InjectRepository(${entityName}) ` +
+    `which requires TypeORM. In sandbox mode, this will fail. ` +
+    `Module needs an in-memory repository implementation.`
+  );
+}
 
 /**
  * Sandbox Module

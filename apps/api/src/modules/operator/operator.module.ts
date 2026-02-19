@@ -27,7 +27,9 @@ function getTypeOrmImports() {
     imports: [CqrsModule, ...getTypeOrmImports()],
     controllers: [OperatorController],
     providers: [OperatorService, OperatorNeo4jProjection, OperatorNeo4jInitializer],
-    exports: [TypeOrmModule, OperatorService, OperatorNeo4jInitializer],
+    exports: isSandBoxMode 
+      ? [OperatorService, OperatorNeo4jInitializer]
+      : [OperatorService, OperatorNeo4jInitializer],
 })
 export class OperatorModule implements OnModuleInit {
     constructor(private readonly operatorNeo4jInitializer: OperatorNeo4jInitializer) { }

@@ -40,7 +40,9 @@ function getTypeOrmImports() {
     PersonaAssignmentNeo4jProjection,
     PersonaNeo4jInitializer,
   ],
-  exports: [TypeOrmModule, CreatePersonaCommandHandler, AssignPersonaToActorCommandHandler],
+  exports: isSandBoxMode 
+    ? [CreatePersonaCommandHandler, AssignPersonaToActorCommandHandler]
+    : [CreatePersonaCommandHandler, AssignPersonaToActorCommandHandler],
 })
 export class PersonaModule implements OnModuleInit {
   constructor(private readonly personaNeo4jInitializer: PersonaNeo4jInitializer) {}
