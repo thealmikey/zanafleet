@@ -1,7 +1,7 @@
 import { WorkspaceEntity } from '@api/modules/workspace/entities/workspace.entity';
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 
 import { ActorController } from './controllers/actor.controller';
 import { ActorEntity } from './entities/actor.entity';
@@ -24,6 +24,40 @@ function getTypeOrmImports() {
   return [
     TypeOrmModule.forFeature([ActorEntity]),
     TypeOrmModule.forFeature([WorkspaceEntity]),
+  ];
+}
+
+/**
+ * Provide fallback mock repository for sandbox mode
+ * This satisfies @InjectRepository() which uses getRepositoryToken()
+ */
+function getSandboxFallbackProviders() {
+  if (!isSandBoxMode) {
+    return [];
+  }
+  
+  console.log('[DEBUG] ActorModule: Using fallback mock repositories in sandbox mode');
+  
+  // Create mock repositories
+  const createMockRepository = (): Record<string, unknown> => ({
+    save: async (entity: unknown): Promise<unknown> => entity,
+    find: async (): Promise<unknown[]> => [],
+    findOne: async (): Promise<unknown> => null,
+    create: (data: unknown): unknown => data,
+    merge: (entity: unknown, ...updates: unknown[]): unknown => ({ ...entity as object, ...updates as object }),
+    delete: async (): Promise<{ affected: number }> => ({ affected: 1 }),
+    createQueryBuilder: () => null,
+  });
+  
+  return [
+    {
+      provide: getRepositoryToken(ActorEntity),
+      useValue: createMockRepository(),
+    },
+    {
+      provide: getRepositoryToken(WorkspaceEntity),
+      useValue: createMockRepository(),
+    },
   ];
 }
 
@@ -64,6 +98,9 @@ function getTypeOrmImports() {
 
     // Services
     TestAccountSeederService,
+
+    // Fallback providers for sandbox mode
+    ...getSandboxFallbackProviders(),
   ],
   exports: [
     // Export for use in other modules

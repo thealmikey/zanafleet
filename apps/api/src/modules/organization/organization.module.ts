@@ -1,3 +1,4 @@
+import { createTypeOrmFallbackProviders } from '@api/core/sandbox';
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -24,6 +25,7 @@ function getTypeOrmImports() {
   if (isSandBoxMode) {
     console.log('[DEBUG] OrganizationModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
     return [];
+
   }
   return [TypeOrmModule.forFeature([OrganizationEntity, ActorEntity])];
 }
@@ -60,6 +62,8 @@ function getTypeOrmImports() {
     // Event Handlers / Projections
     OrganizationNeo4jProjection,
     OrganizationNeo4jInitializer,
+    // Fallback providers for sandbox mode
+    ...createTypeOrmFallbackProviders(OrganizationEntity, ActorEntity),
   ],
   exports: [
     // Export for use in other modules

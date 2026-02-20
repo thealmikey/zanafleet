@@ -1,3 +1,4 @@
+import { createTypeOrmFallbackProviders } from '@api/core/sandbox';
 import { ActorEntity } from '@api/modules/actor/entities/actor.entity';
 import { WorkspaceEntity } from '@api/modules/workspace/entities/workspace.entity';
 import { Logger, Module, OnModuleInit, Type } from '@nestjs/common';
@@ -65,6 +66,9 @@ function getExports(): Array<Type<unknown> | string> {
     // Event Handlers / Projections
     CommitmentNeo4jProjection,
     CommitmentNeo4jInitializer,
+
+    // Fallback providers for sandbox mode (includes ActorEntity, WorkspaceEntity)
+    ...createTypeOrmFallbackProviders(CommitmentEntity, ActorEntity, WorkspaceEntity),
   ],
   exports: getExports(),
 })

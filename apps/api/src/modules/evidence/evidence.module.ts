@@ -1,3 +1,4 @@
+import { createTypeOrmFallbackProviders } from '@api/core/sandbox';
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -54,7 +55,13 @@ function getTypeOrmImports() {
  */
 @Module({
   imports: [CqrsModule, ...getTypeOrmImports()],
-  providers: [CreateEvidenceCommandHandler, EvidenceNeo4jProjection, EvidenceNeo4jInitializer],
+  providers: [
+    CreateEvidenceCommandHandler,
+    EvidenceNeo4jProjection,
+    EvidenceNeo4jInitializer,
+    // Fallback providers for sandbox mode
+    ...createTypeOrmFallbackProviders(EvidenceEntity),
+  ],
   exports: [CreateEvidenceCommandHandler],
 })
 export class EvidenceModule implements OnModuleInit {

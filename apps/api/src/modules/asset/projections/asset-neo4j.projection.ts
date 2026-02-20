@@ -82,10 +82,17 @@ export class AssetNeo4jProjection implements IEventHandler<AssetCreatedEventV1> 
 @Injectable()
 export class AssetNeo4jInitializer {
     private readonly logger = new Logger(AssetNeo4jInitializer.name);
+    private readonly isSandboxMode = process.env.USE_IN_MEMORY_DB === 'true';
 
     constructor(private readonly neo4j: Neo4jService) { }
 
     async initialize(): Promise<void> {
+        // Skip Neo4j initialization in sandbox mode
+        if (this.isSandboxMode) {
+            this.logger.log('[SANDBOX] Skipping Neo4j schema initialization for Asset');
+            return;
+        }
+
         const session = this.neo4j.getWriteSession();
         try {
             await session.run('CREATE CONSTRAINT asset_id_unique IF NOT EXISTS FOR (a:Asset) REQUIRE a.id IS UNIQUE');

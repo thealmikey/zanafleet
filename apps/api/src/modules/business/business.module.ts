@@ -2,6 +2,8 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { createTypeOrmFallbackProviders } from '@api/core/sandbox';
+
 import { BusinessController } from './controllers/business.controller';
 import { BusinessEntity } from './entities/business.entity';
 import { CreateBusinessCommandHandler } from './handlers/create-business.handler';
@@ -35,7 +37,13 @@ function getTypeOrmImports() {
 @Module({
   imports: [CqrsModule, ...getTypeOrmImports()],
   controllers: [BusinessController],
-  providers: [CreateBusinessCommandHandler, BusinessNeo4jProjection, BusinessNeo4jInitializer],
+  providers: [
+    CreateBusinessCommandHandler, 
+    BusinessNeo4jProjection, 
+    BusinessNeo4jInitializer,
+    // Use the new sandbox utility for fallback providers
+    ...createTypeOrmFallbackProviders(BusinessEntity),
+  ],
   exports: [BusinessNeo4jInitializer],
 })
 export class BusinessModule implements OnModuleInit {

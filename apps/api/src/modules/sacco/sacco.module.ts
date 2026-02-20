@@ -1,3 +1,4 @@
+import { createTypeOrmFallbackProviders } from '@api/core/sandbox';
 import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -35,7 +36,12 @@ function getTypeOrmImports() {
 @Module({
   imports: [CqrsModule, ...getTypeOrmImports()],
   controllers: [SaccoController],
-  providers: [CreateSaccoCommandHandler, SaccoNeo4jProjection, SaccoNeo4jInitializer],
+  providers: [
+    CreateSaccoCommandHandler,
+    SaccoNeo4jProjection,
+    SaccoNeo4jInitializer,
+    ...createTypeOrmFallbackProviders(SaccoEntity),
+  ],
   exports: [SaccoNeo4jInitializer],
 })
 export class SaccoModule implements OnModuleInit {

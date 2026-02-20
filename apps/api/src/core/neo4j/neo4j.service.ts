@@ -38,7 +38,6 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
   private readonly user: string | undefined;
   private readonly password: string | undefined;
   private readonly database: string;
-  private readonly isSandbox: boolean;
 
   constructor(
     @Inject(NEO4J_MODULE_OPTIONS)
@@ -48,7 +47,6 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
     this.user = options.user;
     this.password = options.password;
     this.database = options.database || DEFAULT_NEO4J_DATABASE;
-    this.isSandbox = process.env.USE_IN_MEMORY_DB === 'true';
   }
 
   /**
@@ -56,10 +54,10 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
    * Skips connection in sandbox mode
    */
   async onModuleInit(): Promise<void> {
-    this.logger.log(`Neo4j initialization: sandbox mode = ${this.isSandbox}`);
+    this.logger.log(`Neo4j initialization: sandbox mode = ${this.isSandboxMode}`);
 
     // In sandbox mode, skip Neo4j connection
-    if (this.isSandbox) {
+    if (this.isSandboxMode) {
       this.logger.warn('[SANDBOX] Neo4j connection skipped - running with in-memory storage');
       return;
     }
@@ -101,12 +99,34 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
+   * Check if in sandbox mode
+   */
+  private get isSandboxMode(): boolean {
+    return process.env.USE_IN_MEMORY_DB === 'true';
+  }
+
+  /**
+   * Create a mock session for sandbox mode
+   */
+  private createMockSession(): Session {
+    return {
+      run: async () => ({ records: [], summary: {} }),
+      close: async () => {},
+    } as unknown as Session;
+  }
+
+  /**
    * Get a new session with optional configuration
    * @param options - Optional session configuration
    * @returns Neo4j Session instance
    */
   getSession(options?: SessionConfig): Session {
     if (!this.driver) {
+      if (this.isSandboxMode) {
+        // In sandbox mode, return a mock session that does nothing
+        this.logger.warn('[SANDBOX] Neo4j driver not initialized - using mock session');
+        return this.createMockSession();
+      }
       throw new Error('Neo4j driver not initialized. Are you running in sandbox mode?');
     }
     const sessionOptions: SessionConfig = {
@@ -123,6 +143,10 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
    */
   getReadSession(database?: string): Session {
     if (!this.driver) {
+      if (this.isSandboxMode) {
+        this.logger.warn('[SANDBOX] Neo4j driver not initialized - using mock session');
+        return this.createMockSession();
+      }
       throw new Error('Neo4j driver not initialized. Are you running in sandbox mode?');
     }
     return this.driver.session({
@@ -138,6 +162,10 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
    */
   getWriteSession(database?: string): Session {
     if (!this.driver) {
+      if (this.isSandboxMode) {
+        this.logger.warn('[SANDBOX] Neo4j driver not initialized - using mock session');
+        return this.createMockSession();
+      }
       throw new Error('Neo4j driver not initialized. Are you running in sandbox mode?');
     }
     return this.driver.session({
@@ -152,6 +180,10 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
    */
   getDriver(): Driver {
     if (!this.driver) {
+      if (this.isSandboxMode) {
+        this.logger.warn('[SANDBOX] Neo4j driver not initialized');
+        return null as unknown as Driver;
+      }
       throw new Error('Neo4j driver not initialized. Are you running in sandbox mode?');
     }
     return this.driver;

@@ -1,8 +1,7 @@
 import { Neo4jModule } from '@api/core/neo4j';
-import { Module, forwardRef } from '@nestjs/common';
+import { Module, forwardRef, Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { TypeOrmModule } from '@nestjs/typeorm';
-
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 
 import { ChargeEntity } from '../billing/entities/charge.entity';
 import { InvoiceEntity } from '../billing/entities/invoice.entity';
@@ -34,27 +33,32 @@ import { BusinessOwnerDashboardService } from './services/business-owner-dashboa
 const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
 
 /**
- * Conditionally get TypeORM imports based on sandbox mode
+ * Creates mock repository for sandbox mode
  */
-function getTypeOrmImports() {
-  if (isSandBoxMode) {
-    console.log('[DEBUG] DashboardModule: Skipping TypeOrmModule.forFeature() in sandbox mode');
-    return [];
-  }
-  return [TypeOrmModule.forFeature([
-    DeliveryEntity,
-    OrderEntity,
-    InvoiceEntity,
-    ChargeEntity,
-    SettlementBatchEntity,
-    PolicyEntity,
-    DisputeEntity,
-    RefundEntity,
-    PaymentIntentEntity,
-    BusinessEntity,
-    SaccoEntity,
-    RiderEntity,
-  ])];
+function createMockRepository<T = unknown>(): Record<string, unknown> {
+  return {
+    save: async (entity: T): Promise<T> => entity,
+    find: async (): Promise<T[]> => [],
+    findOne: async (): Promise<T | null> => null,
+    findOneBy: async (): Promise<T | null> => null,
+    create: (data: Partial<T>): T => data as T,
+    merge: (entity: T, ...updates: Record<string, unknown>[]): T =>
+      ({ ...entity, ...Object.assign({}, ...updates) }) as T,
+    delete: async (): Promise<{ affected: number }> => ({ affected: 1 }),
+    createQueryBuilder: () => null,
+    manager: { save: async (entity: T): Promise<T> => entity },
+  };
+}
+
+/**
+ * Creates fallback providers for entities in sandbox mode
+ */
+function createTypeOrmFallbackProviders(...entities: (new () => unknown)[]): Provider[] {
+  if (!isSandBoxMode) return [];
+  return entities.map(entity => ({
+    provide: getRepositoryToken(entity),
+    useValue: createMockRepository(),
+  }));
 }
 
 /**
@@ -74,7 +78,6 @@ function getTypeOrmImports() {
  */
 @Module({
   imports: [
-    ...getTypeOrmImports(),
     LocationIntelligenceModule,
     Neo4jModule,
     CqrsModule,
@@ -90,7 +93,25 @@ function getTypeOrmImports() {
     SupportDashboardController,
     OperatorDashboardController,
   ],
-  providers: [AdminScopeService, BusinessOwnerDashboardService],
+  providers: [
+    AdminScopeService,
+    BusinessOwnerDashboardService,
+    // Sandbox mode fallbacks
+    ...createTypeOrmFallbackProviders(
+      DeliveryEntity,
+      OrderEntity,
+      InvoiceEntity,
+      ChargeEntity,
+      SettlementBatchEntity,
+      PolicyEntity,
+      DisputeEntity,
+      RefundEntity,
+      PaymentIntentEntity,
+      BusinessEntity,
+      SaccoEntity,
+      RiderEntity,
+    ),
+  ],
   exports: [AdminScopeService],
 })
 export class DashboardModule {}

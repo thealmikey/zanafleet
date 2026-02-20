@@ -1,12 +1,14 @@
 import { Controller, Get, Query, Param, Inject } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 
-import { CUSTOMER_REPOSITORY_TOKEN } from './customer.module';
 import { BusinessAvailabilityProjection } from './entities/business-availability.projection';
 import { CustomerActivityProjection } from './entities/customer-activity.projection';
 import { CustomerEntity } from './entities/customer.entity';
 import { CustomerRepositoryInMemory } from './repositories/customer.repository.in-memory';
+
+// Use the same token as the module
+export const CUSTOMER_REPOSITORY_TOKEN = getRepositoryToken(CustomerEntity);
 
 @Controller('customers')
 export class CustomerController {

@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { createTypeOrmFallbackProviders } from '@api/core/sandbox';
+
 import { BusinessEntity } from '../business/entities/business.entity';
 import { DeliveryEntity } from '../delivery/entities/delivery.entity';
 import { OrderEntity } from '../order/entities/order.entity';
@@ -35,7 +37,10 @@ function getTypeOrmImports() {
         ...getTypeOrmImports(),
         SearchModule,
     ],
-    providers: [DashboardSeedService],
+    providers: [
+        DashboardSeedService,
+        ...createTypeOrmFallbackProviders(OrderEntity, DeliveryEntity, BusinessEntity, SaccoEntity, RiderEntity),
+    ],
     exports: [DashboardSeedService],
 })
 export class SeedModule { }

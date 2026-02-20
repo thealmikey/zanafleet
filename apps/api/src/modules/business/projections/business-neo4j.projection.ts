@@ -87,6 +87,7 @@ export class BusinessNeo4jProjection implements IEventHandler<BusinessOnboardedE
 @Injectable()
 export class BusinessNeo4jInitializer {
   private readonly logger = new Logger(BusinessNeo4jInitializer.name);
+  private readonly isSandboxMode = process.env.USE_IN_MEMORY_DB === 'true';
 
   constructor(private readonly neo4j: Neo4jService) {}
 
@@ -95,6 +96,12 @@ export class BusinessNeo4jInitializer {
    * Should be called in ModuleOnInit or during bootstrap
    */
   async initialize(): Promise<void> {
+    // Skip Neo4j initialization in sandbox mode
+    if (this.isSandboxMode) {
+      this.logger.log('[SANDBOX] Skipping Neo4j schema initialization for Business');
+      return;
+    }
+
     const session = this.neo4j.getWriteSession();
 
     try {

@@ -1,3 +1,4 @@
+import { createTypeOrmFallbackProviders } from '@api/core/sandbox';
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -49,6 +50,7 @@ function getTypeOrmImports() {
     // Event Handlers / Projections
     RoleNeo4jProjection,
     RoleNeo4jInitializer,
+    ...createTypeOrmFallbackProviders(RoleEntity),
   ],
   exports: [CreateRoleCommandHandler],
 })

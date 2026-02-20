@@ -1,7 +1,7 @@
 import { PersonaEntity } from '@api/modules/persona/entities/persona.entity';
 import { Module, OnModuleInit, Type } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 
 import { CapabilityController } from './controllers/capability.controller';
 import { CapabilityAuditEntity } from './entities/capability-audit.entity';
@@ -71,6 +71,56 @@ function getRepositoryProvider() {
   };
 }
 
+// Helper to get fallback providers for TypeORM entity tokens in sandbox mode
+// These are needed because some handlers use @InjectRepository() which expects TypeORM
+function getSandboxFallbackProviders(): any[] {
+  if (!isSandBoxMode) {
+    return [];
+  }
+  
+  // All entities that need fallback providers
+  const entities = [
+    CapabilityEntity,
+    PersonaCapabilityEntity,
+    PersonaEntity,
+    CapabilityAuditEntity,
+  ];
+  
+  const entityProviders = entities.map(entity => ({
+    provide: getRepositoryToken(entity),
+    useFactory() {
+      // Return a mock repository object
+      return {
+        manager: { getRepository: () => ({}) },
+        metadata: { target: entity, connectionName: 'default' },
+        // Add minimal TypeORM repository methods that handlers might use
+        find: async () => [],
+        findOne: async () => null,
+        findAll: async () => [],
+        save: async (data: unknown) => data,
+        delete: async () => ({ affected: 0 }),
+        create: (data: unknown) => data,
+        createQueryBuilder: () => ({
+          where: () => ({}),
+          andWhere: () => ({}),
+          getMany: async () => [],
+          getOne: async () => null,
+        }),
+      };
+    },
+  }));
+  
+  // Also provide CapabilityRepository class using the in-memory implementation
+  const repositoryProviders = [
+    {
+      provide: CapabilityRepository,
+      useClass: CapabilityRepositoryInMemory,
+    },
+  ];
+  
+  return [...entityProviders, ...repositoryProviders];
+}
+
 // Helper to get exports - export only the repository that's actually provided based on mode
 function getExports(): Array<Type<unknown> | string> {
   const moduleExports: Array<Type<unknown> | string> = [
@@ -104,6 +154,9 @@ function getExports(): Array<Type<unknown> | string> {
   providers: [
     // Repositories - use appropriate implementation based on mode
     getRepositoryProvider(),
+
+    // Fallback providers for TypeORM entity tokens in sandbox mode
+    ...getSandboxFallbackProviders(),
 
     // Access Control
     CapabilityAccessController,

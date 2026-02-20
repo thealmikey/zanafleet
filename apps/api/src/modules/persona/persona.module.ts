@@ -1,3 +1,4 @@
+import { createTypeOrmFallbackProviders } from '@api/core/sandbox';
 import { ActorEntity } from '@api/modules/actor/entities/actor.entity';
 import { WorkspaceEntity } from '@api/modules/workspace/entities/workspace.entity';
 import { Module, OnModuleInit } from '@nestjs/common';
@@ -39,6 +40,8 @@ function getTypeOrmImports() {
     PersonaNeo4jProjection,
     PersonaAssignmentNeo4jProjection,
     PersonaNeo4jInitializer,
+    // Fallback providers for sandbox mode
+    ...createTypeOrmFallbackProviders(PersonaEntity, ActorPersonaEntity, ActorEntity, WorkspaceEntity),
   ],
   exports: isSandBoxMode 
     ? [CreatePersonaCommandHandler, AssignPersonaToActorCommandHandler]

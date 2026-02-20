@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { createTypeOrmFallbackProviders } from '@api/core/sandbox';
+
 import { BusinessEntity } from '../business/entities/business.entity';
 import { DeliveryEntity } from '../delivery/entities/delivery.entity';
 import { OrderEntity } from '../order/entities/order.entity';
@@ -46,6 +48,7 @@ function getTypeOrmImports() {
         },
         SearchProjectionService,
         SearchBackfillWorker,
+        ...createTypeOrmFallbackProviders(SearchDocumentEntity, OrderEntity, BusinessEntity, DeliveryEntity),
     ],
     exports: [SEARCH_PROVIDER],
 })

@@ -1,6 +1,5 @@
-import { Logger, Module, Type } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Logger, Module, Type, Provider } from '@nestjs/common';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 
 import { CalendarModule } from '../calendar/calendar.module';
 import { PolicyModule } from '../policy/policy.module';
@@ -20,11 +19,42 @@ const logger = new Logger('CustomerModule');
 
 logger.debug(`CustomerModule loading, isSandBoxMode=${isSandBoxMode}`);
 
-// Injection token for CustomerRepository
-export const CUSTOMER_REPOSITORY_TOKEN = 'CUSTOMER_REPOSITORY';
+// Injection token for CustomerRepository - using InjectionToken for better compatibility
+// Injection token for CustomerRepository - using standard TypeORM approach
+export const CUSTOMER_REPOSITORY_TOKEN = getRepositoryToken(CustomerEntity);
 
 // Re-export for external use
 export { CustomerRepositoryInMemory } from './repositories/customer.repository.in-memory';
+
+
+
+/**
+ * Creates a mock repository for sandbox mode
+ */
+function createMockRepository<T = unknown>(): Record<string, unknown> {
+  return {
+    save: async (entity: T): Promise<T> => entity,
+    find: async (): Promise<T[]> => [],
+    findOne: async (): Promise<T | null> => null,
+    findOneBy: async (): Promise<T | null> => null,
+    create: (data: Partial<T>): T => data as T,
+    merge: (entity: T, ...updates: Record<string, unknown>[]): T => ({ ...entity, ...Object.assign({}, ...updates) }) as T,
+    delete: async (): Promise<{ affected: number }> => ({ affected: 1 }),
+    createQueryBuilder: () => null,
+    manager: { save: async (entity: T): Promise<T> => entity },
+  };
+}
+
+/**
+ * Creates fallback providers for TypeORM entities in sandbox mode
+ */
+function createTypeOrmFallbackProviders(...entities: (new () => unknown)[]): Provider[] {
+  if (!isSandBoxMode) return [];
+  return entities.map(entity => ({
+    provide: getRepositoryToken(entity),
+    useValue: createMockRepository(),
+  }));
+}
 
 /**
  * Conditionally get TypeORM imports based on sandbox mode
@@ -45,50 +75,35 @@ function getTypeOrmImports() {
   ];
 }
 
-type RepositoryProvider = 
-  | { provide: string; useClass: Type<unknown> }
-  | { provide: string; useFactory: (repo: Repository<CustomerEntity>) => Repository<CustomerEntity>; inject: (string | symbol | Type<unknown>)[] };
-
-/**
- * Get repository provider based on mode
- */
-function getRepositoryProvider(): RepositoryProvider {
+function getCustomerRepositoryProvider(): Provider[] {
   if (isSandBoxMode) {
-    console.log('[DEBUG] CustomerModule: Using CustomerRepositoryInMemory in sandbox mode');
-    return {
-      provide: CUSTOMER_REPOSITORY_TOKEN,
-      useClass: CustomerRepositoryInMemory,
-    };
+    console.log('[DEBUG] CustomerModule using useClass for repository');
+    return [{ provide: CUSTOMER_REPOSITORY_TOKEN, useClass: CustomerRepositoryInMemory }];
   }
-  // In production mode, use a factory to get the TypeORM repository
-  // This allows consumers to use @Inject(CUSTOMER_REPOSITORY_TOKEN) in both modes
-  return {
-    provide: CUSTOMER_REPOSITORY_TOKEN,
-    useFactory: (repo: Repository<CustomerEntity>) => repo,
-    inject: [CustomerEntity],
-  };
+  return [];
 }
 
-/**
- * Get exports - conditionally include TypeOrmModule based on mode
- * Always export the token for consumers that support both modes
- */
-function getExports(): Array<Type<unknown> | string> {
-  const exports: Array<Type<unknown> | string> = [
+function getExports(): Array<Type<unknown> | string | symbol> {
+  const moduleExports: Array<Type<unknown> | string | symbol | undefined> = [
     CommerceContextEngine,
     CustomerProjectionService,
   ];
   
   // Only export TypeOrmModule when not in sandbox mode
   if (!isSandBoxMode) {
-    exports.push(TypeOrmModule);
+    moduleExports.push(TypeOrmModule);
   }
   
   // Export the injection token (useful for consumers that support both modes)
-  exports.push(CUSTOMER_REPOSITORY_TOKEN);
+  // Cast to any to handle both string and symbol types
+  moduleExports.push(CUSTOMER_REPOSITORY_TOKEN as unknown as string);
   
-  return exports;
+  // Filter out any undefined values that might cause issues
+  return moduleExports.filter((exp): exp is Type<unknown> | string | symbol => exp !== undefined);
 }
+
+const repositoryProviders = getCustomerRepositoryProvider();
+console.log('[DEBUG] CustomerModule repository providers:', repositoryProviders);
 
 @Module({
     imports: [
@@ -100,7 +115,12 @@ function getExports(): Array<Type<unknown> | string> {
     providers: [
         CommerceContextEngine,
         CustomerProjectionService,
-        getRepositoryProvider() as unknown as Type<unknown>,
+        ...repositoryProviders,
+        ...createTypeOrmFallbackProviders(
+          BusinessAvailabilityProjection,
+          CustomerActivityProjection,
+          MarketDensityProjection,
+        ),
     ],
     exports: getExports(),
 })

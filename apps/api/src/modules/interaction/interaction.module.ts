@@ -1,6 +1,7 @@
-import { Module, OnModuleInit, Logger } from '@nestjs/common';
+import { Module, OnModuleInit, Logger, Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { Neo4jModule } from '../../core/neo4j/neo4j.module';
@@ -24,6 +25,55 @@ import { InteractionStreamRepository } from './repositories/interaction-stream.r
 
 // Check sandbox mode at module load time
 const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Creates a mock repository for sandbox mode
+ */
+function createMockRepository<T = unknown>(): Record<string, unknown> {
+  return {
+    save: async (entity: T): Promise<T> => entity,
+    find: async (): Promise<T[]> => [],
+    findOne: async (): Promise<T | null> => null,
+    findOneBy: async (): Promise<T | null> => null,
+    create: (data: Partial<T>): T => data as T,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    merge: (entity: T, ...updates: any[]): T => ({ ...entity, ...Object.assign({}, ...updates) }),
+    delete: async (): Promise<{ affected: number }> => ({ affected: 1 }),
+    createQueryBuilder: () => null,
+    manager: { save: async (entity: T): Promise<T> => entity },
+  };
+}
+
+/**
+ * Creates fallback providers for TypeORM entities in sandbox mode
+ */
+function createTypeOrmFallbackProviders(...entities: (new () => unknown)[]): Provider[] {
+  if (!isSandBoxMode) return [];
+  return entities.map(entity => ({
+    provide: getRepositoryToken(entity),
+    useValue: createMockRepository(),
+  }));
+}
+
+/**
+ * Creates a mock DataSource for sandbox mode
+ */
+function createMockDataSource(): Record<string, unknown> {
+  return {
+    createQueryBuilder: () => null,
+    manager: { save: async (entity: unknown): Promise<unknown> => entity },
+    getRepository: () => createMockRepository(),
+    transaction: async (cb: () => Promise<unknown>) => cb(),
+  };
+}
+
+/**
+ * Creates a DataSource fallback provider for sandbox mode
+ */
+function createDataSourceFallbackProvider(): Provider[] {
+  if (!isSandBoxMode) return [];
+  return [{ provide: DataSource, useValue: createMockDataSource() }];
+}
 
 /**
  * Conditionally get TypeORM imports based on sandbox mode
@@ -106,6 +156,9 @@ export const EventHandlers = [
     // Adapters
     SlackAdapter,
     WebChatAdapter,
+    // Sandbox mode fallbacks
+    ...createTypeOrmFallbackProviders(InteractionStreamEntity, InteractionEventEntity),
+    ...createDataSourceFallbackProvider(),
   ],
   exports: [
     InteractionStreamRepository,

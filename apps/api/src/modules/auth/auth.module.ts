@@ -62,6 +62,6 @@ function getTypeOrmImports() {
   ],
   controllers: [AuthController],
   providers: [LoginCommandHandler, JwtStrategy, JwtAuthGuard, KeycloakUserSyncService],
-  exports: [JwtAuthGuard, JwtModule, KeycloakUserSyncService],
+  exports: [JwtAuthGuard, KeycloakUserSyncService],
 })
 export class AuthModule {}

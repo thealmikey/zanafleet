@@ -13,6 +13,8 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { DataSource, Entity, EntityManager } from 'typeorm';
 
 import { createConcertScenario } from '../../database/seeds/scenarios/concert.scenario';
 import { createDashboardScenario } from '../../database/seeds/scenarios/dashboard.scenario';
@@ -31,6 +33,107 @@ import { SandboxOptions } from './sandbox.types';
 import { SeedScenarioRegistry } from './seed-scenario.registry';
 
 const logger = new Logger('SandboxModule');
+
+/**
+ * Creates a mock TypeORM repository for sandbox mode
+ * This provides minimal implementations of common repository methods
+ * that are sufficient for development/testing without a real database
+ */
+export function createMockRepository<T = unknown>(): Record<string, unknown> {
+  return {
+    // Standard Repository methods that handlers commonly use
+    save: async (entity: T): Promise<T> => entity,
+    find: async (): Promise<T[]> => [],
+    findOne: async (): Promise<T | null> => null,
+    findOneBy: async (): Promise<T | null> => null,
+    create: (data: Partial<T>): T => data as T,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    merge: (entity: T, ...updates: any[]): T => ({ ...entity, ...Object.assign({}, ...updates) }),
+    delete: async (): Promise<{ affected: number }> => ({ affected: 1 }),
+    createQueryBuilder: () => null,
+    // QueryRunner methods (optional)
+    manager: {
+      save: async (entity: T): Promise<T> => entity,
+    },
+  };
+}
+
+/**
+ * Creates fallback providers for TypeORM entities in sandbox mode
+ * Use this in any module that uses @InjectRepository()
+ * 
+ * @example
+ * // In your module:
+ * providers: [
+ *   ...createTypeOrmFallbackProviders(Entity1, Entity2, Entity3),
+ * ]
+ */
+export function createTypeOrmFallbackProviders(...entities: (new () => unknown)[]): Provider[] {
+  const isSandbox = process.env.USE_IN_MEMORY_DB === 'true';
+  
+  if (!isSandbox) {
+    return [];
+  }
+
+  return entities.map(entity => ({
+    provide: getRepositoryToken(entity),
+    useValue: createMockRepository(),
+  }));
+}
+
+/**
+ * Creates a mock DataSource for sandbox mode
+ * This provides the minimal DataSource interface needed by handlers
+ * that directly inject DataSource (e.g., for transactions)
+ */
+export function createMockDataSource(): DataSource {
+  const mockManager = {
+    save: async <T>(entity: T): Promise<T> => entity,
+    find: async <T>(): Promise<T[]> => [],
+    findOne: async <T>(): Promise<T | null> => null,
+    getRepository: <T>(entity: new () => T) => createMockRepository<T>(),
+  } as unknown as EntityManager;
+
+  return {
+    manager: mockManager,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    transaction: async <T>(runInTransaction: (manager: EntityManager) => Promise<T>): Promise<T> => {
+      return runInTransaction(mockManager);
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as unknown as DataSource;
+}
+
+/**
+ * Creates a fallback provider for DataSource in sandbox mode
+ * Use this in modules that have handlers injecting DataSource directly
+ * 
+ * @example
+ * // In your module:
+ * providers: [
+ *   ...createTypeOrmFallbackProviders(Entity1, Entity2),
+ *   ...createDataSourceFallbackProvider(),
+ * ]
+ */
+export function createDataSourceFallbackProvider(): Provider[] {
+  const isSandbox = process.env.USE_IN_MEMORY_DB === 'true';
+  
+  if (!isSandbox) {
+    return [];
+  }
+
+  return [{
+    provide: DataSource,
+    useValue: createMockDataSource(),
+  }];
+}
+
+/**
+ * Utility to check if we're in sandbox mode
+ */
+export function isSandboxMode(): boolean {
+  return process.env.USE_IN_MEMORY_DB === 'true';
+}
 
 /**
  * List of known handlers that use @InjectRepository and need in-memory alternatives

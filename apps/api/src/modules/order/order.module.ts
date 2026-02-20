@@ -1,7 +1,7 @@
 import { EventBusModule } from '@api/core/event-bus';
-import { Module, forwardRef } from '@nestjs/common';
+import { Module, forwardRef, Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 
 import { BusinessEntity } from '../business/entities/business.entity';
 import { CustomerModule } from '../customer/customer.module';
@@ -18,6 +18,35 @@ import { ActivitySeederService } from './services/activity-seeder.service';
 
 // Check sandbox mode at module load time
 const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Creates mock repository for sandbox mode
+ */
+function createMockRepository<T = unknown>(): Record<string, unknown> {
+  return {
+    save: async (entity: T): Promise<T> => entity,
+    find: async (): Promise<T[]> => [],
+    findOne: async (): Promise<T | null> => null,
+    findOneBy: async (): Promise<T | null> => null,
+    create: (data: Partial<T>): T => data as T,
+    merge: (entity: T, ...updates: Record<string, unknown>[]): T =>
+      ({ ...entity, ...Object.assign({}, ...updates) }) as T,
+    delete: async (): Promise<{ affected: number }> => ({ affected: 1 }),
+    createQueryBuilder: () => null,
+    manager: { save: async (entity: T): Promise<T> => entity },
+  };
+}
+
+/**
+ * Creates fallback providers for entities in sandbox mode
+ */
+function createTypeOrmFallbackProviders(...entities: (new () => unknown)[]): Provider[] {
+  if (!isSandBoxMode) return [];
+  return entities.map(entity => ({
+    provide: getRepositoryToken(entity),
+    useValue: createMockRepository(),
+  }));
+}
 
 /**
  * Conditionally get TypeORM entities based on sandbox mode
@@ -51,9 +80,23 @@ function getTypeOrmImports() {
     CustomerModule,
   ],
   controllers: [OrdersController],
-  providers: [CreateOrderCommandHandler, CustomerOrderOrchestrator, ActivitySeederService],
+  providers: [
+    CreateOrderCommandHandler,
+    CustomerOrderOrchestrator,
+    ActivitySeederService,
+    // Sandbox mode fallbacks
+    ...createTypeOrmFallbackProviders(OrderEntity, DeliveryEntity, BusinessEntity, CustomerEntity),
+  ],
   exports: isSandBoxMode 
-    ? [CreateOrderCommandHandler, CustomerOrderOrchestrator]
+    ? [
+        CreateOrderCommandHandler, 
+        CustomerOrderOrchestrator,
+        // Export fallback providers for DeliveryModule
+        { provide: getRepositoryToken(OrderEntity), useValue: createMockRepository() },
+        { provide: getRepositoryToken(DeliveryEntity), useValue: createMockRepository() },
+        { provide: getRepositoryToken(BusinessEntity), useValue: createMockRepository() },
+        { provide: getRepositoryToken(CustomerEntity), useValue: createMockRepository() },
+      ]
     : [CreateOrderCommandHandler, CustomerOrderOrchestrator],
 })
 export class OrderModule { }

@@ -48,10 +48,17 @@ export class CapabilityNeo4jProjection implements IEventHandler<CapabilityCreate
 @Injectable()
 export class CapabilityNeo4jInitializer {
   private readonly logger = new Logger(CapabilityNeo4jInitializer.name);
+  private readonly isSandboxMode = process.env.USE_IN_MEMORY_DB === 'true';
 
   constructor(private readonly neo4j: Neo4jService) {}
 
   async initialize(): Promise<void> {
+    // Skip Neo4j initialization in sandbox mode
+    if (this.isSandboxMode) {
+      this.logger.log('[SANDBOX] Skipping Neo4j schema initialization');
+      return;
+    }
+
     const session = this.neo4j.getSession();
 
     try {

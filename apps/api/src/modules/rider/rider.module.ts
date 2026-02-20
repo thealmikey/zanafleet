@@ -1,3 +1,4 @@
+import { createTypeOrmFallbackProviders } from '@api/core/sandbox';
 import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -37,7 +38,12 @@ function getTypeOrmImports() {
 @Module({
   imports: [CqrsModule, ...getTypeOrmImports()],
   controllers: [RiderController],
-  providers: [CreateRiderCommandHandler, RiderNeo4jProjection, RiderNeo4jInitializer],
+  providers: [
+    CreateRiderCommandHandler,
+    RiderNeo4jProjection,
+    RiderNeo4jInitializer,
+    ...createTypeOrmFallbackProviders(RiderEntity, SaccoEntity),
+  ],
   exports: [RiderNeo4jInitializer],
 })
 export class RiderModule implements OnModuleInit {

@@ -1,7 +1,8 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleInit, Provider } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { Neo4jModule } from '../../core/neo4j/neo4j.module';
@@ -23,6 +24,57 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
 
 // Check sandbox mode at module load time
 const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
+
+/**
+ * Creates mock repository for sandbox mode
+ */
+function createMockRepository<T = unknown>(): Record<string, unknown> {
+  return {
+    save: async (entity: T): Promise<T> => entity,
+    find: async (): Promise<T[]> => [],
+    findOne: async (): Promise<T | null> => null,
+    findOneBy: async (): Promise<T | null> => null,
+    create: (data: Partial<T>): T => data as T,
+    merge: (entity: T, ...updates: Record<string, unknown>[]): T =>
+      ({ ...entity, ...Object.assign({}, ...updates) }) as T,
+    delete: async (): Promise<{ affected: number }> => ({ affected: 1 }),
+    createQueryBuilder: () => null,
+    manager: { save: async (entity: T): Promise<T> => entity },
+  };
+}
+
+/**
+ * Creates mock DataSource for sandbox mode
+ */
+function createMockDataSource(): Record<string, unknown> {
+  return {
+    createQueryBuilder: () => null,
+    manager: {
+      save: async (entity: unknown): Promise<unknown> => entity,
+      find: async (): Promise<unknown[]> => [],
+      findOne: async (): Promise<unknown | null> => null,
+    },
+  };
+}
+
+/**
+ * Creates fallback providers for entities in sandbox mode
+ */
+function createTypeOrmFallbackProviders(...entities: (new () => unknown)[]): Provider[] {
+  if (!isSandBoxMode) return [];
+  return entities.map(entity => ({
+    provide: getRepositoryToken(entity),
+    useValue: createMockRepository(),
+  }));
+}
+
+/**
+ * Creates DataSource fallback provider in sandbox mode
+ */
+function createDataSourceFallbackProvider(): Provider[] {
+  if (!isSandBoxMode) return [];
+  return [{ provide: DataSource, useValue: createMockDataSource() }];
+}
 
 /**
  * Conditionally get TypeORM imports based on sandbox mode
@@ -62,6 +114,8 @@ function getTypeOrmImports() {
   ],
   controllers: [GeoController],
   providers: [
+    ...createTypeOrmFallbackProviders(RiderLocationSnapshotEntity, RiderLocationHistoryEntity),
+    ...createDataSourceFallbackProvider(),
     GeoProviderRegistry,
     NoOpGeoProvider,
     H3Service,

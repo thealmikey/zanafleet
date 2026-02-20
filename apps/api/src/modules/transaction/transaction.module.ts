@@ -1,3 +1,4 @@
+import { createDataSourceFallbackProvider, createTypeOrmFallbackProviders } from '@api/core/sandbox';
 import { WalletEntity } from '@api/modules/wallet/entities/wallet.entity';
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -44,6 +45,8 @@ function getTypeOrmImports() {
     CreateTransactionCommandHandler,
     TransactionNeo4jProjection,
     TransactionNeo4jInitializer,
+    ...createTypeOrmFallbackProviders(TransactionEntity, WalletEntity),
+    ...createDataSourceFallbackProvider(),
   ],
   exports: [CreateTransactionCommandHandler],
 })

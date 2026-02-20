@@ -2,6 +2,8 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { createTypeOrmFallbackProviders } from '@api/core/sandbox';
+
 import { ActorEntity } from '../actor/entities/actor.entity';
 
 import { OperatorController } from './controllers/operator.controller';
@@ -26,7 +28,12 @@ function getTypeOrmImports() {
 @Module({
     imports: [CqrsModule, ...getTypeOrmImports()],
     controllers: [OperatorController],
-    providers: [OperatorService, OperatorNeo4jProjection, OperatorNeo4jInitializer],
+    providers: [
+        OperatorService, 
+        OperatorNeo4jProjection, 
+        OperatorNeo4jInitializer,
+        ...createTypeOrmFallbackProviders(OperatorEntity, ActorEntity),
+    ],
     exports: isSandBoxMode 
       ? [OperatorService, OperatorNeo4jInitializer]
       : [OperatorService, OperatorNeo4jInitializer],

@@ -1,3 +1,4 @@
+import { createTypeOrmFallbackProviders } from '@api/core/sandbox';
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -36,6 +37,7 @@ function getTypeOrmImports() {
     UpdateSignUpStepCommandHandler,
     FinalizeSignUpCommandHandler,
     GetSignUpSessionQueryHandler,
+    ...createTypeOrmFallbackProviders(SignUpSessionEntity),
   ],
   exports: [],
 })

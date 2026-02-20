@@ -1,3 +1,4 @@
+import { createTypeOrmFallbackProviders } from '@api/core/sandbox';
 import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -75,6 +76,7 @@ function getTypeOrmImports() {
     WorkspaceNeo4jInitializer,
     MembershipNeo4jProjection,
     MembershipNeo4jInitializer,
+    ...createTypeOrmFallbackProviders(WorkspaceEntity, MembershipEntity, OrganizationEntity, ActorEntity),
   ],
   exports: [
     // Export for use in other modules
