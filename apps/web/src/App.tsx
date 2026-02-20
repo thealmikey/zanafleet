@@ -31,6 +31,7 @@ import OperatorProfile from './pages/AssetPlatform/OperatorProfile';
 import AssetMarketplace from './pages/AssetPlatform/AssetMarketplace';
 import EventDashboard from './pages/EventDashboard';
 import AssetManagement from './pages/AssetManagement';
+import { SDUIPage } from './pages/SDUIPage';
 
 const theme = createTheme();
 
@@ -46,6 +47,11 @@ function App(): React.ReactElement {
               <Route path="/signin" element={<SignIn />} />
               <Route path="/signup" element={<SignupWizard />} />
               <Route path="/demo/components" element={<ComponentsDemo />} />
+              
+              {/* SDUI Routes - Browser-accessible */}
+              <Route path="/sdui" element={<SDUIPage />} />
+              <Route path="/sdui/:screenId" element={<SDUIPage />} />
+              
               <Route
                 path="/profile"
                 element={

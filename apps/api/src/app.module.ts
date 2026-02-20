@@ -36,6 +36,7 @@ import { PersonaModule } from './modules/persona/persona.module';
 import { RiderModule } from './modules/rider/rider.module';
 import { RoleModule } from './modules/role/role.module';
 import { SaccoModule } from './modules/sacco/sacco.module';
+import { SDUIModule } from './modules/sdui';
 import { SearchModule } from './modules/search/search.module';
 import { SeedModule } from './modules/seed/seed.module';
 import { SettlementModule } from './modules/settlement/settlement.module';
@@ -134,6 +135,7 @@ function getTypeOrmConfig() {
     WalletModule,
     WorkspaceModule,
     SearchModule,
+    SDUIModule,
     AssetModule,
     MoversModule,
     OperatorModule,
