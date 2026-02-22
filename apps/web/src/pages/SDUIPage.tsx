@@ -26,8 +26,20 @@ export const SDUIPage: React.FC = () => {
   const [schema, setSchema] = useState<UISchema | null>(null);
   const [screenList, setScreenList] = useState<SDUIScreenList | null>(null);
 
+  // Skip auth check in development mode for easier testing
+  // In production, auth will be enforced based on screen metadata
+  // Also bypass if URL has ?skipAuth=true parameter
+  const isDevMode = process.env.NODE_ENV === 'development';
+  const searchParams = new URLSearchParams(window.location.search);
+  const skipAuth = searchParams.get('skipAuth') === 'true' || isDevMode;
+
   // Handle auth required - redirects to login with return URL
+  // Only redirect when not skipping auth (dev mode or skipAuth param)
   const handleAuthRequired = (currentPath: string) => {
+    if (skipAuth) {
+      console.debug('[SDUIPage] Auth skip enabled: allowing access without auth');
+      return;
+    }
     navigate('/signin', { state: { from: { pathname: currentPath } }, replace: true });
   };
 
