@@ -88,15 +88,76 @@ The renderer supports:
 | `Divider` | Visual separator | text |
 | `Alert` | Info/warning message | severity, content |
 | `Card` | Content container | title, content |
+| `Chip` | Status indicator | label, color |
+| `MetricCard` | Single metric display | label, value, trend, change |
+| `KPIGrid` | Grid of KPI metrics | items (array), columns |
+| `LineChart` | Line chart (react-chartjs-2) | title, data, height |
+| `DoughnutChart` | Doughnut chart (react-chartjs-2) | title, data, height |
+| `Tabs` | Tab navigation | tabs (array of strings or {label, value} objects) |
+| `DataTable` | Data table | columns, rows |
+| `Form` | Form wrapper | method, action |
 
 ## Layout Types
 
-| Layout | Description |
-|--------|-------------|
-| `stack` | Vertical flex container |
-| `flex` | Flexible container with direction |
-| `grid` | CSS Grid layout |
-| `root` | Root page container |
+| Layout | Description | Props |
+|--------|-------------|-------|
+| `stack` | Vertical flex container | spacing, maxWidth, padding |
+| `flex` | Flexible container with direction | spacing, direction, align, justify, fullHeight, wrap, gridColumn |
+| `grid` | CSS Grid layout (MUI Grid) | columns, spacing |
+| `root` | Root page container | - |
+
+### Layout GridColumn Support
+
+The `flex` layout supports `gridColumn` prop for nested layouts within a grid:
+```json
+{
+  "type": "flex",
+  "props": {
+    "gridColumn": "span 8",
+    "spacing": 2
+  }
+}
+```
+
+## Testing for Parity
+
+### Running Tests
+```bash
+# Run SDUI integration tests
+cd apps/web
+npm test -- --testPathPattern="SDUIRenderer"
+```
+
+### Layout Primitive Tests
+The integration tests include specific tests for layout primitives:
+- `renders grid layout with proper structure` - Verifies Grid container exists
+- `renders flex layout with proper structure` - Verifies flexbox behavior
+- `renders nested layout structure` - Tests gridColumn span support
+- `renders stack layout with proper vertical spacing` - Tests stack layout
+
+### Parity Checklist
+When replicating a TSX page in SDUI:
+
+1. **Identify Layout Structure**
+   - Original uses Grid? → Use `grid` layout type
+   - Original uses Flexbox? → Use `flex` layout type
+   - Original uses vertical Stack? → Use `stack` layout type
+
+2. **Match Component Props**
+   - Map MUI props to SDUI props
+   - Note any custom styling that needs to be replicated
+
+3. **Verify with Tests**
+   - Add integration test for the schema
+   - Check all components render
+   - Verify layout structure matches
+
+4. **Visual Comparison**
+   ```bash
+   # Compare side by side:
+   # Original: http://localhost:3001/dashboard/admin
+   # SDUI: http://localhost:3001/sdui/dashboard.admin
+   ```
 
 ## Example - Login Screen Schema
 
@@ -148,6 +209,95 @@ npm run test -- --testPathPattern="sdui"
 2. Navigate to http://localhost:3000/sdui
 3. Click on any screen to see it rendered
 4. Test form submissions and navigation
+
+### Web Integration Tests
+```bash
+cd apps/web
+npm test -- --testPathPattern="SDUIRenderer"
+```
+
+## Troubleshooting
+
+### Common Issues and Solutions
+
+#### 1. "Each child in a list should have a unique 'key' prop"
+**Cause**: Table cells or repeated elements missing unique keys.
+**Solution**: The renderer now automatically generates unique keys using indices. If you see this warning, check:
+- DataTable components have unique column keys
+- Tabs have proper label/value properties
+
+#### 2. "Items on tab menu show text as [Object, Object]"
+**Cause**: Tabs defined as objects but rendered as strings.
+**Solution**: Use the correct tab format in your schema:
+```json
+// ❌ Wrong - causes [Object, Object]
+{ "tabs": [{ "label": "Overview", "value": "overview" }] }
+
+// ✅ Correct - renderer extracts label
+{ "tabs": [{ "label": "Overview", "value": "overview" }] }
+// The renderer now properly extracts the 'label' property
+```
+
+#### 3. "Unknown component: Form"
+**Cause**: Form component not implemented in the renderer.
+**Solution**: The Form component is now supported. If you see this warning, ensure you're using a recent version of the renderer.
+
+#### 4. React Router v7 Future Flag Warnings
+**Cause**: React Router v7 will change some behaviors.
+**Solution**: The app now includes future flags in BrowserRouter:
+```typescript
+<BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+```
+
+### Debug Logging
+
+The SDUI renderer includes development-only debug logging:
+
+- **Console debug messages**: `[SDUI] Rendering <ComponentName>` - Shows when components render
+- **Warning for unknown components**: `[SDUI] Unknown component: <Type>` - Helps identify missing component implementations
+- **Schema loading**: `[SDUIPage] Loaded screen: <screenId>` - Shows schema structure details
+
+To enable verbose logging:
+```typescript
+// In browser console
+localStorage.setItem('DEBUG', 'sdui:*')
+```
+
+### Adding New Components
+
+To add a new component type to the renderer:
+
+1. Add the component case in `SDUIRenderer.tsx`:
+```typescript
+case 'MyComponent':
+  return (
+    <Box key={key} {...props}>
+      {/* Component implementation */}
+    </Box>
+  );
+```
+
+2. Add tests in `SDUIRenderer.integration.spec.tsx`
+
+3. Document in this README
+
+### Component Props Reference
+
+| Component | Required Props | Optional Props |
+|-----------|---------------|----------------|
+| `Logo` | src, alt | height |
+| `Typography` | content | variant, align, color |
+| `TextField` | name, label | type, required, fullWidth, autoComplete |
+| `Button` | content | variant, color, type, fullWidth |
+| `Link` | href, content | align |
+| `Divider` | - | text |
+| `Alert` | severity | content |
+| `Card` | - | title, content |
+| `Chip` | label | color, size |
+| `MetricCard` | label, value | trend, change |
+| `Tabs` | tabs (array) | - |
+| `DataTable` | columns, rows | dataSource |
+| `Form` | - | method, action |
 
 ## Implementation Files
 
