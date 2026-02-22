@@ -12,16 +12,24 @@ import {
   Grid,
 } from '@mui/material';
 import { SDUIRenderer } from '../components/SDUIRenderer';
+import { DashboardLayout } from '../components/Layout';
 import { getScreen, listScreens } from '../services/sduiApi';
 import { UISchema, SDUIScreenList } from '../types/sdui.types';
+import { useAuth } from '../hooks/useAuth';
 
 export const SDUIPage: React.FC = () => {
   const { screenId } = useParams<{ screenId: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [schema, setSchema] = useState<UISchema | null>(null);
   const [screenList, setScreenList] = useState<SDUIScreenList | null>(null);
+
+  // Handle auth required - redirects to login with return URL
+  const handleAuthRequired = (currentPath: string) => {
+    navigate('/signin', { state: { from: { pathname: currentPath } }, replace: true });
+  };
 
   // Fetch screen list for the menu
   useEffect(() => {
@@ -162,9 +170,11 @@ export const SDUIPage: React.FC = () => {
     );
   }
 
+  const useDashboardLayout = schema?.metadata.type === 'dashboard' || Boolean(screenId?.startsWith('dashboard.'));
+
   // Render the screen
   if (schema) {
-    return (
+    const content = (
       <Box>
         <Box sx={{ bgColor: '#f5f5f5', py: 1, px: 2, mb: 2 }}>
           <Button size="small" onClick={() => navigate('/sdui')}>
@@ -176,8 +186,16 @@ export const SDUIPage: React.FC = () => {
           screenId={screenId}
           onNavigate={handleNavigate}
           onActionComplete={handleActionComplete}
+          isAuthenticated={isAuthenticated}
+          onAuthRequired={handleAuthRequired}
         />
       </Box>
+    );
+
+    return useDashboardLayout ? (
+      <DashboardLayout title={schema.metadata.title}>{content}</DashboardLayout>
+    ) : (
+      content
     );
   }
 

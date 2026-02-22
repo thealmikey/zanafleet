@@ -81,14 +81,20 @@ The renderer supports:
 | Component | Description | Props |
 |-----------|-------------|-------|
 | `Logo` | Company/brand logo | src, alt, height |
+| `Container` | Responsive content container | maxWidth, disableGutters |
 | `Typography` | Text display | variant, align, content |
 | `TextField` | Input field | name, label, type, required |
 | `Autocomplete` | Suggesting text input | name, label, options, freeSolo |
+| `Select` | Dropdown selector | name, options, fullWidth |
+| `MenuItem` | Select option item | value, content |
+| `Switch` | Toggle input | name, color |
 | `Button` | Action button | variant, color, content |
 | `Link` | Navigation link | href, content |
 | `Divider` | Visual separator | text |
+| `LinearProgress` | Progress bar | variant, value, color |
 | `Alert` | Info/warning message | severity, content |
 | `Card` | Content container | title, content |
+| `CardMedia` | Card media | image, src, alt |
 | `Chip` | Status indicator | label, color |
 | `MetricCard` | Single metric display | label, value, trend, change |
 | `KPIGrid` | Grid of KPI metrics | items (array), columns |
@@ -100,7 +106,17 @@ The renderer supports:
 | `ToggleButtonGroup` | Exclusive selection | name, label, options |
 | `Box` | Generic container | width, display, sx |
 | `Paper` | Surface container | padding, backgroundColor, sx |
-| `GridItem` | Grid cell wrapper | xs, sm, md |
+| `GridItem` | Grid cell wrapper | xs, sm, md, lg, xl |
+| `Dialog` | Modal container | open |
+| `DialogTitle` | Modal title | content |
+| `DialogContent` | Modal content | children |
+| `DialogActions` | Modal actions | children |
+| `Stepper` | Stepper control | steps, activeStep, orientation |
+| `List` | List container | disablePadding |
+| `ListItem` | List row | divider, disablePadding |
+| `ListItemButton` | Clickable list row | children |
+| `ListItemAvatar` | Avatar wrapper | children |
+| `ListItemText` | List row text | primary, secondary |
 
 ## Layout Types
 
@@ -139,6 +155,52 @@ Interactive components (e.g. `TextField`, `Autocomplete`, `ToggleButtonGroup`) s
 - `{ label: string; value: string }[]`
 
 The renderer stores the selected value as a string in form state.
+
+### Tabs State
+
+`Tabs` keeps its active tab in renderer state keyed by component `id`.
+If `id` is omitted, tab state will reset on re-renders. Always supply `id` for tabs that should be interactive.
+
+## Page Coverage Matrix (TSX → SDUI)
+
+This matrix maps current TSX pages to the SDUI primitives they require. It is the conversion backlog and the feature checklist for the renderer.
+
+**Status definitions**
+- `Covered`: primitives already supported in SDUI renderer
+- `Gap`: primitives not supported or not test-verified
+
+| Page | Key primitives required | Status |
+|------|--------------------------|--------|
+| `AdminDashboard` | `Tabs`, `KPIGrid`, `LineChart`, `DoughnutChart`, `Table`, `ListWithPagination` | `Gap` (pagination + data orchestration) |
+| `BusinessDashboard` | `Tabs`, `Select`, `MenuItem`, `ListWithPagination` | `Gap` (pagination + select wiring) |
+| `OperatorDashboard` | `Tabs`, `Select`, `MenuItem`, `GeoMap`, `ListWithPagination` | `Gap` (map + pagination) |
+| `RiderDashboard` | `Tabs`, `LineChart`, `ListWithPagination` | `Gap` (pagination) |
+| `SupportDashboard` | `Tabs`, `BarChart`, `ListWithPagination` | `Gap` (bar chart + pagination) |
+| `ShopperDashboard` | `Tabs`, `LineChart`, `List` | `Covered` (charts + list) |
+| `EventDashboard` | `LinearProgress`, `Table`, `Chip` | `Covered` |
+| `Messaging` | `List`, `ListItemButton`, `ListItemAvatar`, `ListItemText` | `Covered` |
+| `HistoryCalendar` | Custom calendar grid + `List` | `Gap` (calendar primitive) |
+| `OrderTracking` | `Stepper`, `GeoMap`, `Avatar` | `Gap` (map primitive) |
+| `AssetManagement` | `Dialog`, `Select`, `MenuItem` | `Covered` |
+| `ImageGallery` | `Select`, file input, media grid | `Gap` (file input + gallery) |
+| `Shop` | `Tabs`, `Select`, `MenuItem` | `Covered` |
+| `AIAssistant` | `List`/message stream, avatars | `Covered` |
+| `MoversHomePage` | `Autocomplete`, `ToggleButtonGroup`, `Paper` | `Covered` |
+
+### Conversion Rules (Hard Requirements)
+
+1. **Schema versioned** and validated per screen.
+2. **Layout primitives only** — no ad hoc DOM structure in renderer.
+3. **Tokens-only styling** where possible; `sx` exists but should be minimal and audited.
+4. **Action/data binding** must be explicit; no local page business logic.
+
+### Missing Primitives (Next Additions)
+
+- `ListWithPagination` (or a generic `Pagination` + `List` composite)
+- `GeoMap` (with declarative markers + polyline support)
+- `BarChart`
+- `Calendar` (grid + selection state + badges)
+- `FileUpload` / `ImageGallery` (file input + preview)
 
 ### Layout GridColumn Support
 

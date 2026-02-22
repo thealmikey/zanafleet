@@ -4,15 +4,18 @@ import {
   Typography,
   Button,
   TextField,
+  Container,
   Grid,
   Stack,
   CircularProgress,
+  LinearProgress,
   Alert,
   Divider,
   Avatar,
   Link,
   Card,
   CardContent,
+  CardMedia,
   Chip,
   Paper,
   Table,
@@ -24,6 +27,21 @@ import {
   Tabs as MuiTabs,
   Tab,
   Autocomplete,
+  Select,
+  MenuItem,
+  Switch,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Stepper,
+  Step,
+  StepLabel,
+  List,
+  ListItem,
+  ListItemText,
+  ListItemAvatar,
+  ListItemButton,
   ToggleButton,
   ToggleButtonGroup,
 } from '@mui/material';
@@ -44,6 +62,10 @@ interface SDUIRendererProps {
   actorId?: string;
   onNavigate?: (path: string) => void;
   onActionComplete?: (actionId: string, result: unknown) => void;
+  /** Current authentication state - if not provided, auth checks are skipped */
+  isAuthenticated?: boolean;
+  /** Callback when auth is required but user is not authenticated */
+  onAuthRequired?: (currentPath: string) => void;
 }
 
 export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
@@ -52,18 +74,34 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
   actorId,
   onNavigate,
   onActionComplete,
+  isAuthenticated,
+  onAuthRequired,
 }) => {
-  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [formData, setFormData] = useState<Record<string, unknown>>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [tabState, setTabState] = useState<Record<string, string>>({});
 
-  // Reset form when screen changes
+  // Reset form when screen changed
   useEffect(() => {
     setFormData({});
     setFormErrors({});
     setError(null);
+    setTabState({});
   }, [screenId]);
+
+  // Check auth requirements - extends ProtectedRoute functionality
+  useEffect(() => {
+    if (isAuthenticated === undefined || !onAuthRequired) {
+      return; // Skip if auth not configured
+    }
+
+    const authRequirement = schema.metadata?.auth;
+    if (authRequirement === 'required' && !isAuthenticated) {
+      onAuthRequired(`/sdui/${screenId}`);
+    }
+  }, [schema.metadata?.auth, isAuthenticated, onAuthRequired, screenId]);
 
   // Get component props with binding resolution
   const resolveProps = useCallback((component: ComponentRef): Record<string, unknown> => {
@@ -96,23 +134,24 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
       const validations = schema.validations?.filter((v) => v.field === fieldName);
       if (!validations) return null;
 
+      const stringValue = String(value ?? '');
       for (const rule of validations) {
         switch (rule.type) {
           case 'required':
-            if (!value.trim()) return rule.message || 'Required';
+            if (!stringValue.trim()) return rule.message || 'Required';
             break;
           case 'email':
-            if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+            if (stringValue && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(stringValue)) {
               return rule.message || 'Invalid email';
             }
             break;
           case 'minLength':
-            if (value.length < (rule.params?.min as number || 0)) {
+            if (stringValue.length < (rule.params?.min as number || 0)) {
               return rule.message || `Min ${rule.params?.min} chars`;
             }
             break;
           case 'maxLength':
-            if (value.length > (rule.params?.max as number || Infinity)) {
+            if (stringValue.length > (rule.params?.max as number || Infinity)) {
               return rule.message || `Maximum length is ${rule.params?.max}`;
             }
             break;
@@ -124,7 +163,7 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
   );
 
   const handleInputChange = useCallback(
-    (fieldName: string, value: string) => {
+    (fieldName: string, value: unknown) => {
       setFormData((prev) => ({ ...prev, [fieldName]: value }));
       if (formErrors[fieldName]) {
         setFormErrors((prev) => ({ ...prev, [fieldName]: '' }));
@@ -172,7 +211,7 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
     const fieldNames = new Set(schema.validations?.map((v) => v.field) || []);
     
     fieldNames.forEach((fieldName) => {
-      const error = validateField(fieldName, formData[fieldName] || '');
+      const error = validateField(fieldName, String(formData[fieldName] ?? ''));
       if (error) {
         errors[fieldName] = error;
       }
@@ -217,6 +256,22 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
           </Box>
         );
 
+      case 'Container':
+        return (
+          <Container
+            key={key}
+            maxWidth={(props.maxWidth as any) || 'lg'}
+            disableGutters={props.disableGutters as boolean}
+            sx={sx as any}
+          >
+            {component.children?.map((child, _idx) => {
+              if ('type' in child) return renderLayoutNode(child as LayoutNode, `${keyBase}.container.${_idx}`);
+              if ('component' in child) return renderComponent(child as ComponentRef, `${keyBase}.container.${_idx}`);
+              return null;
+            })}
+          </Container>
+        );
+
       case 'Typography':
         return (
           <Typography
@@ -241,7 +296,7 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
             name={name}
             type={props.type as string}
             placeholder={props.placeholder as string}
-            value={formData[name] || ''}
+            value={String(formData[name] ?? '')}
             onChange={(e) => handleInputChange(name, e.target.value)}
             error={!!formErrors[name]}
             helperText={formErrors[name]}
@@ -262,7 +317,7 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
         const displayOptions = acOptions.length > 0 
           ? acOptions 
           : acOptions2.map(opt => ({ label: opt, value: opt }));
-        const currentValue = formData[acName] || '';
+        const currentValue = String(formData[acName] ?? '');
         const selectedOption =
           displayOptions.find((opt) => opt.value === currentValue) ?? null;
 
@@ -313,11 +368,57 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
         );
       }
 
+      case 'Select': {
+        const selName = props.name as string;
+        const selOptions = (props.options as Array<{ label: string; value: string }>) || [];
+        const selOptions2 = (props.options as string[]) || [];
+        const options = selOptions.length > 0 ? selOptions : selOptions2.map((opt) => ({ label: opt, value: opt }));
+        const value = (formData[selName] ?? '') as string;
+        return (
+          <Select
+            key={key}
+            fullWidth={props.fullWidth as boolean}
+            value={value}
+            displayEmpty={props.displayEmpty as boolean}
+            size={(props.size as any) || 'small'}
+            onChange={(e) => handleInputChange(selName, e.target.value)}
+            sx={sx as any}
+          >
+            {options.map((opt) => (
+              <MenuItem key={`${key}-${opt.value}`} value={opt.value}>
+                {opt.label}
+              </MenuItem>
+            ))}
+          </Select>
+        );
+      }
+
+      case 'MenuItem':
+        return (
+          <MenuItem key={key} value={props.value as string}>
+            {props.content as string}
+          </MenuItem>
+        );
+
+      case 'Switch': {
+        const swName = props.name as string;
+        const checked = Boolean(formData[swName]);
+        return (
+          <Switch
+            key={key}
+            checked={checked}
+            onChange={(e) => handleInputChange(swName, e.target.checked)}
+            color={(props.color as any) || 'primary'}
+            sx={sx as any}
+          />
+        );
+      }
+
       case 'ToggleButtonGroup': {
         const tgName = props.name as string;
         const tgLabel = props.label as string;
         const tgOptions = (props.options as Array<{ value: string; label: string; icon?: string }>) || [];
-        const currentValue = formData[tgName] || '';
+        const currentValue = String(formData[tgName] ?? '');
         return (
           <Box key={key}>
             {tgLabel && (
@@ -392,6 +493,17 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
           </Divider>
         );
 
+      case 'LinearProgress':
+        return (
+          <LinearProgress
+            key={key}
+            variant={(props.variant as any) || 'indeterminate'}
+            value={props.value as number}
+            color={(props.color as any) || 'primary'}
+            sx={sx as any}
+          />
+        );
+
       case 'Alert':
         return (
           <Alert key={key} severity={(props.severity as any) || 'info'} sx={{ mb: 2, ...(sx as any) }}>
@@ -436,6 +548,18 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
           </Card>
         );
 
+      case 'CardMedia':
+        return (
+          <CardMedia
+            key={key}
+            component={(props.component as any) || 'img'}
+            image={props.image as string}
+            src={props.src as string}
+            alt={props.alt as string}
+            sx={sx as any}
+          />
+        );
+
       case 'Chip':
         return (
           <Chip
@@ -448,7 +572,15 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
 
       case 'MetricCard':
         return (
-          <Card key={key} sx={{ height: '100%' }}>
+          <Card
+            key={key}
+            sx={{
+              height: '100%',
+              flex: '1 1 220px',
+              minWidth: 200,
+              ...(sx as any),
+            }}
+          >
             <CardContent>
               <Typography variant="caption" color="text.secondary" gutterBottom>
                 {String(props.label || '')}
@@ -575,9 +707,18 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
                 }
                 return String(tab);
               });
-              const value = labels[0] ?? false;
+              const tabKey = id || key;
+              const value = tabState[tabKey] ?? labels[0] ?? false;
               return (
-                <MuiTabs value={value} sx={{ mb: 2 }}>
+                <MuiTabs
+                  value={value}
+                  onChange={(_event, newValue) => {
+                    if (typeof newValue === 'string') {
+                      setTabState((prev) => ({ ...prev, [tabKey]: newValue }));
+                    }
+                  }}
+                  sx={{ mb: 2 }}
+                >
                   {labels.length > 0
                     ? labels.map((tabLabel, idx) => (
                         <Tab key={`tab-${idx}`} label={tabLabel} value={tabLabel} />
@@ -629,7 +770,14 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
           <Box
             key={key}
             component="form"
-            sx={{ width: '100%', mt: 2, ...(sx as any) }}
+            sx={{
+              width: '100%',
+              mt: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: (props.spacing as number) ?? (props.gap as number) ?? undefined,
+              ...(sx as any),
+            }}
             onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
           >
             {error && (
@@ -659,6 +807,120 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
               return null;
             })}
           </Box>
+        );
+
+      case 'Dialog': {
+        const isOpen = Boolean(props.open);
+        return (
+          <Dialog key={key} open={isOpen} onClose={() => handleInputChange(id || 'dialog', false)}>
+            {component.children?.map((child, _idx) => {
+              if ('type' in child) return renderLayoutNode(child as LayoutNode, `${keyBase}.dialog.${_idx}`);
+              if ('component' in child) return renderComponent(child as ComponentRef, `${keyBase}.dialog.${_idx}`);
+              return null;
+            })}
+          </Dialog>
+        );
+      }
+
+      case 'DialogTitle':
+        return (
+          <DialogTitle key={key} sx={sx as any}>
+            {props.content as string}
+          </DialogTitle>
+        );
+
+      case 'DialogContent':
+        return (
+          <DialogContent key={key} sx={sx as any}>
+            {component.children?.map((child, _idx) => {
+              if ('type' in child) return renderLayoutNode(child as LayoutNode, `${keyBase}.dialogContent.${_idx}`);
+              if ('component' in child) return renderComponent(child as ComponentRef, `${keyBase}.dialogContent.${_idx}`);
+              return null;
+            })}
+          </DialogContent>
+        );
+
+      case 'DialogActions':
+        return (
+          <DialogActions key={key} sx={sx as any}>
+            {component.children?.map((child, _idx) => {
+              if ('type' in child) return renderLayoutNode(child as LayoutNode, `${keyBase}.dialogActions.${_idx}`);
+              if ('component' in child) return renderComponent(child as ComponentRef, `${keyBase}.dialogActions.${_idx}`);
+              return null;
+            })}
+          </DialogActions>
+        );
+
+      case 'Stepper': {
+        const steps = (props.steps as string[]) || [];
+        const activeStep = (props.activeStep as number) ?? 0;
+        return (
+          <Stepper
+            key={key}
+            activeStep={activeStep}
+            orientation={(props.orientation as any) || 'horizontal'}
+            sx={sx as any}
+          >
+            {steps.map((label, idx) => (
+              <Step key={`${key}-step-${idx}`}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+        );
+      }
+
+      case 'List':
+        return (
+          <List key={key} disablePadding={props.disablePadding as boolean} sx={sx as any}>
+            {component.children?.map((child, _idx) => {
+              if ('type' in child) return renderLayoutNode(child as LayoutNode, `${keyBase}.list.${_idx}`);
+              if ('component' in child) return renderComponent(child as ComponentRef, `${keyBase}.list.${_idx}`);
+              return null;
+            })}
+          </List>
+        );
+
+      case 'ListItem':
+        return (
+          <ListItem key={key} divider={props.divider as boolean} disablePadding={props.disablePadding as boolean}>
+            {component.children?.map((child, _idx) => {
+              if ('type' in child) return renderLayoutNode(child as LayoutNode, `${keyBase}.listItem.${_idx}`);
+              if ('component' in child) return renderComponent(child as ComponentRef, `${keyBase}.listItem.${_idx}`);
+              return null;
+            })}
+          </ListItem>
+        );
+
+      case 'ListItemButton':
+        return (
+          <ListItemButton key={key} sx={sx as any}>
+            {component.children?.map((child, _idx) => {
+              if ('type' in child) return renderLayoutNode(child as LayoutNode, `${keyBase}.listItemButton.${_idx}`);
+              if ('component' in child) return renderComponent(child as ComponentRef, `${keyBase}.listItemButton.${_idx}`);
+              return null;
+            })}
+          </ListItemButton>
+        );
+
+      case 'ListItemAvatar':
+        return (
+          <ListItemAvatar key={key} sx={sx as any}>
+            {component.children?.map((child, _idx) => {
+              if ('type' in child) return renderLayoutNode(child as LayoutNode, `${keyBase}.listItemAvatar.${_idx}`);
+              if ('component' in child) return renderComponent(child as ComponentRef, `${keyBase}.listItemAvatar.${_idx}`);
+              return null;
+            })}
+          </ListItemAvatar>
+        );
+
+      case 'ListItemText':
+        return (
+          <ListItemText
+            key={key}
+            primary={props.primary as string}
+            secondary={props.secondary as string}
+          />
         );
 
       case 'Box': {
@@ -693,8 +955,18 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
         const gridXs = props.xs as number;
         const gridSm = props.sm as number;
         const gridMd = props.md as number;
+        const gridLg = props.lg as number;
+        const gridXl = props.xl as number;
         return (
-          <Grid item xs={gridXs || 12} sm={gridSm || gridXs || 12} md={gridMd || gridSm || gridXs || 12} key={key}>
+          <Grid
+            item
+            xs={gridXs || 12}
+            sm={gridSm || gridXs || 12}
+            md={gridMd || gridSm || gridXs || 12}
+            lg={gridLg}
+            xl={gridXl}
+            key={key}
+          >
             {component.children?.map((child, _idx) => {
               if ('type' in child) {
                 return renderLayoutNode(child as LayoutNode, `${keyBase}.gridItem.${_idx}`);
@@ -734,6 +1006,7 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
 
     // Stack layout (vertical)
     if (type === 'stack') {
+      const gridColumn = layoutProps?.gridColumn as string | undefined;
       return (
         <Box
           key={key}
@@ -748,6 +1021,7 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
             bgcolor: (layoutProps?.backgroundColor as string) ?? undefined,
             background: (layoutProps?.background as string) ?? undefined,
             borderRadius: (layoutProps?.borderRadius as number) ?? undefined,
+            ...(gridColumn ? { gridColumn } : {}),
           }}
         >
           {renderedComponents}
@@ -788,12 +1062,42 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
 
     // Grid layout
     if (type === 'grid') {
+      const hasGridItems = (components || []).some((component) => component.component === 'GridItem');
+      if (!hasGridItems) {
+        const columns = layoutProps?.columns as number | undefined;
+        const gridTemplateColumns = (layoutProps?.gridTemplateColumns as string) ||
+          (columns ? `repeat(${columns}, minmax(0, 1fr))` : 'repeat(12, minmax(0, 1fr))');
+        return (
+          <Box
+            key={key}
+            sx={{
+              display: 'grid',
+              gridTemplateColumns,
+              columnGap: (layoutProps?.spacing as number) || 2,
+              rowGap: (layoutProps?.spacing as number) || 2,
+              width: (layoutProps?.width as string) || '100%',
+              maxWidth: toSxDimension(layoutProps?.maxWidth),
+              mx: layoutProps?.maxWidth ? 'auto' : undefined,
+              p: (layoutProps?.padding as number) ?? undefined,
+              bgcolor: (layoutProps?.backgroundColor as string) ?? undefined,
+              background: (layoutProps?.background as string) ?? undefined,
+              borderRadius: (layoutProps?.borderRadius as number) ?? undefined,
+            }}
+          >
+            {renderedComponents}
+            {renderedChildren}
+          </Box>
+        );
+      }
       return (
         <Grid
           container
           spacing={(layoutProps?.spacing as number) || 2}
           key={key}
           sx={{
+            width: (layoutProps?.width as string) || '100%',
+            maxWidth: toSxDimension(layoutProps?.maxWidth),
+            mx: layoutProps?.maxWidth ? 'auto' : undefined,
             p: (layoutProps?.padding as number) ?? undefined,
             bgcolor: (layoutProps?.backgroundColor as string) ?? undefined,
             background: (layoutProps?.background as string) ?? undefined,

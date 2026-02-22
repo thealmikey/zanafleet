@@ -74,7 +74,7 @@ export class SDUIModule implements OnModuleInit {
     this.logger.log('Registered screen: login');
 
     // Register Dashboard screens for different roles
-    const roles = ['admin', 'dispatcher', 'driver', 'business', 'rider', 'operator'];
+    const roles = ['admin', 'dispatcher', 'driver', 'business', 'rider', 'operator', 'support'];
 
     for (const role of roles) {
       const dashboardRenderer = new DashboardScreenStrategy(this.sduiService);

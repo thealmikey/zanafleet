@@ -154,6 +154,7 @@ export class MoversHomeScreenStrategy implements ScreenRenderer {
                   props: {
                     name: 'bookingForm',
                     sx: { mt: 1 },
+                    spacing: 3,
                   },
                   children: [
                     // Location Inputs (responsive grid)

@@ -430,6 +430,9 @@ export class DashboardScreenStrategy implements ScreenRenderer {
       props: {
         columns: 12,
         spacing: 3,
+        maxWidth: 1200,
+        width: '100%',
+        padding: 3,
       },
       children: [
         // Metrics Cards Row

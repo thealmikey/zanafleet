@@ -904,6 +904,241 @@ describe('SDUIRenderer Component Behavior', () => {
       // Should NOT contain [Object, Object]
       expect(screen.queryByText('[Object, Object]')).not.toBeInTheDocument();
     });
+
+    it('tracks active tab selection', async () => {
+      const user = userEvent.setup();
+      const tabsSchema = {
+        id: 'tabs-active-test',
+        version: '1.0.0',
+        metadata: {
+          title: 'Tabs Active',
+          type: 'detail' as const,
+          auth: 'none' as const,
+        },
+        layout: {
+          type: 'stack' as const,
+          components: [
+            {
+              component: 'Tabs',
+              id: 'main-tabs',
+              props: {
+                tabs: ['Overview', 'Recent Activity', 'Reports'],
+              },
+            },
+          ],
+        },
+        actions: [],
+      } as unknown as UISchema;
+
+      render(<SDUIRenderer schema={tabsSchema} screenId="tabs-active-test" />);
+
+      const reportsTab = screen.getByRole('tab', { name: 'Reports' });
+      await user.click(reportsTab);
+      expect(reportsTab).toHaveAttribute('aria-selected', 'true');
+    });
+  });
+
+  describe('New Primitives', () => {
+    it('renders Container with children', () => {
+      const containerSchema = {
+        id: 'container-test',
+        version: '1.0.0',
+        metadata: { title: 'Container', type: 'detail' as const, auth: 'none' as const },
+        layout: {
+          type: 'stack' as const,
+          components: [
+            {
+              component: 'Container',
+              id: 'main-container',
+              props: { maxWidth: 'md' },
+              children: [
+                {
+                  component: 'Typography',
+                  id: 'inside-container',
+                  props: { content: 'Inside Container' },
+                },
+              ],
+            },
+          ],
+        },
+        actions: [],
+      } as unknown as UISchema;
+
+      render(<SDUIRenderer schema={containerSchema} screenId="container-test" />);
+      expect(screen.getByText('Inside Container')).toBeInTheDocument();
+    });
+
+    it('renders Select and updates form state', async () => {
+      const user = userEvent.setup();
+      const selectSchema = {
+        id: 'select-test',
+        version: '1.0.0',
+        metadata: { title: 'Select', type: 'form' as const, auth: 'none' as const },
+        layout: {
+          type: 'stack' as const,
+          components: [
+            {
+              component: 'Select',
+              id: 'status-select',
+              props: {
+                name: 'status',
+                fullWidth: true,
+                options: [
+                  { label: 'Active', value: 'active' },
+                  { label: 'Paused', value: 'paused' },
+                ],
+              },
+            },
+          ],
+        },
+        actions: [],
+      } as unknown as UISchema;
+
+      render(<SDUIRenderer schema={selectSchema} screenId="select-test" />);
+      const selectControl = screen.getByRole('combobox');
+      await user.click(selectControl);
+      await user.click(screen.getByText('Active'));
+      expect(selectControl).toHaveTextContent('Active');
+    });
+
+    it('renders Switch and toggles', async () => {
+      const user = userEvent.setup();
+      const switchSchema = {
+        id: 'switch-test',
+        version: '1.0.0',
+        metadata: { title: 'Switch', type: 'form' as const, auth: 'none' as const },
+        layout: {
+          type: 'stack' as const,
+          components: [
+            {
+              component: 'Switch',
+              id: 'notifications',
+              props: { name: 'notifications' },
+            },
+          ],
+        },
+        actions: [],
+      } as unknown as UISchema;
+
+      render(<SDUIRenderer schema={switchSchema} screenId="switch-test" />);
+      const toggle = screen.getByRole('checkbox');
+      expect(toggle).not.toBeChecked();
+      await user.click(toggle);
+      expect(toggle).toBeChecked();
+    });
+
+    it('renders Dialog with nested content', () => {
+      const dialogSchema = {
+        id: 'dialog-test',
+        version: '1.0.0',
+        metadata: { title: 'Dialog', type: 'detail' as const, auth: 'none' as const },
+        layout: {
+          type: 'stack' as const,
+          components: [
+            {
+              component: 'Dialog',
+              id: 'asset-dialog',
+              props: { open: true },
+              children: [
+                { component: 'DialogTitle', props: { content: 'Create Asset' } },
+                {
+                  component: 'DialogContent',
+                  children: [
+                    { component: 'Typography', props: { content: 'Dialog body' } },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        actions: [],
+      } as unknown as UISchema;
+
+      render(<SDUIRenderer schema={dialogSchema} screenId="dialog-test" />);
+      expect(screen.getByText('Create Asset')).toBeInTheDocument();
+      expect(screen.getByText('Dialog body')).toBeInTheDocument();
+    });
+
+    it('renders Stepper with steps', () => {
+      const stepperSchema = {
+        id: 'stepper-test',
+        version: '1.0.0',
+        metadata: { title: 'Stepper', type: 'detail' as const, auth: 'none' as const },
+        layout: {
+          type: 'stack' as const,
+          components: [
+            {
+              component: 'Stepper',
+              id: 'order-steps',
+              props: {
+                steps: ['Requested', 'Assigned', 'In Transit', 'Delivered'],
+                activeStep: 2,
+                orientation: 'vertical',
+              },
+            },
+          ],
+        },
+        actions: [],
+      } as unknown as UISchema;
+
+      render(<SDUIRenderer schema={stepperSchema} screenId="stepper-test" />);
+      expect(screen.getByText('Requested')).toBeInTheDocument();
+      expect(screen.getByText('Delivered')).toBeInTheDocument();
+    });
+
+    it('renders List and ListItemText', () => {
+      const listSchema = {
+        id: 'list-test',
+        version: '1.0.0',
+        metadata: { title: 'List', type: 'detail' as const, auth: 'none' as const },
+        layout: {
+          type: 'stack' as const,
+          components: [
+            {
+              component: 'List',
+              id: 'message-list',
+              children: [
+                {
+                  component: 'ListItem',
+                  id: 'item-1',
+                  children: [
+                    { component: 'ListItemText', props: { primary: 'Hello', secondary: 'World' } },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        actions: [],
+      } as unknown as UISchema;
+
+      render(<SDUIRenderer schema={listSchema} screenId="list-test" />);
+      expect(screen.getByText('Hello')).toBeInTheDocument();
+      expect(screen.getByText('World')).toBeInTheDocument();
+    });
+
+    it('renders LinearProgress', () => {
+      const progressSchema = {
+        id: 'progress-test',
+        version: '1.0.0',
+        metadata: { title: 'Progress', type: 'detail' as const, auth: 'none' as const },
+        layout: {
+          type: 'stack' as const,
+          components: [
+            {
+              component: 'LinearProgress',
+              id: 'progress',
+              props: { variant: 'determinate', value: 40 },
+            },
+          ],
+        },
+        actions: [],
+      } as unknown as UISchema;
+
+      render(<SDUIRenderer schema={progressSchema} screenId="progress-test" />);
+      const progress = screen.getByRole('progressbar');
+      expect(progress).toBeInTheDocument();
+    });
   });
 
   describe('Form Component', () => {
@@ -1288,8 +1523,12 @@ describe('SDUIRenderer Component Behavior', () => {
       
       const { container } = render(<SDUIRenderer schema={gridSchema} screenId="grid-test" />);
       
-      // Verify grid container exists
-      expect(container.querySelector('.MuiGrid-container')).toBeInTheDocument();
+      // Verify grid container exists (MUI Grid or CSS grid)
+      const muiGrid = container.querySelector('.MuiGrid-container');
+      const cssGrid = Array.from(container.querySelectorAll('div')).find((node) => {
+        return window.getComputedStyle(node).display === 'grid';
+      });
+      expect(muiGrid || cssGrid).toBeTruthy();
     });
 
     it('renders flex layout with proper structure', () => {
