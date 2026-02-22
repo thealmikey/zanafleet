@@ -37,4 +37,14 @@ module.exports = {
       return webpackConfig;
     },
   },
+  jest: {
+    configure: (jestConfig) => {
+      // Add polyfills before any test file is loaded
+      jestConfig.setupFiles = [
+        ...(jestConfig.setupFiles || []),
+        '<rootDir>/src/setupJestPolyfills.js',
+      ];
+      return jestConfig;
+    },
+  },
 };

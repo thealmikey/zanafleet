@@ -5,8 +5,8 @@ global.TextDecoder = TextDecoder as any;
 
 import '@testing-library/jest-dom';
 
-import { resetMockSessions } from './mocks/handlers';
-import { server } from './mocks/server';
+// Note: For tests that need MSW server, use the setupServer from msw/node directly
+// This avoids loading the server for tests that don't need network mocking
 
 // Polyfill crypto.randomUUID for Node.js test environment
 if (typeof crypto === 'undefined' || !crypto.randomUUID) {
@@ -47,19 +47,4 @@ const localStorageMock = (() => {
 
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
-});
-
-// Setup MSW server
-beforeAll(() => {
-  server.listen({ onUnhandledRequest: 'error' });
-});
-
-afterEach(() => {
-  server.resetHandlers();
-  resetMockSessions();
-  localStorageMock.clear();
-});
-
-afterAll(() => {
-  server.close();
 });
