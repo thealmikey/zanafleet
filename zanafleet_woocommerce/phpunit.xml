@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="tests/bootstrap/bootstrap.php"
+         colors="true"
+         convertDeprecationsToExceptions="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         stopOnError="false"
+         stopOnFailure="false"
+         verbose="true"
+         cacheDirectory=".phpunit.cache"
+         executionOrder="defects"
+         resolveDependencies="true">
+    <php>
+        <const name="ABSPATH" value="/tmp/wordpress/"/>
+        <const name="WP_PLUGIN_DIR" value="/tmp/wordpress/wp-content/plugins/"/>
+        <const name="WP_TESTS_DIR" value="/tmp/wordpress/tests/"/>
+        <const name="WP_TESTS_DOMAIN" value="example.org"/>
+        <const name="WP_TESTS_EMAIL" value="admin@example.org"/>
+        <const name="WP_TESTS_TITLE" value="Test Blog"/>
+        <const name="ZANAFLEET_TEST_MODE" value="true"/>
+    </php>
+    <testsuites>
+        <testsuite name="ZanaFleet Unit Tests">
+            <directory>tests/unit</directory>
+        </testsuite>
+        <testsuite name="ZanaFleet Integration Tests">
+            <directory>tests/integration</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>includes</directory>
+        </include>
+        <exclude>
+            <directory>tests</directory>
+        </exclude>
+    </source>
+    <coverage>
+        <report>
+            <html outputDirectory="coverage"/>
+            <text outputFile="php://stdout"/>
+        </report>
+    </coverage>
+    <extensions>
+        <bootstrap class="ZanaFleet\PHPUnit\WooCommerceExtension"/>
+    </extensions>
+</phpunit>

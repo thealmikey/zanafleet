@@ -1,0 +1,201 @@
+/**
+ * ZanaFleet Checkout Styles
+ */
+
+.zanafleet-checkout-section {
+    background: #f9f9f9;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.zanafleet-checkout-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.zanafleet-field {
+    margin-bottom: 15px;
+}
+
+.zanafleet-field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.zanafleet-field select,
+.zanafleet-field textarea,
+.zanafleet-field input[type="text"] {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.zanafleet-field select:focus,
+.zanafleet-field textarea:focus,
+.zanafleet-field input[type="text"]:focus {
+    border-color: #2271b1;
+    outline: none;
+    box-shadow: 0 0 0 1px #2271b1;
+}
+
+/* Quote Display */
+.zanafleet-quote {
+    background: #fff;
+    border: 1px solid #2e7d32;
+    border-radius: 4px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.zanafleet-quote-price {
+    font-size: 24px;
+    color: #2e7d32;
+    margin-bottom: 5px;
+}
+
+.zanafleet-quote-price strong {
+    font-weight: 700;
+}
+
+.zanafleet-quote-time {
+    color: #666;
+    font-size: 14px;
+}
+
+/* Loading State */
+.zanafleet-loading {
+    padding: 15px;
+    text-align: center;
+    color: #666;
+}
+
+.zanafleet-loading .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #2271b1;
+    border-radius: 50%;
+    animation: zanafleet-spin 1s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+@keyframes zanafleet-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Error State */
+.zanafleet-error {
+    background: #fff5f5;
+    border: 1px solid #c62828;
+    color: #c62828;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+
+/* Tracking Page Styles */
+.zanafleet-tracking {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.zanafleet-tracking h1 {
+    margin-top: 0;
+    color: #333;
+}
+
+.zanafleet-tracking-status {
+    padding: 15px 20px;
+    border-radius: 4px;
+    margin: 20px 0;
+    font-weight: 600;
+}
+
+.zanafleet-tracking-status.status-requested {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.zanafleet-tracking-status.status-assigned {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.zanafleet-tracking-status.status-in-transit {
+    background: #fff3e0;
+    color: #ef6c00;
+}
+
+.zanafleet-tracking-status.status-delivered {
+    background: #e8f5e9;
+    color: #1b5e20;
+}
+
+.zanafleet-tracking-timeline {
+    margin-top: 30px;
+}
+
+.zanafleet-tracking-timeline-item {
+    display: flex;
+    padding: 15px 0;
+    border-left: 2px solid #e0e0e0;
+    padding-left: 20px;
+    margin-left: 10px;
+    position: relative;
+}
+
+.zanafleet-tracking-timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: 18px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ccc;
+}
+
+.zanafleet-tracking-timeline-item.completed::before {
+    background: #2e7d32;
+}
+
+.zanafleet-tracking-timeline-item.current::before {
+    background: #2271b1;
+}
+
+.zanafleet-tracking-timeline-time {
+    font-size: 12px;
+    color: #999;
+    min-width: 100px;
+}
+
+.zanafleet-tracking-timeline-content {
+    flex: 1;
+}
+
+/* Admin Order Page */
+.zf-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.zf-status-assigned { background: #e7f7e7; color: #2e7d32; }
+.zf-status-pickedup, .zf-status-intransit { background: #fff3e0; color: #ef6c00; }
+.zf-status-delivered { background: #e8f5e9; color: #1b5e20; }
+.zf-status-failed, .zf-status-cancelled { background: #ffebee; color: #c62828; }
