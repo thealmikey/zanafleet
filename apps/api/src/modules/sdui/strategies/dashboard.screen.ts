@@ -442,6 +442,7 @@ export class DashboardScreenStrategy implements ScreenRenderer {
             gridColumn: 'span 12',
             spacing: 3,
             wrap: true,
+            direction: 'row',
           },
           components: metricsCards,
         },
@@ -485,6 +486,7 @@ export class DashboardScreenStrategy implements ScreenRenderer {
           components: [
             {
               component: 'Tabs',
+              id: 'dashboard-tabs',
               props: {
                 tabs: [
                   { label: 'Overview', value: 'overview' },
@@ -493,16 +495,83 @@ export class DashboardScreenStrategy implements ScreenRenderer {
                 ],
               },
             },
+            // Overview Tab Panel
             {
-              component: 'DataTable',
+              component: 'TabPanel',
+              id: 'tab-overview',
               props: {
-                dataSource: 'activity',
-                columns: [
-                  { field: 'icon', header: '', width: 40 },
-                  { field: 'message', header: 'Activity' },
-                  { field: 'timestamp', header: 'Time' },
-                ],
+                tabGroup: 'dashboard-tabs',
+                value: 'overview',
               },
+              children: [
+                {
+                  component: 'DataTable',
+                  props: {
+                    dataSource: 'activity',
+                    columns: [
+                      { key: 'icon', label: '' },
+                      { key: 'message', label: 'Activity' },
+                      { key: 'timestamp', label: 'Time' },
+                    ],
+                    rows: [
+                      { id: '1', icon: '✓', message: 'Delivery #1001 completed', timestamp: '2024-01-15 10:30' },
+                      { id: '2', icon: '+', message: 'New booking #1002 received', timestamp: '2024-01-15 09:15' },
+                      { id: '3', icon: '↗', message: 'Driver assigned to #1001', timestamp: '2024-01-15 08:00' },
+                    ],
+                  },
+                },
+              ],
+            },
+            // Recent Activity Tab Panel
+            {
+              component: 'TabPanel',
+              id: 'tab-activity',
+              props: {
+                tabGroup: 'dashboard-tabs',
+                value: 'activity',
+              },
+              children: [
+                {
+                  component: 'DataTable',
+                  props: {
+                    columns: [
+                      { key: 'type', label: 'Type' },
+                      { key: 'message', label: 'Message' },
+                      { key: 'timestamp', label: 'Timestamp' },
+                    ],
+                    rows: [
+                      { type: 'delivery', message: 'Delivery completed', timestamp: '10:30 AM' },
+                      { type: 'booking', message: 'New booking', timestamp: '09:15 AM' },
+                      { type: 'assignment', message: 'Driver assigned', timestamp: '08:00 AM' },
+                    ],
+                  },
+                },
+              ],
+            },
+            // Reports Tab Panel
+            {
+              component: 'TabPanel',
+              id: 'tab-reports',
+              props: {
+                tabGroup: 'dashboard-tabs',
+                value: 'reports',
+              },
+              children: [
+                {
+                  component: 'Card',
+                  props: {
+                    title: 'Report Options',
+                  },
+                },
+                {
+                  component: 'LineChart',
+                  props: {
+                    title: 'Monthly Revenue',
+                    data: '{{revenue-trend}}',
+                    height: 200,
+                  },
+                },
+              ],
             },
           ],
         },

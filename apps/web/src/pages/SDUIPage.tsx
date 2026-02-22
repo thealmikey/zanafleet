@@ -93,8 +93,30 @@ export const SDUIPage: React.FC = () => {
     fetchScreen();
   }, [screenId]);
 
+  // Map of known SDUI screen paths to screen IDs
+  const screenPathMap: Record<string, string> = {
+    '/dashboard': 'dashboard.admin',
+    '/admin': 'dashboard.admin',
+    '/bookings': 'bookings.list',
+    '/bookings/new': 'bookings.create',
+    '/riders': 'riders.list',
+    '/reports': 'reports.overview',
+    '/settings': 'settings.profile',
+  };
+
   const handleNavigate = (path: string) => {
-    navigate(path);
+    // Check if we have an SDUI screen for this path
+    let sduiScreenId = screenPathMap[path];
+    
+    if (sduiScreenId) {
+      // Navigate to SDUI version of the screen
+      navigate(`/sdui/${sduiScreenId}`);
+    } else {
+      // For paths we don't have SDUI screens for, stay in SDUI but show a message
+      // Navigate to the root SDUI page with a query param
+      console.debug('[SDUIPage] No SDUI screen found for path:', path, '- staying in SDUI');
+      navigate(`/sdui?redirect=${encodeURIComponent(path)}`);
+    }
   };
 
   const handleActionComplete = (actionId: string, result: unknown) => {

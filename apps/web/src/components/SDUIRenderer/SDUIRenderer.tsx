@@ -730,6 +730,32 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
           </Box>
         );
 
+      case 'TabPanel': {
+        // TabPanel shows content based on the selected tab
+        const tabKey = String(props.tabGroup || id || key);
+        const panelValue = props.value as string;
+        const currentTab = tabState[tabKey] ?? '';
+        const isVisible = currentTab === panelValue;
+        
+        return (
+          <Box
+            key={key}
+            role="tabpanel"
+            hidden={!isVisible}
+            sx={{ 
+              display: isVisible ? 'block' : 'none',
+              ...(sx as any)
+            }}
+          >
+            {isVisible && component.children?.map((child, idx) => {
+              if ('type' in child) return renderLayoutNode(child as LayoutNode, `${key}.panel.${idx}`);
+              if ('component' in child) return renderComponent(child as ComponentRef, `${key}.panel.${idx}`);
+              return null;
+            })}
+          </Box>
+        );
+      }
+
       case 'DataTable':
         const columns = (props.columns as { key: string; label: string }[]) || [];
         const rows = (props.rows as Record<string, unknown>[]) || [];
