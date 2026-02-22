@@ -1,0 +1,9 @@
+{
+  "timeout": 60000,
+  "spec": "tests/e2e/specs/**/*.spec.ts",
+  "require": ["ts-node/register", "tests/e2e/support/hooks.ts"],
+  "extension": ["ts"],
+  "parallel": false,
+  "reporter": "spec",
+  "node-option": ["no-warnings=ExperimentalWarning"]
+}

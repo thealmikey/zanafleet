@@ -1,0 +1,25 @@
+{
+  "version": "1.0.0",
+  "screenId": "dashboard.admin",
+  "metadata": {
+    "title": "Admin Dashboard",
+    "type": "dashboard",
+    "auth": "required"
+  },
+  "layout": {
+    "type": "root",
+    "components": [
+      {
+        "component": "Typography",
+        "id": "welcome",
+        "props": { "variant": "h4", "content": "Welcome, Administrator" }
+      },
+      {
+        "component": "Card",
+        "id": "stats",
+        "props": { "title": "Statistics", "content": "System overview" }
+      }
+    ]
+  },
+  "actions": []
+}

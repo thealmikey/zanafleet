@@ -1,0 +1,43 @@
+{
+  "version": "1.0.0",
+  "screenId": "login",
+  "metadata": {
+    "title": "Login",
+    "type": "login",
+    "auth": "none"
+  },
+  "layout": {
+    "type": "stack",
+    "props": { "maxWidth": 400, "spacing": 2 },
+    "components": [
+      {
+        "component": "Typography",
+        "id": "title",
+        "props": { "variant": "h5", "align": "center", "content": "Welcome Back" }
+      },
+      {
+        "component": "TextField",
+        "id": "email",
+        "props": { "name": "email", "label": "Email", "type": "email", "fullWidth": true, "required": true }
+      },
+      {
+        "component": "TextField",
+        "id": "password",
+        "props": { "name": "password", "label": "Password", "type": "password", "fullWidth": true, "required": true }
+      },
+      {
+        "component": "Button",
+        "id": "submit",
+        "props": { "variant": "contained", "fullWidth": true, "type": "submit", "content": "Sign In" }
+      }
+    ]
+  },
+  "validations": [
+    { "field": "email", "type": "required", "message": "Email is required" },
+    { "field": "email", "type": "email", "message": "Invalid email format" },
+    { "field": "password", "type": "required", "message": "Password is required" }
+  ],
+  "actions": [
+    { "id": "submit", "type": "submit", "label": "Sign In", "endpoint": "/api/auth/login", "method": "POST" }
+  ]
+}
