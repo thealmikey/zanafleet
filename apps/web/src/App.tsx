@@ -41,7 +41,7 @@ function App(): React.ReactElement {
       <CssBaseline />
       <AuthProvider>
         <SignupWizardProvider>
-          <BrowserRouter>
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <Routes>
               <Route path="/" element={<MoversHomePage />} />
               <Route path="/signin" element={<SignIn />} />

@@ -49,9 +49,22 @@ export const SDUIPage: React.FC = () => {
 
       try {
         const data = await getScreen(screenId);
+        // Debug log the schema for troubleshooting
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[SDUIPage] Loaded screen:', screenId, {
+            version: data.version,
+            screenId: data.screenId,
+            metadata: data.metadata,
+            hasLayout: !!data.layout,
+            layoutType: data.layout?.type,
+            componentsCount: data.layout?.components?.length || 0,
+            actionsCount: data.actions?.length || 0,
+            dataSourcesCount: data.data?.length || 0,
+          });
+        }
         setSchema(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load screen');
+        console.error('[SDUIPage] Failed to load screen:', screenId, err);
       } finally {
         setLoading(false);
       }
