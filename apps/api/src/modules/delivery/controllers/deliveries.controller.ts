@@ -5,6 +5,9 @@ import {
   createPaginationMeta,
   RawQueryParams,
 } from '@api/core/api/utils';
+import { BillingCalculatorService } from '@api/modules/billing/services/billing-calculator.service';
+import { ChargeType } from '@api/modules/billing/dto/billing.enums';
+import { CommandBus } from '@nestjs/cqrs';
 import {
   Controller,
   Get,
@@ -23,6 +26,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeliveryStatus, PolicyTrigger } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 
+import { CancelDeliveryCommand } from '../commands/cancel-delivery.command';
 
 import { DeliveryExecutionCoordinator } from '../coordinators/delivery-execution.coordinator';
 import { DeliveryLifecycleCoordinator } from '../coordinators/delivery-lifecycle.coordinator';
@@ -69,6 +73,10 @@ export class UpdateDeliveryDto {
 
 export class AssignRiderDto { }
 
+export class CancelDeliveryDto {
+  reason?: string;
+}
+
 export class PickupDto {
   riderId!: string;
   proofData?: {
@@ -92,6 +100,21 @@ export class TransitionDto {
   triggeredBy?: string;
 }
 
+/**
+ * DTO for creating a delivery quote (WooCommerce compatible API)
+ */
+export class CreateQuoteDto {
+  businessId!: string;
+  workspaceId!: string;
+  actorId?: string;
+  pickup!: LocationPinInput;
+  dropoff!: LocationPinInput;
+  distanceKm?: number;
+  vehicleType?: string;
+  scheduledPickupTime?: Date;
+  scheduledDropoffTime?: Date;
+}
+
 @Controller('deliveries')
 @UseGuards(CapabilityGuard)
 @RequireCapability('delivery.manage')
@@ -103,8 +126,53 @@ export class DeliveriesController {
     private readonly matchingCoordinator: DeliveryMatchingCoordinator,
     private readonly executionCoordinator: DeliveryExecutionCoordinator,
     private readonly requestCoordinator: DeliveryRequestCoordinator,
-
+    private readonly billingCalculator: BillingCalculatorService,
+    private readonly commandBus: CommandBus,
   ) { }
+
+  /**
+   * POST /deliveries/quotes
+   * Create a delivery quote (WooCommerce compatible)
+   */
+  @Post('quotes')
+  @HttpCode(HttpStatus.CREATED)
+  async createQuote(
+    @Body() dto: CreateQuoteDto,
+  ): Promise<{
+    quoteId: string;
+    basePrice: number;
+    distancePrice: number;
+    totalPrice: number;
+    currency: string;
+    distanceKm: number | null;
+    estimatedPickupMinutes: number | null;
+    estimatedDeliveryMinutes: number | null;
+    vehicleType: string | null;
+    expiresAt: Date;
+  }> {
+    // Use billing calculator to compute pricing
+    const distanceKm = dto.distanceKm ?? 5; // Default 5km if not provided
+    const charges = this.billingCalculator.calculateDeliveryCharges({
+      distanceKm,
+      currency: 'KES',
+      baseDeliveryFee: 200,
+      pricePerKm: 50,
+    });
+
+    // Return quote in WooCommerce-compatible format
+    return {
+      quoteId: `quote_${Date.now()}`,
+      basePrice: charges.charges.find(c => c.chargeType === ChargeType.BASE_DELIVERY_FEE)?.amount ?? 200,
+      distancePrice: charges.charges.find(c => c.chargeType === ChargeType.DISTANCE_FEE)?.amount ?? (distanceKm * 50),
+      totalPrice: charges.grandTotal,
+      currency: 'KES',
+      distanceKm,
+      estimatedPickupMinutes: Math.max(15, Math.round(distanceKm * 2)),
+      estimatedDeliveryMinutes: Math.max(30, Math.round(distanceKm * 4)),
+      vehicleType: dto.vehicleType ?? 'motorbike',
+      expiresAt: new Date(Date.now() + 30 * 60 * 1000),
+    };
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -183,6 +251,49 @@ export class DeliveriesController {
     return {
       data: entities.map((e) => e.toDomain()),
       meta: createPaginationMeta(pagination, total),
+    };
+  }
+
+  /**
+   * GET /deliveries/by-external-order/:externalOrderId
+   * Get delivery by external order ID (WooCommerce integration)
+   */
+  @Get('by-external-order/:externalOrderId')
+  async findByExternalOrderId(
+    @Param('externalOrderId') externalOrderId: string,
+  ): Promise<{ data: ReturnType<DeliveryEntity['toDomain']>[] }> {
+    const entities = await this.deliveryRepository.find({
+      where: { externalOrderId },
+    });
+
+    return {
+      data: entities.map((e) => e.toDomain()),
+    };
+  }
+
+  /**
+   * POST /deliveries/:id/cancel
+   * Cancel a delivery (WooCommerce compatible)
+   */
+  @Post(':id/cancel')
+  @HttpCode(HttpStatus.OK)
+  async cancel(
+    @Param('id') id: string,
+    @Body() dto: CancelDeliveryDto,
+  ): Promise<{ success: boolean; deliveryId: string; message: string }> {
+    const existing = await this.deliveryRepository.findOne({ where: { id } });
+    if (!existing) {
+      throw new NotFoundException(`Delivery with ID "${id}" not found`);
+    }
+
+    await this.commandBus.execute(
+      new CancelDeliveryCommand(id, dto.reason),
+    );
+
+    return {
+      success: true,
+      deliveryId: id,
+      message: 'Delivery cancelled successfully',
     };
   }
 

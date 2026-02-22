@@ -5,6 +5,7 @@
  */
 
 import { ScreenRenderer, SDUIService } from '../services/sdui.service';
+// eslint-disable-next-line import/order
 import {
   UISchema,
   SDUIRequest,
@@ -174,6 +175,7 @@ export class DashboardScreenStrategy implements ScreenRenderer {
         const processInstances = await processStore.findAll();
         const businesses = await businessStore.findAll();
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         const activeBookings = processInstances.filter(
           (p: Record<string, unknown>) => p.status === 'ACTIVE'
         ).length;
@@ -702,3 +704,4 @@ export class DashboardScreenStrategy implements ScreenRenderer {
     return actions;
   }
 }
+

@@ -9,6 +9,7 @@ import { DeliveryEntity } from '../../entities/delivery.entity'
 import { AssignmentRulesService } from '../../services/assignment-rules.service'
 import { CandidateSelectionService } from '../../services/candidate-selection.service'
 import { DeliveryScheduledSubscriber } from '../../subscribers/delivery-scheduled.subscriber'
+import { LocationIntelligenceService } from '../../../location-intelligence/services/location-intelligence.service'
 
 describe('DeliveryScheduledSubscriber', () => {
   let subscriber: DeliveryScheduledSubscriber
@@ -17,6 +18,7 @@ describe('DeliveryScheduledSubscriber', () => {
   let rules: { shouldNotifyEarlyAssignment: jest.Mock }
   let commandBus: { execute: jest.Mock }
   let locationResolver: { resolveToPoint: jest.Mock }
+  let locationIntelligence: { findNearbyRiders: jest.Mock }
 
   beforeEach(async () => {
     repo = {
@@ -39,6 +41,10 @@ describe('DeliveryScheduledSubscriber', () => {
       resolveToPoint: jest.fn(),
     }
 
+    locationIntelligence = {
+      findNearbyRiders: jest.fn(),
+    }
+
     const moduleRef = await Test.createTestingModule({
       providers: [
         DeliveryScheduledSubscriber,
@@ -47,6 +53,7 @@ describe('DeliveryScheduledSubscriber', () => {
         { provide: AssignmentRulesService, useValue: rules },
         { provide: CommandBus, useValue: commandBus },
         { provide: LocationResolverService, useValue: locationResolver },
+        { provide: LocationIntelligenceService, useValue: locationIntelligence },
       ],
     }).compile()
 

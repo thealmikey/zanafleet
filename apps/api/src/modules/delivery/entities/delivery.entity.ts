@@ -18,6 +18,10 @@ export class DeliveryEntity {
   @Column('uuid')
   businessId!: string
 
+  @Index('IDX_deliveries_external_order_id')
+  @Column('uuid', { nullable: true })
+  externalOrderId!: string | null
+
   @Column('uuid', { nullable: true })
   pickupLocationId!: string | null
 
@@ -105,6 +109,7 @@ export class DeliveryEntity {
   toDomain(): {
     deliveryId: string
     businessId: string
+    externalOrderId: string | null
     pickupLocationId: string | null
     dropoffLocationId: string | null
     assignedRiderId: string | null
@@ -134,6 +139,7 @@ export class DeliveryEntity {
     return {
       deliveryId: this.id,
       businessId: this.businessId,
+      externalOrderId: this.externalOrderId,
       pickupLocationId: this.pickupLocationId,
       dropoffLocationId: this.dropoffLocationId,
       assignedRiderId: this.assignedRiderId,
@@ -165,6 +171,7 @@ export class DeliveryEntity {
   static fromDomain(data: {
     deliveryId: string
     businessId: string
+    externalOrderId?: string | null
     pickupLocationId?: string | null
     dropoffLocationId?: string | null
     assignedRiderId?: string | null
@@ -193,6 +200,7 @@ export class DeliveryEntity {
     const e = new DeliveryEntity()
     e.id = data.deliveryId
     e.businessId = data.businessId
+    e.externalOrderId = data.externalOrderId ?? null
     e.pickupLocationId = data.pickupLocationId ?? null
     e.dropoffLocationId = data.dropoffLocationId ?? null
     e.assignedRiderId = data.assignedRiderId ?? null
