@@ -83,6 +83,7 @@ The renderer supports:
 | `Logo` | Company/brand logo | src, alt, height |
 | `Typography` | Text display | variant, align, content |
 | `TextField` | Input field | name, label, type, required |
+| `Autocomplete` | Suggesting text input | name, label, options, freeSolo |
 | `Button` | Action button | variant, color, content |
 | `Link` | Navigation link | href, content |
 | `Divider` | Visual separator | text |
@@ -96,6 +97,10 @@ The renderer supports:
 | `Tabs` | Tab navigation | tabs (array of strings or {label, value} objects) |
 | `DataTable` | Data table | columns, rows |
 | `Form` | Form wrapper | method, action |
+| `ToggleButtonGroup` | Exclusive selection | name, label, options |
+| `Box` | Generic container | width, display, sx |
+| `Paper` | Surface container | padding, backgroundColor, sx |
+| `GridItem` | Grid cell wrapper | xs, sm, md |
 
 ## Layout Types
 
@@ -105,6 +110,35 @@ The renderer supports:
 | `flex` | Flexible container with direction | spacing, direction, align, justify, fullHeight, wrap, gridColumn |
 | `grid` | CSS Grid layout (MUI Grid) | columns, spacing |
 | `root` | Root page container | - |
+
+### Common Layout Props (Renderer-Supported)
+
+The current renderer supports these layout props on `root`, `stack`, `flex`, and `grid` nodes:
+
+- `padding` (number)
+- `backgroundColor` (string)
+- `background` (string, e.g. gradients)
+- `borderRadius` (number)
+- `maxWidth` (number or string)
+- `width` (string)
+
+> Note: SDUI schemas may include additional layout props, but if the renderer doesn't implement them they will be ignored. Keep schema and renderer aligned to avoid "looks wrong" regressions.
+
+### Stable Keys For Interactive Components
+
+Interactive components (e.g. `TextField`, `Autocomplete`, `ToggleButtonGroup`) should have a stable `id` in the schema.
+
+- The renderer uses `id` (when present) to keep React keys stable.
+- Unstable keys cause component remounts during typing, which can collapse popups (e.g. Autocomplete) or reset focus.
+
+### Autocomplete Value Contract
+
+`Autocomplete` supports `options` as:
+
+- `string[]`, or
+- `{ label: string; value: string }[]`
+
+The renderer stores the selected value as a string in form state.
 
 ### Layout GridColumn Support
 

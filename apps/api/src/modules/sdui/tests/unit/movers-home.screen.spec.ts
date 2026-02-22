@@ -32,7 +32,7 @@ describe('MoversHomeScreenStrategy', () => {
 
       expect(schema.screenId).toBe('movers-home');
       expect(schema.version).toBe('1.0.0');
-      expect(schema.metadata.title).toBe('ZanaFleet Movers');
+      expect(schema.metadata.title).toBe('Find Reliable Movers');
       expect(schema.metadata.type).toBe('movers-home');
       expect(schema.metadata.auth).toBe('none');
     });
@@ -49,7 +49,7 @@ describe('MoversHomeScreenStrategy', () => {
       expect(configSource?.type).toBe('static');
       expect(configSource?.staticData).toHaveProperty('companyName', 'ZanaFleet Movers');
       expect(configSource?.staticData).toHaveProperty('tagline', 'Reliable Moving Services');
-      expect(configSource?.staticData).toHaveProperty('ctaText', 'Get a Free Quote');
+      expect(configSource?.staticData).toHaveProperty('ctaText', 'Find Movers');
       expect(configSource?.staticData).toHaveProperty('phoneNumber');
       expect(configSource?.staticData).toHaveProperty('email');
     });
@@ -59,7 +59,7 @@ describe('MoversHomeScreenStrategy', () => {
       const schema = await strategy.render(request);
 
       expect(schema.layout).toBeDefined();
-      expect(schema.layout.type).toBe('flex');
+      expect(schema.layout.type).toBe('root');
       expect(schema.layout.children).toBeDefined();
       expect(schema.layout.children?.length).toBeGreaterThan(0);
     });
@@ -72,77 +72,31 @@ describe('MoversHomeScreenStrategy', () => {
       const heroSection = schema.layout.children?.[0];
       expect(heroSection).toBeDefined();
       expect(heroSection?.type).toBe('flex');
-      expect(heroSection?.components).toBeDefined();
-      
-      // Check for Typography component with company name
-      const hasCompanyName = heroSection?.components?.some(
-        c => c.component === 'Typography' && (c.props?.content as string) === '{{config.companyName}}'
-      );
-      expect(hasCompanyName).toBe(true);
+      expect(heroSection?.props).toBeDefined();
+      expect(heroSection?.props?.background).toContain('linear-gradient');
     });
 
-    it('should include services section', async () => {
+    it('should include booking form with location inputs', async () => {
       const request = { screenId: 'movers-home' };
       const schema = await strategy.render(request);
 
-      // Find services section (second child)
-      const servicesSection = schema.layout.children?.[1];
-      expect(servicesSection).toBeDefined();
-      expect(servicesSection?.components).toBeDefined();
-      
-      // Check for services title
-      const hasServicesTitle = servicesSection?.components?.some(
-        c => c.component === 'Typography' && (c.props?.content as string) === 'Our Services'
-      );
-      expect(hasServicesTitle).toBe(true);
-
-      // Check for service cards
-      const hasServiceCards = servicesSection?.components?.some(
-        c => c.component === 'Card' && c.props?.title
-      );
-      expect(hasServiceCards).toBe(true);
+      const hero = schema.layout.children?.[0];
+      expect(hero).toBeDefined();
+      const heroComponents = hero?.children?.[0]?.components || hero?.components || [];
+      const hasForm = heroComponents.some((c) => c.component === 'Form' && c.id === 'booking-form');
+      expect(hasForm).toBe(true);
     });
 
-    it('should include CTA section with contact info', async () => {
-      const request = { screenId: 'movers-home' };
-      const schema = await strategy.render(request);
-
-      // Find CTA section (third child)
-      const ctaSection = schema.layout.children?.[2];
-      expect(ctaSection).toBeDefined();
-      expect(ctaSection?.components).toBeDefined();
-      
-      // Check for CTA title
-      const hasCtaTitle = ctaSection?.components?.some(
-        c => c.component === 'Typography' && (c.props?.content as string) === 'Ready to Move?'
-      );
-      expect(hasCtaTitle).toBe(true);
-
-      // Check for phone number
-      const phoneContent = ctaSection?.components?.find(
-        c => c.component === 'Typography' && (c.props?.content as string)?.startsWith('Phone:')
-      );
-      expect(phoneContent).toBeDefined();
-
-      // Check for email
-      const emailContent = ctaSection?.components?.find(
-        c => c.component === 'Typography' && (c.props?.content as string)?.startsWith('Email:')
-      );
-      expect(emailContent).toBeDefined();
-    });
-
-    it('should include navigation action to quote form', async () => {
+    it('should include submit action for quote request', async () => {
       const request = { screenId: 'movers-home' };
       const schema = await strategy.render(request);
 
       expect(schema.actions).toBeDefined();
       expect(schema.actions?.length).toBeGreaterThan(0);
       
-      const quoteAction = schema.actions.find(a => a.id === 'open-quote-form');
+      const quoteAction = schema.actions.find(a => a.id === 'submit-quote-request');
       expect(quoteAction).toBeDefined();
-      expect(quoteAction?.type).toBe('navigate');
-      expect(quoteAction?.label).toBe('Get Quote');
-      expect(quoteAction?.navigateTo).toBe('quote');
+      expect(quoteAction?.type).toBe('submit');
     });
 
     it('should include login navigation action', async () => {
@@ -172,10 +126,10 @@ describe('MoversHomeScreenStrategy', () => {
   });
 
   describe('executeAction', () => {
-    it('should handle open-quote-form action', async () => {
+    it('should handle submit-quote-request action', async () => {
       const request = {
         screenId: 'movers-home',
-        actionId: 'open-quote-form',
+        actionId: 'submit-quote-request',
         payload: {},
         actorId: 'anonymous',
       };
@@ -183,7 +137,7 @@ describe('MoversHomeScreenStrategy', () => {
       const response = await strategy.executeAction(request);
 
       expect(response.success).toBe(true);
-      expect(response.navigateTo).toBe('quote');
+      expect(response.data).toBeDefined();
     });
 
     it('should return error for unknown action', async () => {

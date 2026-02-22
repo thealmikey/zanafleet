@@ -190,16 +190,25 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
     }
   }, [schema, formData, validateField, handleAction]);
 
-  // Render a single component based on its type
-  const renderComponent = useCallback((component: ComponentRef): React.ReactNode => {
+  const toSxDimension = (value: unknown): string | number | undefined => {
+    if (typeof value === 'number') return `${value}px`;
+    if (typeof value === 'string') return value;
+    return undefined;
+  };
+
+  // Render a single component based on its type.
+  // Note: this is intentionally a plain function (not useCallback) because it is mutually recursive
+  // with renderLayoutNode, and stable keys matter more than memoization for SDUI correctness.
+  function renderComponent(component: ComponentRef, keyBase: string): React.ReactNode {
     const { component: type, id } = component;
     const props = resolveProps(component);
-    const key = id || `${type}-${Math.random().toString(36).slice(2)}`;
+    const key = id || `${keyBase}:${type}`;
+    const sx = (props.sx as Record<string, unknown> | undefined) ?? undefined;
 
     switch (type) {
       case 'Logo':
         return (
-          <Box key={key} sx={{ textAlign: 'center', my: 2 }}>
+          <Box key={key} sx={{ textAlign: 'center', my: 2, ...(sx as any) }}>
             <Avatar
               src={props.src as string}
               alt={props.alt as string}
@@ -215,6 +224,7 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
             variant={(props.variant as any) || 'body1'}
             align={(props.align as any) || 'left'}
             color={(props.color as any) || 'initial'}
+            sx={sx as any}
           >
             {props.content as string}
           </Typography>
@@ -237,6 +247,8 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
             helperText={formErrors[name]}
             required={props.required as boolean}
             autoComplete={props.autoComplete as string}
+            size={(props.size as any) || 'medium'}
+            sx={sx as any}
           />
         );
       }
@@ -250,21 +262,28 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
         const displayOptions = acOptions.length > 0 
           ? acOptions 
           : acOptions2.map(opt => ({ label: opt, value: opt }));
+        const currentValue = formData[acName] || '';
+        const selectedOption =
+          displayOptions.find((opt) => opt.value === currentValue) ?? null;
+
         return (
           <Autocomplete
             key={key}
             freeSolo={props.freeSolo as boolean}
             options={displayOptions}
+            isOptionEqualToValue={(option, value) => {
+              if (typeof value === 'string') return option.value === value;
+              return option.value === (value as { value: string }).value;
+            }}
             getOptionLabel={(option) => typeof option === 'string' ? option : (option.label || '')}
-            value={formData[acName] || null}
+            value={(props.freeSolo ? (currentValue || '') : selectedOption) as any}
+            inputValue={currentValue}
             onChange={(_event, value) => {
               const selectedValue = typeof value === 'string' ? value : (value?.value || '');
               handleInputChange(acName, selectedValue);
             }}
             onInputChange={(_event, value) => {
-              if (props.freeSolo) {
-                handleInputChange(acName, value);
-              }
+              if (props.freeSolo) handleInputChange(acName, value);
             }}
             renderInput={(params) => (
               <TextField
@@ -274,13 +293,22 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
                 required={props.required as boolean}
                 error={!!formErrors[acName]}
                 helperText={formErrors[acName]}
+                size={(props.size as any) || 'small'}
+                fullWidth={props.fullWidth as boolean}
               />
             )}
             renderOption={(params, option) => (
-              <Box component="li" {...params}>
-                {typeof option === 'string' ? option : option.label}
-              </Box>
+              (() => {
+                // MUI passes a `key` inside params; spreading it triggers a React warning.
+                const { key: optionKey, ...liProps } = params as unknown as { key: string };
+                return (
+                  <Box component="li" key={optionKey} {...(liProps as any)}>
+                    {typeof option === 'string' ? option : option.label}
+                  </Box>
+                );
+              })()
             )}
+            sx={sx as any}
           />
         );
       }
@@ -338,6 +366,7 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
               if (action) handleAction(action);
               else if (props.type === 'submit') handleSubmit();
             }}
+            sx={sx as any}
           >
             {loading ? <CircularProgress size={20} /> : props.content as string}
           </Button>
@@ -358,21 +387,40 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
 
       case 'Divider':
         return (
-          <Divider key={key} sx={{ my: 2 }}>
+          <Divider key={key} sx={{ my: 2, ...(sx as any) }}>
             {props.text as string}
           </Divider>
         );
 
       case 'Alert':
         return (
-          <Alert key={key} severity={(props.severity as any) || 'info'} sx={{ mb: 2 }}>
+          <Alert key={key} severity={(props.severity as any) || 'info'} sx={{ mb: 2, ...(sx as any) }}>
             {props.content as string}
           </Alert>
         );
 
+      case 'Paper':
+        return (
+          <Paper
+            key={key}
+            elevation={(props.elevation as number) ?? 1}
+            sx={{
+              p: (props.padding as number) ?? undefined,
+              bgcolor: (props.backgroundColor as string) ?? undefined,
+              ...(sx as any),
+            }}
+          >
+            {component.children?.map((child, _idx) => {
+              if ('type' in child) return renderLayoutNode(child as LayoutNode, `${keyBase}.paper.${_idx}`);
+              if ('component' in child) return renderComponent(child as ComponentRef, `${keyBase}.paper.${_idx}`);
+              return null;
+            })}
+          </Paper>
+        );
+
       case 'Card':
         return (
-          <Card key={key}>
+          <Card key={key} sx={sx as any}>
             <CardContent>
               <>
                 {props.title && (
@@ -517,18 +565,27 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
 
       case 'Tabs':
         return (
-          <Box key={key}>
-            <MuiTabs value={0} sx={{ mb: 2 }}>
-              {(props.tabs as unknown[])?.map((tab, _idx) => {
-                // Handle both string tabs and object tabs { label, value }
-                const tabLabel = typeof tab === 'string' 
-                  ? tab 
-                  : (tab && typeof tab === 'object' && 'label' in tab) 
-                    ? (tab as { label: string }).label 
-                    : String(tab);
-                return <Tab key={`tab-${_idx}`} label={tabLabel} value={tabLabel} />;
-              }) || <Tab label="Tab 1" />}
-            </MuiTabs>
+          <Box key={key} sx={sx as any}>
+            {(() => {
+              const rawTabs = (props.tabs as unknown[]) || [];
+              const labels = rawTabs.map((tab) => {
+                if (typeof tab === 'string') return tab;
+                if (tab && typeof tab === 'object' && 'label' in tab) {
+                  return (tab as { label: string }).label;
+                }
+                return String(tab);
+              });
+              const value = labels[0] ?? false;
+              return (
+                <MuiTabs value={value} sx={{ mb: 2 }}>
+                  {labels.length > 0
+                    ? labels.map((tabLabel, idx) => (
+                        <Tab key={`tab-${idx}`} label={tabLabel} value={tabLabel} />
+                      ))
+                    : <Tab label="Tab 1" value="Tab 1" />}
+                </MuiTabs>
+              );
+            })()}
           </Box>
         );
 
@@ -569,7 +626,12 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
           console.debug('[SDUI] Rendering Form component:', { id, props, children: component.children });
         }
         return (
-          <Box key={key} component="form" sx={{ width: '100%', mt: 2 }} onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+          <Box
+            key={key}
+            component="form"
+            sx={{ width: '100%', mt: 2, ...(sx as any) }}
+            onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
+          >
             {error && (
               <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
                 {error}
@@ -588,11 +650,11 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
             {component.children?.map((child, _idx) => {
               // Handle LayoutNode children
               if ('type' in child) {
-                return renderLayoutNode(child as LayoutNode);
+                return renderLayoutNode(child as LayoutNode, `${keyBase}.form.${_idx}`);
               }
               // Handle ComponentRef children
               if ('component' in child) {
-                return renderComponent(child as ComponentRef);
+                return renderComponent(child as ComponentRef, `${keyBase}.form.${_idx}`);
               }
               return null;
             })}
@@ -611,14 +673,15 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
               justifyContent: props.justifyContent || 'flex-start',
               flexDirection: props.flexDirection || 'row',
               gap: (props.spacing as number) || 2,
+              ...(sx as any),
             }}
           >
             {component.children?.map((child, _idx) => {
               if ('type' in child) {
-                return renderLayoutNode(child as LayoutNode);
+                return renderLayoutNode(child as LayoutNode, `${keyBase}.box.${_idx}`);
               }
               if ('component' in child) {
-                return renderComponent(child as ComponentRef);
+                return renderComponent(child as ComponentRef, `${keyBase}.box.${_idx}`);
               }
               return null;
             })}
@@ -634,10 +697,10 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
           <Grid item xs={gridXs || 12} sm={gridSm || gridXs || 12} md={gridMd || gridSm || gridXs || 12} key={key}>
             {component.children?.map((child, _idx) => {
               if ('type' in child) {
-                return renderLayoutNode(child as LayoutNode);
+                return renderLayoutNode(child as LayoutNode, `${keyBase}.gridItem.${_idx}`);
               }
               if ('component' in child) {
-                return renderComponent(child as ComponentRef);
+                return renderComponent(child as ComponentRef, `${keyBase}.gridItem.${_idx}`);
               }
               return null;
             })}
@@ -656,18 +719,18 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
           </Box>
         );
     }
-  }, [formData, formErrors, loading, schema.actions, schema.layout, schema.metadata, schema.validations, resolveProps, handleInputChange, handleAction, handleSubmit, error, setError]);
+  }
 
   // Render a layout node recursively
-  const renderLayoutNode = useCallback((node: LayoutNode): React.ReactNode => {
+  function renderLayoutNode(node: LayoutNode, keyBase: string): React.ReactNode {
     const { type, children, components, props: layoutProps } = node;
-    const key = `${type}-${Math.random().toString(36).slice(2)}`;
+    const key = `${keyBase}:${type}`;
 
     // Render child components first
-    const renderedComponents = components?.map(renderComponent) || [];
+    const renderedComponents = components?.map((c, idx) => renderComponent(c, `${keyBase}.cmp.${idx}`)) || [];
 
     // Then render children layout nodes
-    const renderedChildren = children?.map(renderLayoutNode) || [];
+    const renderedChildren = children?.map((c, idx) => renderLayoutNode(c, `${keyBase}.child.${idx}`)) || [];
 
     // Stack layout (vertical)
     if (type === 'stack') {
@@ -678,9 +741,13 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
             display: 'flex',
             flexDirection: 'column',
             gap: (layoutProps?.spacing as number) || 2,
-            maxWidth: layoutProps?.maxWidth as string,
-            padding: (layoutProps?.padding as number) || 0,
+            width: (layoutProps?.width as string) || '100%',
+            maxWidth: toSxDimension(layoutProps?.maxWidth),
+            padding: (layoutProps?.padding as number) ?? 0,
             mx: 'auto',
+            bgcolor: (layoutProps?.backgroundColor as string) ?? undefined,
+            background: (layoutProps?.background as string) ?? undefined,
+            borderRadius: (layoutProps?.borderRadius as number) ?? undefined,
           }}
         >
           {renderedComponents}
@@ -703,6 +770,12 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
             gap: (layoutProps?.spacing as number) || 2,
             minHeight: layoutProps?.fullHeight ? '100vh' : 'auto',
             flexWrap: layoutProps?.wrap ? 'wrap' : 'nowrap',
+            width: (layoutProps?.width as string) || '100%',
+            maxWidth: toSxDimension(layoutProps?.maxWidth),
+            padding: (layoutProps?.padding as number) ?? 0,
+            bgcolor: (layoutProps?.backgroundColor as string) ?? undefined,
+            background: (layoutProps?.background as string) ?? undefined,
+            borderRadius: (layoutProps?.borderRadius as number) ?? undefined,
             // Grid column support for nested layouts within grid
             ...(gridColumn ? { gridColumn } : {}),
           }}
@@ -716,7 +789,17 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
     // Grid layout
     if (type === 'grid') {
       return (
-        <Grid container spacing={(layoutProps?.spacing as number) || 2} key={key}>
+        <Grid
+          container
+          spacing={(layoutProps?.spacing as number) || 2}
+          key={key}
+          sx={{
+            p: (layoutProps?.padding as number) ?? undefined,
+            bgcolor: (layoutProps?.backgroundColor as string) ?? undefined,
+            background: (layoutProps?.background as string) ?? undefined,
+            borderRadius: (layoutProps?.borderRadius as number) ?? undefined,
+          }}
+        >
           {renderedComponents}
           {renderedChildren}
         </Grid>
@@ -726,7 +809,15 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
     // Root layout
     if (type === 'root') {
       return (
-        <Box key={key} sx={{ p: 3 }}>
+        <Box
+          key={key}
+          sx={{
+            p: (layoutProps?.padding as number) ?? 3,
+            bgcolor: (layoutProps?.backgroundColor as string) ?? undefined,
+            background: (layoutProps?.background as string) ?? undefined,
+            borderRadius: (layoutProps?.borderRadius as number) ?? undefined,
+          }}
+        >
           {renderedComponents}
           {renderedChildren}
         </Box>
@@ -740,7 +831,7 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
         {renderedChildren}
       </Box>
     );
-  }, [renderComponent]);
+  }
 
   return (
     <Box>
@@ -762,7 +853,7 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
       )}
 
       {/* Render the layout */}
-      {renderLayoutNode(schema.layout)}
+      {renderLayoutNode(schema.layout, `layout.${schema.screenId || screenId}`)}
 
       {/* Global Actions (for non-form screens) */}
       {!schema.validations?.length && schema.actions && (

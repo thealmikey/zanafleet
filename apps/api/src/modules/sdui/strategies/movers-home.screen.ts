@@ -55,7 +55,10 @@ export class MoversHomeScreenStrategy implements ScreenRenderer {
         endpoint: '/api/sdui/screens/movers-home/config',
         staticData: {
           companyName: 'ZanaFleet Movers',
-          tagline: 'Professional Moving Services',
+          tagline: 'Reliable Moving Services',
+          ctaText: 'Find Movers',
+          phoneNumber: '+254 700 000 000',
+          email: 'info@zanafleet.movers',
         },
         cacheable: true,
         cacheDuration: 3600,
@@ -101,167 +104,288 @@ export class MoversHomeScreenStrategy implements ScreenRenderer {
     ];
 
     const layout: LayoutNode = {
-      type: 'flex' as LayoutType,
+      type: 'root' as LayoutType,
       props: {
-        direction: 'column',
-        spacing: 0,
+        padding: 0,
+        backgroundColor: '#f8f9fa',
       },
       children: [
-        // Hero/Header Section
+        // Hero + Form Section (styled container)
         {
           type: 'flex' as LayoutType,
           props: {
             direction: 'column',
-            align: 'center',
-            justify: 'center',
-            padding: 6,
-            backgroundColor: '#1976d2',
-          },
-          components: [
-            {
-              component: 'Typography',
-              props: {
-                variant: 'h3',
-                color: '#FFFFFF',
-                align: 'center',
-                content: 'Find Reliable Movers',
-              },
-            },
-            {
-              component: 'Typography',
-              props: {
-                variant: 'h6',
-                color: '#FFFFFF',
-                align: 'center',
-                content: 'Get instant quotes and book your move in minutes',
-              },
-            },
-          ],
-        },
-        // Booking Form Section
-        {
-          type: 'flex' as LayoutType,
-          props: {
-            direction: 'column',
-            padding: 4,
             spacing: 3,
+            padding: 6,
+            align: 'stretch',
+            background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
           },
-          components: [
-            // Form wrapper
+          children: [
             {
-              component: 'Form',
-              id: 'booking-form',
+              type: 'stack' as LayoutType,
               props: {
-                name: 'bookingForm',
+                spacing: 3,
+                maxWidth: 1200,
+                padding: 0,
               },
-              children: [
-                // Address Search Section
+              components: [
                 {
-                  type: 'flex' as LayoutType,
+                  component: 'Typography',
                   props: {
-                    direction: 'row',
-                    spacing: 2,
-                    align: 'center',
+                    variant: 'h3',
+                    color: '#FFFFFF',
+                    content: 'Find Reliable Movers',
+                    sx: { fontWeight: 700 },
                   },
-                  components: [
-                    // Moving From Autocomplete
+                },
+                {
+                  component: 'Typography',
+                  props: {
+                    variant: 'h6',
+                    color: '#FFFFFF',
+                    content: 'Get instant quotes and book your move in minutes',
+                    sx: { opacity: 0.9 },
+                  },
+                },
+                // Form wrapper
+                {
+                  component: 'Form',
+                  id: 'booking-form',
+                  props: {
+                    name: 'bookingForm',
+                    sx: { mt: 1 },
+                  },
+                  children: [
+                    // Location Inputs (responsive grid)
                     {
-                      component: 'Autocomplete',
-                      id: 'moving-from',
-                      props: {
-                        name: 'movingFrom',
-                        label: 'Moving From',
-                        placeholder: 'Enter origin address',
-                        freeSolo: true,
-                        options: ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Thika', 'Malindi', 'Kitale'],
-                        required: true,
-                      },
+                      type: 'grid' as LayoutType,
+                      props: { spacing: 2 },
+                      components: [
+                        {
+                          component: 'GridItem',
+                          id: 'grid-moving-from',
+                          props: { xs: 12, md: 5 },
+                          children: [
+                            {
+                              component: 'Paper',
+                              id: 'paper-moving-from',
+                              props: { padding: 2, backgroundColor: '#ffffff' },
+                              children: [
+                                {
+                                  component: 'Typography',
+                                  props: {
+                                    variant: 'subtitle2',
+                                    color: 'text.secondary',
+                                    content: 'Moving From',
+                                    sx: { mb: 1 },
+                                  },
+                                },
+                                {
+                                  component: 'Autocomplete',
+                                  id: 'moving-from',
+                                  props: {
+                                    name: 'movingFrom',
+                                    label: '',
+                                    placeholder: 'Enter origin address',
+                                    freeSolo: true,
+                                    fullWidth: true,
+                                    size: 'small',
+                                    options: [
+                                      'Nairobi',
+                                      'Mombasa',
+                                      'Kisumu',
+                                      'Nakuru',
+                                      'Eldoret',
+                                      'Thika',
+                                      'Malindi',
+                                      'Kitale',
+                                    ],
+                                    required: true,
+                                  },
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                        {
+                          component: 'GridItem',
+                          id: 'grid-swap',
+                          props: { xs: 12, md: 2 },
+                          children: [
+                            {
+                              component: 'Box',
+                              id: 'swap-icon',
+                              props: {
+                                width: '100%',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                sx: {
+                                  my: 2,
+                                },
+                              },
+                              children: [
+                                {
+                                  component: 'Box',
+                                  id: 'swap-circle',
+                                  props: {
+                                    width: '48px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    sx: {
+                                      height: '48px',
+                                      borderRadius: '50%',
+                                      bgcolor: '#ffffff',
+                                      color: 'primary.main',
+                                      fontSize: '1.2rem',
+                                    },
+                                  },
+                                  children: [
+                                    {
+                                      component: 'Typography',
+                                      props: {
+                                        variant: 'body1',
+                                        content: '⇄',
+                                      },
+                                    },
+                                  ],
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                        {
+                          component: 'GridItem',
+                          id: 'grid-moving-to',
+                          props: { xs: 12, md: 5 },
+                          children: [
+                            {
+                              component: 'Paper',
+                              id: 'paper-moving-to',
+                              props: { padding: 2, backgroundColor: '#ffffff' },
+                              children: [
+                                {
+                                  component: 'Typography',
+                                  props: {
+                                    variant: 'subtitle2',
+                                    color: 'text.secondary',
+                                    content: 'Moving To',
+                                    sx: { mb: 1 },
+                                  },
+                                },
+                                {
+                                  component: 'Autocomplete',
+                                  id: 'moving-to',
+                                  props: {
+                                    name: 'movingTo',
+                                    label: '',
+                                    placeholder: 'Enter destination address',
+                                    freeSolo: true,
+                                    fullWidth: true,
+                                    size: 'small',
+                                    options: [
+                                      'Nairobi',
+                                      'Mombasa',
+                                      'Kisumu',
+                                      'Nakuru',
+                                      'Eldoret',
+                                      'Thika',
+                                      'Malindi',
+                                      'Kitale',
+                                    ],
+                                    required: true,
+                                  },
+                                },
+                              ],
+                            },
+                          ],
+                        },
+                      ],
                     },
-                    // Swap Icon placeholder (just empty space for now)
+                    // House Size Selectors
                     {
-                      component: 'Box',
+                      type: 'grid' as LayoutType,
                       props: {
-                        width: '48px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        spacing: 3,
+                        padding: 3,
+                        backgroundColor: '#ffffff',
+                        borderRadius: 1,
                       },
+                      components: [
+                        {
+                          component: 'GridItem',
+                          id: 'grid-current-house-size',
+                          props: { xs: 12, md: 6 },
+                          children: [
+                            {
+                              component: 'ToggleButtonGroup',
+                              id: 'current-house-size',
+                              props: {
+                                name: 'currentHouseSize',
+                                label: 'Current Home Size',
+                                fullWidth: true,
+                                size: 'small',
+                                options: [
+                                  { value: 'studio', label: 'Studio', icon: '🏢' },
+                                  { value: '1br', label: '1 Bedroom', icon: '🏠' },
+                                  { value: '2br', label: '2 Bedrooms', icon: '🏡' },
+                                  { value: '3br', label: '3 Bedrooms', icon: '🏘️' },
+                                  { value: '4br+', label: '4+ Bedrooms', icon: '🏚️' },
+                                ],
+                                required: true,
+                              },
+                            },
+                          ],
+                        },
+                        {
+                          component: 'GridItem',
+                          id: 'grid-destination-house-size',
+                          props: { xs: 12, md: 6 },
+                          children: [
+                            {
+                              component: 'ToggleButtonGroup',
+                              id: 'destination-house-size',
+                              props: {
+                                name: 'destinationHouseSize',
+                                label: 'Destination Home Size',
+                                fullWidth: true,
+                                size: 'small',
+                                options: [
+                                  { value: 'studio', label: 'Studio', icon: '🏢' },
+                                  { value: '1br', label: '1 Bedroom', icon: '🏠' },
+                                  { value: '2br', label: '2 Bedrooms', icon: '🏡' },
+                                  { value: '3br', label: '3 Bedrooms', icon: '🏘️' },
+                                  { value: '4br+', label: '4+ Bedrooms', icon: '🏚️' },
+                                ],
+                                required: true,
+                              },
+                            },
+                          ],
+                        },
+                      ],
                     },
-                    // Moving To Autocomplete
+                    // CTA Button
                     {
-                      component: 'Autocomplete',
-                      id: 'moving-to',
+                      component: 'Button',
+                      id: 'find-movers-btn',
                       props: {
-                        name: 'movingTo',
-                        label: 'Moving To',
-                        placeholder: 'Enter destination address',
-                        freeSolo: true,
-                        options: ['Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Thika', 'Malindi', 'Kitale'],
-                        required: true,
+                        variant: 'contained',
+                        size: 'large',
+                        content: '{{config.ctaText}}',
+                        type: 'submit',
+                        sx: {
+                          bgcolor: '#ffffff',
+                          color: 'primary.main',
+                          px: 6,
+                          py: 1.5,
+                          fontSize: '1.1rem',
+                          fontWeight: 600,
+                          '&:hover': { bgcolor: 'grey.100' },
+                        },
                       },
                     },
                   ],
-                },
-                // House Size Section
-                {
-                  type: 'flex' as LayoutType,
-                  props: {
-                    direction: 'row',
-                    spacing: 3,
-                  },
-                  components: [
-                    // Current House Size
-                    {
-                      component: 'ToggleButtonGroup',
-                      id: 'current-house-size',
-                      props: {
-                        name: 'currentHouseSize',
-                        label: 'Current Home Size',
-                        fullWidth: true,
-                        size: 'small',
-                        options: [
-                          { value: 'studio', label: 'Studio', icon: '🏢' },
-                          { value: '1br', label: '1 Bedroom', icon: '🏠' },
-                          { value: '2br', label: '2 Bedrooms', icon: '🏡' },
-                          { value: '3br', label: '3 Bedrooms', icon: '🏘️' },
-                          { value: '4br+', label: '4+ Bedrooms', icon: '🏚️' },
-                        ],
-                        required: true,
-                      },
-                    },
-                    // Destination House Size
-                    {
-                      component: 'ToggleButtonGroup',
-                      id: 'destination-house-size',
-                      props: {
-                        name: 'destinationHouseSize',
-                        label: 'Destination Home Size',
-                        fullWidth: true,
-                        size: 'small',
-                        options: [
-                          { value: 'studio', label: 'Studio', icon: '🏢' },
-                          { value: '1br', label: '1 Bedroom', icon: '🏠' },
-                          { value: '2br', label: '2 Bedrooms', icon: '🏡' },
-                          { value: '3br', label: '3 Bedrooms', icon: '🏘️' },
-                          { value: '4br+', label: '4+ Bedrooms', icon: '🏚️' },
-                        ],
-                        required: true,
-                      },
-                    },
-                  ],
-                },
-                // Submit Button
-                {
-                  component: 'Button',
-                  id: 'find-movers-btn',
-                  props: {
-                    variant: 'contained',
-                    color: 'primary',
-                    size: 'large',
-                    content: 'Find Movers',
-                    type: 'submit',
-                    fullWidth: false,
-                  },
                 },
               ],
             },
@@ -274,8 +398,7 @@ export class MoversHomeScreenStrategy implements ScreenRenderer {
       {
         id: 'submit-quote-request',
         type: 'submit' as ActionType,
-        label: 'Get Quote',
-        navigateTo: 'quote',
+        label: 'Find Movers',
       },
       {
         id: 'navigate-to-login',
