@@ -502,6 +502,7 @@ export class DashboardScreenStrategy implements ScreenRenderer {
               props: {
                 tabGroup: 'dashboard-tabs',
                 value: 'overview',
+                defaultValue: 'Overview',
               },
               children: [
                 {

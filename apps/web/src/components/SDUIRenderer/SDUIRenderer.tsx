@@ -732,9 +732,12 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
 
       case 'TabPanel': {
         // TabPanel shows content based on the selected tab
+        // Get the default tab value from props or use first tab label
         const tabKey = String(props.tabGroup || id || key);
         const panelValue = props.value as string;
-        const currentTab = tabState[tabKey] ?? '';
+        // Default to 'Overview' (first tab) if no state is set
+        const defaultTab = props.defaultValue as string || 'Overview';
+        const currentTab = tabState[tabKey] ?? defaultTab;
         const isVisible = currentTab === panelValue;
         
         return (
