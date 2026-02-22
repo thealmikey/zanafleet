@@ -13,6 +13,7 @@ import { SDUIController } from './sdui.controller';
 import { SDUIService } from './services/sdui.service';
 import { DashboardScreenStrategy } from './strategies/dashboard.screen';
 import { LoginScreenStrategy } from './strategies/login.screen';
+import { MoversHomeScreenStrategy } from './strategies/movers-home.screen';
 
 // Type for sandbox store factory
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -30,6 +31,7 @@ type InMemoryStoreFactoryType = new (...args: any[]) => any;
     SDUIService,
     LoginScreenStrategy,
     DashboardScreenStrategy,
+    MoversHomeScreenStrategy,
   ],
   exports: [SDUIService],
 })
@@ -41,7 +43,8 @@ export class SDUIModule implements OnModuleInit {
   constructor(
     private readonly sduiService: SDUIService,
     private readonly loginStrategy: LoginScreenStrategy,
-    private readonly dashboardStrategy: DashboardScreenStrategy
+    private readonly dashboardStrategy: DashboardScreenStrategy,
+    private readonly moversHomeStrategy: MoversHomeScreenStrategy
   ) {
     // Try to get sandbox store factory using dynamic import
     this.initSandbox();
@@ -81,7 +84,11 @@ export class SDUIModule implements OnModuleInit {
     // Register default dashboard
     this.sduiService.registerRenderer('dashboard', this.dashboardStrategy);
 
-    this.logger.log(`Registered screens: login, dashboard (${roles.length} roles)`);
+    // Register Movers homepage
+    this.sduiService.registerRenderer('movers-home', this.moversHomeStrategy);
+    this.logger.log('Registered screen: movers-home');
+
+    this.logger.log(`Registered screens: login, dashboard (${roles.length} roles), movers-home`);
     this.logger.log('SDUI Module initialized');
   }
 }

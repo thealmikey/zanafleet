@@ -23,7 +23,13 @@ import {
   TableRow,
   Tabs as MuiTabs,
   Tab,
+  Autocomplete,
+  ToggleButton,
+  ToggleButtonGroup,
 } from '@mui/material';
+// Import chart components for SDUI rendering
+import { LineChart, DoughnutChart } from '../common/Charts';
+import { KPIGrid, KPIGridItem } from '../common/KPIGrid';
 import {
   UISchema,
   LayoutNode,
@@ -235,6 +241,88 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
         );
       }
 
+      case 'Autocomplete': {
+        const acName = props.name as string;
+        const acLabel = props.label as string;
+        const acOptions = (props.options as Array<{ label: string; value: string }>) || [];
+        const acOptions2 = (props.options as string[]) || [];
+        // Handle both object arrays and string arrays
+        const displayOptions = acOptions.length > 0 
+          ? acOptions 
+          : acOptions2.map(opt => ({ label: opt, value: opt }));
+        return (
+          <Autocomplete
+            key={key}
+            freeSolo={props.freeSolo as boolean}
+            options={displayOptions}
+            getOptionLabel={(option) => typeof option === 'string' ? option : (option.label || '')}
+            value={formData[acName] || null}
+            onChange={(_event, value) => {
+              const selectedValue = typeof value === 'string' ? value : (value?.value || '');
+              handleInputChange(acName, selectedValue);
+            }}
+            onInputChange={(_event, value) => {
+              if (props.freeSolo) {
+                handleInputChange(acName, value);
+              }
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label={acLabel}
+                placeholder={props.placeholder as string}
+                required={props.required as boolean}
+                error={!!formErrors[acName]}
+                helperText={formErrors[acName]}
+              />
+            )}
+            renderOption={(params, option) => (
+              <Box component="li" {...params}>
+                {typeof option === 'string' ? option : option.label}
+              </Box>
+            )}
+          />
+        );
+      }
+
+      case 'ToggleButtonGroup': {
+        const tgName = props.name as string;
+        const tgLabel = props.label as string;
+        const tgOptions = (props.options as Array<{ value: string; label: string; icon?: string }>) || [];
+        const currentValue = formData[tgName] || '';
+        return (
+          <Box key={key}>
+            {tgLabel && (
+              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                {tgLabel}
+              </Typography>
+            )}
+            <ToggleButtonGroup
+              value={currentValue}
+              exclusive
+              onChange={(_event, value) => {
+                if (value !== null) {
+                  handleInputChange(tgName, value);
+                }
+              }}
+              fullWidth={props.fullWidth as boolean}
+              size={props.size as 'small' | 'medium'}
+            >
+              {tgOptions.map((opt) => (
+                <ToggleButton key={opt.value} value={opt.value}>
+                  {opt.icon} {opt.label}
+                </ToggleButton>
+              ))}
+            </ToggleButtonGroup>
+            {formErrors[tgName] && (
+              <Typography variant="caption" color="error">
+                {formErrors[tgName]}
+              </Typography>
+            )}
+          </Box>
+        );
+      }
+
       case 'Button':
         return (
           <Button
@@ -331,13 +419,115 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
           </Card>
         );
 
+      case 'LineChart': {
+        // LineChart expects data in react-chartjs-2 format
+        const chartData = props.data as {
+          labels?: string[];
+          datasets?: Array<{
+            label?: string;
+            data?: number[];
+            borderColor?: string;
+            backgroundColor?: string;
+          }>;
+        };
+        // Ensure data is properly typed for the chart
+        const lineData = chartData?.datasets?.map(ds => ({
+          ...ds,
+          data: ds.data || [],
+        })) || [];
+        const title = props.title as string | undefined;
+        return (
+          <Card key={key}>
+            <CardContent>
+              {title && (
+                <Typography variant="subtitle1" gutterBottom>
+                  {title}
+                </Typography>
+              )}
+              <LineChart
+                data={{
+                  labels: chartData?.labels || [],
+                  datasets: lineData as any,
+                }}
+                height={Number(props.height) || 240}
+                ariaLabel={title || 'Line Chart'}
+              />
+            </CardContent>
+          </Card>
+        );
+      }
+
+      case 'DoughnutChart': {
+        // DoughnutChart expects data in react-chartjs-2 format
+        const chartData = props.data as {
+          labels?: string[];
+          datasets?: Array<{
+            label?: string;
+            data?: number[];
+            backgroundColor?: string[];
+          }>;
+        };
+        // Ensure data is properly typed for the chart
+        const doughnutData = chartData?.datasets?.map(ds => ({
+          ...ds,
+          data: ds.data || [],
+        })) || [];
+        const title = props.title as string | undefined;
+        return (
+          <Card key={key}>
+            <CardContent>
+              {title && (
+                <Typography variant="subtitle1" gutterBottom>
+                  {title}
+                </Typography>
+              )}
+              <DoughnutChart
+                data={{
+                  labels: chartData?.labels || [],
+                  datasets: doughnutData as any,
+                }}
+                height={Number(props.height) || 240}
+                ariaLabel={title || 'Doughnut Chart'}
+              />
+            </CardContent>
+          </Card>
+        );
+      }
+
+      case 'KPIGrid': {
+        // KPIGrid expects items array with title, value, icon, color, loading
+        const items = (props.items as Array<{
+          title?: string;
+          value?: string;
+          icon?: React.ReactNode;
+          color?: string;
+          loading?: boolean;
+        }>) || [];
+        const kpiItems: KPIGridItem[] = items.map((item) => ({
+          title: item.title || '',
+          value: item.value || '-',
+          loading: item.loading || false,
+        }));
+        return (
+          <Box key={key} sx={{ mb: 3 }}>
+            <KPIGrid items={kpiItems} md={Number(props.columns) || 3} />
+          </Box>
+        );
+      }
+
       case 'Tabs':
         return (
           <Box key={key}>
             <MuiTabs value={0} sx={{ mb: 2 }}>
-              {(props.tabs as unknown[])?.map((tab, idx) => (
-                <Tab key={idx} label={typeof tab === 'string' ? tab : String(tab)} />
-              )) || <Tab label="Tab 1" />}
+              {(props.tabs as unknown[])?.map((tab, _idx) => {
+                // Handle both string tabs and object tabs { label, value }
+                const tabLabel = typeof tab === 'string' 
+                  ? tab 
+                  : (tab && typeof tab === 'object' && 'label' in tab) 
+                    ? (tab as { label: string }).label 
+                    : String(tab);
+                return <Tab key={`tab-${_idx}`} label={tabLabel} value={tabLabel} />;
+              }) || <Tab label="Tab 1" />}
             </MuiTabs>
           </Box>
         );
@@ -345,21 +535,25 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
       case 'DataTable':
         const columns = (props.columns as { key: string; label: string }[]) || [];
         const rows = (props.rows as Record<string, unknown>[]) || [];
+        // Debug log for DataTable
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[SDUI] Rendering DataTable:', { id, columns: columns.length, rows: rows.length });
+        }
         return (
           <TableContainer key={key} component={Paper} sx={{ maxHeight: 400 }}>
             <Table stickyHeader size="small">
               <TableHead>
                 <TableRow>
-                  {columns.map((col) => (
-                    <TableCell key={col.key} sx={{ fontWeight: 'bold' }}>{col.label}</TableCell>
+                  {columns.map((col, _cIdx) => (
+                    <TableCell key={`header-${_cIdx}-${col.key}`} sx={{ fontWeight: 'bold' }}>{col.label}</TableCell>
                   ))}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row, idx) => (
-                  <TableRow key={idx}>
-                    {columns.map((col) => (
-                      <TableCell key={col.key}>{String(row[col.key] ?? '')}</TableCell>
+                {rows.map((row, _rIdx) => (
+                  <TableRow key={`row-${_rIdx}`}>
+                    {columns.map((col, _cIdx) => (
+                      <TableCell key={`cell-${_rIdx}-${_cIdx}-${col.key}`}>{String(row[col.key] ?? '')}</TableCell>
                     ))}
                   </TableRow>
                 ))}
@@ -368,16 +562,101 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
           </TableContainer>
         );
 
-      default:
+      case 'Form':
+        // Form component - renders children via the layout system
+        // Debug log to help identify rendering issues
+        if (process.env.NODE_ENV === 'development') {
+          console.debug('[SDUI] Rendering Form component:', { id, props, children: component.children });
+        }
         return (
-          <Box key={key} sx={{ p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
-            <Typography variant="caption" color="text.secondary">
+          <Box key={key} component="form" sx={{ width: '100%', mt: 2 }} onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+            {error && (
+              <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
+                {error}
+              </Alert>
+            )}
+            {Object.keys(formErrors).length > 0 && (
+              <Alert variant="outlined" severity="error" sx={{ mb: 2 }}>
+                <ul style={{ margin: 0, paddingLeft: 16 }}>
+                  {Object.keys(formErrors).map((fieldName) => (
+                    <li key={fieldName}>{formErrors[fieldName]}</li>
+                  ))}
+                </ul>
+              </Alert>
+            )}
+            {/* Render nested layout children within the form */}
+            {component.children?.map((child, _idx) => {
+              // Handle LayoutNode children
+              if ('type' in child) {
+                return renderLayoutNode(child as LayoutNode);
+              }
+              // Handle ComponentRef children
+              if ('component' in child) {
+                return renderComponent(child as ComponentRef);
+              }
+              return null;
+            })}
+          </Box>
+        );
+
+      case 'Box': {
+        const boxWidth = props.width as string;
+        return (
+          <Box
+            key={key}
+            sx={{
+              width: boxWidth || 'auto',
+              display: props.display || 'flex',
+              alignItems: props.alignItems || 'flex-start',
+              justifyContent: props.justifyContent || 'flex-start',
+              flexDirection: props.flexDirection || 'row',
+              gap: (props.spacing as number) || 2,
+            }}
+          >
+            {component.children?.map((child, _idx) => {
+              if ('type' in child) {
+                return renderLayoutNode(child as LayoutNode);
+              }
+              if ('component' in child) {
+                return renderComponent(child as ComponentRef);
+              }
+              return null;
+            })}
+          </Box>
+        );
+      }
+
+      case 'GridItem': {
+        const gridXs = props.xs as number;
+        const gridSm = props.sm as number;
+        const gridMd = props.md as number;
+        return (
+          <Grid item xs={gridXs || 12} sm={gridSm || gridXs || 12} md={gridMd || gridSm || gridXs || 12} key={key}>
+            {component.children?.map((child, _idx) => {
+              if ('type' in child) {
+                return renderLayoutNode(child as LayoutNode);
+              }
+              if ('component' in child) {
+                return renderComponent(child as ComponentRef);
+              }
+              return null;
+            })}
+          </Grid>
+        );
+      }
+
+      default:
+        // Debug log for unknown components to help identify issues
+        console.warn(`[SDUI] Unknown component: ${type}`, { id, props });
+        return (
+          <Box key={key} sx={{ p: 2, bgcolor: '#fff3e0', borderRadius: 1, border: '1px solid #ff9800' }}>
+            <Typography variant="caption" color="warning.main">
               Unknown component: {type}
             </Typography>
           </Box>
         );
     }
-  }, [formData, formErrors, loading, schema.actions, resolveProps, handleInputChange, handleAction, handleSubmit]);
+  }, [formData, formErrors, loading, schema.actions, schema.layout, schema.metadata, schema.validations, resolveProps, handleInputChange, handleAction, handleSubmit, error, setError]);
 
   // Render a layout node recursively
   const renderLayoutNode = useCallback((node: LayoutNode): React.ReactNode => {
@@ -410,8 +689,9 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
       );
     }
 
-    // Flex layout
+    // Flex layout (also used within grid)
     if (type === 'flex') {
+      const gridColumn = layoutProps?.gridColumn as string | undefined;
       return (
         <Box
           key={key}
@@ -422,6 +702,9 @@ export const SDUIRenderer: React.FC<SDUIRendererProps> = ({
             justifyContent: (layoutProps?.justify as any) || 'flex-start',
             gap: (layoutProps?.spacing as number) || 2,
             minHeight: layoutProps?.fullHeight ? '100vh' : 'auto',
+            flexWrap: layoutProps?.wrap ? 'wrap' : 'nowrap',
+            // Grid column support for nested layouts within grid
+            ...(gridColumn ? { gridColumn } : {}),
           }}
         >
           {renderedComponents}

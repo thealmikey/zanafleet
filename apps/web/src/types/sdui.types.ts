@@ -38,7 +38,8 @@ export type ScreenType =
   | 'list'
   | 'wizard'
   | 'settings'
-  | 'error';
+  | 'error'
+  | 'movers-home';
 
 export type AuthRequirement = 'required' | 'optional' | 'none';
 
@@ -89,6 +90,7 @@ export interface ComponentRef {
   props?: Record<string, unknown>;
   when?: DataBinding;
   layout?: ComponentLayoutConfig;
+  children?: (LayoutNode | ComponentRef)[]; // Nested components for Form, Box, etc.
 }
 
 export interface DataBinding {

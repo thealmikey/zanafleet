@@ -336,6 +336,11 @@ export interface ComponentRef {
    * Layout configuration
    */
   layout?: ComponentLayoutConfig;
+
+  /**
+   * Nested children components for Form, Box, etc.
+   */
+  children?: (LayoutNode | ComponentRef)[];
 }
 
 /**
@@ -866,6 +871,11 @@ export interface SDUIActionResponse {
     message: string;
     type: 'success' | 'error' | 'warning' | 'info';
   };
+
+  /**
+   * General message (for responses)
+   */
+  message?: string;
 
   /**
    * Updated schema (if screen should update)
