@@ -23,9 +23,15 @@ const isSandBoxMode = process.env.USE_IN_MEMORY_DB === 'true';
  * Creates mock repository for sandbox mode
  */
 function createMockRepository<T = unknown>(): Record<string, unknown> {
+  // In-memory store to track entities for querying
+  const store: T[] = [];
+  
   return {
-    save: async (entity: T): Promise<T> => entity,
-    find: async (): Promise<T[]> => [],
+    save: async (entity: T): Promise<T> => {
+      store.push(entity);
+      return entity;
+    },
+    find: async (): Promise<T[]> => [...store],
     findOne: async (): Promise<T | null> => null,
     findOneBy: async (): Promise<T | null> => null,
     create: (data: Partial<T>): T => data as T,
@@ -34,6 +40,9 @@ function createMockRepository<T = unknown>(): Record<string, unknown> {
     delete: async (): Promise<{ affected: number }> => ({ affected: 1 }),
     createQueryBuilder: () => null,
     manager: { save: async (entity: T): Promise<T> => entity },
+    // Add missing TypeORM methods with proper signatures
+    count: async (_options?: { where?: Record<string, unknown> }): Promise<number> => store.length,
+    countBy: async (_criteria?: Record<string, unknown>): Promise<number> => store.length,
   };
 }
 

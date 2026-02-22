@@ -234,6 +234,23 @@ export class DashboardScreenStrategy implements ScreenRenderer {
       });
     }
 
+    // Chart data sources for admin/dispatcher
+    if (role === 'admin' || role === 'dispatcher') {
+      dataSources.push({
+        id: 'revenue-trend',
+        type: 'static',
+        endpoint: 'demo://revenue-trend',
+        staticData: this.getRevenueTrendData(),
+      });
+
+      dataSources.push({
+        id: 'settlement-status',
+        type: 'static',
+        endpoint: 'demo://settlement-status',
+        staticData: this.getSettlementStatusData(),
+      });
+    }
+
     return dataSources;
   }
 
@@ -281,6 +298,40 @@ export class DashboardScreenStrategy implements ScreenRenderer {
     };
 
     return roleMetrics[role] || baseMetrics;
+  }
+
+  /**
+   * Get chart data for revenue trend (LineChart)
+   */
+  private getRevenueTrendData(): Record<string, unknown> {
+    return {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+      datasets: [
+        {
+          label: 'Revenue (KES)',
+          data: [125000, 145000, 138000, 172000, 189000, 210000, 245000],
+          borderColor: '#1976d2',
+          backgroundColor: 'rgba(25, 118, 210, 0.1)',
+          fill: true,
+        },
+      ],
+    };
+  }
+
+  /**
+   * Get chart data for settlement status (DoughnutChart)
+   */
+  private getSettlementStatusData(): Record<string, unknown> {
+    return {
+      labels: ['Completed', 'Processing', 'Pending', 'Failed'],
+      datasets: [
+        {
+          label: 'Settlements',
+          data: [145, 32, 18, 5],
+          backgroundColor: ['#4caf50', '#2196f3', '#ff9800', '#f44336'],
+        },
+      ],
+    };
   }
 
   /**
@@ -391,6 +442,36 @@ export class DashboardScreenStrategy implements ScreenRenderer {
           },
           components: metricsCards,
         },
+        // Charts Row (for admin/dispatcher)
+        ...(role === 'admin' || role === 'dispatcher' ? [
+          {
+            type: 'flex' as LayoutType,
+            props: {
+              gridColumn: 'span 12',
+              spacing: 3,
+            },
+            components: [
+              {
+                component: 'LineChart',
+                id: 'revenue-chart',
+                props: {
+                  title: 'Revenue Trend',
+                  data: '{{revenue-trend}}',
+                  height: 240,
+                },
+              },
+              {
+                component: 'DoughnutChart',
+                id: 'settlement-chart',
+                props: {
+                  title: 'Settlement Status',
+                  data: '{{settlement-status}}',
+                  height: 240,
+                },
+              },
+            ],
+          },
+        ] : []),
         // Main Content Area
         {
           type: 'stack' as LayoutType,

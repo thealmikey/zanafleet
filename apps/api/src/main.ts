@@ -6,6 +6,13 @@ import { AppModule } from './app.module';
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
 
+  // Enable CORS to allow frontend (localhost:3001) to communicate with API (localhost:3000)
+  app.enableCors({
+    origin: ['http://localhost:3001'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    credentials: true,
+  });
+
   app.setGlobalPrefix('api');
 
   const port = process.env.PORT || 3000;
