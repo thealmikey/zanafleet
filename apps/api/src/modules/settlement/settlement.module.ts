@@ -3,6 +3,7 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
+import { JobQueueModule } from '../../core/job-queue/job-queue.module';
 import { AccountModule } from '../account/account.module';
 import { LedgerModule } from '../ledger/ledger.module';
 import { PaymentModule } from '../payment/payment.module';
@@ -23,12 +24,18 @@ const CommandHandlers = [CreateSettlementBatchCommandHandler, ProcessPayoutComma
     TypeOrmModule.forFeature([SettlementBatchEntity, SettlementItemEntity]),
     CqrsModule,
     EventBusModule,
+    JobQueueModule,
     AccountModule,
     LedgerModule,
     PaymentModule,
   ],
   controllers: [SettlementsController],
-  providers: [SettlementSchedulerService, PayoutRiskService, PayoutOrchestrator, ...CommandHandlers],
+  providers: [
+    SettlementSchedulerService,
+    PayoutRiskService,
+    PayoutOrchestrator,
+    ...CommandHandlers,
+  ],
   exports: [TypeOrmModule, SettlementSchedulerService, PayoutRiskService, PayoutOrchestrator],
 })
 export class SettlementModule {}

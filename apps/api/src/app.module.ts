@@ -10,6 +10,7 @@ import { MediaModule } from './core/media';
 import { HttpMetricsInterceptor } from './core/metrics/interceptors/http-metrics.interceptor';
 import { MetricsModule } from './core/metrics/metrics.module';
 import { Neo4jModule } from './core/neo4j';
+import { WebhookModule } from './core/webhook/webhook.module';
 import { AccountModule } from './modules/account/account.module';
 import { ActorModule } from './modules/actor/actor.module';
 import { AssetModule } from './modules/asset/asset.module';
@@ -74,6 +75,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     ScheduleModule.forRoot(),
     MetricsModule,
     MediaModule,
+    WebhookModule,
     AccountModule,
     ActorModule,
     AuthModule,
@@ -117,4 +119,4 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

@@ -4,12 +4,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-
+import { Repository, DataSource } from 'typeorm';
 
 import { CreateSettlementBatchCommand } from '../commands/create-settlement-batch.command';
 import { ProcessPayoutCommand } from '../commands/process-payout.command';
 import { PayoutMethod } from '../dto/settlement.enums';
+import { JobQueueService, QUEUE_NAMES } from '@api/core/job-queue';
 
 export interface SchedulerConfig {
   minimumPayoutThreshold: number;
@@ -38,22 +38,33 @@ export class SettlementSchedulerService {
     @InjectRepository(AccountEntity)
     private readonly accountRepository: Repository<AccountEntity>,
     private readonly ledgerService: LedgerService,
+    private readonly dataSource: DataSource,
+    private readonly jobQueueService: JobQueueService,
   ) {}
 
   @Cron(CronExpression.EVERY_WEEK)
   async processWeeklySettlements(): Promise<void> {
     this.logger.log('Starting weekly settlement processing...');
 
-    const periodEnd = new Date();
-    const periodStart = new Date();
-    periodStart.setDate(periodStart.getDate() - 7);
+    // Use distributed lock to prevent concurrent execution across instances
+    const lockName = 'settlement-weekly-processing';
 
-    try {
-      await this.processSettlementsForPeriod(periodStart, periodEnd);
-    } catch (error) {
-      this.logger.error(
-        `Failed to process weekly settlements: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
+    const result = await this.jobQueueService.withLock(lockName, async () => {
+      const periodEnd = new Date();
+      const periodStart = new Date();
+      periodStart.setDate(periodStart.getDate() - 7);
+
+      try {
+        await this.processSettlementsForPeriod(periodStart, periodEnd);
+      } catch (error) {
+        this.logger.error(
+          `Failed to process weekly settlements: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        );
+      }
+    });
+
+    if (!result) {
+      this.logger.warn('Weekly settlement processing already running on another instance');
     }
   }
 

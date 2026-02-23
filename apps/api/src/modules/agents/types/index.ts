@@ -257,6 +257,7 @@ export interface DeadLetterMessage {
 
 /**
  * BackgroundJob - background job definition
+ * Multi-tenant aware with workspaceId and organizationId
  */
 export interface BackgroundJob {
   id: string;
@@ -269,6 +270,9 @@ export interface BackgroundJob {
   priority?: number;
   scheduledAt?: Date;
   createdAt: Date;
+  // Multi-tenant scoping
+  workspaceId: string;
+  organizationId?: string;
 }
 
 /**
