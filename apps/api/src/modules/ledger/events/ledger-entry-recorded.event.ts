@@ -17,11 +17,11 @@ export interface LedgerEntryData {
  */
 export class LedgerEntryRecordedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'LedgerEntryRecordedEvent-V1' = 'LedgerEntryRecordedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'LedgerEntryRecordedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Ledger' = 'Ledger';
+  readonly aggregateType = 'Ledger' as const;
 
   readonly referenceType: LedgerReferenceType;
   readonly referenceId: string;

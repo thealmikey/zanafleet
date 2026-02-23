@@ -18,11 +18,11 @@ import { InteractionStreamState, InteractionContextType } from '../entities/inte
  */
 export class InteractionStreamCreatedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'InteractionStreamCreatedEvent-V1' = 'InteractionStreamCreatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'InteractionStreamCreatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'InteractionStream' = 'InteractionStream';
+  readonly aggregateType = 'InteractionStream' as const;
 
   readonly streamId: string;
   readonly contextType: InteractionContextType;

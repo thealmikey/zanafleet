@@ -17,11 +17,11 @@ import { GuardEvaluationResult } from '../entities/process-instance.entity';
  */
 export class ProcessStateChangedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'Workflow.Process.StateChangedV1' = 'Workflow.Process.StateChangedV1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'Workflow.Process.StateChangedV1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'ProcessInstance' = 'ProcessInstance';
+  readonly aggregateType = 'ProcessInstance' as const;
 
   readonly instanceId: string;
   readonly definitionId: string;

@@ -38,11 +38,11 @@ export class OrganizationCreatedEventV1 {
    * Event metadata
    */
   readonly eventId: string; // UUID, unique identifier for this event
-  readonly eventType: 'OrganizationCreatedEvent-V1' = 'OrganizationCreatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'OrganizationCreatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date; // When this event was created
   readonly aggregateId: string; // organizationId (aggregate root identifier)
-  readonly aggregateType: 'Organization' = 'Organization';
+  readonly aggregateType = 'Organization' as const;
 
   /**
    * Event payload (immutable)

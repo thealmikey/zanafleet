@@ -1,10 +1,10 @@
 export class RequirementSatisfiedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'RequirementSatisfiedEvent-V1' = 'RequirementSatisfiedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'RequirementSatisfiedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Requirement' = 'Requirement';
+  readonly aggregateType = 'Requirement' as const;
   readonly requirementId: string;
   readonly entityType: string;
   readonly entityId: string;

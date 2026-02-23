@@ -24,11 +24,11 @@ export class EvidenceCreatedEventV1 {
    * Event metadata
    */
   readonly eventId: string;
-  readonly eventType: 'EvidenceCreatedEvent-V1' = 'EvidenceCreatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'EvidenceCreatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Evidence' = 'Evidence';
+  readonly aggregateType = 'Evidence' as const;
 
   /**
    * Event payload (immutable)

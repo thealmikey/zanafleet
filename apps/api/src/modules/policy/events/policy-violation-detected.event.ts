@@ -14,11 +14,11 @@ export type PolicyViolationType = 'BLOCKED' | 'REQUIRES_APPROVAL';
  */
 export class PolicyViolationDetectedEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'PolicyViolationDetectedEvent-V1' = 'PolicyViolationDetectedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'PolicyViolationDetectedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'PolicyViolation' = 'PolicyViolation';
+  readonly aggregateType = 'PolicyViolation' as const;
 
   readonly policyId: string;
   readonly policyName: string;

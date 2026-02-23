@@ -18,11 +18,11 @@ import { BusinessType, LocationData } from '@zanafleet/contracts';
  */
 export class BusinessOnboardedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'Business.Business.OnboardedV1' = 'Business.Business.OnboardedV1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'Business.Business.OnboardedV1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Business' = 'Business';
+  readonly aggregateType = 'Business' as const;
 
   readonly businessId: string;
   readonly businessName: string;

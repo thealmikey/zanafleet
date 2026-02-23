@@ -20,11 +20,11 @@ export class CommitmentStatusChangedEventV1 {
    * Event metadata
    */
   readonly eventId: string;
-  readonly eventType: 'CommitmentStatusChangedEvent-V1' = 'CommitmentStatusChangedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'CommitmentStatusChangedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Commitment' = 'Commitment';
+  readonly aggregateType = 'Commitment' as const;
 
   /**
    * Event payload (immutable)

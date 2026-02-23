@@ -6,11 +6,11 @@ import { PaymentFlowType } from '../dto/payment.enums';
  */
 export class PaymentCompletedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'PaymentCompletedEvent-V1' = 'PaymentCompletedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'PaymentCompletedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'PaymentIntent' = 'PaymentIntent';
+  readonly aggregateType = 'PaymentIntent' as const;
 
   readonly paymentIntentId: string;
   readonly payerAccountId: string;

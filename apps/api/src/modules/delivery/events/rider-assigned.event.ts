@@ -11,11 +11,11 @@
  */
 export class RiderAssignedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'RiderAssignedEvent-V1' = 'RiderAssignedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'RiderAssignedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Delivery' = 'Delivery';
+  readonly aggregateType = 'Delivery' as const;
 
   readonly deliveryId: string;
   readonly riderId: string;

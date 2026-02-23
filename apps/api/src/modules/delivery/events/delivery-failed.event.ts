@@ -2,11 +2,11 @@ import { randomUUID } from 'node:crypto'
 
 export class DeliveryFailedEventV1 {
   readonly eventId: string
-  readonly eventType: 'Delivery.Delivery.FailedV1' = 'Delivery.Delivery.FailedV1'
-  readonly eventVersion: '1.0.0' = '1.0.0'
+  readonly eventType = 'Delivery.Delivery.FailedV1' as const
+  readonly eventVersion = '1.0.0' as const
   readonly occurredAt: Date
   readonly aggregateId: string
-  readonly aggregateType: 'Delivery' = 'Delivery'
+  readonly aggregateType = 'Delivery' as const
   readonly deliveryId: string
   readonly businessId: string
   readonly attemptCount: number

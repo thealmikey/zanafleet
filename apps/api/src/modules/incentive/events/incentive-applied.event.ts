@@ -6,11 +6,11 @@ import { IncentiveType, FundingSource } from '../dto/incentive.enums';
  */
 export class IncentiveAppliedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'IncentiveAppliedEvent-V1' = 'IncentiveAppliedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'IncentiveAppliedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'IncentiveApplication' = 'IncentiveApplication';
+  readonly aggregateType = 'IncentiveApplication' as const;
 
   readonly applicationId: string;
   readonly campaignId: string;

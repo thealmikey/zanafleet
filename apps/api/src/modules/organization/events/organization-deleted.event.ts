@@ -14,11 +14,11 @@ export interface OrganizationDeletedEventV1JSON {
 
 export class OrganizationDeletedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'OrganizationDeletedEvent-V1' = 'OrganizationDeletedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'OrganizationDeletedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Organization' = 'Organization';
+  readonly aggregateType = 'Organization' as const;
 
   readonly organizationId: string;
   readonly deletedAt: Date;

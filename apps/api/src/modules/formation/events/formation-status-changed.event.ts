@@ -2,11 +2,11 @@ import { FormationState } from '../dto/formation.enums';
 
 export class FormationStatusChangedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'FormationStatusChangedEvent-V1' = 'FormationStatusChangedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'FormationStatusChangedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'FormationStatus' = 'FormationStatus';
+  readonly aggregateType = 'FormationStatus' as const;
   readonly entityType: string;
   readonly entityId: string;
   readonly previousState: FormationState;

@@ -120,7 +120,7 @@ export class CapabilityEntity {
       category: this.category ?? undefined,
       requiresConsent: this.requiresConsent,
       version: this.version,
-      ...(this.metadata ?? {}),
+      ...this.metadata,
     };
   }
 

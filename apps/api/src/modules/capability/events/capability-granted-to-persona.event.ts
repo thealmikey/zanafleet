@@ -14,11 +14,11 @@ export interface CapabilityGrantedToPersonaEventV1JSON {
 
 export class CapabilityGrantedToPersonaEventV1 {
   readonly eventId: string;
-  readonly eventType: 'CapabilityGrantedToPersonaEvent-V1' = 'CapabilityGrantedToPersonaEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'CapabilityGrantedToPersonaEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Capability' = 'Capability';
+  readonly aggregateType = 'Capability' as const;
   readonly personaId: string;
   readonly capabilityId: string;
   readonly grantedAt: Date;

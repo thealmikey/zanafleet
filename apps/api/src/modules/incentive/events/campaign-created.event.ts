@@ -6,11 +6,11 @@ import { IncentiveType, CampaignStatus, FundingSource } from '../dto/incentive.e
  */
 export class CampaignCreatedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'CampaignCreatedEvent-V1' = 'CampaignCreatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'CampaignCreatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Campaign' = 'Campaign';
+  readonly aggregateType = 'Campaign' as const;
 
   readonly campaignId: string;
   readonly name: string;

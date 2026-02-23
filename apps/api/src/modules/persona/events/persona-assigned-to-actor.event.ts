@@ -1,10 +1,10 @@
 export class PersonaAssignedToActorEventV1 {
   readonly eventId: string;
-  readonly eventType: 'PersonaAssignedToActorEvent-V1' = 'PersonaAssignedToActorEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'PersonaAssignedToActorEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'ActorPersonaAssignment' = 'ActorPersonaAssignment';
+  readonly aggregateType = 'ActorPersonaAssignment' as const;
 
   readonly actorId: string;
   readonly workspaceId: string;

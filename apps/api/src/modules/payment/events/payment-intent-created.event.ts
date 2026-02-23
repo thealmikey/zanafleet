@@ -6,11 +6,11 @@ import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../dto/paym
  */
 export class PaymentIntentCreatedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'PaymentIntentCreatedEvent-V1' = 'PaymentIntentCreatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'PaymentIntentCreatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'PaymentIntent' = 'PaymentIntent';
+  readonly aggregateType = 'PaymentIntent' as const;
 
   readonly paymentIntentId: string;
   readonly payerAccountId: string;

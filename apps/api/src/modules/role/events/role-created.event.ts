@@ -21,11 +21,11 @@ export class RoleCreatedEventV1 {
    * Event metadata
    */
   readonly eventId: string;
-  readonly eventType: 'RoleCreatedEvent-V1' = 'RoleCreatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'RoleCreatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Role' = 'Role';
+  readonly aggregateType = 'Role' as const;
 
   /**
    * Event payload (immutable)

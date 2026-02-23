@@ -7,11 +7,11 @@ import { v4 as uuidv4 } from 'uuid';
  */
 export class CalendarCreatedEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'Calendar.Calendar.CreatedV1' = 'Calendar.Calendar.CreatedV1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'Calendar.Calendar.CreatedV1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Calendar' = 'Calendar';
+  readonly aggregateType = 'Calendar' as const;
 
   readonly calendarId: string;
   readonly name: string;
@@ -84,11 +84,11 @@ export class CalendarCreatedEventV1 implements BaseEvent {
  */
 export class CalendarEventAddedEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'Calendar.Event.AddedV1' = 'Calendar.Event.AddedV1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'Calendar.Event.AddedV1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'CalendarEvent' = 'CalendarEvent';
+  readonly aggregateType = 'CalendarEvent' as const;
 
   readonly calendarEventId: string;
   readonly calendarEventType: CalendarEventType;
@@ -171,11 +171,11 @@ export class CalendarEventAddedEventV1 implements BaseEvent {
  */
 export class HolidayDeclaredEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'Calendar.Holiday.DeclaredV1' = 'Calendar.Holiday.DeclaredV1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'Calendar.Holiday.DeclaredV1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'CalendarEvent' = 'CalendarEvent';
+  readonly aggregateType = 'CalendarEvent' as const;
 
   readonly holidayId: string;
   readonly title: string;
@@ -248,11 +248,11 @@ export class HolidayDeclaredEventV1 implements BaseEvent {
  */
 export class OverrideAppliedEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'Calendar.Override.AppliedV1' = 'Calendar.Override.AppliedV1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'Calendar.Override.AppliedV1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'CalendarOverride' = 'CalendarOverride';
+  readonly aggregateType = 'CalendarOverride' as const;
 
   readonly overrideId: string;
   readonly targetScope: CalendarScope;
@@ -335,11 +335,11 @@ export class OverrideAppliedEventV1 implements BaseEvent {
  */
 export class ConstraintBlockedActionEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'Calendar.Constraint.BlockedV1' = 'Calendar.Constraint.BlockedV1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'Calendar.Constraint.BlockedV1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'SchedulingConstraint' = 'SchedulingConstraint';
+  readonly aggregateType = 'SchedulingConstraint' as const;
 
   readonly targetType: BindingTargetType;
   readonly targetId: string;

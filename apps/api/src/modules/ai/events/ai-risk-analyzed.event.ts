@@ -86,11 +86,11 @@ export class AIRiskFactor {
  */
 export class AIRiskAnalyzedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'AIRiskAnalyzedEvent-V1' = 'AIRiskAnalyzedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'AIRiskAnalyzedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'AIRiskAnalysis' = 'AIRiskAnalysis';
+  readonly aggregateType = 'AIRiskAnalysis' as const;
 
   // Analysis subject
   readonly actorId: string;

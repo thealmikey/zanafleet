@@ -13,11 +13,11 @@ import { OrderStatus, PaymentStatus } from '@zanafleet/contracts';
  */
 export class OrderCreatedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'Order.Order.CreatedV1' = 'Order.Order.CreatedV1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'Order.Order.CreatedV1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Order' = 'Order';
+  readonly aggregateType = 'Order' as const;
 
   readonly orderId: string;
   readonly businessId: string;

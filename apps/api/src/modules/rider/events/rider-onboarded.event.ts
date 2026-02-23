@@ -18,11 +18,11 @@ import { VehicleType, LocationData } from '@zanafleet/contracts';
  */
 export class RiderOnboardedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'Rider.Rider.OnboardedV1' = 'Rider.Rider.OnboardedV1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'Rider.Rider.OnboardedV1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Rider' = 'Rider';
+  readonly aggregateType = 'Rider' as const;
 
   readonly riderId: string;
   readonly fullName: string;

@@ -49,11 +49,11 @@ export interface AIHangingStateDetectedEventV1JSON {
  */
 export class AIHangingStateDetectedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'AIHangingStateDetectedEvent-V1' = 'AIHangingStateDetectedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'AIHangingStateDetectedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'WorkflowProcess' = 'WorkflowProcess';
+  readonly aggregateType = 'WorkflowProcess' as const;
 
   // Actor information
   readonly actorId: string;

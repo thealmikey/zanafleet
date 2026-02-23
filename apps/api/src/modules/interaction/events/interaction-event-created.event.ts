@@ -22,11 +22,11 @@ import { InteractionEventType, InteractionActorType } from '../entities/interact
  */
 export class InteractionEventCreatedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'InteractionEventCreatedEvent-V1' = 'InteractionEventCreatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'InteractionEventCreatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'InteractionEvent' = 'InteractionEvent';
+  readonly aggregateType = 'InteractionEvent' as const;
 
   readonly interactionEventId: string;
   readonly streamId: string;

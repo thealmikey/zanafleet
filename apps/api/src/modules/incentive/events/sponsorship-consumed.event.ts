@@ -6,11 +6,11 @@ import { FundingSource } from '../dto/incentive.enums';
  */
 export class SponsorshipConsumedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'SponsorshipConsumedEvent-V1' = 'SponsorshipConsumedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'SponsorshipConsumedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Campaign' = 'Campaign';
+  readonly aggregateType = 'Campaign' as const;
 
   readonly campaignId: string;
   readonly sponsorAccountId: string;

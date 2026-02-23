@@ -11,11 +11,11 @@
  */
 export class DeliveryPricingAppliedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'DeliveryPricingAppliedEvent-V1' = 'DeliveryPricingAppliedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'DeliveryPricingAppliedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Delivery' = 'Delivery';
+  readonly aggregateType = 'Delivery' as const;
 
   readonly deliveryId: string;
   readonly baseFee: number;

@@ -33,11 +33,11 @@ export interface OrganizationUpdatedEventV1JSON {
  */
 export class OrganizationUpdatedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'OrganizationUpdatedEvent-V1' = 'OrganizationUpdatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'OrganizationUpdatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Organization' = 'Organization';
+  readonly aggregateType = 'Organization' as const;
 
   readonly organizationId: string;
   readonly changes: Readonly<OrganizationUpdatedEventV1Changes>;

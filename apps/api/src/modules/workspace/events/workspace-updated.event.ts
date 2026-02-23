@@ -37,11 +37,11 @@ export interface WorkspaceUpdatedEventV1JSON {
  */
 export class WorkspaceUpdatedEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'WorkspaceUpdatedEvent-V1' = 'WorkspaceUpdatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'WorkspaceUpdatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Workspace' = 'Workspace';
+  readonly aggregateType = 'Workspace' as const;
 
   readonly workspaceId: string;
   readonly changes: Readonly<WorkspaceUpdatedEventV1Changes>;

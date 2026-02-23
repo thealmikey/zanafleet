@@ -1,10 +1,10 @@
 export class PersonaCreatedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'PersonaCreatedEvent-V1' = 'PersonaCreatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'PersonaCreatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Persona' = 'Persona';
+  readonly aggregateType = 'Persona' as const;
 
   readonly personaId: string;
   readonly name: string;

@@ -16,11 +16,11 @@
  */
 export class ProcessTimeoutEventV1 {
   readonly eventId: string;
-  readonly eventType: 'Workflow.Process.TimeoutV1' = 'Workflow.Process.TimeoutV1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'Workflow.Process.TimeoutV1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'ProcessInstance' = 'ProcessInstance';
+  readonly aggregateType = 'ProcessInstance' as const;
 
   readonly instanceId: string;
   readonly definitionId: string;

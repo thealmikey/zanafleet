@@ -9,11 +9,11 @@ import { PolicyEffect, PolicyTrigger } from '../dto';
  */
 export class PolicyEvaluatedEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'PolicyEvaluatedEvent-V1' = 'PolicyEvaluatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'PolicyEvaluatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'PolicyDecision' = 'PolicyDecision';
+  readonly aggregateType = 'PolicyDecision' as const;
 
   readonly trigger: PolicyTrigger;
   readonly workspaceId: string;

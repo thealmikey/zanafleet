@@ -6,11 +6,11 @@ import { InvoiceStatus } from '../dto/billing.enums';
  */
 export class InvoiceIssuedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'InvoiceIssuedEvent-V1' = 'InvoiceIssuedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'InvoiceIssuedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Invoice' = 'Invoice';
+  readonly aggregateType = 'Invoice' as const;
 
   readonly invoiceId: string;
   readonly payerAccountId: string;

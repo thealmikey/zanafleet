@@ -18,11 +18,11 @@ import { ActorType } from '../dto/actor.enums';
  */
 export class ActorOnboardedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'ActorOnboardedEvent-V1' = 'ActorOnboardedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'ActorOnboardedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Actor' = 'Actor';
+  readonly aggregateType = 'Actor' as const;
 
   readonly actorId: string;
   readonly email: string;

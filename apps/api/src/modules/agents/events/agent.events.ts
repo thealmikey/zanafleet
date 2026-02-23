@@ -14,11 +14,11 @@ import {
  */
 export class AgentTriggeredEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'AgentTriggeredEvent-V1' = 'AgentTriggeredEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'AgentTriggeredEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Agent' = 'Agent';
+  readonly aggregateType = 'Agent' as const;
 
   readonly agentId: string;
   readonly agentName: string;
@@ -87,11 +87,11 @@ export class AgentTriggeredEventV1 implements BaseEvent {
  */
 export class AgentDecisionMadeEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'AgentDecisionMadeEvent-V1' = 'AgentDecisionMadeEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'AgentDecisionMadeEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Agent' = 'Agent';
+  readonly aggregateType = 'Agent' as const;
 
   readonly agentId: string;
   readonly executionId: string;
@@ -164,11 +164,11 @@ export class AgentDecisionMadeEventV1 implements BaseEvent {
  */
 export class AgentExecutionStartedEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'AgentExecutionStartedEvent-V1' = 'AgentExecutionStartedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'AgentExecutionStartedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'AgentExecution' = 'AgentExecution';
+  readonly aggregateType = 'AgentExecution' as const;
 
   readonly agentId: string;
   readonly executionId: string;
@@ -217,11 +217,11 @@ export class AgentExecutionStartedEventV1 implements BaseEvent {
  */
 export class AgentExecutionCompletedEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'AgentExecutionCompletedEvent-V1' = 'AgentExecutionCompletedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'AgentExecutionCompletedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'AgentExecution' = 'AgentExecution';
+  readonly aggregateType = 'AgentExecution' as const;
 
   readonly agentId: string;
   readonly executionId: string;
@@ -286,11 +286,11 @@ export class AgentExecutionCompletedEventV1 implements BaseEvent {
  */
 export class AgentConsentRequestedEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'AgentConsentRequestedEvent-V1' = 'AgentConsentRequestedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'AgentConsentRequestedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'ConsentRequest' = 'ConsentRequest';
+  readonly aggregateType = 'ConsentRequest' as const;
 
   readonly consentRequestId: string;
   readonly executionId: string;
@@ -367,11 +367,11 @@ export class AgentConsentRequestedEventV1 implements BaseEvent {
  */
 export class AgentBlockedEventV1 implements BaseEvent {
   readonly eventId: string;
-  readonly eventType: 'AgentBlockedEvent-V1' = 'AgentBlockedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'AgentBlockedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'AgentExecution' = 'AgentExecution';
+  readonly aggregateType = 'AgentExecution' as const;
 
   readonly agentId: string;
   readonly executionId: string;

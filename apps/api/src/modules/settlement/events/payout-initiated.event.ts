@@ -6,11 +6,11 @@ import { PayoutMethod } from '../dto/settlement.enums';
  */
 export class PayoutInitiatedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'PayoutInitiatedEvent-V1' = 'PayoutInitiatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'PayoutInitiatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'SettlementBatch' = 'SettlementBatch';
+  readonly aggregateType = 'SettlementBatch' as const;
 
   readonly batchId: string;
   readonly riderAccountId: string;

@@ -13,11 +13,11 @@ import { TransactionType, TransactionStatus } from '../dto/transaction.enums';
  */
 export class TransactionCreatedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'TransactionCreatedEvent-V1' = 'TransactionCreatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'TransactionCreatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Transaction' = 'Transaction';
+  readonly aggregateType = 'Transaction' as const;
 
   readonly transactionId: string;
   readonly sourceWalletId: string;

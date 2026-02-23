@@ -7,11 +7,11 @@ import { AccountType, AccountStatus } from '../dto/account.enums';
  */
 export class AccountCreatedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'AccountCreatedEvent-V1' = 'AccountCreatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'AccountCreatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Account' = 'Account';
+  readonly aggregateType = 'Account' as const;
 
   readonly accountId: string;
   readonly externalId: string;

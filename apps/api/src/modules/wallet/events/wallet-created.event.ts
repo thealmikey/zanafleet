@@ -13,11 +13,11 @@ import { WalletType, OwnerType } from '../dto/wallet.enums';
  */
 export class WalletCreatedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'WalletCreatedEvent-V1' = 'WalletCreatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'WalletCreatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Wallet' = 'Wallet';
+  readonly aggregateType = 'Wallet' as const;
 
   readonly walletId: string;
   readonly ownerId: string;

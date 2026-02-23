@@ -11,11 +11,11 @@
  */
 export class WalletDebitedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'WalletDebitedEvent-V1' = 'WalletDebitedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'WalletDebitedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Wallet' = 'Wallet';
+  readonly aggregateType = 'Wallet' as const;
 
   readonly walletId: string;
   readonly amount: number;

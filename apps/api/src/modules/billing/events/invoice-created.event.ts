@@ -16,11 +16,11 @@ export interface ChargeData {
  */
 export class InvoiceCreatedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'InvoiceCreatedEvent-V1' = 'InvoiceCreatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'InvoiceCreatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'Invoice' = 'Invoice';
+  readonly aggregateType = 'Invoice' as const;
 
   readonly invoiceId: string;
   readonly payerAccountId: string;

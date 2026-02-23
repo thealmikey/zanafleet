@@ -47,11 +47,11 @@ export interface AISuggestionAcceptedEventV1JSON {
  */
 export class AISuggestionAcceptedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'AISuggestionAcceptedEvent-V1' = 'AISuggestionAcceptedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'AISuggestionAcceptedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'AISuggestion' = 'AISuggestion';
+  readonly aggregateType = 'AISuggestion' as const;
 
   // Actor information
   readonly actorId: string;

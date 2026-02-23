@@ -64,11 +64,11 @@ export interface CapabilityUsedEventV1JSON {
  */
 export class CapabilityUsedEventV1 {
   readonly eventId: string;
-  readonly eventType: 'CapabilityUsedEvent-V1' = 'CapabilityUsedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'CapabilityUsedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date;
   readonly aggregateId: string;
-  readonly aggregateType: 'CapabilityUsage' = 'CapabilityUsage';
+  readonly aggregateType = 'CapabilityUsage' as const;
 
   // Actor information
   readonly actorId: string;

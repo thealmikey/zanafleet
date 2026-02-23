@@ -21,11 +21,11 @@ export class WorkspaceCreatedEventV1 {
    * Event metadata
    */
   readonly eventId: string; // UUID, unique identifier for this event
-  readonly eventType: 'WorkspaceCreatedEvent-V1' = 'WorkspaceCreatedEvent-V1';
-  readonly eventVersion: '1.0.0' = '1.0.0';
+  readonly eventType = 'WorkspaceCreatedEvent-V1' as const;
+  readonly eventVersion = '1.0.0' as const;
   readonly occurredAt: Date; // When this event was created
   readonly aggregateId: string; // workspaceId (aggregate root identifier)
-  readonly aggregateType: 'Workspace' = 'Workspace';
+  readonly aggregateType = 'Workspace' as const;
 
   /**
    * Event payload (immutable)
