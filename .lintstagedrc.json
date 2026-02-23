@@ -1,10 +1,10 @@
 {
   "*.ts": [
-    "eslint --fix --max-warnings 0",
+    "oxlint --fix",
     "prettier --write"
   ],
   "*.js": [
-    "eslint --fix --max-warnings 0",
+    "oxlint --fix",
     "prettier --write"
   ]
 }

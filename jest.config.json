@@ -7,7 +7,35 @@
   "rootDir": ".",
   "testRegex": ".*\\.spec\\.ts$",
   "transform": {
-    "^.+\\.(t|j)s$": "ts-jest"
+    "^.+\\.(t|j)s$": ["@swc/jest", {
+      "jsc": {
+        "parser": {
+          "syntax": "typescript",
+          "tsx": false,
+          "decorators": true,
+          "dynamicImport": true
+        },
+        "transform": {
+          "legacyDecorator": true,
+          "decoratorMetadata": true
+        },
+        "target": "es2020",
+        "baseUrl": ".",
+        "paths": {
+          "@zanafleet/contracts": ["packages/contracts/src"],
+          "@zanafleet/contracts/*": ["packages/contracts/src/*"],
+          "@zanafleet/domain": ["packages/domain/src"],
+          "@zanafleet/domain/*": ["packages/domain/src/*"],
+          "@zanafleet/utils": ["packages/utils/src"],
+          "@zanafleet/utils/*": ["packages/utils/src/*"],
+          "@api/*": ["apps/api/src/*"]
+        }
+      },
+      "module": {
+        "type": "commonjs",
+        "noInterop": false
+      }
+    }]
   },
   "collectCoverageFrom": [
     "apps/api/src/**/*.(t|j)s",
@@ -47,5 +75,7 @@
       "lines": 60,
       "statements": 60
     }
-  }
+  },
+  "maxWorkers": "50%",
+  "cache": true
 }

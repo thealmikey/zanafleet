@@ -3,7 +3,11 @@
   "collection": "@nestjs/schematics",
   "sourceRoot": "apps/api/src",
   "compilerOptions": {
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "webpack": false,
+    "tsConfigPath": "apps/api/tsconfig.json",
+    "builder": "swc",
+    "typeCheck": true
   },
   "projects": {
     "api": {
@@ -12,7 +16,9 @@
       "entryFile": "main",
       "sourceRoot": "apps/api/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/api/tsconfig.json"
+        "tsConfigPath": "apps/api/tsconfig.json",
+        "webpack": false,
+        "builder": "swc"
       }
     }
   }

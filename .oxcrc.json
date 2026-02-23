@@ -1,0 +1,26 @@
+{
+  "$schema": "https://oxc.rs/schema/config/oxcrc.json",
+  "rules": {
+    "noUnusedVars": "warn",
+    "noUnusedImports": "warn",
+    "noExplicitAny": "warn",
+    "noDebugChecker": "warn",
+    "suspiciousDoubleNegation": "warn",
+    "noUnreachableCode": "warn",
+    "noUnusedLabels": "warn",
+    "noUndeclaredVariables": "warn",
+    "noUnusedPrivateFields": "warn"
+  },
+  "deny": [],
+  "warn": [],
+  "allow": [],
+  "isolateDeclaration": true,
+  "lint": {
+    "enabled": true,
+    "rules": {
+      "correctness": {
+        "noUnusedVariables": "warn"
+      }
+    }
+  }
+}
