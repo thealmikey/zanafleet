@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   Unique,
+  Index,
 } from 'typeorm';
 
 /**
@@ -20,6 +21,7 @@ import {
  */
 @Entity('saccos')
 @Unique('UQ_sacco_name', ['name'])
+@Index(['workspaceId'])
 export class SaccoEntity {
   @PrimaryColumn('uuid')
   id!: string;
@@ -32,6 +34,9 @@ export class SaccoEntity {
 
   @Column('varchar', { length: 20 })
   contactPhone!: string;
+
+  @Column('uuid')
+  workspaceId!: string;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;

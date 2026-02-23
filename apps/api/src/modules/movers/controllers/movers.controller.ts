@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Query, HttpException, HttpStatus, Logger, Inject } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 
 import { 
   MovingQuoteRequest, 
@@ -33,10 +34,11 @@ export class MoversController {
 
   /**
    * GET /mover/locations/suggestions
-   * 
+   *
    * Get location autocomplete suggestions
    */
   @Get('locations/suggestions')
+  @Throttle({ public: { limit: 30, ttl: 60000 } })
   async getLocationSuggestions(
     @Query('q') query: string,
     @Query('lat') latitude?: string,
@@ -65,10 +67,11 @@ export class MoversController {
 
   /**
    * POST /mover/quote
-   * 
+   *
    * Calculate a moving quote (legacy endpoint)
    */
   @Post('quote')
+  @Throttle({ public: { limit: 10, ttl: 60000 } })
   async calculateQuote(
     @Body() request: MovingQuoteRequest,
   ): Promise<MovingQuote> {
@@ -119,11 +122,12 @@ export class MoversController {
 
   /**
    * POST /mover/estimate
-   * 
+   *
    * Create a comprehensive moving estimate using the orchestration layer
    * This is the new AI-powered estimate endpoint
    */
   @Post('estimate')
+  @Throttle({ public: { limit: 5, ttl: 60000 } })
   async createEstimate(
     @Body() request: MoversEstimateRequestDto,
   ): Promise<MoversEstimateResponseDto> {
@@ -160,10 +164,11 @@ export class MoversController {
 
   /**
    * POST /mover/quote/pre-authorize
-   * 
+   *
    * Pre-authorize a quote amount
    */
   @Post('quote/pre-authorize')
+  @Throttle({ public: { limit: 5, ttl: 60000 } })
   async preAuthorizeQuote(
     @Body() _request: QuotePreAuthorizationRequest,
   ): Promise<QuotePreAuthorizationResponse> {

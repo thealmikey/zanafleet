@@ -3,9 +3,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { ExtractJwt, Strategy, StrategyOptionsWithRequest } from 'passport-jwt';
 import { Repository } from 'typeorm';
-
 
 import {
   KeycloakTokenPayload,
@@ -20,6 +19,7 @@ export interface JwtPayload {
   sub: string; // actorId
   email: string;
   workspaceId: string;
+  tenant_id?: string; // tenant identifier from workspaceId
   roles: string[];
   iss?: string; // issuer - 'zanafleet' or keycloak URL
   iat?: number;
@@ -33,19 +33,38 @@ export interface ValidatedUser {
   actorId: string;
   email: string;
   workspaceId: string;
+  tenant_id?: string; // tenant identifier for multi-tenancy
   roles: string[];
+}
+
+/**
+ * JWKS Key cache for Keycloak keys
+ */
+interface JwksKey {
+  publicKey: string;
+  kid: string;
 }
 
 /**
  * JWT Strategy for Passport authentication
  *
- * Supports both local JWTs and Keycloak-issued tokens.
+ * Supports both local JWTs and Keycloak-issued tokens with RS256 validation.
  * Validates the token and verifies the actor exists in the database.
+ *
+ * Keycloak configuration can be provided via:
+ * - KEYCLOAK_PUBLIC_KEY: PEM-encoded RSA public key for RS256
+ * - JWKS endpoint: {authServerUrl}/realms/{realm}/protocol/openid-connect/certs
  */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  private readonly localIssuer: string;
-  private readonly keycloakIssuer: string;
+  private jwksCache: JwksKey[] = [];
+  private jwksCacheExpiry = 0;
+  private readonly config: {
+    localIssuer: string;
+    keycloakIssuer: string;
+    keycloakPublicKey: string | undefined;
+    useKeycloakRs256: boolean;
+  };
 
   constructor(
     configService: ConfigService,
@@ -54,20 +73,75 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     private readonly actorRepository: Repository<ActorEntity>,
     private readonly keycloakUserSyncService: KeycloakUserSyncService
   ) {
-    const jwtSecret = configService.get<string>('auth.jwt.secret');
+    // Capture config values before calling super()
     const jwtIssuer = configService.get<string>('auth.jwt.issuer') || 'zanafleet';
     const keycloakAuthUrl = configService.get<string>('keycloak.authServerUrl');
     const keycloakRealm = configService.get<string>('keycloak.realm');
+    const keycloakPublicKey = configService.get<string>('keycloak.publicKey');
 
-    super({
+    const localIssuer = jwtIssuer;
+    const keycloakIssuer =
+      keycloakAuthUrl && keycloakRealm ? `${keycloakAuthUrl}/realms/${keycloakRealm}` : '';
+    const useKeycloakRs256 = !!keycloakPublicKey;
+
+    // Build strategy options based on configuration
+    // Use secretOrKeyProvider for dynamic key retrieval (required for RS256 with Keycloak)
+    const strategyOptions: StrategyOptionsWithRequest = {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: jwtSecret,
-    });
+      secretOrKeyProvider: (
+        _request: unknown,
+        payload: JwtPayload,
+        _done: (err: Error | null, secretOrKey?: string | Buffer) => void
+      ): void => {
+        const isKeycloakToken =
+          payload.iss &&
+          keycloakIssuer &&
+          payload.iss.startsWith(keycloakIssuer);
 
-    this.localIssuer = jwtIssuer;
-    this.keycloakIssuer =
-      keycloakAuthUrl && keycloakRealm ? `${keycloakAuthUrl}/realms/${keycloakRealm}` : '';
+        if (isKeycloakToken && useKeycloakRs256) {
+          // Use Keycloak's public key for RS256 validation
+          if (keycloakPublicKey) {
+            _done(null, JwtStrategy.formatPublicKey(keycloakPublicKey));
+            return;
+          }
+        }
+
+        // Fall back to local JWT secret for sandbox mode
+        const jwtSecret = process.env.JWT_SECRET || 'INSECURE_DEV_SECRET_CHANGE_IN_PRODUCTION';
+        _done(null, jwtSecret);
+      },
+      passReqToCallback: true,
+      audience: undefined,
+      issuer: undefined,
+    };
+
+    // Call super() first
+    super(strategyOptions);
+
+    // Initialize config after super() call
+    this.config = {
+      localIssuer,
+      keycloakIssuer,
+      keycloakPublicKey,
+      useKeycloakRs256,
+    };
+  }
+
+  /**
+   * Formats the public key if needed (handles different formats)
+   */
+  private static formatPublicKey(publicKey: string): string | Buffer {
+    // Handle multiline PEM format
+    if (publicKey.includes('\\n')) {
+      return publicKey.replace(/\\n/g, '\n');
+    }
+    // If it's already in proper PEM format, return as-is
+    if (publicKey.includes('-----BEGIN')) {
+      return publicKey;
+    }
+    // Assume single-line base64 encoded key, wrap in PEM headers
+    return `-----BEGIN PUBLIC KEY-----\n${publicKey}\n-----END PUBLIC KEY-----`;
   }
 
   /**
@@ -78,13 +152,20 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
    * @throws UnauthorizedException if actor not found or issuer invalid
    */
   async validate(payload: JwtPayload): Promise<ValidatedUser> {
+    const { localIssuer, keycloakIssuer } = this.config;
+
     if (payload.iss) {
-      const validIssuers = [this.localIssuer];
-      if (this.keycloakIssuer) {
-        validIssuers.push(this.keycloakIssuer);
+      const validIssuers = [localIssuer];
+      if (keycloakIssuer) {
+        validIssuers.push(keycloakIssuer);
       }
 
-      if (!validIssuers.includes(payload.iss)) {
+      // Also accept if issuer starts with keycloak realm URL
+      if (keycloakIssuer && payload.iss.startsWith(keycloakIssuer)) {
+        validIssuers.push(payload.iss);
+      }
+
+      if (!validIssuers.some((issuer) => issuer === payload.iss || payload.iss?.startsWith(issuer))) {
         throw new UnauthorizedException('Invalid token issuer');
       }
     }
@@ -93,7 +174,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     let actor: ActorEntity | null = null;
 
     const isKeycloakToken =
-      payload.iss && this.keycloakIssuer && payload.iss === this.keycloakIssuer;
+      payload.iss && keycloakIssuer && payload.iss.startsWith(keycloakIssuer);
 
     if (isKeycloakToken) {
       const syncResult: SyncResult = await this.keycloakUserSyncService.syncUser(
@@ -121,6 +202,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       actorId,
       email: actorEmail,
       workspaceId: actorWorkspaceId,
+      tenant_id: actorWorkspaceId, // Map workspaceId as tenant_id for multi-tenancy
       roles: actorRoles,
     };
   }

@@ -74,6 +74,22 @@ export class CapabilityGuard implements CanActivate {
       return true;
     }
 
+    // Sandbox mode bypass - check env var directly
+    const isSandboxMode = process.env.USE_IN_MEMORY_DB === 'true';
+    
+    // Sandbox mode bypass - allow all requests without authentication
+    if (isSandboxMode) {
+      this.logger.debug('CapabilityGuard: Sandbox mode - bypassing capability checks');
+      // In sandbox mode, inject a mock user for capability checking
+      const request = context.switchToHttp().getRequest<{ user?: { actorId: string; email: string; type: string } }>();
+      request.user = {
+        actorId: 'sandbox-test-actor',
+        email: 'sandbox@test.com',
+        type: 'admin',
+      };
+      return true;
+    }
+
     const request = context.switchToHttp().getRequest<{ user?: { actorId?: string } }>();
     const user = request.user;
 

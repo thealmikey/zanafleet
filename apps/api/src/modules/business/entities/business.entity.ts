@@ -25,6 +25,7 @@ import {
 @Entity('businesses')
 @Unique('UQ_business_phone', ['phone'])
 @Index(['businessType'])
+@Index(['workspaceId'])
 export class BusinessEntity {
   @PrimaryColumn('uuid')
   id!: string;
@@ -43,6 +44,9 @@ export class BusinessEntity {
 
   @Column('varchar', { length: 255, nullable: true })
   email?: string | null;
+
+  @Column('uuid')
+  workspaceId!: string;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;

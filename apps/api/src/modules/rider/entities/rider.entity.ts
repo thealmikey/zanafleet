@@ -30,6 +30,7 @@ import { SaccoEntity } from '../../sacco/entities/sacco.entity';
 @Unique('UQ_rider_national_id', ['nationalId'])
 @Index(['vehicleType'])
 @Index(['saccoId'])
+@Index(['workspaceId'])
 export class RiderEntity {
   @PrimaryColumn('uuid')
   id!: string;
@@ -51,6 +52,9 @@ export class RiderEntity {
 
   @Column('uuid', { nullable: true })
   saccoId!: string | null;
+
+  @Column('uuid')
+  workspaceId!: string;
 
   @Column('varchar', { length: 255, nullable: true })
   email?: string | null;

@@ -2,6 +2,7 @@ import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Inde
 
 @Entity('customers')
 @Index(['businessId'])
+@Index(['workspaceId'])
 @Index(['phoneNumber'])
 export class CustomerEntity {
     @PrimaryColumn('uuid')
@@ -9,6 +10,9 @@ export class CustomerEntity {
 
     @Column('uuid')
     businessId!: string;
+
+    @Column('uuid')
+    workspaceId!: string;
 
     @Column('varchar', { length: 255 })
     name!: string;

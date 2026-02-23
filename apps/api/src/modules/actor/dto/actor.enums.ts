@@ -13,4 +13,5 @@ export enum ActorType {
   BusinessOwner = 'BusinessOwner',
   Internal = 'Internal',
   AIService = 'AIService',
+  Customer = 'Customer',
 }

@@ -16,6 +16,7 @@ export const keycloakConfig = registerAs('keycloak', () => ({
   realm: process.env.KEYCLOAK_REALM,
   clientId: process.env.KEYCLOAK_CLIENT_ID,
   secret: process.env.KEYCLOAK_SECRET,
+  publicKey: process.env.KEYCLOAK_PUBLIC_KEY,
 }));
 
 /**

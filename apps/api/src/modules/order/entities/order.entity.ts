@@ -4,6 +4,7 @@ import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Inde
 
 @Entity('orders')
 @Index(['businessId'])
+@Index(['workspaceId'])
 @Index(['status'])
 @Index(['scheduledTime'])
 export class OrderEntity {
@@ -12,6 +13,9 @@ export class OrderEntity {
 
   @Column('uuid')
   businessId!: string;
+
+  @Column('uuid')
+  workspaceId!: string;
 
   @Column('uuid', { nullable: true })
   deliveryId: string | null = null;

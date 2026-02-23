@@ -19,5 +19,14 @@ export * from './commands/login.command';
 // Handlers
 export * from './handlers/login.handler';
 
+// Guards
+export * from './guards/jwt-auth.guard';
+
+// Strategies
+export * from './strategies/jwt.strategy';
+
+// Services - re-export specific items to avoid duplicate exports
+export { KeycloakUserSyncService, SyncResult } from './services/keycloak-user-sync.service';
+
 // Module
 export * from './auth.module';

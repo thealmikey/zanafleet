@@ -5,10 +5,22 @@ import { z } from 'zod';
 /**
  * Zod validation schema for LoginDto
  */
-export const LoginDtoSchema = z.object({
-  identifier: z.string().trim().min(1, 'Identifier is required'),
-  password: z.string().optional(),
-});
+export const LoginDtoSchema = z
+  .object({
+    identifier: z
+      .string()
+      .refine((val) => val.trim().length > 0, {
+        message: 'Identifier is required',
+      })
+      .refine((val) => !val.includes('\n'), {
+        message: 'Identifier cannot contain newlines',
+      }),
+    password: z.string().optional(),
+  })
+  .transform((data) => ({
+    ...data,
+    identifier: data.identifier.trim(),
+  }));
 
 export type LoginDtoInput = z.infer<typeof LoginDtoSchema>;
 
@@ -55,7 +67,7 @@ export const LoginResponseDtoSchema = z.object({
   workspaceId: z.string(),
   type: z.nativeEnum(ActorType),
   token: z.string().min(1),
-  expiresAt: z.coerce.date(),
+  expiresAt: z.union([z.string(), z.date()]),
 });
 
 export type LoginResponseDtoInput = z.infer<typeof LoginResponseDtoSchema>;

@@ -11,6 +11,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { Throttle } from '@nestjs/throttler';
 import { ZodError } from 'zod';
 
 import { FinalizeSignUpCommand } from '../commands/finalize-signup.command';
@@ -28,6 +29,7 @@ export class SignUpController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
+  @Throttle({ auth: { limit: 5, ttl: 60000 } })
   async initiate(
     @Body() body: InitiateSignUpDto
   ): Promise<{ sessionId: string; expiresAt: string }> {

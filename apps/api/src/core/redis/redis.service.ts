@@ -56,4 +56,12 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   getClient(): Redis {
     return this.client;
   }
+
+  /**
+   * Check if Redis is connected and ready.
+   * Used for health check endpoints.
+   */
+  isReady(): boolean {
+    return !!this.client && this.client.status === 'ready';
+  }
 }

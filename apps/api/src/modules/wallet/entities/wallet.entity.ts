@@ -17,6 +17,7 @@ import { WalletType, OwnerType } from '../dto/wallet.enums';
 @Index(['ownerId'])
 @Index(['type'])
 @Index(['ownerId', 'type'])
+@Index(['workspaceId'])
 export class WalletEntity {
   @PrimaryColumn('uuid')
   id!: string;
@@ -35,6 +36,9 @@ export class WalletEntity {
 
   @Column('decimal', { precision: 18, scale: 2, default: 0 })
   balance!: string;
+
+  @Column('uuid')
+  workspaceId!: string;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;
@@ -87,6 +91,7 @@ export class WalletEntity {
     entity.currency = data.currency;
     entity.balance = data.balance.toFixed(2);
     entity.createdAt = data.createdAt;
+    entity.workspaceId = 'default';
     return entity;
   }
 }
