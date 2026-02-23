@@ -1,11 +1,14 @@
 import * as path from 'path';
 
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { EventBusModule } from './core/event-bus';
 import { MediaModule } from './core/media';
+import { HttpMetricsInterceptor } from './core/metrics/interceptors/http-metrics.interceptor';
+import { MetricsModule } from './core/metrics/metrics.module';
 import { Neo4jModule } from './core/neo4j';
 import { AccountModule } from './modules/account/account.module';
 import { ActorModule } from './modules/actor/actor.module';
@@ -69,6 +72,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
       isGlobal: true,
     }),
     ScheduleModule.forRoot(),
+    MetricsModule,
     MediaModule,
     AccountModule,
     ActorModule,
@@ -105,6 +109,12 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     SeedModule,
     InteractionModule,
     WorkflowModule,
+  ],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: HttpMetricsInterceptor,
+    },
   ],
 })
 export class AppModule { }
