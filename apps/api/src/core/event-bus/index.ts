@@ -18,7 +18,7 @@ export {
 export { BaseEvent, SerializedEvent, isBaseEvent } from './interfaces/base-event.interface';
 export { IdempotencyService } from './services/idempotency.service';
 export { RetryService, RetryOptions, RetryResult } from './services/retry.service';
-export { EventLoggerService, EventLogEntry } from './services/event-logger.service';
+export { EventLoggerService, EventLogEntry, EventLogContext } from './services/event-logger.service';
 export {
   DomainEventRouter,
   EventFilter,
