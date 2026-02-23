@@ -1,6 +1,8 @@
-import { Injectable, Inject, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Inject, Logger, OnModuleInit, Optional } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom, timeout, catchError } from 'rxjs';
+
+import { MetricsService } from '../metrics/metrics.service';
 
 import { NATS_CLIENT, buildSubjectFromEventType } from './event-bus.constants';
 import { BaseEvent, SerializedEvent } from './interfaces/base-event.interface';
@@ -20,7 +22,7 @@ export interface PublishOptions {
  * EventBusService
  *
  * Service wrapping the NATS client for publishing domain events.
- * Provides serialization, retry logic, and structured logging.
+ * Provides serialization, retry logic, structured logging, and metrics.
  */
 @Injectable()
 export class EventBusService implements OnModuleInit {
@@ -32,7 +34,8 @@ export class EventBusService implements OnModuleInit {
   constructor(
     @Inject(NATS_CLIENT) private readonly natsClient: ClientProxy,
     private readonly eventLogger: EventLoggerService,
-    private readonly retryService: RetryService
+    private readonly retryService: RetryService,
+    @Optional() private readonly metricsService?: MetricsService,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -55,8 +58,10 @@ export class EventBusService implements OnModuleInit {
   async publish(
     subject: string,
     event: BaseEvent,
-    options: Omit<PublishOptions, 'subject'> = {}
+    options: Omit<PublishOptions, 'subject'> = {},
   ): Promise<void> {
+    const startTime = Date.now();
+
     if (!this.isConnected) {
       try {
         await this.natsClient.connect();
@@ -67,6 +72,12 @@ export class EventBusService implements OnModuleInit {
           error instanceof Error ? error : new Error('NATS client is not connected');
         this.eventLogger.logFailed(event, connectionError);
         this.recordPublishFailure(subject);
+
+        // Record metrics for failed publish
+        if (this.metricsService) {
+          this.metricsService.incrementEventsPublishedFailed(event.eventType, subject);
+        }
+
         throw connectionError;
       }
     }
@@ -83,8 +94,8 @@ export class EventBusService implements OnModuleInit {
           timeout(timeoutMs),
           catchError((error) => {
             throw error;
-          })
-        )
+          }),
+        ),
       );
     };
 
@@ -100,6 +111,12 @@ export class EventBusService implements OnModuleInit {
         const error = result.error ?? new Error('Unknown error during publish');
         this.eventLogger.logFailed(event, error, result.attempts);
         this.recordPublishFailure(subject);
+
+        // Record metrics for failed publish
+        if (this.metricsService) {
+          this.metricsService.incrementEventsPublishedFailed(event.eventType, subject);
+        }
+
         throw error;
       }
     } else {
@@ -108,8 +125,21 @@ export class EventBusService implements OnModuleInit {
       } catch (error) {
         this.eventLogger.logFailed(event, error as Error);
         this.recordPublishFailure(subject);
+
+        // Record metrics for failed publish
+        if (this.metricsService) {
+          this.metricsService.incrementEventsPublishedFailed(event.eventType, subject);
+        }
+
         throw error;
       }
+    }
+
+    // Record metrics for successful publish
+    const duration = (Date.now() - startTime) / 1000;
+    if (this.metricsService) {
+      this.metricsService.incrementEventsPublished(event.eventType, subject);
+      this.metricsService.observeEventPublishDuration(event.eventType, subject, duration);
     }
   }
 
