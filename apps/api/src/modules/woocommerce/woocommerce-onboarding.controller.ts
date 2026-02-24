@@ -60,17 +60,17 @@ export class GenerateApiCredentialsDto {
 
 /**
  * WooCommerce Onboarding Controller
- * 
+ *
  * Provides endpoints for WooCommerce store onboarding:
  * - POST /woocommerce/register - Register a new store and create ZanaFleet account
  * - POST /woocommerce/link - Link existing ZanaFleet account to WooCommerce
  * - GET /woocommerce/status/:storeId - Get onboarding status
  * - POST /woocommerce/credentials - Generate API credentials
- * 
+ *
  * INTEGRATION NOTE: This controller integrates with existing ZanaFleet command patterns:
  * - SignUpModule (InitiateSignUpCommand, UpdateSignUpStepCommand, FinalizeSignUpCommand)
  * - BusinessModule (CreateBusinessCommand)
- * 
+ *
  * The actual command execution is handled via CommandBus to maintain consistency
  * with the existing authentication and business creation flows.
  */
@@ -81,15 +81,13 @@ export class WooCommerceOnboardingController {
 
   /**
    * POST /api/v1/woocommerce/register
-   * 
+   *
    * Register a new WooCommerce store and create associated ZanaFleet account.
    * This integrates with existing ZanaFleet signup and business creation flows.
    */
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
-  async registerStore(
-    @Body() dto: RegisterWooCommerceStoreDto,
-  ): Promise<{
+  async registerStore(@Body() dto: RegisterWooCommerceStoreDto): Promise<{
     businessId: string;
     userId: string;
     workspaceId: string;
@@ -130,7 +128,7 @@ export class WooCommerceOnboardingController {
       const locationData = {
         latitude: 0,
         longitude: 0,
-        humanReadableName: dto.address.street 
+        humanReadableName: dto.address.street
           ? `${dto.address.street}, ${dto.address.city}`
           : dto.address.city,
         administrativeArea: dto.address.county || dto.address.city,
@@ -166,7 +164,7 @@ export class WooCommerceOnboardingController {
       // In production, proper error handling would be implemented
       const storeId = `woo_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const apiKey = `wf_live_${uuidv4().replace(/-/g, '').slice(0, 24)}`;
-      
+
       return {
         businessId: `biz_${storeId}`,
         userId: `user_${storeId}`,
@@ -181,14 +179,12 @@ export class WooCommerceOnboardingController {
 
   /**
    * POST /api/v1/woocommerce/link
-   * 
+   *
    * Link an existing ZanaFleet account to a WooCommerce store.
    */
   @Post('link')
   @HttpCode(HttpStatus.OK)
-  async linkStore(
-    @Body() _dto: LinkStoreDto,
-  ): Promise<{
+  async linkStore(@Body() _dto: LinkStoreDto): Promise<{
     success: boolean;
     storeId?: string;
     businessId?: string;
@@ -211,14 +207,12 @@ export class WooCommerceOnboardingController {
 
   /**
    * GET /api/v1/woocommerce/status/:storeId
-   * 
+   *
    * Get the onboarding status of a WooCommerce store.
    */
   @Get('status/:storeId')
   @HttpCode(HttpStatus.OK)
-  async getStoreStatus(
-    @Param('storeId') storeId: string,
-  ): Promise<{
+  async getStoreStatus(@Param('storeId') storeId: string): Promise<{
     storeId: string;
     status: string;
     businessId: string | null;
@@ -236,14 +230,12 @@ export class WooCommerceOnboardingController {
 
   /**
    * POST /api/v1/woocommerce/credentials
-   * 
+   *
    * Generate new API credentials for a store.
    */
   @Post('credentials')
   @HttpCode(HttpStatus.CREATED)
-  async generateCredentials(
-    @Body() _dto: GenerateApiCredentialsDto,
-  ): Promise<{
+  async generateCredentials(@Body() _dto: GenerateApiCredentialsDto): Promise<{
     apiKey: string;
     apiSecret: string;
     createdAt: string;

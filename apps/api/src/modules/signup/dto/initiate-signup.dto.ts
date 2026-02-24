@@ -2,7 +2,6 @@ import { ActorType } from '@api/modules/actor/dto/actor.enums';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
-
 /**
  * InitiateSignUpDto
  *

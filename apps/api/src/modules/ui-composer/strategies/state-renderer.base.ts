@@ -38,10 +38,7 @@ export abstract class AbstractStateRenderer implements StateRenderer {
   protected readonly componentRegistry: ComponentRegistryService;
   protected readonly options: StateRendererOptions;
 
-  constructor(
-    componentRegistry: ComponentRegistryService,
-    options?: StateRendererOptions
-  ) {
+  constructor(componentRegistry: ComponentRegistryService, options?: StateRendererOptions) {
     this.componentRegistry = componentRegistry;
     this.options = { debug: false, ...options };
     this.logger = new Logger(this.constructor.name);

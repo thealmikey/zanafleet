@@ -9,7 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { ProcessDefinitionEntity , ProcessState } from './process-definition.entity';
+import { ProcessDefinitionEntity, ProcessState } from './process-definition.entity';
 
 /**
  * Process Instance Status Enum

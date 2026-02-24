@@ -13,26 +13,20 @@ import { SEARCH_PROVIDER } from './providers/search-provider.interface';
 import { SearchProjectionService } from './services/search-projection.service';
 import { SearchBackfillWorker } from './workers/search-backfill.worker';
 
-
 @Module({
-    imports: [
-        CqrsModule,
-        TypeOrmModule.forFeature([
-            SearchDocumentEntity,
-            OrderEntity,
-            BusinessEntity,
-            DeliveryEntity,
-        ]),
-    ],
-    controllers: [SearchController],
-    providers: [
-        {
-            provide: SEARCH_PROVIDER,
-            useClass: PostgresSearchProvider,
-        },
-        SearchProjectionService,
-        SearchBackfillWorker,
-    ],
-    exports: [SEARCH_PROVIDER],
+  imports: [
+    CqrsModule,
+    TypeOrmModule.forFeature([SearchDocumentEntity, OrderEntity, BusinessEntity, DeliveryEntity]),
+  ],
+  controllers: [SearchController],
+  providers: [
+    {
+      provide: SEARCH_PROVIDER,
+      useClass: PostgresSearchProvider,
+    },
+    SearchProjectionService,
+    SearchBackfillWorker,
+  ],
+  exports: [SEARCH_PROVIDER],
 })
-export class SearchModule { }
+export class SearchModule {}

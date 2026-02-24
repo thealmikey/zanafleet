@@ -36,7 +36,7 @@ export class WorkflowEventSubscriber {
 
     if (!payload.instanceId) {
       this.logger.warn(
-        `No instanceId provided for payment ${payload.paymentId}, skipping workflow transition`,
+        `No instanceId provided for payment ${payload.paymentId}, skipping workflow transition`
       );
       return;
     }
@@ -54,9 +54,7 @@ export class WorkflowEventSubscriber {
       });
 
       if (!result.success) {
-        this.logger.warn(
-          `Failed to transition workflow ${payload.instanceId}: ${result.error}`,
-        );
+        this.logger.warn(`Failed to transition workflow ${payload.instanceId}: ${result.error}`);
       }
     } catch (error) {
       const err = error as Error;
@@ -78,7 +76,7 @@ export class WorkflowEventSubscriber {
 
     if (!payload.instanceId) {
       this.logger.warn(
-        `No instanceId provided for driver ${payload.driverId}, skipping workflow transition`,
+        `No instanceId provided for driver ${payload.driverId}, skipping workflow transition`
       );
       return;
     }
@@ -96,9 +94,7 @@ export class WorkflowEventSubscriber {
       });
 
       if (!result.success) {
-        this.logger.warn(
-          `Failed to transition workflow ${payload.instanceId}: ${result.error}`,
-        );
+        this.logger.warn(`Failed to transition workflow ${payload.instanceId}: ${result.error}`);
       }
     } catch (error) {
       const err = error as Error;
@@ -120,7 +116,7 @@ export class WorkflowEventSubscriber {
 
     if (!payload.instanceId) {
       this.logger.warn(
-        `No instanceId provided for vehicle ${payload.vehicleId}, skipping workflow transition`,
+        `No instanceId provided for vehicle ${payload.vehicleId}, skipping workflow transition`
       );
       return;
     }
@@ -138,9 +134,7 @@ export class WorkflowEventSubscriber {
       });
 
       if (!result.success) {
-        this.logger.warn(
-          `Failed to transition workflow ${payload.instanceId}: ${result.error}`,
-        );
+        this.logger.warn(`Failed to transition workflow ${payload.instanceId}: ${result.error}`);
       }
     } catch (error) {
       const err = error as Error;
@@ -162,7 +156,7 @@ export class WorkflowEventSubscriber {
 
     if (!payload.instanceId) {
       this.logger.warn(
-        `No instanceId provided for delivery ${payload.deliveryId}, skipping workflow transition`,
+        `No instanceId provided for delivery ${payload.deliveryId}, skipping workflow transition`
       );
       return;
     }
@@ -180,9 +174,7 @@ export class WorkflowEventSubscriber {
       });
 
       if (!result.success) {
-        this.logger.warn(
-          `Failed to transition workflow ${payload.instanceId}: ${result.error}`,
-        );
+        this.logger.warn(`Failed to transition workflow ${payload.instanceId}: ${result.error}`);
       }
     } catch (error) {
       const err = error as Error;
@@ -205,7 +197,7 @@ export class WorkflowEventSubscriber {
 
     if (!payload.instanceId) {
       this.logger.warn(
-        `No instanceId provided for booking ${payload.bookingId}, skipping workflow transition`,
+        `No instanceId provided for booking ${payload.bookingId}, skipping workflow transition`
       );
       return;
     }
@@ -224,9 +216,7 @@ export class WorkflowEventSubscriber {
       });
 
       if (!result.success) {
-        this.logger.warn(
-          `Failed to transition workflow ${payload.instanceId}: ${result.error}`,
-        );
+        this.logger.warn(`Failed to transition workflow ${payload.instanceId}: ${result.error}`);
       }
     } catch (error) {
       const err = error as Error;
@@ -248,7 +238,7 @@ export class WorkflowEventSubscriber {
 
     if (!payload.instanceId) {
       this.logger.warn(
-        `No instanceId provided for estimate ${payload.estimateId}, skipping workflow transition`,
+        `No instanceId provided for estimate ${payload.estimateId}, skipping workflow transition`
       );
       return;
     }
@@ -266,9 +256,7 @@ export class WorkflowEventSubscriber {
       });
 
       if (!result.success) {
-        this.logger.warn(
-          `Failed to transition workflow ${payload.instanceId}: ${result.error}`,
-        );
+        this.logger.warn(`Failed to transition workflow ${payload.instanceId}: ${result.error}`);
       }
     } catch (error) {
       const err = error as Error;
@@ -290,7 +278,7 @@ export class WorkflowEventSubscriber {
 
     if (!payload.instanceId) {
       this.logger.warn(
-        `No instanceId provided for booking ${payload.bookingId}, skipping workflow transition`,
+        `No instanceId provided for booking ${payload.bookingId}, skipping workflow transition`
       );
       return;
     }
@@ -308,9 +296,7 @@ export class WorkflowEventSubscriber {
       });
 
       if (!result.success) {
-        this.logger.warn(
-          `Failed to transition workflow ${payload.instanceId}: ${result.error}`,
-        );
+        this.logger.warn(`Failed to transition workflow ${payload.instanceId}: ${result.error}`);
       }
     } catch (error) {
       const err = error as Error;
@@ -332,7 +318,7 @@ export class WorkflowEventSubscriber {
 
     if (!payload.instanceId) {
       this.logger.warn(
-        `No instanceId provided for move ${payload.moveId}, skipping workflow transition`,
+        `No instanceId provided for move ${payload.moveId}, skipping workflow transition`
       );
       return;
     }
@@ -350,9 +336,7 @@ export class WorkflowEventSubscriber {
       });
 
       if (!result.success) {
-        this.logger.warn(
-          `Failed to transition workflow ${payload.instanceId}: ${result.error}`,
-        );
+        this.logger.warn(`Failed to transition workflow ${payload.instanceId}: ${result.error}`);
       }
     } catch (error) {
       const err = error as Error;

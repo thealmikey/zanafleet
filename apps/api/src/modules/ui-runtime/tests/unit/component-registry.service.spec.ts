@@ -99,7 +99,7 @@ describe('ComponentRegistryService', () => {
     it('should retrieve components by category', () => {
       const displayComponents = service.getByCategory('display');
       expect(displayComponents.length).toBeGreaterThan(0);
-      displayComponents.forEach(c => {
+      displayComponents.forEach((c) => {
         expect(c.category).toBe('display');
       });
     });

@@ -39,7 +39,7 @@ export class SettlementSchedulerService {
     private readonly accountRepository: Repository<AccountEntity>,
     private readonly ledgerService: LedgerService,
     private readonly dataSource: DataSource,
-    private readonly jobQueueService: JobQueueService,
+    private readonly jobQueueService: JobQueueService
   ) {}
 
   @Cron(CronExpression.EVERY_WEEK)
@@ -58,7 +58,9 @@ export class SettlementSchedulerService {
         await this.processSettlementsForPeriod(periodStart, periodEnd);
       } catch (error) {
         this.logger.error(
-          `Failed to process weekly settlements: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          `Failed to process weekly settlements: ${
+            error instanceof Error ? error.message : 'Unknown error'
+          }`
         );
       }
     });
@@ -80,7 +82,9 @@ export class SettlementSchedulerService {
         await this.processRiderSettlement(account.id, periodStart, periodEnd);
       } catch (error) {
         this.logger.error(
-          `Failed to process settlement for rider ${account.id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          `Failed to process settlement for rider ${account.id}: ${
+            error instanceof Error ? error.message : 'Unknown error'
+          }`
         );
       }
     }
@@ -89,13 +93,13 @@ export class SettlementSchedulerService {
   async processRiderSettlement(
     riderAccountId: string,
     periodStart: Date,
-    periodEnd: Date,
+    periodEnd: Date
   ): Promise<void> {
     const balance = await this.ledgerService.getBalance(riderAccountId);
 
     if (!balance || balance.balance < this.config.minimumPayoutThreshold) {
       this.logger.debug(
-        `Rider ${riderAccountId} balance (${balance?.balance ?? 0}) below threshold, skipping`,
+        `Rider ${riderAccountId} balance (${balance?.balance ?? 0}) below threshold, skipping`
       );
       return;
     }
@@ -107,7 +111,7 @@ export class SettlementSchedulerService {
         periodEnd,
         payoutMethod: this.config.defaultPayoutMethod,
         commissionRate: this.config.defaultCommissionRate,
-      }),
+      })
     );
 
     if (batchResult.itemCount === 0) {
@@ -119,11 +123,11 @@ export class SettlementSchedulerService {
       new ProcessPayoutCommand({
         batchId: batchResult.batchId,
         providerId: this.config.defaultProviderId,
-      }),
+      })
     );
 
     this.logger.log(
-      `Processed settlement for rider ${riderAccountId}: ${batchResult.netPayout} ${balance.currency}`,
+      `Processed settlement for rider ${riderAccountId}: ${batchResult.netPayout} ${balance.currency}`
     );
   }
 

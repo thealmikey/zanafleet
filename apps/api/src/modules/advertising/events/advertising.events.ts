@@ -10,7 +10,7 @@ export class AdCampaignActivatedEvent implements IEvent {
     public readonly campaignId: string,
     public readonly workspaceId: string,
     public readonly adType: string,
-    public readonly budget: string,
+    public readonly budget: string
   ) {}
 }
 
@@ -23,7 +23,7 @@ export class AdCampaignPausedEvent implements IEvent {
   constructor(
     public readonly campaignId: string,
     public readonly workspaceId: string,
-    public readonly reason?: string,
+    public readonly reason?: string
   ) {}
 }
 
@@ -38,7 +38,7 @@ export class AdCampaignCompletedEvent implements IEvent {
     public readonly workspaceId: string,
     public readonly totalSpent: string,
     public readonly totalImpressions: number,
-    public readonly totalClicks: number,
+    public readonly totalClicks: number
   ) {}
 }
 
@@ -53,7 +53,7 @@ export class AdImpressionRecordedEvent implements IEvent {
     public readonly campaignId: string,
     public readonly workspaceId: string,
     public readonly userId: string | null,
-    public readonly placement: string,
+    public readonly placement: string
   ) {}
 }
 
@@ -68,7 +68,7 @@ export class AdClickedEvent implements IEvent {
     public readonly impressionId: string,
     public readonly campaignId: string,
     public readonly workspaceId: string,
-    public readonly userId: string | null,
+    public readonly userId: string | null
   ) {}
 }
 
@@ -86,7 +86,7 @@ export class VisibilityTokenPurchasedEvent implements IEvent {
     public readonly targetType: string,
     public readonly targetId: string,
     public readonly price: string,
-    public readonly durationDays: number,
+    public readonly durationDays: number
   ) {}
 }
 
@@ -102,7 +102,7 @@ export class VisibilityTokenActivatedEvent implements IEvent {
     public readonly targetType: string,
     public readonly targetId: string,
     public readonly boostScore: string,
-    public readonly expiresAt: Date,
+    public readonly expiresAt: Date
   ) {}
 }
 
@@ -116,6 +116,6 @@ export class VisibilityTokenExpiredEvent implements IEvent {
     public readonly tokenId: string,
     public readonly workspaceId: string,
     public readonly targetType: string,
-    public readonly targetId: string,
+    public readonly targetId: string
   ) {}
 }

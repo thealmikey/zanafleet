@@ -17,10 +17,7 @@ import {
 } from '../../../payment/providers/dto/payment-provider.types';
 import { PaymentProviderRegistry } from '../../../payment/providers/payment-provider-registry.service';
 import { PaymentProvider } from '../../../payment/providers/payment-provider.interface';
-import {
-  PayoutOrchestrator,
-  PayoutStatus,
-} from '../../coordinators/payout.orchestrator';
+import { PayoutOrchestrator, PayoutStatus } from '../../coordinators/payout.orchestrator';
 import { SettlementStatus, PayoutMethod } from '../../dto/settlement.enums';
 import { SettlementBatchEntity } from '../../entities/settlement-batch.entity';
 import {
@@ -35,7 +32,7 @@ class MockPaymentProvider implements PaymentProvider {
     public readonly providerId: string,
     public readonly displayName: string,
     public readonly supportedCurrencies: string[],
-    public readonly capabilities: ProviderCapability[],
+    public readonly capabilities: ProviderCapability[]
   ) {}
 
   async initiatePayment(_intent: PaymentIntentData): Promise<PaymentInitiationResult> {
@@ -84,10 +81,12 @@ describe('PayoutOrchestrator', () => {
     'test-provider',
     'Test Provider',
     ['KES', 'USD'],
-    ['MOBILE_MONEY', 'BANK_TRANSFER'],
+    ['MOBILE_MONEY', 'BANK_TRANSFER']
   );
 
-  const createMockBatch = (overrides: Partial<SettlementBatchEntity> = {}): SettlementBatchEntity => {
+  const createMockBatch = (
+    overrides: Partial<SettlementBatchEntity> = {}
+  ): SettlementBatchEntity => {
     const batch = new SettlementBatchEntity();
     batch.id = 'batch-123';
     batch.riderAccountId = 'rider-acc-001';
@@ -220,7 +219,7 @@ describe('PayoutOrchestrator', () => {
 
     it('should block payout when KYC verification fails', async () => {
       accountRepository.findOne.mockResolvedValue(
-        createMockAccount({ status: AccountStatus.SUSPENDED }),
+        createMockAccount({ status: AccountStatus.SUSPENDED })
       );
 
       const result = await orchestrator.initiatePayout('rider-acc-001');
@@ -307,7 +306,7 @@ describe('PayoutOrchestrator', () => {
         'settlement.events.payout-initiated-v1',
         expect.objectContaining({
           eventType: 'Settlement.Payout.InitiatedV1',
-        }),
+        })
       );
     });
 
@@ -318,7 +317,7 @@ describe('PayoutOrchestrator', () => {
         'settlement.events.payout-completed-v1',
         expect.objectContaining({
           eventType: 'Settlement.Payout.CompletedV1',
-        }),
+        })
       );
     });
 
@@ -337,7 +336,7 @@ describe('PayoutOrchestrator', () => {
         'settlement.events.payout-failed-v1',
         expect.objectContaining({
           eventType: 'Settlement.Payout.FailedV1',
-        }),
+        })
       );
     });
 
@@ -346,10 +345,10 @@ describe('PayoutOrchestrator', () => {
         'custom-provider',
         'Custom Provider',
         ['KES'],
-        ['MOBILE_MONEY'],
+        ['MOBILE_MONEY']
       );
       providerRegistry.get.mockImplementation((id) =>
-        id === 'custom-provider' ? customProvider : mockProvider,
+        id === 'custom-provider' ? customProvider : mockProvider
       );
 
       const result = await orchestrator.initiatePayout('rider-acc-001', {
@@ -536,7 +535,7 @@ describe('PayoutOrchestrator', () => {
         'failing-provider',
         'Failing Provider',
         ['KES'],
-        ['MOBILE_MONEY'],
+        ['MOBILE_MONEY']
       );
 
       let callCount = 0;
@@ -590,7 +589,7 @@ describe('PayoutOrchestrator', () => {
         'failing-provider',
         'Failing Provider',
         ['KES'],
-        ['MOBILE_MONEY'],
+        ['MOBILE_MONEY']
       );
 
       jest.spyOn(persistentlyFailingProvider, 'initiatePayment').mockResolvedValue({
@@ -661,14 +660,14 @@ describe('PayoutOrchestrator', () => {
         expect.objectContaining({
           status: SettlementStatus.FAILED,
           failureReason: 'User requested cancellation',
-        }),
+        })
       );
     });
 
     it('should throw error when payout not found', async () => {
-      await expect(
-        orchestrator.cancelPayout('non-existent', 'Test cancellation'),
-      ).rejects.toThrow('not found');
+      await expect(orchestrator.cancelPayout('non-existent', 'Test cancellation')).rejects.toThrow(
+        'not found'
+      );
     });
 
     it('should throw error when trying to cancel completed payout', async () => {
@@ -683,9 +682,9 @@ describe('PayoutOrchestrator', () => {
       };
       (orchestrator as any).retryStates.set('payout-123', retryState);
 
-      await expect(
-        orchestrator.cancelPayout('payout-123', 'Test cancellation'),
-      ).rejects.toThrow('Cannot cancel a completed payout');
+      await expect(orchestrator.cancelPayout('payout-123', 'Test cancellation')).rejects.toThrow(
+        'Cannot cancel a completed payout'
+      );
     });
   });
 

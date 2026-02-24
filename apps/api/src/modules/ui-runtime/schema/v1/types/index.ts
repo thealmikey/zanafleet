@@ -4,13 +4,13 @@
 /**
  * Component categories
  */
-export type ComponentCategory = 
-  | 'display' 
-  | 'interactive' 
-  | 'form' 
-  | 'data' 
-  | 'visualization' 
-  | 'composite' 
+export type ComponentCategory =
+  | 'display'
+  | 'interactive'
+  | 'form'
+  | 'data'
+  | 'visualization'
+  | 'composite'
   | 'container';
 
 /**
@@ -243,14 +243,14 @@ export interface ScreenState {
 /**
  * Layout node types
  */
-export type LayoutType = 
-  | 'grid' 
-  | 'flex' 
-  | 'stack' 
-  | 'tabs' 
-  | 'accordion' 
-  | 'modal' 
-  | 'drawer' 
+export type LayoutType =
+  | 'grid'
+  | 'flex'
+  | 'stack'
+  | 'tabs'
+  | 'accordion'
+  | 'modal'
+  | 'drawer'
   | 'carousel'
   | 'split-view'
   | 'master-detail';
@@ -297,14 +297,16 @@ export interface ColumnDefinition {
 /**
  * Responsive value
  */
-export type ResponsiveValue<T> = T | {
-  base?: T;
-  sm?: T;
-  md?: T;
-  lg?: T;
-  xl?: T;
-  '2xl'?: T;
-};
+export type ResponsiveValue<T> =
+  | T
+  | {
+      base?: T;
+      sm?: T;
+      md?: T;
+      lg?: T;
+      xl?: T;
+      '2xl'?: T;
+    };
 
 /**
  * Dimension (with optional responsive)
@@ -351,7 +353,13 @@ export interface FlexLayout extends BaseLayout {
 }
 
 /** Flex justify options */
-export type FlexJustify = 'start' | 'center' | 'end' | 'space-between' | 'space-around' | 'space-evenly';
+export type FlexJustify =
+  | 'start'
+  | 'center'
+  | 'end'
+  | 'space-between'
+  | 'space-around'
+  | 'space-evenly';
 
 /** Flex align options */
 export type FlexAlign = 'start' | 'center' | 'end' | 'stretch' | 'baseline';
@@ -474,12 +482,12 @@ export interface AnimationConfig {
 /**
  * Union of all layout types
  */
-export type LayoutNode = 
-  | GridLayout 
-  | FlexLayout 
-  | StackLayout 
-  | TabsLayout 
-  | ModalLayout 
+export type LayoutNode =
+  | GridLayout
+  | FlexLayout
+  | StackLayout
+  | TabsLayout
+  | ModalLayout
   | DrawerLayout;
 
 /**
@@ -566,11 +574,11 @@ type ComponentNodeRef = ComponentNode;
 /**
  * Prop value types - simplified to avoid circular reference
  */
-export type PropValue = 
-  | string 
-  | number 
-  | boolean 
-  | null 
+export type PropValue =
+  | string
+  | number
+  | boolean
+  | null
   | undefined
   | PropValue[]
   | Record<string, unknown>
@@ -631,15 +639,37 @@ export interface Expression {
 }
 
 /** Expression operators */
-export type ExpressionOperator = 
-  | 'eq' | 'ne' | 'gt' | 'lt' | 'gte' | 'lte'
-  | 'and' | 'or' | 'not'
-  | 'in' | 'notIn'
-  | 'contains' | 'startsWith' | 'endsWith'
-  | 'add' | 'sub' | 'mul' | 'div' | 'mod'
-  | 'map' | 'filter' | 'reduce' | 'sort'
-  | 'length' | 'toUpper' | 'toLower' | 'trim'
-  | 'formatDate' | 'formatNumber' | 'formatCurrency';
+export type ExpressionOperator =
+  | 'eq'
+  | 'ne'
+  | 'gt'
+  | 'lt'
+  | 'gte'
+  | 'lte'
+  | 'and'
+  | 'or'
+  | 'not'
+  | 'in'
+  | 'notIn'
+  | 'contains'
+  | 'startsWith'
+  | 'endsWith'
+  | 'add'
+  | 'sub'
+  | 'mul'
+  | 'div'
+  | 'mod'
+  | 'map'
+  | 'filter'
+  | 'reduce'
+  | 'sort'
+  | 'length'
+  | 'toUpper'
+  | 'toLower'
+  | 'trim'
+  | 'formatDate'
+  | 'formatNumber'
+  | 'formatCurrency';
 
 /**
  * Component state
@@ -811,7 +841,20 @@ export interface Condition {
  */
 export interface ConditionExpression {
   /** Operator */
-  operator: 'eq' | 'ne' | 'gt' | 'lt' | 'gte' | 'lte' | 'in' | 'notIn' | 'contains' | 'startsWith' | 'endsWith' | 'exists' | 'isNull';
+  operator:
+    | 'eq'
+    | 'ne'
+    | 'gt'
+    | 'lt'
+    | 'gte'
+    | 'lte'
+    | 'in'
+    | 'notIn'
+    | 'contains'
+    | 'startsWith'
+    | 'endsWith'
+    | 'exists'
+    | 'isNull';
   /** Left operand */
   left: BindingReference | ContextReference | string;
   /** Right operand */
@@ -825,11 +868,11 @@ export interface ConditionExpression {
 /**
  * Action types
  */
-export type ActionType = 
-  | 'submit' 
-  | 'navigate' 
-  | 'refresh' 
-  | 'open-modal' 
+export type ActionType =
+  | 'submit'
+  | 'navigate'
+  | 'refresh'
+  | 'open-modal'
   | 'close-modal'
   | 'open-drawer'
   | 'close-drawer'
@@ -977,7 +1020,18 @@ export interface ValidationRule {
  */
 export interface ValidationRuleSet {
   /** Rule type */
-  type: 'required' | 'min' | 'max' | 'minLength' | 'maxLength' | 'pattern' | 'custom' | 'email' | 'url' | 'phone' | 'match';
+  type:
+    | 'required'
+    | 'min'
+    | 'max'
+    | 'minLength'
+    | 'maxLength'
+    | 'pattern'
+    | 'custom'
+    | 'email'
+    | 'url'
+    | 'phone'
+    | 'match';
   /** Rule value */
   value?: unknown;
   /** Error message */
@@ -1169,7 +1223,7 @@ export interface TelemetryConfig {
 /**
  * Telemetry event types
  */
-export type TelemetryEventType = 
+export type TelemetryEventType =
   | 'ScreenRendered'
   | 'ComponentRendered'
   | 'ActionInvoked'

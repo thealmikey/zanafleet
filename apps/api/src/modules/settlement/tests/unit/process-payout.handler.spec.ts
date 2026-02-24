@@ -13,7 +13,6 @@ import { PayoutFailedEventV1 } from '../../events/payout-failed.event';
 import { PayoutInitiatedEventV1 } from '../../events/payout-initiated.event';
 import { ProcessPayoutCommandHandler } from '../../handlers/process-payout.handler';
 
-
 describe('ProcessPayoutCommandHandler', () => {
   let handler: ProcessPayoutCommandHandler;
   let mockBatchRepo: jest.Mocked<Repository<SettlementBatchEntity>>;
@@ -93,7 +92,7 @@ describe('ProcessPayoutCommandHandler', () => {
         mockProviderRegistry,
         mockEventBus,
         mockCommandBus,
-        mockEventBusService,
+        mockEventBusService
       );
 
       mockBatchRepo.findOne.mockResolvedValue(existingBatch());
@@ -117,7 +116,7 @@ describe('ProcessPayoutCommandHandler', () => {
             flowType: 'B2C',
             payoutMethod: PayoutMethod.MOBILE_MONEY,
           }),
-        }),
+        })
       );
     });
 
@@ -130,7 +129,7 @@ describe('ProcessPayoutCommandHandler', () => {
           status: SettlementStatus.COMPLETED,
           payoutReference: 'mpesa_ref_456',
           processedAt: expect.any(Date),
-        }),
+        })
       );
     });
 
@@ -161,11 +160,11 @@ describe('ProcessPayoutCommandHandler', () => {
 
       expect(mockEventBusService.publish).toHaveBeenCalledWith(
         'settlement.events.payout-initiated-v1',
-        expect.any(PayoutInitiatedEventV1),
+        expect.any(PayoutInitiatedEventV1)
       );
       expect(mockEventBusService.publish).toHaveBeenCalledWith(
         'settlement.events.payout-completed-v1',
-        expect.any(PayoutCompletedEventV1),
+        expect.any(PayoutCompletedEventV1)
       );
     });
 
@@ -183,7 +182,7 @@ describe('ProcessPayoutCommandHandler', () => {
         mockProviderRegistry,
         mockEventBus,
         mockCommandBus,
-        mockEventBusService,
+        mockEventBusService
       );
 
       mockBatchRepo.findOne.mockResolvedValue(existingBatch());
@@ -204,7 +203,7 @@ describe('ProcessPayoutCommandHandler', () => {
         expect.objectContaining({
           status: SettlementStatus.FAILED,
           failureReason: 'Disbursement account has insufficient funds',
-        }),
+        })
       );
     });
 
@@ -219,7 +218,7 @@ describe('ProcessPayoutCommandHandler', () => {
 
       const events = mockEventBus.publish.mock.calls.map((call) => call[0]);
       const failedEvent = events.find(
-        (e) => (e as PayoutFailedEventV1).eventType === 'PayoutFailedEvent-V1',
+        (e) => (e as PayoutFailedEventV1).eventType === 'PayoutFailedEvent-V1'
       ) as PayoutFailedEventV1;
 
       expect(failedEvent).toBeDefined();
@@ -232,7 +231,7 @@ describe('ProcessPayoutCommandHandler', () => {
 
       const updateCalls = mockBatchRepo.update.mock.calls;
       const failedUpdate = updateCalls.find(
-        (call) => (call[1] as Partial<SettlementBatchEntity>).status === SettlementStatus.FAILED,
+        (call) => (call[1] as Partial<SettlementBatchEntity>).status === SettlementStatus.FAILED
       );
 
       expect(failedUpdate).toBeDefined();
@@ -246,7 +245,7 @@ describe('ProcessPayoutCommandHandler', () => {
         mockProviderRegistry,
         mockEventBus,
         mockCommandBus,
-        undefined,
+        undefined
       );
     });
 
@@ -262,7 +261,7 @@ describe('ProcessPayoutCommandHandler', () => {
       mockBatchRepo.findOne.mockResolvedValue(processingBatch);
 
       await expect(handler.execute(validCommand)).rejects.toThrow(
-        'Settlement batch is not in PENDING status',
+        'Settlement batch is not in PENDING status'
       );
     });
 
@@ -272,7 +271,7 @@ describe('ProcessPayoutCommandHandler', () => {
       mockBatchRepo.findOne.mockResolvedValue(completedBatch);
 
       await expect(handler.execute(validCommand)).rejects.toThrow(
-        'Settlement batch is not in PENDING status',
+        'Settlement batch is not in PENDING status'
       );
     });
 
@@ -291,7 +290,7 @@ describe('ProcessPayoutCommandHandler', () => {
         mockProviderRegistry,
         mockEventBus,
         mockCommandBus,
-        undefined,
+        undefined
       );
 
       mockBatchRepo.findOne.mockResolvedValue(existingBatch());

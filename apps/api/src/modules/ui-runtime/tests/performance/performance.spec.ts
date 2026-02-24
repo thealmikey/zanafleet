@@ -134,7 +134,9 @@ describe('SDUI Runtime Performance', () => {
 
   describe('Concurrent Requests', () => {
     it('should handle 10 concurrent screen compositions', async () => {
-      const requests = Array(10).fill(null).map(() => createComposeRequest());
+      const requests = Array(10)
+        .fill(null)
+        .map(() => createComposeRequest());
 
       const startTime = Date.now();
       await Promise.all(requests.map((req) => composer.compose(req)));
@@ -144,7 +146,9 @@ describe('SDUI Runtime Performance', () => {
     });
 
     it('should handle 50 concurrent screen compositions', async () => {
-      const requests = Array(50).fill(null).map(() => createComposeRequest());
+      const requests = Array(50)
+        .fill(null)
+        .map(() => createComposeRequest());
 
       const startTime = Date.now();
       await Promise.all(requests.map((req) => composer.compose(req)));

@@ -36,8 +36,8 @@ export enum PricingModel {
 }
 
 export enum VisibilityTokenType {
-  BOOST = 'BOOST',       // Short-term visibility boost
-  PREMIUM = 'PREMIUM',   // Premium badge/listing
+  BOOST = 'BOOST', // Short-term visibility boost
+  PREMIUM = 'PREMIUM', // Premium badge/listing
   FEATURED = 'FEATURED', // Featured placement
   TOP_RESULT = 'TOP_RESULT', // Always show at top
 }

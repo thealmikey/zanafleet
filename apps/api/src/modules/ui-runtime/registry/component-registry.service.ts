@@ -16,13 +16,13 @@ import {
 @Injectable()
 export class ComponentRegistryService {
   private readonly logger = new Logger(ComponentRegistryService.name);
-  
+
   // Component storage
   private readonly components = new Map<string, ComponentDefinition>();
-  
+
   // Category index
   private readonly categories = new Map<ComponentCategory, Set<string>>();
-  
+
   // Tag index
   private readonly tags = new Map<string, Set<string>>();
 
@@ -36,19 +36,17 @@ export class ComponentRegistryService {
    */
   register(component: ComponentDefinition): void {
     if (this.components.has(component.type)) {
-      this.logger.warn(
-        `Component ${component.type} already registered, overwriting`,
-      );
+      this.logger.warn(`Component ${component.type} already registered, overwriting`);
     }
-    
+
     this.components.set(component.type, component);
-    
+
     // Index by category
     if (!this.categories.has(component.category)) {
       this.categories.set(component.category, new Set());
     }
     this.categories.get(component.category)!.add(component.type);
-    
+
     // Index by tags
     if (component.tags) {
       for (const tag of component.tags) {
@@ -58,7 +56,7 @@ export class ComponentRegistryService {
         this.tags.get(tag)!.add(component.type);
       }
     }
-    
+
     this.logger.debug(`Registered component: ${component.type}`);
   }
 
@@ -82,7 +80,7 @@ export class ComponentRegistryService {
   getByCategory(category: ComponentCategory): ComponentDefinition[] {
     const types = this.categories.get(category);
     if (!types) return [];
-    
+
     return Array.from(types)
       .map((type) => this.components.get(type))
       .filter((c): c is ComponentDefinition => c !== undefined);
@@ -94,7 +92,7 @@ export class ComponentRegistryService {
   getByTag(tag: string): ComponentDefinition[] {
     const types = this.tags.get(tag);
     if (!types) return [];
-    
+
     return Array.from(types)
       .map((type) => this.components.get(type))
       .filter((c): c is ComponentDefinition => c !== undefined);
@@ -161,13 +159,13 @@ export class ComponentRegistryService {
     this.registerAvatarComponent();
     this.registerCardComponent();
     this.registerDividerComponent();
-    
+
     // Interactive components
     this.registerButtonComponent();
     this.registerLinkComponent();
     this.registerToggleComponent();
     this.registerSliderComponent();
-    
+
     // Form components
     this.registerInputComponent();
     this.registerSelectComponent();
@@ -176,12 +174,12 @@ export class ComponentRegistryService {
     this.registerTextAreaComponent();
     this.registerDatePickerComponent();
     this.registerFileUploadComponent();
-    
+
     // Data components
     this.registerTableComponent();
     this.registerListComponent();
     this.registerTreeComponent();
-    
+
     // Layout components
     this.registerGridComponent();
     this.registerFlexComponent();
@@ -189,7 +187,7 @@ export class ComponentRegistryService {
     this.registerTabsComponent();
     this.registerModalComponent();
     this.registerDrawerComponent();
-    
+
     this.logger.log(`Registered ${this.components.size} built-in components`);
   }
 
@@ -203,16 +201,16 @@ export class ComponentRegistryService {
       tags: ['text', 'typography'],
       propsSchema: {
         content: { type: 'string', required: false },
-        variant: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['heading1', 'heading2', 'heading3', 'body', 'caption', 'label'] 
+        variant: {
+          type: 'enum',
+          required: false,
+          enum: ['heading1', 'heading2', 'heading3', 'body', 'caption', 'label'],
         },
         color: { type: 'string', required: false },
-        align: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['left', 'center', 'right', 'justify'] 
+        align: {
+          type: 'enum',
+          required: false,
+          enum: ['left', 'center', 'right', 'justify'],
         },
       },
       platforms: ['web', 'ios', 'android'],
@@ -233,10 +231,10 @@ export class ComponentRegistryService {
         alt: { type: 'string', required: true },
         width: { type: 'number', required: false },
         height: { type: 'number', required: false },
-        fit: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['cover', 'contain', 'fill', 'none'] 
+        fit: {
+          type: 'enum',
+          required: false,
+          enum: ['cover', 'contain', 'fill', 'none'],
         },
         rounded: { type: 'boolean', required: false },
       },
@@ -273,15 +271,15 @@ export class ComponentRegistryService {
       tags: ['badge', 'indicator'],
       propsSchema: {
         label: { type: 'string', required: true },
-        variant: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['primary', 'secondary', 'success', 'warning', 'danger'] 
+        variant: {
+          type: 'enum',
+          required: false,
+          enum: ['primary', 'secondary', 'success', 'warning', 'danger'],
         },
-        size: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['sm', 'md', 'lg'] 
+        size: {
+          type: 'enum',
+          required: false,
+          enum: ['sm', 'md', 'lg'],
         },
         dot: { type: 'boolean', required: false },
       },
@@ -329,9 +327,7 @@ export class ComponentRegistryService {
         padding: { type: 'string', required: false },
         clickable: { type: 'boolean', required: false },
       },
-      events: [
-        { name: 'click', description: 'Card clicked', bubbles: true },
-      ],
+      events: [{ name: 'click', description: 'Card clicked', bubbles: true }],
       platforms: ['web', 'ios', 'android'],
       renderer: 'CardRenderer',
     });
@@ -346,10 +342,10 @@ export class ComponentRegistryService {
       category: 'display',
       tags: ['divider', 'separator'],
       propsSchema: {
-        orientation: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['horizontal', 'vertical'] 
+        orientation: {
+          type: 'enum',
+          required: false,
+          enum: ['horizontal', 'vertical'],
         },
         spacing: { type: 'string', required: false },
       },
@@ -369,28 +365,26 @@ export class ComponentRegistryService {
       requiredCapabilities: [],
       propsSchema: {
         label: { type: 'string', required: true },
-        variant: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['primary', 'secondary', 'danger', 'link', 'ghost'] 
+        variant: {
+          type: 'enum',
+          required: false,
+          enum: ['primary', 'secondary', 'danger', 'link', 'ghost'],
         },
-        size: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['sm', 'md', 'lg'] 
+        size: {
+          type: 'enum',
+          required: false,
+          enum: ['sm', 'md', 'lg'],
         },
         icon: { type: 'string', required: false },
-        iconPosition: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['left', 'right'] 
+        iconPosition: {
+          type: 'enum',
+          required: false,
+          enum: ['left', 'right'],
         },
         fullWidth: { type: 'boolean', required: false },
         loading: { type: 'boolean', required: false },
       },
-      events: [
-        { name: 'click', description: 'Button clicked', bubbles: true },
-      ],
+      events: [{ name: 'click', description: 'Button clicked', bubbles: true }],
       platforms: ['web', 'ios', 'android'],
       renderer: 'ButtonRenderer',
       lifecycle: {
@@ -411,16 +405,14 @@ export class ComponentRegistryService {
       propsSchema: {
         href: { type: 'string', required: true },
         label: { type: 'string', required: false },
-        variant: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['default', 'primary', 'secondary'] 
+        variant: {
+          type: 'enum',
+          required: false,
+          enum: ['default', 'primary', 'secondary'],
         },
         external: { type: 'boolean', required: false },
       },
-      events: [
-        { name: 'click', description: 'Link clicked', bubbles: true },
-      ],
+      events: [{ name: 'click', description: 'Link clicked', bubbles: true }],
       platforms: ['web', 'ios', 'android'],
       renderer: 'LinkRenderer',
     });
@@ -439,9 +431,7 @@ export class ComponentRegistryService {
         label: { type: 'string', required: false },
         disabled: { type: 'boolean', required: false },
       },
-      events: [
-        { name: 'change', description: 'Toggle changed', bubbles: true },
-      ],
+      events: [{ name: 'change', description: 'Toggle changed', bubbles: true }],
       platforms: ['web', 'ios', 'android'],
       renderer: 'ToggleRenderer',
     });
@@ -484,10 +474,10 @@ export class ComponentRegistryService {
         value: { type: 'string', required: false },
         label: { type: 'string', required: false },
         placeholder: { type: 'string', required: false },
-        type: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['text', 'email', 'password', 'number', 'tel', 'search'] 
+        type: {
+          type: 'enum',
+          required: false,
+          enum: ['text', 'email', 'password', 'number', 'tel', 'search'],
         },
         disabled: { type: 'boolean', required: false },
         error: { type: 'string', required: false },
@@ -516,8 +506,8 @@ export class ComponentRegistryService {
       tags: ['select', 'dropdown', 'form'],
       propsSchema: {
         value: { type: 'string', required: false },
-        options: { 
-          type: 'array', 
+        options: {
+          type: 'array',
           required: true,
           items: {
             type: 'object',
@@ -535,9 +525,7 @@ export class ComponentRegistryService {
         multiple: { type: 'boolean', required: false },
         searchable: { type: 'boolean', required: false },
       },
-      events: [
-        { name: 'change', description: 'Selection changed', bubbles: true },
-      ],
+      events: [{ name: 'change', description: 'Selection changed', bubbles: true }],
       platforms: ['web', 'ios', 'android'],
       renderer: 'SelectRenderer',
     });
@@ -557,9 +545,7 @@ export class ComponentRegistryService {
         disabled: { type: 'boolean', required: false },
         indeterminate: { type: 'boolean', required: false },
       },
-      events: [
-        { name: 'change', description: 'Checkbox changed', bubbles: true },
-      ],
+      events: [{ name: 'change', description: 'Checkbox changed', bubbles: true }],
       platforms: ['web', 'ios', 'android'],
       renderer: 'CheckboxRenderer',
     });
@@ -579,9 +565,7 @@ export class ComponentRegistryService {
         label: { type: 'string', required: false },
         disabled: { type: 'boolean', required: false },
       },
-      events: [
-        { name: 'change', description: 'Radio selected', bubbles: true },
-      ],
+      events: [{ name: 'change', description: 'Radio selected', bubbles: true }],
       platforms: ['web', 'ios', 'android'],
       renderer: 'RadioRenderer',
     });
@@ -605,9 +589,7 @@ export class ComponentRegistryService {
         error: { type: 'string', required: false },
         autoResize: { type: 'boolean', required: false },
       },
-      events: [
-        { name: 'change', description: 'Text changed', bubbles: true },
-      ],
+      events: [{ name: 'change', description: 'Text changed', bubbles: true }],
       platforms: ['web', 'ios', 'android'],
       renderer: 'TextAreaRenderer',
     });
@@ -624,19 +606,17 @@ export class ComponentRegistryService {
       propsSchema: {
         value: { type: 'string', required: false },
         label: { type: 'string', required: false },
-        mode: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['date', 'time', 'datetime'] 
+        mode: {
+          type: 'enum',
+          required: false,
+          enum: ['date', 'time', 'datetime'],
         },
         minDate: { type: 'string', required: false },
         maxDate: { type: 'string', required: false },
         disabled: { type: 'boolean', required: false },
         error: { type: 'string', required: false },
       },
-      events: [
-        { name: 'change', description: 'Date selected', bubbles: true },
-      ],
+      events: [{ name: 'change', description: 'Date selected', bubbles: true }],
       platforms: ['web', 'ios', 'android'],
       renderer: 'DatePickerRenderer',
     });
@@ -678,8 +658,8 @@ export class ComponentRegistryService {
       category: 'data',
       tags: ['table', 'data', 'grid'],
       propsSchema: {
-        columns: { 
-          type: 'array', 
+        columns: {
+          type: 'array',
           required: true,
           items: {
             type: 'object',
@@ -722,9 +702,7 @@ export class ComponentRegistryService {
         emptyText: { type: 'string', required: false },
         virtualized: { type: 'boolean', required: false },
       },
-      events: [
-        { name: 'itemClick', description: 'Item clicked', bubbles: true },
-      ],
+      events: [{ name: 'itemClick', description: 'Item clicked', bubbles: true }],
       platforms: ['web', 'ios', 'android'],
       renderer: 'ListRenderer',
     });
@@ -787,26 +765,26 @@ export class ComponentRegistryService {
         default: { name: 'default', description: 'Flex content', multiple: true },
       },
       propsSchema: {
-        direction: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['row', 'column', 'row-reverse', 'column-reverse'] 
+        direction: {
+          type: 'enum',
+          required: false,
+          enum: ['row', 'column', 'row-reverse', 'column-reverse'],
         },
-        justify: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'] 
+        justify: {
+          type: 'enum',
+          required: false,
+          enum: ['start', 'center', 'end', 'space-between', 'space-around', 'space-evenly'],
         },
-        align: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['start', 'center', 'end', 'stretch', 'baseline'] 
+        align: {
+          type: 'enum',
+          required: false,
+          enum: ['start', 'center', 'end', 'stretch', 'baseline'],
         },
         gap: { type: 'string', required: false },
-        wrap: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['nowrap', 'wrap', 'wrap-reverse'] 
+        wrap: {
+          type: 'enum',
+          required: false,
+          enum: ['nowrap', 'wrap', 'wrap-reverse'],
         },
       },
       platforms: ['web', 'ios', 'android'],
@@ -826,16 +804,16 @@ export class ComponentRegistryService {
         default: { name: 'default', description: 'Stack content', multiple: true },
       },
       propsSchema: {
-        direction: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['vertical', 'horizontal'] 
+        direction: {
+          type: 'enum',
+          required: false,
+          enum: ['vertical', 'horizontal'],
         },
         gap: { type: 'string', required: false },
-        align: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['start', 'center', 'end', 'stretch', 'space-between', 'space-around'] 
+        align: {
+          type: 'enum',
+          required: false,
+          enum: ['start', 'center', 'end', 'stretch', 'space-between', 'space-around'],
         },
       },
       platforms: ['web', 'ios', 'android'],
@@ -852,8 +830,8 @@ export class ComponentRegistryService {
       category: 'container',
       tags: ['tabs', 'layout', 'container'],
       propsSchema: {
-        tabs: { 
-          type: 'array', 
+        tabs: {
+          type: 'array',
           required: true,
           items: {
             type: 'object',
@@ -865,20 +843,18 @@ export class ComponentRegistryService {
           },
         },
         activeTab: { type: 'string', required: false },
-        position: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['top', 'bottom', 'left', 'right'] 
+        position: {
+          type: 'enum',
+          required: false,
+          enum: ['top', 'bottom', 'left', 'right'],
         },
-        variant: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['line', 'pills', 'enclosed'] 
+        variant: {
+          type: 'enum',
+          required: false,
+          enum: ['line', 'pills', 'enclosed'],
         },
       },
-      events: [
-        { name: 'tabChange', description: 'Tab changed', bubbles: true },
-      ],
+      events: [{ name: 'tabChange', description: 'Tab changed', bubbles: true }],
       platforms: ['web', 'ios', 'android'],
       renderer: 'TabsRenderer',
     });
@@ -900,18 +876,16 @@ export class ComponentRegistryService {
       propsSchema: {
         open: { type: 'boolean', required: true },
         title: { type: 'string', required: false },
-        size: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['sm', 'md', 'lg', 'xl', 'full'] 
+        size: {
+          type: 'enum',
+          required: false,
+          enum: ['sm', 'md', 'lg', 'xl', 'full'],
         },
         closable: { type: 'boolean', required: false },
         closeOnOverlayClick: { type: 'boolean', required: false },
         closeOnEscape: { type: 'boolean', required: false },
       },
-      events: [
-        { name: 'close', description: 'Modal closed', bubbles: true },
-      ],
+      events: [{ name: 'close', description: 'Modal closed', bubbles: true }],
       platforms: ['web', 'ios', 'android'],
       renderer: 'ModalRenderer',
     });
@@ -933,18 +907,16 @@ export class ComponentRegistryService {
       propsSchema: {
         open: { type: 'boolean', required: true },
         title: { type: 'string', required: false },
-        placement: { 
-          type: 'enum', 
-          required: false, 
-          enum: ['start', 'end', 'top', 'bottom'] 
+        placement: {
+          type: 'enum',
+          required: false,
+          enum: ['start', 'end', 'top', 'bottom'],
         },
         size: { type: 'string', required: false },
         closable: { type: 'boolean', required: false },
         closeOnOverlayClick: { type: 'boolean', required: false },
       },
-      events: [
-        { name: 'close', description: 'Drawer closed', bubbles: true },
-      ],
+      events: [{ name: 'close', description: 'Drawer closed', bubbles: true }],
       platforms: ['web', 'ios', 'android'],
       renderer: 'DrawerRenderer',
     });

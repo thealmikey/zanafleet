@@ -6,7 +6,10 @@ import { ComponentRegistryService } from '../../services/component-registry.serv
 import { MoveBookingStateRenderer } from '../../strategies/move-booking-renderer';
 import { CapabilityAccessController } from '../../../capability/services/capability-access.controller';
 import { WorkflowEngineService } from '../../../workflow/services/workflow-engine.service';
-import { ProcessInstanceEntity, ProcessInstanceStatus } from '../../../workflow/entities/process-instance.entity';
+import {
+  ProcessInstanceEntity,
+  ProcessInstanceStatus,
+} from '../../../workflow/entities/process-instance.entity';
 import { ProcessState } from '../../../workflow/entities/process-definition.entity';
 import { UIComposeRequest } from '../../interfaces/ui-composer.interfaces';
 
@@ -43,9 +46,7 @@ function createMockProcessInstance(): ProcessInstanceEntity {
     pickupAddress: '123 Pickup St',
     dropoffAddress: '456 Dropoff Ave',
     scheduledDate: '2024-01-15T10:00:00Z',
-    items: [
-      { id: 'item-1', name: 'Sofa', quantity: 1 },
-    ],
+    items: [{ id: 'item-1', name: 'Sofa', quantity: 1 }],
   };
   instance.relatedEntities = [];
   instance.triggeredBy = 'system';
@@ -121,9 +122,7 @@ describe('Error Handling', () => {
 
     it('should handle generic workflow engine errors', async () => {
       // Arrange
-      mockWorkflowEngine.getProcessState.mockRejectedValue(
-        new Error('Database connection failed')
-      );
+      mockWorkflowEngine.getProcessState.mockRejectedValue(new Error('Database connection failed'));
 
       // Act & Assert
       await expect(service.compose(mockRequest)).rejects.toThrow();
@@ -347,9 +346,8 @@ describe('Error Handling', () => {
     it('should handle workflow engine timeout', async () => {
       // Arrange
       mockWorkflowEngine.getProcessState.mockImplementation(
-        () => new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Request timeout')), 100)
-        )
+        () =>
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Request timeout')), 100))
       );
 
       // Act & Assert
@@ -361,9 +359,8 @@ describe('Error Handling', () => {
       const mockProcessInstance = createMockProcessInstance();
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
       mockCapabilityAccessController.getCapabilitiesForActor.mockImplementation(
-        () => new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Request timeout')), 100)
-        )
+        () =>
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Request timeout')), 100))
       );
 
       // Act & Assert
@@ -534,7 +531,7 @@ describe('Error Handling', () => {
           },
         }
       );
-      
+
       service.registerRenderer(failingRenderer);
 
       const request: UIComposeRequest = {
@@ -561,7 +558,7 @@ describe('Error Handling', () => {
           },
         }
       );
-      
+
       service.registerRenderer(invalidRenderer);
 
       const request: UIComposeRequest = {

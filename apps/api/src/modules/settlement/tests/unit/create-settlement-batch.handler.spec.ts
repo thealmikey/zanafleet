@@ -1,5 +1,10 @@
 import { EventBusService } from '@api/core/event-bus';
-import { LedgerEntryEntity, LedgerCategory, LedgerEntryType, LedgerReferenceType } from '@api/modules/ledger';
+import {
+  LedgerEntryEntity,
+  LedgerCategory,
+  LedgerEntryType,
+  LedgerReferenceType,
+} from '@api/modules/ledger';
 import { EventBus } from '@nestjs/cqrs';
 import { DataSource, Repository, EntityManager } from 'typeorm';
 
@@ -73,7 +78,7 @@ describe('CreateSettlementBatchCommandHandler', () => {
       handler = new CreateSettlementBatchCommandHandler(
         mockDataSource,
         mockEventBus,
-        mockEventBusService,
+        mockEventBusService
       );
 
       mockLedgerRepo.find.mockResolvedValue([
@@ -99,12 +104,12 @@ describe('CreateSettlementBatchCommandHandler', () => {
       expect(mockEntityManager.save).toHaveBeenCalledTimes(2);
 
       const batchSaveCall = mockEntityManager.save.mock.calls.find(
-        (call) => call[0] === SettlementBatchEntity,
+        (call) => call[0] === SettlementBatchEntity
       );
       expect(batchSaveCall).toBeDefined();
 
       const itemsSaveCall = mockEntityManager.save.mock.calls.find(
-        (call) => call[0] === SettlementItemEntity,
+        (call) => call[0] === SettlementItemEntity
       );
       expect(itemsSaveCall).toBeDefined();
     });
@@ -113,7 +118,7 @@ describe('CreateSettlementBatchCommandHandler', () => {
       await handler.execute(validCommand);
 
       const batchSaveCall = mockEntityManager.save.mock.calls.find(
-        (call) => call[0] === SettlementBatchEntity,
+        (call) => call[0] === SettlementBatchEntity
       );
       const savedBatch = batchSaveCall?.[1] as SettlementBatchEntity;
 
@@ -124,7 +129,7 @@ describe('CreateSettlementBatchCommandHandler', () => {
       await handler.execute(validCommand);
 
       const itemsSaveCall = mockEntityManager.save.mock.calls.find(
-        (call) => call[0] === SettlementItemEntity,
+        (call) => call[0] === SettlementItemEntity
       );
       const savedItems = itemsSaveCall?.[1] as SettlementItemEntity[];
 
@@ -156,7 +161,7 @@ describe('CreateSettlementBatchCommandHandler', () => {
 
       expect(mockEventBusService.publish).toHaveBeenCalledWith(
         'settlement.events.batch-created-v1',
-        expect.any(SettlementBatchCreatedEventV1),
+        expect.any(SettlementBatchCreatedEventV1)
       );
     });
 
@@ -165,18 +170,14 @@ describe('CreateSettlementBatchCommandHandler', () => {
 
       expect(result.batchId).toBeDefined();
       expect(result.batchId).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       );
     });
   });
 
   describe('without earnings', () => {
     beforeEach(() => {
-      handler = new CreateSettlementBatchCommandHandler(
-        mockDataSource,
-        mockEventBus,
-        undefined,
-      );
+      handler = new CreateSettlementBatchCommandHandler(mockDataSource, mockEventBus, undefined);
 
       mockLedgerRepo.find.mockResolvedValue([]);
     });
@@ -200,11 +201,7 @@ describe('CreateSettlementBatchCommandHandler', () => {
 
   describe('commission calculation', () => {
     beforeEach(() => {
-      handler = new CreateSettlementBatchCommandHandler(
-        mockDataSource,
-        mockEventBus,
-        undefined,
-      );
+      handler = new CreateSettlementBatchCommandHandler(mockDataSource, mockEventBus, undefined);
     });
 
     it('should apply custom commission rate', async () => {

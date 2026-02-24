@@ -3,7 +3,11 @@ import { CommandBus } from '@nestjs/cqrs';
 import { BusinessType } from '@zanafleet/contracts';
 
 import { WooCommerceOnboardingController } from '../woocommerce-onboarding.controller';
-import { RegisterWooCommerceStoreDto, LinkStoreDto, GenerateApiCredentialsDto } from '../woocommerce-onboarding.controller';
+import {
+  RegisterWooCommerceStoreDto,
+  LinkStoreDto,
+  GenerateApiCredentialsDto,
+} from '../woocommerce-onboarding.controller';
 
 describe('WooCommerceOnboardingController', () => {
   let controller: WooCommerceOnboardingController;
@@ -65,7 +69,7 @@ describe('WooCommerceOnboardingController', () => {
       expect(result).toHaveProperty('storeId');
       expect(result).toHaveProperty('status');
       expect(result.status).toBe('active');
-      
+
       // Verify API key format
       expect(result.apiKey).toMatch(/^wf_live_/);
     });
@@ -147,7 +151,7 @@ describe('WooCommerceOnboardingController', () => {
       expect(result.apiSecret).toBeDefined();
       expect(result.createdAt).toBeDefined();
       expect(result.expiresAt).toBeDefined();
-      
+
       // Verify expiration is approximately 1 year from now
       const createdAt = new Date(result.createdAt);
       const expiresAt = new Date(result.expiresAt);

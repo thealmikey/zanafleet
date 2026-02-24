@@ -3,10 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EventBus } from '@nestjs/cqrs';
 
-import {
-  ProcessDefinitionEntity,
-  ProcessState,
-} from '../entities/process-definition.entity';
+import { ProcessDefinitionEntity, ProcessState } from '../entities/process-definition.entity';
 import {
   ProcessInstanceEntity,
   ProcessInstanceStatus,
@@ -82,7 +79,7 @@ export class WorkflowEngineService {
     private readonly instanceRepository: Repository<ProcessInstanceEntity>,
     @InjectRepository(ProcessTransitionEntity)
     private readonly transitionRepository: Repository<ProcessTransitionEntity>,
-    private readonly eventBus: EventBus,
+    private readonly eventBus: EventBus
   ) {}
 
   /**
@@ -91,8 +88,19 @@ export class WorkflowEngineService {
    * @param options - Process instance creation options
    * @returns The created process instance
    */
-  async createProcessInstance(options: CreateProcessInstanceOptions): Promise<ProcessInstanceEntity> {
-    const { definitionId, name, context = {}, triggeredBy = 'system', correlationId, parentInstanceId, relatedEntities = [], expiresAt } = options;
+  async createProcessInstance(
+    options: CreateProcessInstanceOptions
+  ): Promise<ProcessInstanceEntity> {
+    const {
+      definitionId,
+      name,
+      context = {},
+      triggeredBy = 'system',
+      correlationId,
+      parentInstanceId,
+      relatedEntities = [],
+      expiresAt,
+    } = options;
 
     // Fetch the process definition
     const definition = await this.definitionRepository.findOne({
@@ -180,12 +188,12 @@ export class WorkflowEngineService {
     const transition = await this.findMatchingTransition(
       instance.definitionId,
       instance.currentState,
-      eventType,
+      eventType
     );
 
     if (!transition) {
       this.logger.warn(
-        `No transition found for ${instanceId} from state ${instance.currentState} on event ${eventType}`,
+        `No transition found for ${instanceId} from state ${instance.currentState} on event ${eventType}`
       );
       return {
         success: false,
@@ -198,7 +206,7 @@ export class WorkflowEngineService {
     const guardResults = await this.evaluateGuardConditions(
       transition.guardConditions,
       instance,
-      eventData,
+      eventData
     );
 
     // Check if all guards pass
@@ -225,7 +233,10 @@ export class WorkflowEngineService {
    * @param targetState - The desired target state
    * @returns Validation result with available transitions
    */
-  async validateTransition(instanceId: string, targetState: string): Promise<{
+  async validateTransition(
+    instanceId: string,
+    targetState: string
+  ): Promise<{
     possible: boolean;
     transition?: ProcessTransitionEntity;
     reason?: string;
@@ -242,7 +253,7 @@ export class WorkflowEngineService {
       instance.definitionId,
       instance.currentState,
       undefined,
-      targetState,
+      targetState
     );
 
     if (!transition) {
@@ -300,7 +311,7 @@ export class WorkflowEngineService {
     transition: ProcessTransitionEntity,
     eventData: Record<string, unknown>,
     guardResults: GuardEvaluationResult[],
-    triggeredBy: string,
+    triggeredBy: string
   ): Promise<TransitionResult> {
     const previousState = instance.currentState;
     const previousContext = { ...instance.context };
@@ -357,7 +368,7 @@ export class WorkflowEngineService {
     this.eventBus.publish(stateChangedEvent);
 
     this.logger.log(
-      `Transition executed: ${instance.instanceId} from ${previousState} to ${transition.targetState}`,
+      `Transition executed: ${instance.instanceId} from ${previousState} to ${transition.targetState}`
     );
 
     return {
@@ -374,7 +385,7 @@ export class WorkflowEngineService {
   private async evaluateGuardConditions(
     guardConditions: GuardConditionConfig[],
     instance: ProcessInstanceEntity,
-    eventData: Record<string, unknown>,
+    eventData: Record<string, unknown>
   ): Promise<GuardEvaluationResult[]> {
     const results: GuardEvaluationResult[] = [];
 
@@ -419,7 +430,11 @@ export class WorkflowEngineService {
    */
   private evaluateExpression(
     expression: string,
-    context: { context: Record<string, unknown>; eventData: Record<string, unknown>; currentState: string },
+    context: {
+      context: Record<string, unknown>;
+      eventData: Record<string, unknown>;
+      currentState: string;
+    }
   ): boolean {
     try {
       // Simple expression evaluation
@@ -438,7 +453,7 @@ export class WorkflowEngineService {
     definitionId: string,
     currentState: string,
     eventType?: string,
-    targetState?: string,
+    targetState?: string
   ): Promise<ProcessTransitionEntity | null> {
     const query = this.transitionRepository
       .createQueryBuilder('transition')
@@ -448,10 +463,14 @@ export class WorkflowEngineService {
 
     if (eventType) {
       query.andWhere('transition.triggerEventType = :eventType', { eventType });
-      query.andWhere('transition.triggerType = :triggerType', { triggerType: TransitionTriggerType.EVENT });
+      query.andWhere('transition.triggerType = :triggerType', {
+        triggerType: TransitionTriggerType.EVENT,
+      });
     } else if (targetState) {
       query.andWhere('transition.targetState = :targetState', { targetState });
-      query.andWhere('transition.triggerType = :triggerType', { triggerType: TransitionTriggerType.MANUAL });
+      query.andWhere('transition.triggerType = :triggerType', {
+        triggerType: TransitionTriggerType.MANUAL,
+      });
     }
 
     query.orderBy('transition.priority', 'DESC');
@@ -464,13 +483,13 @@ export class WorkflowEngineService {
    */
   private async executeTransitionActions(
     actions: TransitionActionConfig[],
-    instance: ProcessInstanceEntity,
+    instance: ProcessInstanceEntity
   ): Promise<void> {
     for (const action of actions) {
       if (action.async) {
         // Execute asynchronously
         this.executeAction(action, instance).catch((err) =>
-          this.logger.error(`Action ${action.actionName} failed: ${err.message}`),
+          this.logger.error(`Action ${action.actionName} failed: ${err.message}`)
         );
       } else {
         await this.executeAction(action, instance);
@@ -483,11 +502,13 @@ export class WorkflowEngineService {
    */
   private async executeAction(
     action: TransitionActionConfig,
-    instance: ProcessInstanceEntity,
+    instance: ProcessInstanceEntity
   ): Promise<void> {
     if (action.actionType === 'event') {
       // Event publishing would be handled by EventBus
-      this.logger.debug(`Executing action: ${action.actionName} for instance: ${instance.instanceId}`);
+      this.logger.debug(
+        `Executing action: ${action.actionName} for instance: ${instance.instanceId}`
+      );
     }
     // Service and notification actions would be implemented here
   }

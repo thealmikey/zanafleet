@@ -11,7 +11,6 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 
-
 import { PayoutOrchestrator } from '../coordinators/payout.orchestrator';
 import { PayoutMethod } from '../dto/settlement.enums';
 import { SettlementSchedulerService } from '../services/settlement-scheduler.service';

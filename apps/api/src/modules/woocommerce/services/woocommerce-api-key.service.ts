@@ -29,9 +29,9 @@ export class ValidateApiKeyResult {
 
 /**
  * WooCommerce API Key Service
- * 
+ *
  * Manages API keys for WooCommerce integration with Keycloak-backed authentication.
- * 
+ *
  * Features:
  * - Cryptographically secure key generation
  * - Key hash storage (never store raw keys)
@@ -46,12 +46,12 @@ export class WooCommerceApiKeyService {
 
   constructor(
     @InjectRepository(WooCommerceApiKeyEntity)
-    private readonly apiKeyRepository: Repository<WooCommerceApiKeyEntity>,
+    private readonly apiKeyRepository: Repository<WooCommerceApiKeyEntity>
   ) {}
 
   /**
    * Generate a new API key pair
-   * 
+   *
    * @param dto - Key creation parameters
    * @returns Object containing the raw key (only shown once) and key metadata
    */
@@ -100,7 +100,7 @@ export class WooCommerceApiKeyService {
 
   /**
    * Validate an API key
-   * 
+   *
    * @param rawKey - The raw API key to validate
    * @returns Validation result with key metadata if valid
    */
@@ -142,18 +142,20 @@ export class WooCommerceApiKeyService {
 
   /**
    * List all API keys for a store
-   * 
+   *
    * @param storeId - The store ID
    * @returns List of API keys (without secrets)
    */
-  async listKeysForStore(storeId: string): Promise<{
-    id: string;
-    name: string;
-    isActive: boolean;
-    lastUsedAt: Date | null;
-    expiresAt: Date | null;
-    createdAt: Date;
-  }[]> {
+  async listKeysForStore(storeId: string): Promise<
+    {
+      id: string;
+      name: string;
+      isActive: boolean;
+      lastUsedAt: Date | null;
+      expiresAt: Date | null;
+      createdAt: Date;
+    }[]
+  > {
     const keys = await this.apiKeyRepository.find({
       where: { storeId },
       order: { createdAt: 'DESC' },
@@ -171,19 +173,21 @@ export class WooCommerceApiKeyService {
 
   /**
    * List all API keys for an actor (Keycloak user)
-   * 
+   *
    * @param actorId - The actor ID
    * @returns List of API keys
    */
-  async listKeysForActor(actorId: string): Promise<{
-    id: string;
-    storeId: string;
-    name: string;
-    isActive: boolean;
-    lastUsedAt: Date | null;
-    expiresAt: Date | null;
-    createdAt: Date;
-  }[]> {
+  async listKeysForActor(actorId: string): Promise<
+    {
+      id: string;
+      storeId: string;
+      name: string;
+      isActive: boolean;
+      lastUsedAt: Date | null;
+      expiresAt: Date | null;
+      createdAt: Date;
+    }[]
+  > {
     const keys = await this.apiKeyRepository.find({
       where: { actorId },
       order: { createdAt: 'DESC' },
@@ -202,7 +206,7 @@ export class WooCommerceApiKeyService {
 
   /**
    * Revoke an API key
-   * 
+   *
    * @param keyId - The key ID to revoke
    * @returns True if revoked successfully
    */
@@ -221,7 +225,7 @@ export class WooCommerceApiKeyService {
 
   /**
    * Delete an API key permanently
-   * 
+   *
    * @param keyId - The key ID to delete
    * @returns True if deleted successfully
    */
@@ -238,7 +242,7 @@ export class WooCommerceApiKeyService {
 
   /**
    * Get key by ID
-   * 
+   *
    * @param keyId - The key ID
    * @returns The API key entity
    */

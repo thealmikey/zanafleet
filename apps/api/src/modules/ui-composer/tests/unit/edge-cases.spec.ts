@@ -5,7 +5,10 @@ import { ComponentRegistryService } from '../../services/component-registry.serv
 import { MoveBookingStateRenderer } from '../../strategies/move-booking-renderer';
 import { CapabilityAccessController } from '../../../capability/services/capability-access.controller';
 import { WorkflowEngineService } from '../../../workflow/services/workflow-engine.service';
-import { ProcessInstanceEntity, ProcessInstanceStatus } from '../../../workflow/entities/process-instance.entity';
+import {
+  ProcessInstanceEntity,
+  ProcessInstanceStatus,
+} from '../../../workflow/entities/process-instance.entity';
 import { ProcessState } from '../../../workflow/entities/process-definition.entity';
 import { UIComposeRequest } from '../../interfaces/ui-composer.interfaces';
 
@@ -26,7 +29,9 @@ const mockCapabilityAccessController = {
 /**
  * Create a mock process instance
  */
-function createMockProcessInstance(overrides?: Partial<ProcessInstanceEntity>): ProcessInstanceEntity {
+function createMockProcessInstance(
+  overrides?: Partial<ProcessInstanceEntity>
+): ProcessInstanceEntity {
   const instance = new ProcessInstanceEntity();
   instance.instanceId = 'instance-123';
   instance.definitionId = 'move-booking-process';
@@ -42,9 +47,7 @@ function createMockProcessInstance(overrides?: Partial<ProcessInstanceEntity>): 
     pickupAddress: '123 Pickup St',
     dropoffAddress: '456 Dropoff Ave',
     scheduledDate: '2024-01-15T10:00:00Z',
-    items: [
-      { id: 'item-1', name: 'Sofa', quantity: 1 },
-    ],
+    items: [{ id: 'item-1', name: 'Sofa', quantity: 1 }],
   };
   instance.relatedEntities = [];
   instance.triggeredBy = 'system';
@@ -202,9 +205,7 @@ describe('Edge Cases', () => {
         contextId: longId,
       };
 
-      mockWorkflowEngine.getProcessState.mockRejectedValue(
-        new Error('Process not found')
-      );
+      mockWorkflowEngine.getProcessState.mockRejectedValue(new Error('Process not found'));
 
       // Act & Assert
       await expect(service.compose(request)).rejects.toThrow();
@@ -349,9 +350,7 @@ describe('Edge Cases', () => {
       ];
 
       // Act
-      const results = await Promise.all(
-        requests.map((req) => service.compose(req))
-      );
+      const results = await Promise.all(requests.map((req) => service.compose(req)));
 
       // Assert
       expect(results.length).toBe(3);
@@ -390,7 +389,7 @@ describe('Edge Cases', () => {
       // Arrange - Simulate state changing during composition
       let callCount = 0;
       const mockProcessInstance = createMockProcessInstance();
-      
+
       mockWorkflowEngine.getProcessState.mockImplementation(() => {
         callCount++;
         // Return different states on subsequent calls
@@ -519,7 +518,7 @@ describe('Edge Cases', () => {
       mockProcessInstance.createdAt = new Date();
       mockProcessInstance.updatedAt = new Date();
       // name is optional
-      
+
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
       mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([]);
 

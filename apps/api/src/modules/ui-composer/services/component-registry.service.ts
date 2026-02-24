@@ -392,7 +392,9 @@ export class ComponentRegistryService {
       requiresContext: false,
     });
 
-    this.logger.log(`ComponentRegistry initialized with ${Object.keys(this.components).length} components`);
+    this.logger.log(
+      `ComponentRegistry initialized with ${Object.keys(this.components).length} components`
+    );
   }
 
   /**
@@ -482,11 +484,13 @@ export class ComponentRegistryService {
    * @param specs - Array of component specifications
    * @returns Array of UIComponent instances
    */
-  createComponents(specs: Array<{
-    type: string;
-    props?: Record<string, unknown>;
-    overrides?: Partial<UIComponent>;
-  }>): UIComponent[] {
+  createComponents(
+    specs: Array<{
+      type: string;
+      props?: Record<string, unknown>;
+      overrides?: Partial<UIComponent>;
+    }>
+  ): UIComponent[] {
     return specs.map((spec) => this.createComponent(spec.type, spec.props ?? {}, spec.overrides));
   }
 }

@@ -111,7 +111,9 @@ export class ProcessInstanceNeo4jProjection implements IEventHandler<ProcessCrea
  */
 @EventsHandler(ProcessStateChangedEventV1)
 @Injectable()
-export class ProcessStateChangedNeo4jProjection implements IEventHandler<ProcessStateChangedEventV1> {
+export class ProcessStateChangedNeo4jProjection
+  implements IEventHandler<ProcessStateChangedEventV1>
+{
   private readonly logger = new Logger(ProcessStateChangedNeo4jProjection.name);
 
   constructor(private readonly neo4j: Neo4jService) {}
@@ -122,7 +124,7 @@ export class ProcessStateChangedNeo4jProjection implements IEventHandler<Process
    */
   async handle(event: ProcessStateChangedEventV1): Promise<void> {
     this.logger.log(
-      `Handling ProcessStateChangedEvent-V1 for instance: ${event.instanceId} (${event.previousState} -> ${event.newState})`,
+      `Handling ProcessStateChangedEvent-V1 for instance: ${event.instanceId} (${event.previousState} -> ${event.newState})`
     );
 
     const session = this.neo4j.getWriteSession();
@@ -185,7 +187,7 @@ export class ProcessStateChangedNeo4jProjection implements IEventHandler<Process
       }
 
       this.logger.debug(
-        `ProcessInstance state updated in Neo4j: ${event.instanceId} -> ${event.newState}`,
+        `ProcessInstance state updated in Neo4j: ${event.instanceId} -> ${event.newState}`
       );
     } catch (error) {
       const err = error as Error;

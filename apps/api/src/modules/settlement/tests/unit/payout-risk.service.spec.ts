@@ -1,5 +1,10 @@
 import { AccountEntity, AccountStatus, AccountType } from '@api/modules/account';
-import { LedgerEntryEntity, LedgerEntryType, LedgerCategory, LedgerReferenceType } from '@api/modules/ledger';
+import {
+  LedgerEntryEntity,
+  LedgerEntryType,
+  LedgerCategory,
+  LedgerReferenceType,
+} from '@api/modules/ledger';
 import { Repository } from 'typeorm';
 
 import { SettlementStatus, PayoutMethod } from '../../dto/settlement.enums';
@@ -15,7 +20,9 @@ describe('PayoutRiskService', () => {
   let mockAccountRepo: jest.Mocked<Repository<AccountEntity>>;
   let mockLedgerRepo: jest.Mocked<Repository<LedgerEntryEntity>>;
 
-  const createBatch = (overrides?: Partial<ReturnType<SettlementBatchEntity['toDomain']>>): SettlementBatchEntity => {
+  const createBatch = (
+    overrides?: Partial<ReturnType<SettlementBatchEntity['toDomain']>>
+  ): SettlementBatchEntity => {
     const entity = new SettlementBatchEntity();
     entity.id = '550e8400-e29b-41d4-a716-446655440000';
     entity.riderAccountId = '660e8400-e29b-41d4-a716-446655440001';
@@ -36,7 +43,8 @@ describe('PayoutRiskService', () => {
     entity.updatedAt = new Date();
 
     if (overrides) {
-      if (overrides.totalEarnings !== undefined) entity.totalEarnings = overrides.totalEarnings.toFixed(2);
+      if (overrides.totalEarnings !== undefined)
+        entity.totalEarnings = overrides.totalEarnings.toFixed(2);
       if (overrides.netPayout !== undefined) entity.netPayout = overrides.netPayout.toFixed(2);
       if (overrides.itemCount !== undefined) entity.itemCount = overrides.itemCount;
     }
@@ -141,9 +149,7 @@ describe('PayoutRiskService', () => {
     });
 
     it('should approve normal earning patterns', async () => {
-      const entries = Array.from({ length: 30 }, (_, i) =>
-        createLedgerEntry(30, i),
-      );
+      const entries = Array.from({ length: 30 }, (_, i) => createLedgerEntry(30, i));
       mockLedgerRepo.find.mockResolvedValue(entries);
 
       const batch = createBatch({ totalEarnings: 200 });
@@ -154,9 +160,7 @@ describe('PayoutRiskService', () => {
     });
 
     it('should flag unusually high earnings', async () => {
-      const entries = Array.from({ length: 30 }, (_, i) =>
-        createLedgerEntry(10, i),
-      );
+      const entries = Array.from({ length: 30 }, (_, i) => createLedgerEntry(10, i));
       mockLedgerRepo.find.mockResolvedValue(entries);
 
       const batch = createBatch({ totalEarnings: 5000 });
@@ -250,7 +254,7 @@ describe('PayoutRiskService', () => {
     it('should return APPROVE with LOW risk when all checks pass', async () => {
       mockAccountRepo.findOne.mockResolvedValue(createAccount(AccountStatus.ACTIVE));
       mockLedgerRepo.find.mockResolvedValue(
-        Array.from({ length: 30 }, (_, i) => createLedgerEntry(30, i)),
+        Array.from({ length: 30 }, (_, i) => createLedgerEntry(30, i))
       );
 
       const batch = createBatch({ netPayout: 800, itemCount: 15, totalEarnings: 900 });

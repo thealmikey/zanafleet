@@ -9,11 +9,7 @@ import { UIComposerService } from '../../composer/composer.service';
 import { UISchemaCompilerService } from '../../compiler/compiler.service';
 import { ComponentRegistryService } from '../../registry/component-registry.service';
 import { ValidationService } from '../../validation/validation.service';
-import {
-  createComposeRequest,
-  createActionRequest,
-  createUISchema,
-} from '../utils/test-fixtures';
+import { createComposeRequest, createActionRequest, createUISchema } from '../utils/test-fixtures';
 
 describe('UIRuntime Integration', () => {
   let composer: UIComposerService;

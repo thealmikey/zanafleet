@@ -1,7 +1,4 @@
-import {
-  ProcessDefinitionEntity,
-  ProcessState,
-} from '../entities/process-definition.entity';
+import { ProcessDefinitionEntity, ProcessState } from '../entities/process-definition.entity';
 import {
   ProcessTransitionEntity,
   TransitionTriggerType,

@@ -28,7 +28,7 @@ export class TelemetryService {
    */
   emit(event: TelemetryEvent): void {
     this.eventBuffer.push(event);
-    
+
     if (this.eventBuffer.length >= this.bufferSize) {
       this.flush();
     }
@@ -125,7 +125,7 @@ export class TelemetryService {
     if (this.eventBuffer.length === 0) return;
 
     const events = this.eventBuffer.splice(0, this.eventBuffer.length);
-    
+
     // Log events (in production, send to analytics service)
     for (const event of events) {
       this.logger.debug(`Telemetry: ${event.event}`, {

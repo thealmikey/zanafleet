@@ -3,12 +3,16 @@ import { EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
+import { ProcessDefinitionEntity, ProcessState } from '../../entities/process-definition.entity';
 import {
-  ProcessDefinitionEntity,
-  ProcessState,
-} from '../../entities/process-definition.entity';
-import { ProcessInstanceEntity, ProcessInstanceStatus } from '../../entities/process-instance.entity';
-import { ProcessTransitionEntity, TransitionTriggerType, GuardType } from '../../entities/process-transition.entity';
+  ProcessInstanceEntity,
+  ProcessInstanceStatus,
+} from '../../entities/process-instance.entity';
+import {
+  ProcessTransitionEntity,
+  TransitionTriggerType,
+  GuardType,
+} from '../../entities/process-transition.entity';
 import { WorkflowEngineService } from '../../services/workflow-engine.service';
 
 describe('WorkflowEngineService', () => {
@@ -131,7 +135,7 @@ describe('WorkflowEngineService', () => {
         service.createProcessInstance({
           definitionId: 'non-existent',
           name: 'Test',
-        }),
+        })
       ).rejects.toThrow(NotFoundException);
     });
 
@@ -299,7 +303,10 @@ describe('WorkflowEngineService', () => {
         getOne: jest.fn().mockResolvedValue(mockTransition),
       });
 
-      const result = await service.validateTransition('instance-123', ProcessState.OPTIONS_PRESENTED);
+      const result = await service.validateTransition(
+        'instance-123',
+        ProcessState.OPTIONS_PRESENTED
+      );
 
       expect(result.possible).toBe(true);
       expect(result.transition).toBeDefined();
@@ -324,7 +331,7 @@ describe('WorkflowEngineService', () => {
       instanceRepository.findOne.mockResolvedValue(null);
 
       await expect(
-        service.validateTransition('non-existent', ProcessState.COMPLETED),
+        service.validateTransition('non-existent', ProcessState.COMPLETED)
       ).rejects.toThrow(NotFoundException);
     });
   });

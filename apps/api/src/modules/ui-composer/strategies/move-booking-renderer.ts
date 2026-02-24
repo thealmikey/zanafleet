@@ -32,10 +32,7 @@ export class MoveBookingStateRenderer extends AbstractStateRenderer {
   /**
    * Get components for a specific state
    */
-  protected getComponentsForState(
-    state: string,
-    context: Record<string, unknown>
-  ): UIComponent[] {
+  protected getComponentsForState(state: string, context: Record<string, unknown>): UIComponent[] {
     const components: UIComponent[] = [];
 
     switch (state) {
@@ -258,14 +255,16 @@ export class MoveBookingStateRenderer extends AbstractStateRenderer {
       },
     };
 
-    return screenConfigs[state] ?? {
-      screen: 'move-booking-unknown',
-      title: 'Booking',
-      breadcrumbs: [
-        { label: 'Home', href: '/' },
-        { label: 'Booking', isCurrent: true },
-      ],
-    };
+    return (
+      screenConfigs[state] ?? {
+        screen: 'move-booking-unknown',
+        title: 'Booking',
+        breadcrumbs: [
+          { label: 'Home', href: '/' },
+          { label: 'Booking', isCurrent: true },
+        ],
+      }
+    );
   }
 
   // ---------------------------------------------------------------------------

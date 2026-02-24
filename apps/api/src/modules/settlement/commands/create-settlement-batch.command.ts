@@ -43,7 +43,7 @@ export class CreateSettlementBatchCommand {
   }
 
   static safeValidate(
-    input: unknown,
+    input: unknown
   ): z.SafeParseReturnType<unknown, CreateSettlementBatchCommandInput> {
     return CreateSettlementBatchCommandSchema.safeParse(input);
   }

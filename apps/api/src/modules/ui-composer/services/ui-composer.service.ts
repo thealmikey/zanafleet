@@ -133,21 +133,22 @@ export class UIComposerService {
         definitionId: instance.definitionId,
         currentState: instance.currentState,
         context: instance.context ?? {},
-        relatedEntities: instance.relatedEntities as Array<{
-          entityType: string;
-          entityId: string;
-          role: string;
-          linkedAt: Date;
-        }> ?? [],
+        relatedEntities:
+          (instance.relatedEntities as Array<{
+            entityType: string;
+            entityId: string;
+            role: string;
+            linkedAt: Date;
+          }>) ?? [],
         status: instance.status,
       };
     } catch (error) {
       this.logger.error(
-        `Failed to get process context for contextId=${request.contextId}: ${(error as Error).message}`
+        `Failed to get process context for contextId=${request.contextId}: ${
+          (error as Error).message
+        }`
       );
-      throw new NotFoundException(
-        `Process instance not found: ${request.contextId}`
-      );
+      throw new NotFoundException(`Process instance not found: ${request.contextId}`);
     }
   }
 
@@ -256,7 +257,10 @@ export class UIComposerService {
       // 2. Action definition
       // 3. Inherent consent requirement based on capability name
       const inherentRequiresConsent = this.determineRequiresConsent(definition.capability);
-      const requiresConsent = capabilityMetadata?.requiresConsent ?? definition.requiresConsent ?? inherentRequiresConsent;
+      const requiresConsent =
+        capabilityMetadata?.requiresConsent ??
+        definition.requiresConsent ??
+        inherentRequiresConsent;
 
       return {
         id: definition.id,

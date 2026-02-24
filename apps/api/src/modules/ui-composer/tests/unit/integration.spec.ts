@@ -5,7 +5,10 @@ import { ComponentRegistryService } from '../../services/component-registry.serv
 import { MoveBookingStateRenderer } from '../../strategies/move-booking-renderer';
 import { CapabilityAccessController } from '../../../capability/services/capability-access.controller';
 import { WorkflowEngineService } from '../../../workflow/services/workflow-engine.service';
-import { ProcessInstanceEntity, ProcessInstanceStatus } from '../../../workflow/entities/process-instance.entity';
+import {
+  ProcessInstanceEntity,
+  ProcessInstanceStatus,
+} from '../../../workflow/entities/process-instance.entity';
 import { ProcessState } from '../../../workflow/entities/process-definition.entity';
 import { UIComposeRequest } from '../../interfaces/ui-composer.interfaces';
 
@@ -26,7 +29,9 @@ const mockCapabilityAccessController = {
 /**
  * Create a mock process instance
  */
-function createMockProcessInstance(overrides?: Partial<ProcessInstanceEntity>): ProcessInstanceEntity {
+function createMockProcessInstance(
+  overrides?: Partial<ProcessInstanceEntity>
+): ProcessInstanceEntity {
   const instance = new ProcessInstanceEntity();
   instance.instanceId = 'instance-123';
   instance.definitionId = 'move-booking-process';
@@ -167,7 +172,9 @@ describe('UIComposer Integration Tests', () => {
       await service.compose(request);
 
       // Assert - Verify CapabilityAccessController was called correctly
-      expect(mockCapabilityAccessController.getCapabilitiesForActor).toHaveBeenCalledWith('actor-123');
+      expect(mockCapabilityAccessController.getCapabilitiesForActor).toHaveBeenCalledWith(
+        'actor-123'
+      );
     });
 
     it('should correctly map process state to screen', async () => {
@@ -445,7 +452,7 @@ describe('UIComposer Integration Tests', () => {
 
       const mockProcessInstance = createMockProcessInstance();
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
-      
+
       // Only give partial capabilities
       mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([
         'move:driver:view', // Has this

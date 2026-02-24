@@ -46,7 +46,8 @@ import { WorkspaceEntity } from '../entities/workspace.entity';
 @ApiBearerAuth('JWT-auth')
 @ApiHeader({
   name: 'workspaceId',
-  description: 'Workspace identifier for multi-tenancy (required for operations within a workspace)',
+  description:
+    'Workspace identifier for multi-tenancy (required for operations within a workspace)',
   required: false,
 })
 @Controller('workspaces')
@@ -63,10 +64,20 @@ export class WorkspaceController {
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new workspace', description: 'Create a new workspace with specified type and configuration' })
-  @ApiResponse({ status: 201, description: 'Workspace created successfully', schema: { example: { workspaceId: 'uuid' } } })
+  @ApiOperation({
+    summary: 'Create a new workspace',
+    description: 'Create a new workspace with specified type and configuration',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Workspace created successfully',
+    schema: { example: { workspaceId: 'uuid' } },
+  })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   async create(@Body() body: CreateWorkspaceDto): Promise<{ workspaceId: string }> {
     let input;
     try {
@@ -89,9 +100,17 @@ export class WorkspaceController {
    * Centralizes the business rule for actor-workspace type mapping
    */
   @Get('allowed-types')
-  @ApiOperation({ summary: 'Get allowed workspace types', description: 'Retrieve workspace types allowed for a specific actor type' })
+  @ApiOperation({
+    summary: 'Get allowed workspace types',
+    description: 'Retrieve workspace types allowed for a specific actor type',
+  })
   @ApiResponse({ status: 200, description: 'Allowed workspace types retrieved successfully' })
-  @ApiQuery({ name: 'actorType', required: true, description: 'Actor type to get allowed workspace types for', enum: ActorType })
+  @ApiQuery({
+    name: 'actorType',
+    required: true,
+    description: 'Actor type to get allowed workspace types for',
+    enum: ActorType,
+  })
   getAllowedTypes(@Query() query: AllowedWorkspaceTypesQueryDto): {
     allowedTypes: WorkspaceType[];
   } {
@@ -104,10 +123,25 @@ export class WorkspaceController {
    * Direct read from repository (projection)
    */
   @Get()
-  @ApiOperation({ summary: 'List all workspaces', description: 'Retrieve all active workspaces, optionally filtered by type' })
-  @ApiResponse({ status: 200, description: 'Workspaces retrieved successfully', type: [WorkspaceDto] })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
-  @ApiQuery({ name: 'type', required: false, description: 'Filter by workspace type', enum: WorkspaceType })
+  @ApiOperation({
+    summary: 'List all workspaces',
+    description: 'Retrieve all active workspaces, optionally filtered by type',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Workspaces retrieved successfully',
+    type: [WorkspaceDto],
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
+  @ApiQuery({
+    name: 'type',
+    required: false,
+    description: 'Filter by workspace type',
+    enum: WorkspaceType,
+  })
   async findAll(@Query() query: ListWorkspacesQueryDto): Promise<WorkspaceDto[]> {
     const workspaces = await this.workspaceRepository.find({
       where: {
@@ -124,9 +158,15 @@ export class WorkspaceController {
    * Direct read from repository (projection)
    */
   @Get(':id')
-  @ApiOperation({ summary: 'Get workspace by ID', description: 'Retrieve a specific workspace by its unique identifier' })
+  @ApiOperation({
+    summary: 'Get workspace by ID',
+    description: 'Retrieve a specific workspace by its unique identifier',
+  })
   @ApiResponse({ status: 200, description: 'Workspace retrieved successfully', type: WorkspaceDto })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 404, description: 'Workspace not found' })
   @ApiParam({ name: 'id', description: 'Workspace unique identifier (UUID)', type: String })
   async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<WorkspaceDto> {
@@ -146,10 +186,16 @@ export class WorkspaceController {
    * Uses UpdateWorkspaceCommand with Zod validation
    */
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a workspace', description: 'Update an existing workspace configuration' })
+  @ApiOperation({
+    summary: 'Update a workspace',
+    description: 'Update an existing workspace configuration',
+  })
   @ApiResponse({ status: 200, description: 'Workspace updated successfully', type: WorkspaceDto })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 404, description: 'Workspace not found' })
   @ApiParam({ name: 'id', description: 'Workspace unique identifier (UUID)', type: String })
   async update(

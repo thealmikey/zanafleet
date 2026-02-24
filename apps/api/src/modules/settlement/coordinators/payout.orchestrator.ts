@@ -108,7 +108,7 @@ export class PayoutOrchestrator {
     @Optional() private readonly revenueEngine?: RevenueDistributionEngine,
     @Optional() private readonly providerRegistry?: PaymentProviderRegistry,
     @Optional() private readonly schedulerService?: SettlementSchedulerService,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async initiatePayout(
@@ -117,7 +117,7 @@ export class PayoutOrchestrator {
       payoutMethod?: PayoutMethod;
       providerId?: string;
       correlationId?: string;
-    } = {},
+    } = {}
   ): Promise<PayoutResult> {
     const payoutId = uuidv4();
     const correlationId = options.correlationId ?? uuidv4();
@@ -131,19 +131,19 @@ export class PayoutOrchestrator {
         return this.createFailedResult(
           payoutId,
           `KYC verification failed: ${kycResult.reason}`,
-          PayoutStatus.KYC_BLOCKED,
+          PayoutStatus.KYC_BLOCKED
         );
       }
 
       const payableBalance = await this.getPayableBalance(riderAccountId);
       if (payableBalance.pendingAmount < this.config.minimumPayoutThreshold) {
         this.logger.debug(
-          `Insufficient balance for ${riderAccountId}: ${payableBalance.pendingAmount} < ${this.config.minimumPayoutThreshold}`,
+          `Insufficient balance for ${riderAccountId}: ${payableBalance.pendingAmount} < ${this.config.minimumPayoutThreshold}`
         );
         return this.createFailedResult(
           payoutId,
           `Insufficient balance: ${payableBalance.pendingAmount} < ${this.config.minimumPayoutThreshold}`,
-          PayoutStatus.INSUFFICIENT_BALANCE,
+          PayoutStatus.INSUFFICIENT_BALANCE
         );
       }
 
@@ -157,19 +157,23 @@ export class PayoutOrchestrator {
         payableBalance.currency,
         options.payoutMethod ?? this.config.defaultPayoutMethod,
         periodStart,
-        periodEnd,
+        periodEnd
       );
 
       if (this.payoutRiskService) {
         const riskResult = await this.payoutRiskService.checkPayoutEligibility(batch);
         if (riskResult.decision === RiskDecision.REJECT) {
           await this.updateBatchStatus(batch.id, SettlementStatus.FAILED, riskResult.holdReason);
-          await this.emitPayoutFailedEvent(batch, riskResult.holdReason ?? 'Risk check blocked', correlationId);
+          await this.emitPayoutFailedEvent(
+            batch,
+            riskResult.holdReason ?? 'Risk check blocked',
+            correlationId
+          );
           return this.createFailedResult(
             payoutId,
             `Risk check blocked: ${riskResult.holdReason}`,
             PayoutStatus.RISK_BLOCKED,
-            batch.id,
+            batch.id
           );
         }
 
@@ -183,28 +187,40 @@ export class PayoutOrchestrator {
       const provider = this.selectProvider(
         options.payoutMethod ?? this.config.defaultPayoutMethod,
         payableBalance.currency,
-        options.providerId ?? this.config.defaultProviderId,
+        options.providerId ?? this.config.defaultProviderId
       );
 
       if (!provider) {
-        await this.updateBatchStatus(batch.id, SettlementStatus.FAILED, 'No suitable provider available');
-        await this.emitPayoutFailedEvent(batch, 'No suitable payout provider available', correlationId);
+        await this.updateBatchStatus(
+          batch.id,
+          SettlementStatus.FAILED,
+          'No suitable provider available'
+        );
+        await this.emitPayoutFailedEvent(
+          batch,
+          'No suitable payout provider available',
+          correlationId
+        );
         return this.createFailedResult(
           payoutId,
           'No suitable payout provider available',
           PayoutStatus.FAILED,
-          batch.id,
+          batch.id
         );
       }
 
-      const paymentResult = await this.executePayoutWithRetry(batch, provider, DEFAULT_RETRY_CONFIG);
+      const paymentResult = await this.executePayoutWithRetry(
+        batch,
+        provider,
+        DEFAULT_RETRY_CONFIG
+      );
 
       if (paymentResult.success && paymentResult.status === PaymentStatus.SUCCEEDED) {
         await this.updateBatchStatus(
           batch.id,
           SettlementStatus.COMPLETED,
           undefined,
-          paymentResult.providerReference,
+          paymentResult.providerReference
         );
         await this.emitPayoutCompletedEvent(batch, paymentResult, correlationId);
 
@@ -223,7 +239,11 @@ export class PayoutOrchestrator {
       }
 
       await this.updateBatchStatus(batch.id, SettlementStatus.FAILED, paymentResult.errorMessage);
-      await this.emitPayoutFailedEvent(batch, paymentResult.errorMessage ?? 'Payment failed', correlationId);
+      await this.emitPayoutFailedEvent(
+        batch,
+        paymentResult.errorMessage ?? 'Payment failed',
+        correlationId
+      );
 
       this.updateRetryState(payoutId, batch.id, 1, DEFAULT_RETRY_CONFIG);
 
@@ -232,14 +252,14 @@ export class PayoutOrchestrator {
         paymentResult.errorMessage ?? 'Payout execution failed',
         PayoutStatus.FAILED,
         batch.id,
-        DEFAULT_RETRY_CONFIG.maxRetries - 1,
+        DEFAULT_RETRY_CONFIG.maxRetries - 1
       );
     } catch (error) {
       this.logger.error(`Payout ${payoutId} failed with unexpected error:`, error);
       return this.createFailedResult(
         payoutId,
         error instanceof Error ? error.message : 'Unexpected error during payout',
-        PayoutStatus.FAILED,
+        PayoutStatus.FAILED
       );
     }
   }
@@ -250,7 +270,7 @@ export class PayoutOrchestrator {
       payoutMethod?: PayoutMethod;
       providerId?: string;
       correlationId?: string;
-    } = {},
+    } = {}
   ): Promise<BatchPayoutResult> {
     const correlationId = options.correlationId ?? uuidv4();
     this.logger.log(`Processing batch payouts for ${accountIds.length} accounts`);
@@ -286,14 +306,14 @@ export class PayoutOrchestrator {
           this.createFailedResult(
             uuidv4(),
             error instanceof Error ? error.message : 'Batch processing error',
-            PayoutStatus.FAILED,
-          ),
+            PayoutStatus.FAILED
+          )
         );
       }
     }
 
     this.logger.log(
-      `Batch payout completed: ${successCount} success, ${failedCount} failed, ${skippedCount} skipped`,
+      `Batch payout completed: ${successCount} success, ${failedCount} failed, ${skippedCount} skipped`
     );
 
     return {
@@ -308,7 +328,7 @@ export class PayoutOrchestrator {
 
   async retryFailedPayout(
     payoutId: string,
-    retryConfig: Partial<RetryConfig> = {},
+    retryConfig: Partial<RetryConfig> = {}
   ): Promise<PayoutResult> {
     this.logger.log(`Retrying failed payout: ${payoutId}`);
 
@@ -319,7 +339,7 @@ export class PayoutOrchestrator {
       return this.createFailedResult(
         payoutId,
         'No retry state found for payout',
-        PayoutStatus.FAILED,
+        PayoutStatus.FAILED
       );
     }
 
@@ -329,7 +349,7 @@ export class PayoutOrchestrator {
         'Maximum retry attempts exceeded',
         PayoutStatus.FAILED,
         retryState.batchId,
-        0,
+        0
       );
     }
 
@@ -338,11 +358,7 @@ export class PayoutOrchestrator {
     });
 
     if (!batch) {
-      return this.createFailedResult(
-        payoutId,
-        'Settlement batch not found',
-        PayoutStatus.FAILED,
-      );
+      return this.createFailedResult(payoutId, 'Settlement batch not found', PayoutStatus.FAILED);
     }
 
     if (batch.status !== SettlementStatus.FAILED) {
@@ -350,14 +366,14 @@ export class PayoutOrchestrator {
         payoutId,
         `Cannot retry payout with batch status: ${batch.status}`,
         batch.status === SettlementStatus.COMPLETED ? PayoutStatus.COMPLETED : PayoutStatus.FAILED,
-        batch.id,
+        batch.id
       );
     }
 
     const provider = this.selectProvider(
       batch.payoutMethod,
       batch.currency,
-      this.config.defaultProviderId,
+      this.config.defaultProviderId
     );
 
     if (!provider) {
@@ -365,18 +381,17 @@ export class PayoutOrchestrator {
         payoutId,
         'No suitable payout provider available for retry',
         PayoutStatus.FAILED,
-        batch.id,
+        batch.id
       );
     }
 
     await this.updateBatchStatus(batch.id, SettlementStatus.PROCESSING);
 
     const remainingRetries = config.maxRetries - retryState.attempts;
-    const paymentResult = await this.executePayoutWithRetry(
-      batch,
-      provider,
-      { ...config, maxRetries: remainingRetries },
-    );
+    const paymentResult = await this.executePayoutWithRetry(batch, provider, {
+      ...config,
+      maxRetries: remainingRetries,
+    });
 
     const totalAttempts = retryState.attempts + 1;
     this.updateRetryState(payoutId, batch.id, totalAttempts, config);
@@ -386,7 +401,7 @@ export class PayoutOrchestrator {
         batch.id,
         SettlementStatus.COMPLETED,
         undefined,
-        paymentResult.providerReference,
+        paymentResult.providerReference
       );
       await this.emitPayoutCompletedEvent(batch, paymentResult);
 
@@ -412,7 +427,7 @@ export class PayoutOrchestrator {
       paymentResult.errorMessage ?? 'Retry payout execution failed',
       PayoutStatus.FAILED,
       batch.id,
-      config.maxRetries - totalAttempts,
+      config.maxRetries - totalAttempts
     );
   }
 
@@ -530,7 +545,7 @@ export class PayoutOrchestrator {
     currency: string,
     payoutMethod: PayoutMethod,
     periodStart: Date,
-    periodEnd: Date,
+    periodEnd: Date
   ): Promise<SettlementBatchEntity> {
     const schedulerConfig = this.schedulerService?.getConfig();
     const commissionRate = schedulerConfig?.defaultCommissionRate ?? 0.15;
@@ -559,7 +574,7 @@ export class PayoutOrchestrator {
   private selectProvider(
     payoutMethod: PayoutMethod,
     currency: string,
-    preferredProviderId?: string,
+    preferredProviderId?: string
   ): PaymentProvider | undefined {
     if (!this.providerRegistry) {
       return undefined;
@@ -576,7 +591,7 @@ export class PayoutOrchestrator {
     const capableProviders = this.providerRegistry.getByCapability(capability) ?? [];
 
     const suitableProvider = capableProviders.find((p) =>
-      p.supportedCurrencies.includes(currency.toUpperCase()),
+      p.supportedCurrencies.includes(currency.toUpperCase())
     );
 
     if (suitableProvider) {
@@ -602,7 +617,7 @@ export class PayoutOrchestrator {
   private async executePayoutWithRetry(
     batch: SettlementBatchEntity,
     provider: PaymentProvider,
-    config: RetryConfig,
+    config: RetryConfig
   ): Promise<PaymentInitiationResult> {
     let lastError: Error | undefined;
     let lastResult: PaymentInitiationResult | undefined;
@@ -628,12 +643,12 @@ export class PayoutOrchestrator {
 
         lastResult = result;
         this.logger.warn(
-          `Payout attempt ${attempt}/${config.maxRetries} failed: ${result.errorMessage}`,
+          `Payout attempt ${attempt}/${config.maxRetries} failed: ${result.errorMessage}`
         );
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         this.logger.warn(
-          `Payout attempt ${attempt}/${config.maxRetries} threw error: ${lastError.message}`,
+          `Payout attempt ${attempt}/${config.maxRetries} threw error: ${lastError.message}`
         );
       }
 
@@ -667,7 +682,7 @@ export class PayoutOrchestrator {
     batchId: string,
     status: SettlementStatus,
     failureReason?: string,
-    payoutReference?: string,
+    payoutReference?: string
   ): Promise<void> {
     const updates: {
       status: SettlementStatus;
@@ -699,7 +714,7 @@ export class PayoutOrchestrator {
     payoutId: string,
     batchId: string,
     attempts: number,
-    config: RetryConfig,
+    config: RetryConfig
   ): void {
     const state: RetryState = {
       payoutId,
@@ -736,7 +751,7 @@ export class PayoutOrchestrator {
     error: string,
     status: PayoutStatus,
     batchId?: string,
-    retriesRemaining?: number,
+    retriesRemaining?: number
   ): PayoutResult {
     return {
       success: false,
@@ -750,7 +765,7 @@ export class PayoutOrchestrator {
 
   private async emitPayoutInitiatedEvent(
     batch: SettlementBatchEntity,
-    correlationId?: string,
+    correlationId?: string
   ): Promise<void> {
     if (!this.eventBusService) {
       return;
@@ -786,7 +801,7 @@ export class PayoutOrchestrator {
   private async emitPayoutCompletedEvent(
     batch: SettlementBatchEntity,
     paymentResult: PaymentInitiationResult,
-    correlationId?: string,
+    correlationId?: string
   ): Promise<void> {
     if (!this.eventBusService) {
       return;
@@ -822,7 +837,7 @@ export class PayoutOrchestrator {
   private async emitPayoutFailedEvent(
     batch: SettlementBatchEntity,
     reason: string,
-    correlationId?: string,
+    correlationId?: string
   ): Promise<void> {
     if (!this.eventBusService) {
       return;

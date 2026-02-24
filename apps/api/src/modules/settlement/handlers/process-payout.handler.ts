@@ -37,7 +37,7 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
     private readonly eventBus: EventBus,
     private readonly commandBus: CommandBus,
     @Optional() private readonly eventBusService?: EventBusService,
-    @Optional() private readonly payoutRiskService?: PayoutRiskService,
+    @Optional() private readonly payoutRiskService?: PayoutRiskService
   ) {}
 
   async execute(command: ProcessPayoutCommand): Promise<string> {
@@ -51,7 +51,7 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
 
     if (batch.status !== SettlementStatus.PENDING) {
       this.logger.warn(
-        `Settlement batch ${batch.id} is not in PENDING status (current: ${batch.status})`,
+        `Settlement batch ${batch.id} is not in PENDING status (current: ${batch.status})`
       );
       throw new Error(`Settlement batch is not in PENDING status: ${batch.status}`);
     }
@@ -61,7 +61,7 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
 
       if (riskResult.decision === RiskDecision.REJECT) {
         this.logger.warn(
-          `Settlement batch ${batch.id} rejected by risk check: ${riskResult.holdReason}`,
+          `Settlement batch ${batch.id} rejected by risk check: ${riskResult.holdReason}`
         );
 
         await this.batchRepository.update(batch.id, {
@@ -90,9 +90,7 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
           this.eventBusService
             .publish(NatsSubjects.Settlement.PAYOUT_FAILED_V1, failedEvent)
             .catch((error) => {
-              this.logger.error(
-                `Failed to publish PayoutFailedEvent to NATS: ${error.message}`,
-              );
+              this.logger.error(`Failed to publish PayoutFailedEvent to NATS: ${error.message}`);
             });
         }
 
@@ -100,9 +98,7 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
       }
 
       if (riskResult.decision === RiskDecision.HOLD) {
-        this.logger.warn(
-          `Settlement batch ${batch.id} held for review: ${riskResult.holdReason}`,
-        );
+        this.logger.warn(`Settlement batch ${batch.id} held for review: ${riskResult.holdReason}`);
 
         await this.batchRepository.update(batch.id, {
           metadata: {
@@ -115,7 +111,7 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
       }
 
       this.logger.debug(
-        `Risk check passed for batch ${batch.id}: decision=${riskResult.decision}, risk=${riskResult.riskLevel}`,
+        `Risk check passed for batch ${batch.id}: decision=${riskResult.decision}, risk=${riskResult.riskLevel}`
       );
     }
 
@@ -147,9 +143,7 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
       this.eventBusService
         .publish(NatsSubjects.Settlement.PAYOUT_INITIATED_V1, initiatedEvent)
         .catch((error) => {
-          this.logger.error(
-            `Failed to publish PayoutInitiatedEvent to NATS: ${error.message}`,
-          );
+          this.logger.error(`Failed to publish PayoutInitiatedEvent to NATS: ${error.message}`);
         });
     }
 
@@ -214,7 +208,7 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
             },
           ],
           correlationId: command.correlationId,
-        }),
+        })
       );
 
       const completedEvent = new PayoutCompletedEventV1({
@@ -236,14 +230,12 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
         this.eventBusService
           .publish(NatsSubjects.Settlement.PAYOUT_COMPLETED_V1, completedEvent)
           .catch((error) => {
-            this.logger.error(
-              `Failed to publish PayoutCompletedEvent to NATS: ${error.message}`,
-            );
+            this.logger.error(`Failed to publish PayoutCompletedEvent to NATS: ${error.message}`);
           });
       }
 
       this.logger.log(
-        `Payout completed for batch ${batch.id}: ${batchDomain.netPayout} ${batchDomain.currency}`,
+        `Payout completed for batch ${batch.id}: ${batchDomain.netPayout} ${batchDomain.currency}`
       );
     } else {
       await this.batchRepository.update(batch.id, {
@@ -270,14 +262,12 @@ export class ProcessPayoutCommandHandler implements ICommandHandler<ProcessPayou
         this.eventBusService
           .publish(NatsSubjects.Settlement.PAYOUT_FAILED_V1, failedEvent)
           .catch((error) => {
-            this.logger.error(
-              `Failed to publish PayoutFailedEvent to NATS: ${error.message}`,
-            );
+            this.logger.error(`Failed to publish PayoutFailedEvent to NATS: ${error.message}`);
           });
       }
 
       this.logger.warn(
-        `Payout failed for batch ${batch.id}: ${providerResult.errorCode} - ${providerResult.errorMessage}`,
+        `Payout failed for batch ${batch.id}: ${providerResult.errorCode} - ${providerResult.errorMessage}`
       );
     }
 

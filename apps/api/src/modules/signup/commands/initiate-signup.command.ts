@@ -1,7 +1,6 @@
 import { ActorType } from '@api/modules/actor/dto/actor.enums';
 import { z } from 'zod';
 
-
 /**
  * InitiateSignUpCommandSchema
  * Zod schema for validating InitiateSignUpCommand input

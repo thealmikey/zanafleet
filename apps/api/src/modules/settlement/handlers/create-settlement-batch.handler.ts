@@ -33,7 +33,7 @@ export class CreateSettlementBatchCommandHandler
   constructor(
     private readonly dataSource: DataSource,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: CreateSettlementBatchCommand): Promise<SettlementBatchResult> {
@@ -52,9 +52,7 @@ export class CreateSettlementBatchCommandHandler
     });
 
     if (unsettledEarnings.length === 0) {
-      this.logger.warn(
-        `No unsettled earnings found for rider ${command.riderAccountId} in period`,
-      );
+      this.logger.warn(`No unsettled earnings found for rider ${command.riderAccountId} in period`);
       return {
         batchId,
         itemCount: 0,
@@ -75,7 +73,7 @@ export class CreateSettlementBatchCommandHandler
 
       totalEarnings += earningAmount;
 
-      const deliveryId = earning.metadata?.deliveryId as string || earning.referenceId;
+      const deliveryId = (earning.metadata?.deliveryId as string) || earning.referenceId;
 
       itemEntities.push(
         SettlementItemEntity.fromDomain({
@@ -87,7 +85,7 @@ export class CreateSettlementBatchCommandHandler
           netAmount,
           ledgerEntryId: earning.id,
           createdAt: now,
-        }),
+        })
       );
     }
 
@@ -138,13 +136,13 @@ export class CreateSettlementBatchCommandHandler
         .publish(NatsSubjects.Settlement.BATCH_CREATED_V1, event)
         .catch((error) => {
           this.logger.error(
-            `Failed to publish SettlementBatchCreatedEvent to NATS: ${error.message}`,
+            `Failed to publish SettlementBatchCreatedEvent to NATS: ${error.message}`
           );
         });
     }
 
     this.logger.log(
-      `Settlement batch created: ${batchId} with ${itemEntities.length} items, netPayout: ${netPayout} ${currency}`,
+      `Settlement batch created: ${batchId} with ${itemEntities.length} items, netPayout: ${netPayout} ${currency}`
     );
 
     return {

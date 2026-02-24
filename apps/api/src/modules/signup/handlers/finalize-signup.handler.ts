@@ -12,7 +12,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-
 import { FinalizeSignUpCommand } from '../commands/finalize-signup.command';
 import { SignUpSessionStatus } from '../dto/signup.enums';
 import { SignUpSessionEntity } from '../entities/signup-session.entity';

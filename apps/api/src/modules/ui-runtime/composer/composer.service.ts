@@ -23,7 +23,7 @@ export class UIComposerService {
     private readonly compiler: UISchemaCompilerService,
     private readonly componentRegistry: ComponentRegistryService,
     private readonly validation: ValidationService,
-    private readonly telemetry: TelemetryService,
+    private readonly telemetry: TelemetryService
   ) {}
 
   /**

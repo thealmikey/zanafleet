@@ -6,7 +6,10 @@ import { ComponentRegistryService } from '../../services/component-registry.serv
 import { MoveBookingStateRenderer } from '../../strategies/move-booking-renderer';
 import { CapabilityAccessController } from '../../../capability/services/capability-access.controller';
 import { WorkflowEngineService } from '../../../workflow/services/workflow-engine.service';
-import { ProcessInstanceEntity, ProcessInstanceStatus } from '../../../workflow/entities/process-instance.entity';
+import {
+  ProcessInstanceEntity,
+  ProcessInstanceStatus,
+} from '../../../workflow/entities/process-instance.entity';
 import { ProcessState } from '../../../workflow/entities/process-definition.entity';
 import { UIComposeRequest } from '../../interfaces/ui-composer.interfaces';
 
@@ -27,7 +30,9 @@ const mockCapabilityAccessController = {
 /**
  * Create a mock process instance with flexible state
  */
-function createMockProcessInstance(overrides?: Partial<ProcessInstanceEntity>): ProcessInstanceEntity {
+function createMockProcessInstance(
+  overrides?: Partial<ProcessInstanceEntity>
+): ProcessInstanceEntity {
   const instance = new ProcessInstanceEntity();
   instance.instanceId = 'instance-123';
   instance.definitionId = 'move-booking-process';
@@ -61,7 +66,10 @@ function createMockProcessInstance(overrides?: Partial<ProcessInstanceEntity>): 
 /**
  * Create process instance for specific state
  */
-function createProcessInstanceForState(state: ProcessState, context: Record<string, unknown> = {}): ProcessInstanceEntity {
+function createProcessInstanceForState(
+  state: ProcessState,
+  context: Record<string, unknown> = {}
+): ProcessInstanceEntity {
   return createMockProcessInstance({
     currentState: state,
     context: {
@@ -172,7 +180,9 @@ describe('UIComposerService', () => {
       // Arrange
       const mockProcessInstance = createMockProcessInstance();
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
-      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue(['move:driver:view']);
+      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([
+        'move:driver:view',
+      ]);
 
       // Act
       const result = await service.compose(mockRequest);
@@ -302,7 +312,9 @@ describe('UIComposerService', () => {
       // Arrange
       const mockProcessInstance = createProcessInstanceForState(ProcessState.DRAFT);
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
-      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue(['move:quote:request']);
+      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([
+        'move:quote:request',
+      ]);
 
       // Act
       const result = await service.compose(mockRequest);
@@ -317,7 +329,9 @@ describe('UIComposerService', () => {
       // Arrange
       const mockProcessInstance = createProcessInstanceForState(ProcessState.ESTIMATE_REQUESTED);
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
-      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue(['move:quote:refresh']);
+      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([
+        'move:quote:refresh',
+      ]);
 
       // Act
       const result = await service.compose(mockRequest);
@@ -336,7 +350,9 @@ describe('UIComposerService', () => {
         ],
       });
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
-      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue(['move:option:select']);
+      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([
+        'move:option:select',
+      ]);
 
       // Act
       const result = await service.compose(mockRequest);
@@ -350,7 +366,9 @@ describe('UIComposerService', () => {
       // Arrange
       const mockProcessInstance = createProcessInstanceForState(ProcessState.BOOKING_CONFIRMED);
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
-      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue(['move:payment:add']);
+      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([
+        'move:payment:add',
+      ]);
 
       // Act
       const result = await service.compose(mockRequest);
@@ -364,7 +382,9 @@ describe('UIComposerService', () => {
       // Arrange
       const mockProcessInstance = createProcessInstanceForState(ProcessState.DRIVER_ASSIGNED);
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
-      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue(['move:driver:view']);
+      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([
+        'move:driver:view',
+      ]);
 
       // Act
       const result = await service.compose(mockRequest);
@@ -378,7 +398,9 @@ describe('UIComposerService', () => {
       // Arrange
       const mockProcessInstance = createProcessInstanceForState(ProcessState.IN_PROGRESS);
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
-      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue(['move:tracking:view']);
+      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([
+        'move:tracking:view',
+      ]);
 
       // Act
       const result = await service.compose(mockRequest);
@@ -396,7 +418,9 @@ describe('UIComposerService', () => {
         paymentMethod: 'card',
       });
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
-      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue(['move:driver:rate']);
+      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([
+        'move:driver:rate',
+      ]);
 
       // Act
       const result = await service.compose(mockRequest);
@@ -475,7 +499,7 @@ describe('UIComposerService', () => {
       const cancelAction = result.actions.find((a) => a.id === 'cancel-booking');
       expect(cancelAction).toBeDefined();
       expect(cancelAction?.disabled).toBe(true);
-      expect(cancelAction?.disabledReason).toContain("move:booking:cancel");
+      expect(cancelAction?.disabledReason).toContain('move:booking:cancel');
 
       const contactAction = result.actions.find((a) => a.id === 'contact-driver');
       expect(contactAction?.disabled).toBe(true);
@@ -568,7 +592,9 @@ describe('UIComposerService', () => {
       // Arrange
       const mockProcessInstance = createMockProcessInstance();
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
-      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue(['move:driver:view']);
+      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([
+        'move:driver:view',
+      ]);
 
       // Act
       const result = await service.compose(mockRequest);
@@ -582,7 +608,9 @@ describe('UIComposerService', () => {
       // Arrange
       const mockProcessInstance = createMockProcessInstance();
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
-      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue(['move:driver:contact']);
+      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([
+        'move:driver:contact',
+      ]);
 
       // Act
       const result = await service.compose(mockRequest);
@@ -596,7 +624,9 @@ describe('UIComposerService', () => {
       // Arrange
       const mockProcessInstance = createProcessInstanceForState(ProcessState.BOOKING_CONFIRMED);
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
-      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue(['move:payment:add']);
+      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([
+        'move:payment:add',
+      ]);
 
       // Act
       const result = await service.compose(mockRequest);
@@ -615,7 +645,7 @@ describe('UIComposerService', () => {
     it('should handle different context types', async () => {
       // This test verifies that the system can handle multiple registered context types
       // MOVE_BOOKING is registered by default
-      
+
       // Verify MOVE_BOOKING works
       const mockRequest: UIComposeRequest = {
         actorId: 'actor-123',
@@ -625,7 +655,9 @@ describe('UIComposerService', () => {
 
       const mockProcessInstance = createMockProcessInstance();
       mockWorkflowEngine.getProcessState.mockResolvedValue(mockProcessInstance);
-      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue(['move:driver:view']);
+      mockCapabilityAccessController.getCapabilitiesForActor.mockResolvedValue([
+        'move:driver:view',
+      ]);
 
       const result = await service.compose(mockRequest);
       expect(result).toBeDefined();
@@ -646,7 +678,9 @@ describe('UIComposerService', () => {
 
     it('should handle WorkflowEngine failure gracefully', async () => {
       // Arrange
-      mockWorkflowEngine.getProcessState.mockRejectedValue(new Error('Workflow engine unavailable'));
+      mockWorkflowEngine.getProcessState.mockRejectedValue(
+        new Error('Workflow engine unavailable')
+      );
 
       // Act & Assert
       await expect(service.compose(mockRequest)).rejects.toThrow();
@@ -679,7 +713,7 @@ describe('UIComposerService', () => {
           title: 'Fallback Screen',
         }),
       } as unknown as MoveBookingStateRenderer;
-      
+
       service.registerRenderer(failingRenderer);
 
       const failingRequest: UIComposeRequest = {
@@ -909,7 +943,11 @@ describe('ComponentRegistryService', () => {
     });
 
     it('should apply layout overrides', () => {
-      const component = service.createComponent('DriverCard', {}, { layout: { colSpan: 6, order: 1 } });
+      const component = service.createComponent(
+        'DriverCard',
+        {},
+        { layout: { colSpan: 6, order: 1 } }
+      );
 
       expect(component.layout?.colSpan).toBe(6);
       expect(component.layout?.order).toBe(1);

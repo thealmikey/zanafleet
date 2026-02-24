@@ -8,7 +8,7 @@ import {
 
 /**
  * WooCommerce API Key Entity
- * 
+ *
  * Stores API keys for WooCommerce integration with Keycloak-backed authentication.
  * Key values are hashed using SHA-256 for security.
  */

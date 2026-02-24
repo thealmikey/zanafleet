@@ -248,7 +248,7 @@ describe('SDUI Runtime Security', () => {
     it('should not expose sensitive component capabilities', () => {
       // Components should not expose sensitive handlers
       const buttonComponent = registry.get('Button');
-      
+
       if (buttonComponent) {
         expect(buttonComponent.requiredCapabilities).toBeDefined();
       }
@@ -257,7 +257,7 @@ describe('SDUI Runtime Security', () => {
     it('should validate component platform restrictions', () => {
       // Sensitive components may have platform restrictions
       const components = registry.getAll();
-      
+
       components.forEach((component: ComponentDefinition) => {
         expect(component.type).toBeDefined();
       });

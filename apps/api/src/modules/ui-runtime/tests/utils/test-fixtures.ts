@@ -232,7 +232,9 @@ export function createComposeRequest(overrides?: Partial<UIComposeRequest>): UIC
 /**
  * Create an action invocation request
  */
-export function createActionRequest(overrides?: Partial<ActionInvocationRequest>): ActionInvocationRequest {
+export function createActionRequest(
+  overrides?: Partial<ActionInvocationRequest>
+): ActionInvocationRequest {
   return {
     actorId: TEST_ACTOR_ID,
     actionId: 'test-action',
@@ -246,7 +248,9 @@ export function createActionRequest(overrides?: Partial<ActionInvocationRequest>
 /**
  * Create an action invocation result
  */
-export function createActionResult(overrides?: Partial<ActionInvocationResult>): ActionInvocationResult {
+export function createActionResult(
+  overrides?: Partial<ActionInvocationResult>
+): ActionInvocationResult {
   return {
     success: true,
     correlationId: `corr_${Date.now()}`,
@@ -272,10 +276,7 @@ export function createNestedLayout(depth: number): StackLayout {
 
   return createStackLayout({
     id: `level-${depth}`,
-    children: [
-      createNestedLayout(depth - 1),
-      createNestedLayout(depth - 1),
-    ],
+    children: [createNestedLayout(depth - 1), createNestedLayout(depth - 1)],
   });
 }
 
@@ -398,7 +399,7 @@ export function createAction(overrides?: Partial<ActionDefinition>): ActionDefin
  */
 export function createCapabilityRequirement(
   capability: string,
-  overrides?: Partial<CapabilityRequirement>,
+  overrides?: Partial<CapabilityRequirement>
 ): CapabilityRequirement {
   return {
     capability,
@@ -648,7 +649,7 @@ export function createLargeComponentTree(componentCount: number): StackLayout {
       createStackLayout({
         id: `component-${i}`,
         children: [],
-      }),
+      })
     );
   }
 
@@ -672,7 +673,7 @@ export function createSchemaWithManyAISuggestions(count: number): UISchema {
           body: `Suggestion ${i}`,
           confidence: 0.9,
         },
-      }),
+      })
     );
   }
 

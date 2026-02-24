@@ -43,7 +43,7 @@ describe('TelemetryService', () => {
           renderTime: 150,
           componentCount: 10,
           correlationId: 'corr-001',
-        }),
+        })
       ).not.toThrow();
     });
   });
@@ -58,7 +58,7 @@ describe('TelemetryService', () => {
           contextId: 'context-001',
           contextType: 'form',
           correlationId: 'corr-001',
-        }),
+        })
       ).not.toThrow();
     });
   });
@@ -73,7 +73,7 @@ describe('TelemetryService', () => {
           correlationId: 'corr-001',
           contextId: 'context-001',
           contextType: 'form',
-        }),
+        })
       ).not.toThrow();
     });
   });
@@ -90,7 +90,7 @@ describe('TelemetryService', () => {
           correlationId: 'corr-001',
           contextId: 'context-001',
           contextType: 'form',
-        }),
+        })
       ).not.toThrow();
     });
   });
@@ -107,7 +107,7 @@ describe('TelemetryService', () => {
           correlationId: 'corr-001',
           contextId: 'context-001',
           contextType: 'dashboard',
-        }),
+        })
       ).not.toThrow();
     });
   });
@@ -124,7 +124,7 @@ describe('TelemetryService', () => {
           correlationId: 'corr-001',
           contextId: 'context-001',
           contextType: 'dashboard',
-        }),
+        })
       ).not.toThrow();
     });
   });

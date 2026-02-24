@@ -4,7 +4,6 @@ import { Injectable, Logger, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan } from 'typeorm';
 
-
 import { SettlementBatchEntity } from '../entities/settlement-batch.entity';
 
 /**
@@ -79,7 +78,7 @@ export class PayoutRiskService {
     private readonly accountRepository?: Repository<AccountEntity>,
     @Optional()
     @InjectRepository(LedgerEntryEntity)
-    private readonly ledgerRepository?: Repository<LedgerEntryEntity>,
+    private readonly ledgerRepository?: Repository<LedgerEntryEntity>
   ) {
     if (!this.accountRepository) {
       this.logger.warn('AccountRepository not available - account status checks disabled');
@@ -104,7 +103,7 @@ export class PayoutRiskService {
         batchDomain.riderAccountId,
         batchDomain.totalEarnings,
         batchDomain.periodStart,
-        batchDomain.periodEnd,
+        batchDomain.periodEnd
       );
       checks.push(earningPatternCheck);
     }
@@ -118,7 +117,7 @@ export class PayoutRiskService {
     const { decision, riskLevel, holdReason } = this.aggregateResults(checks);
 
     this.logger.debug(
-      `Payout risk check for batch ${batch.id}: decision=${decision}, risk=${riskLevel}`,
+      `Payout risk check for batch ${batch.id}: decision=${decision}, risk=${riskLevel}`
     );
 
     return {
@@ -178,7 +177,7 @@ export class PayoutRiskService {
       };
     } catch (error) {
       this.logger.error(
-        `Account status check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Account status check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
       return {
         checkName: 'account_status',
@@ -193,7 +192,7 @@ export class PayoutRiskService {
     riderAccountId: string,
     currentEarnings: number,
     periodStart: Date,
-    _periodEnd: Date,
+    _periodEnd: Date
   ): Promise<RiskCheckDetail> {
     if (!this.ledgerRepository) {
       return {
@@ -229,13 +228,10 @@ export class PayoutRiskService {
         };
       }
 
-      const totalHistorical = historicalEarnings.reduce(
-        (sum, e) => sum + parseFloat(e.amount),
-        0,
-      );
+      const totalHistorical = historicalEarnings.reduce((sum, e) => sum + parseFloat(e.amount), 0);
       const averageEarnings = totalHistorical / this.config.lookbackDays;
       const periodDays = Math.ceil(
-        (periodStart.getTime() - lookbackStart.getTime()) / (1000 * 60 * 60 * 24),
+        (periodStart.getTime() - lookbackStart.getTime()) / (1000 * 60 * 60 * 24)
       );
       const expectedEarnings = averageEarnings * Math.max(periodDays, 7);
 
@@ -258,7 +254,9 @@ export class PayoutRiskService {
         passed: !isUnusual,
         riskLevel,
         reason: isUnusual
-          ? `Earnings ${currentEarnings.toFixed(2)} are ${earningsRatio.toFixed(1)}x higher than average`
+          ? `Earnings ${currentEarnings.toFixed(2)} are ${earningsRatio.toFixed(
+              1
+            )}x higher than average`
           : undefined,
         metadata: {
           currentEarnings,
@@ -270,7 +268,7 @@ export class PayoutRiskService {
       };
     } catch (error) {
       this.logger.error(
-        `Earning pattern check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Earning pattern check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
       return {
         checkName: 'earning_pattern',
@@ -299,9 +297,7 @@ export class PayoutRiskService {
       checkName: 'payout_amount',
       passed,
       riskLevel,
-      reason: passed
-        ? undefined
-        : `Payout amount ${amount} ${currency} exceeds maximum threshold`,
+      reason: passed ? undefined : `Payout amount ${amount} ${currency} exceeds maximum threshold`,
       metadata: {
         amount,
         currency,
@@ -342,8 +338,8 @@ export class PayoutRiskService {
       reason: passed
         ? undefined
         : unusuallyHigh
-          ? `Average earning per item (${averagePerItem.toFixed(2)}) is unusually high`
-          : `Average earning per item (${averagePerItem.toFixed(2)}) is unusually low`,
+        ? `Average earning per item (${averagePerItem.toFixed(2)}) is unusually high`
+        : `Average earning per item (${averagePerItem.toFixed(2)}) is unusually low`,
       metadata: {
         itemCount,
         totalEarnings,

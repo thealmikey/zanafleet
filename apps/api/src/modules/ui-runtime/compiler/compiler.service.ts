@@ -25,9 +25,7 @@ import {
 export class UISchemaCompilerService {
   private readonly logger = new Logger(UISchemaCompilerService.name);
 
-  constructor(
-    private readonly componentRegistry: ComponentRegistryService,
-  ) {}
+  constructor(private readonly componentRegistry: ComponentRegistryService) {}
 
   /**
    * Compile UISchema from request
@@ -135,10 +133,7 @@ export class UISchemaCompilerService {
   /**
    * Build metadata
    */
-  private buildMetadata(
-    screenDef: { id: string },
-    request: UIComposeRequest,
-  ): SchemaMetadata {
+  private buildMetadata(screenDef: { id: string }, request: UIComposeRequest): SchemaMetadata {
     return {
       screenId: screenDef.id,
       screenTitle: this.formatScreenTitle(screenDef.id),
@@ -170,7 +165,7 @@ export class UISchemaCompilerService {
    */
   private async resolveDataSources(
     dataSources: DataSource[],
-    request: UIComposeRequest,
+    request: UIComposeRequest
   ): Promise<DataSource[]> {
     // TODO: Load actual data for async/computed data sources
     return dataSources.map((ds) => ({
@@ -185,7 +180,7 @@ export class UISchemaCompilerService {
    */
   private resolveEndpointVariables(
     endpoint: string | undefined,
-    request: UIComposeRequest,
+    request: UIComposeRequest
   ): string | undefined {
     if (!endpoint) return endpoint;
     return endpoint
@@ -207,7 +202,7 @@ export class UISchemaCompilerService {
    */
   private async resolveActions(
     actions: ActionDefinition[],
-    request: UIComposeRequest,
+    request: UIComposeRequest
   ): Promise<ActionDefinition[]> {
     // TODO: Filter actions based on actor capabilities
     // For now, return all actions - capability filtering happens at runtime
@@ -237,20 +232,34 @@ export class UISchemaCompilerService {
       const rightValue = this.resolveValue(right, context);
 
       switch (operator) {
-        case 'eq': return leftValue === rightValue;
-        case 'ne': return leftValue !== rightValue;
-        case 'gt': return Number(leftValue) > Number(rightValue);
-        case 'lt': return Number(leftValue) < Number(rightValue);
-        case 'gte': return Number(leftValue) >= Number(rightValue);
-        case 'lte': return Number(leftValue) <= Number(rightValue);
-        case 'in': return Array.isArray(rightValue) && rightValue.includes(leftValue);
-        case 'notIn': return Array.isArray(rightValue) && !rightValue.includes(leftValue);
-        case 'contains': return String(leftValue).includes(String(rightValue));
-        case 'startsWith': return String(leftValue).startsWith(String(rightValue));
-        case 'endsWith': return String(leftValue).endsWith(String(rightValue));
-        case 'exists': return leftValue !== null && leftValue !== undefined;
-        case 'isNull': return leftValue === null || leftValue === undefined;
-        default: return true;
+        case 'eq':
+          return leftValue === rightValue;
+        case 'ne':
+          return leftValue !== rightValue;
+        case 'gt':
+          return Number(leftValue) > Number(rightValue);
+        case 'lt':
+          return Number(leftValue) < Number(rightValue);
+        case 'gte':
+          return Number(leftValue) >= Number(rightValue);
+        case 'lte':
+          return Number(leftValue) <= Number(rightValue);
+        case 'in':
+          return Array.isArray(rightValue) && rightValue.includes(leftValue);
+        case 'notIn':
+          return Array.isArray(rightValue) && !rightValue.includes(leftValue);
+        case 'contains':
+          return String(leftValue).includes(String(rightValue));
+        case 'startsWith':
+          return String(leftValue).startsWith(String(rightValue));
+        case 'endsWith':
+          return String(leftValue).endsWith(String(rightValue));
+        case 'exists':
+          return leftValue !== null && leftValue !== undefined;
+        case 'isNull':
+          return leftValue === null || leftValue === undefined;
+        default:
+          return true;
       }
     }
 
@@ -268,10 +277,7 @@ export class UISchemaCompilerService {
   /**
    * Resolve value from binding or context
    */
-  private resolveValue(
-    value: unknown,
-    _context: Record<string, unknown>,
-  ): unknown {
+  private resolveValue(value: unknown, _context: Record<string, unknown>): unknown {
     return value;
   }
 
@@ -294,7 +300,7 @@ export class UISchemaCompilerService {
     let hash = 0;
     for (let i = 0; i < content.length; i++) {
       const char = content.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
     return `"${hash.toString(16)}"`;

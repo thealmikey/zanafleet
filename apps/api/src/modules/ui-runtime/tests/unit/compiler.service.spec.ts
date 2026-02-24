@@ -81,7 +81,7 @@ describe('UISchemaCompilerService', () => {
     it('should handle deeply nested components', async () => {
       const depth = 10;
       const nestedLayout = createStackLayout({ id: 'root' });
-      
+
       let current = nestedLayout;
       for (let i = 0; i < depth; i++) {
         const next = createStackLayout({ id: `level-${i}`, children: [] });
@@ -103,7 +103,7 @@ describe('UISchemaCompilerService', () => {
   describe('buildResponse', () => {
     it('should build a valid response with metadata', () => {
       const schema = createUISchema();
-      
+
       const response = service.buildResponse(schema);
 
       expect(response.schema).toEqual(schema);
@@ -296,8 +296,12 @@ describe('UISchemaCompilerService', () => {
         ],
       };
 
-      const result1 = service.evaluateCondition(condition, { user: { role: 'admin', active: true } });
-      const result2 = service.evaluateCondition(condition, { user: { role: 'admin', active: false } });
+      const result1 = service.evaluateCondition(condition, {
+        user: { role: 'admin', active: true },
+      });
+      const result2 = service.evaluateCondition(condition, {
+        user: { role: 'admin', active: false },
+      });
 
       expect(result1).toBe(true);
       expect(result2).toBe(false);
@@ -334,7 +338,7 @@ describe('UISchemaCompilerService', () => {
 
     it('should handle unknown operators gracefully', () => {
       const condition = INVALID_CONDITIONS.unknownOperator;
-      
+
       const result = service.evaluateCondition(condition as Condition, {});
 
       expect(result).toBe(true);

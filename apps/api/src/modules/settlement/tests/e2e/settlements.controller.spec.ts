@@ -259,9 +259,7 @@ describe('SettlementsController (e2e)', () => {
         new Error('Scheduler error')
       );
 
-      await request(app.getHttpServer())
-        .post('/settlements/schedule/run')
-        .expect(500);
+      await request(app.getHttpServer()).post('/settlements/schedule/run').expect(500);
 
       expect(mockSettlementSchedulerService.processWeeklySettlements).toHaveBeenCalled();
     });
@@ -289,17 +287,13 @@ describe('SettlementsController (e2e)', () => {
     it('should return 403 for schedule run when lacking capability', async () => {
       mockCapabilityAccessController.hasCapability.mockResolvedValue(false);
 
-      await request(app.getHttpServer())
-        .post('/settlements/schedule/run')
-        .expect(403);
+      await request(app.getHttpServer()).post('/settlements/schedule/run').expect(403);
     });
 
     it('should return 403 for get status when lacking capability', async () => {
       mockCapabilityAccessController.hasCapability.mockResolvedValue(false);
 
-      await request(app.getHttpServer())
-        .get('/settlements/payouts/payout-123')
-        .expect(403);
+      await request(app.getHttpServer()).get('/settlements/payouts/payout-123').expect(403);
     });
 
     it('should return 403 for retry when lacking capability', async () => {

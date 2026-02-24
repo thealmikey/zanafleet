@@ -1,7 +1,6 @@
 import { ActorType } from '@api/modules/actor/dto/actor.enums';
 import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 
-
 import { SignUpSessionStatus } from '../dto/signup.enums';
 
 /**

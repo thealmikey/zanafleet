@@ -14,7 +14,6 @@ import {
 import { WorkflowEngineService } from './services/workflow-engine.service';
 import { WorkflowEventSubscriber } from './subscribers/workflow-event.subscriber';
 
-
 /**
  * Command handlers
  */
@@ -51,15 +50,7 @@ const EventHandlers = [ProcessInstanceNeo4jProjection, ProcessStateChangedNeo4jP
       ProcessTransitionEntity,
     ]),
   ],
-  providers: [
-    WorkflowEngineService,
-    WorkflowEventSubscriber,
-    ...CommandHandlers,
-    ...EventHandlers,
-  ],
-  exports: [
-    WorkflowEngineService,
-    WorkflowEventSubscriber,
-  ],
+  providers: [WorkflowEngineService, WorkflowEventSubscriber, ...CommandHandlers, ...EventHandlers],
+  exports: [WorkflowEngineService, WorkflowEventSubscriber],
 })
 export class WorkflowModule {}

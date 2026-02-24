@@ -2,7 +2,11 @@ import { Logger } from '@nestjs/common';
 
 import { AbstractStateRenderer } from '../../strategies/state-renderer.base';
 import { ComponentRegistryService } from '../../services/component-registry.service';
-import { UIComponent, UIActionDefinition, ScreenConfig } from '../../interfaces/ui-composer.interfaces';
+import {
+  UIComponent,
+  UIActionDefinition,
+  ScreenConfig,
+} from '../../interfaces/ui-composer.interfaces';
 
 /**
  * Concrete implementation of AbstractStateRenderer for testing
@@ -36,7 +40,10 @@ class TestStateRenderer extends AbstractStateRenderer {
     return components;
   }
 
-  protected getActionsForState(state: string, _context: Record<string, unknown>): UIActionDefinition[] {
+  protected getActionsForState(
+    state: string,
+    _context: Record<string, unknown>
+  ): UIActionDefinition[] {
     const actions: UIActionDefinition[] = [];
 
     if (state === 'draft') {
@@ -66,20 +73,28 @@ class TestStateRenderer extends AbstractStateRenderer {
         screen: 'test-draft',
         title: 'Draft Screen',
         subtitle: 'Test draft subtitle',
-        breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Draft', isCurrent: true }],
+        breadcrumbs: [
+          { label: 'Home', href: '/' },
+          { label: 'Draft', isCurrent: true },
+        ],
       },
       completed: {
         screen: 'test-completed',
         title: 'Completed Screen',
-        breadcrumbs: [{ label: 'Home', href: '/' }, { label: 'Completed', isCurrent: true }],
+        breadcrumbs: [
+          { label: 'Home', href: '/' },
+          { label: 'Completed', isCurrent: true },
+        ],
       },
     };
 
-    return configs[state] ?? {
-      screen: 'test-default',
-      title: 'Default Screen',
-      breadcrumbs: [{ label: 'Home', href: '/', isCurrent: true }],
-    };
+    return (
+      configs[state] ?? {
+        screen: 'test-default',
+        title: 'Default Screen',
+        breadcrumbs: [{ label: 'Home', href: '/', isCurrent: true }],
+      }
+    );
   }
 }
 
@@ -158,7 +173,10 @@ describe('AbstractStateRenderer', () => {
     it('should return empty array when no components defined for state', () => {
       // Create a renderer with no components for specific state
       const emptyRenderer = new (class extends TestStateRenderer {
-        protected getComponentsForState(_state: string, _context: Record<string, unknown>): UIComponent[] {
+        protected getComponentsForState(
+          _state: string,
+          _context: Record<string, unknown>
+        ): UIComponent[] {
           return [];
         }
       })(componentRegistry);
@@ -203,7 +221,10 @@ describe('AbstractStateRenderer', () => {
 
     it('should return empty array when no actions defined for state', () => {
       const emptyRenderer = new (class extends TestStateRenderer {
-        protected getActionsForState(_state: string, _context: Record<string, unknown>): UIActionDefinition[] {
+        protected getActionsForState(
+          _state: string,
+          _context: Record<string, unknown>
+        ): UIActionDefinition[] {
           return [];
         }
       })(componentRegistry);
@@ -370,9 +391,9 @@ describe('AbstractStateRenderer', () => {
   describe('debug logging', () => {
     it('should not log when debug is false', () => {
       const loggerSpy = jest.spyOn(renderer['logger'], 'debug');
-      
+
       renderer['debug']('Test message');
-      
+
       expect(loggerSpy).not.toHaveBeenCalled();
     });
 
@@ -380,9 +401,9 @@ describe('AbstractStateRenderer', () => {
       // Create renderer with debug option
       const debugRenderer = new TestStateRenderer(componentRegistry, { debug: true });
       const loggerSpy = jest.spyOn(debugRenderer['logger'], 'debug');
-      
+
       debugRenderer['debug']('Test message');
-      
+
       expect(loggerSpy).toHaveBeenCalledWith('Test message');
     });
   });

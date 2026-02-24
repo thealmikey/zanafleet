@@ -177,7 +177,10 @@ describe('ValidationService', () => {
         {
           id: 'rule-2',
           field: 'email',
-          rules: [{ type: 'required', severity: 'error' }, { type: 'email', severity: 'error' }],
+          rules: [
+            { type: 'required', severity: 'error' },
+            { type: 'email', severity: 'error' },
+          ],
         },
       ];
 
@@ -238,10 +241,7 @@ describe('ValidationService', () => {
         },
       ];
 
-      const result = service.validate(
-        { user: { profile: { bio: 'a'.repeat(600) } } },
-        rules,
-      );
+      const result = service.validate({ user: { profile: { bio: 'a'.repeat(600) } } }, rules);
 
       expect(result.valid).toBe(false);
     });

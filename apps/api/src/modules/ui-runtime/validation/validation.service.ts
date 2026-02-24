@@ -15,7 +15,7 @@ import {
 @Injectable()
 export class ValidationService {
   private readonly logger = new Logger(ValidationService.name);
-  
+
   // Built-in validators
   private readonly validators: Map<string, ValidatorFunction> = new Map();
 
@@ -39,10 +39,10 @@ export class ValidationService {
 
     for (const rule of rules) {
       const value = this.getNestedValue(data, rule.field);
-      
+
       for (const ruleSet of rule.rules) {
         const result = this.validateValue(value, ruleSet);
-        
+
         if (!result.valid) {
           const error: ValidationError = {
             field: rule.field,
@@ -50,7 +50,7 @@ export class ValidationService {
             code: ruleSet.type,
             severity: ruleSet.severity ?? 'error',
           };
-          
+
           if (error.severity === 'error') {
             errors.push(error);
           } else {
@@ -74,7 +74,7 @@ export class ValidationService {
     switch (ruleSet.type) {
       case 'required':
         return { valid: value !== null && value !== undefined && value !== '' };
-      
+
       case 'min':
         if (typeof value === 'number') {
           return { valid: value >= (ruleSet.value as number) };
@@ -83,7 +83,7 @@ export class ValidationService {
           return { valid: value.length >= (ruleSet.value as number) };
         }
         return { valid: true };
-      
+
       case 'max':
         if (typeof value === 'number') {
           return { valid: value <= (ruleSet.value as number) };
@@ -92,7 +92,7 @@ export class ValidationService {
           return { valid: value.length <= (ruleSet.value as number) };
         }
         return { valid: true };
-      
+
       case 'minLength':
         if (typeof value === 'string') {
           return { valid: value.length >= (ruleSet.value as number) };
@@ -101,7 +101,7 @@ export class ValidationService {
           return { valid: value.length >= (ruleSet.value as number) };
         }
         return { valid: true };
-      
+
       case 'maxLength':
         if (typeof value === 'string') {
           return { valid: value.length <= (ruleSet.value as number) };
@@ -110,21 +110,21 @@ export class ValidationService {
           return { valid: value.length <= (ruleSet.value as number) };
         }
         return { valid: true };
-      
+
       case 'pattern':
         if (typeof value === 'string') {
           const regex = new RegExp(ruleSet.value as string);
           return { valid: regex.test(value) };
         }
         return { valid: true };
-      
+
       case 'email':
         if (typeof value === 'string') {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           return { valid: emailRegex.test(value) };
         }
         return { valid: true };
-      
+
       case 'url':
         if (typeof value === 'string') {
           try {
@@ -135,18 +135,18 @@ export class ValidationService {
           }
         }
         return { valid: true };
-      
+
       case 'phone':
         if (typeof value === 'string') {
           const phoneRegex = /^[\d\s\-+()]+$/;
           return { valid: phoneRegex.test(value) && value.replace(/\D/g, '').length >= 10 };
         }
         return { valid: true };
-      
+
       case 'match':
         // Field must match another field
         return { valid: true }; // Handled separately
-      
+
       default:
         // Check custom validators
         const customValidator = this.validators.get(ruleSet.type);
@@ -163,7 +163,7 @@ export class ValidationService {
   private getNestedValue(obj: Record<string, unknown>, path: string): unknown {
     const keys = path.split('.');
     let value: unknown = obj;
-    
+
     for (const key of keys) {
       if (value && typeof value === 'object') {
         value = (value as Record<string, unknown>)[key];
@@ -171,7 +171,7 @@ export class ValidationService {
         return undefined;
       }
     }
-    
+
     return value;
   }
 
@@ -190,7 +190,7 @@ export class ValidationService {
       url: 'Invalid URL',
       phone: 'Invalid phone number',
     };
-    
+
     return messages[type] ?? 'Validation failed';
   }
 
