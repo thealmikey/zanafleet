@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 
 import { MembershipEntity } from '@api/modules/workspace/entities/membership.entity';
 import { WorkspaceEntity } from '@api/modules/workspace/entities/workspace.entity';
-import { MembershipRole } from '@api/modules/workspace/dto/workspace.enums';
 
 import {
   ContextResolutionRequest,
@@ -33,7 +32,7 @@ export class ContextResolutionService {
     @InjectRepository(MembershipEntity)
     private readonly membershipRepository: Repository<MembershipEntity>,
     @InjectRepository(WorkspaceEntity)
-    private readonly workspaceRepository: Repository<WorkspaceEntity>,
+    private readonly workspaceRepository: Repository<WorkspaceEntity>
   ) {}
 
   /**
@@ -81,7 +80,6 @@ export class ContextResolutionService {
 
       // 3. Fallback to default workspace
       return this.getDefaultWorkspace(actorId, source);
-
     } catch (error) {
       this.logger.error(`Context resolution failed for actor ${actorId}`, error);
       return {
@@ -97,7 +95,7 @@ export class ContextResolutionService {
   private async validateWorkspaceMembership(
     actorId: string,
     workspaceId: string,
-    source: ContextSource,
+    source: ContextSource
   ): Promise<ContextResolutionResult> {
     const membership = await this.membershipRepository.findOne({
       where: { actorId, workspaceId },
@@ -139,7 +137,7 @@ export class ContextResolutionService {
    */
   private async getDefaultWorkspace(
     actorId: string,
-    source: ContextSource,
+    source: ContextSource
   ): Promise<ContextResolutionResult> {
     const defaultMembership = await this.membershipRepository.findOne({
       where: { actorId, defaultWorkspace: true },
@@ -196,7 +194,7 @@ export class ContextResolutionService {
    */
   private async inferWorkspaceFromRoute(
     actorId: string,
-    route?: string,
+    route?: string
   ): Promise<WorkspaceContext | null> {
     if (!route) {
       return null;
@@ -252,13 +250,13 @@ export class ContextResolutionService {
     // Clear existing default
     await this.membershipRepository.update(
       { actorId, defaultWorkspace: true },
-      { defaultWorkspace: false },
+      { defaultWorkspace: false }
     );
 
     // Set new default
     const result = await this.membershipRepository.update(
       { actorId, workspaceId },
-      { defaultWorkspace: true },
+      { defaultWorkspace: true }
     );
 
     return (result.affected ?? 0) > 0;

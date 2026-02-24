@@ -19,13 +19,14 @@
  * ```
  */
 
-// Module
-export * from './context.module';
-
 // Types
 export * from './context.types';
 
 // Services
-export * from './services/context-resolution.service';
-export * from './services/role-projection.service';
-export * from './services/unified-job-feed.service';
+export * from './services';
+
+// Guards
+export * from './guards';
+
+// Module
+export * from './context.module';
