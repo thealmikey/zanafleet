@@ -222,9 +222,7 @@ export class DeliveriesController {
     description: 'Unauthorized - Invalid or missing authentication token',
   })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
-  async request(
-    @Body() dto: RequestDeliveryDto
-  ): Promise<{
+  async request(@Body() dto: RequestDeliveryDto): Promise<{
     deliveryId: string;
     orderId: string;
     estimatedCharges: number;

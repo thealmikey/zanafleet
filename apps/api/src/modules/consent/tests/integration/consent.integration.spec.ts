@@ -33,12 +33,10 @@ describe('Consent Integration Tests', () => {
 
   const createMockProposalRepository = () => ({
     create: jest.fn().mockImplementation((data: any) => data),
-    save: jest
-      .fn()
-      .mockImplementation(async (data: any) => ({
-        ...data,
-        proposalId: data.proposalId || 'proposal-1',
-      })),
+    save: jest.fn().mockImplementation(async (data: any) => ({
+      ...data,
+      proposalId: data.proposalId || 'proposal-1',
+    })),
     findOne: jest.fn(),
     find: jest.fn(),
   });
