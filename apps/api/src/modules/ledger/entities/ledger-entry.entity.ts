@@ -1,6 +1,6 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, Index } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryColumn } from 'typeorm';
 
-import { LedgerEntryType, LedgerCategory, LedgerReferenceType } from '../dto/ledger.enums';
+import { LedgerCategory, LedgerEntryType, LedgerReferenceType } from '../dto/ledger.enums';
 
 /**
  * LedgerEntry Entity
@@ -11,18 +11,29 @@ import { LedgerEntryType, LedgerCategory, LedgerReferenceType } from '../dto/led
  * - Double-entry: Each financial operation creates balanced debit/credit pairs
  * - Unique constraint prevents double-posting for same reference
  * - balanceAfter tracks running balance for each account
+ * - workspaceId: Enables financial isolation per workspace (multi-tenant)
  */
 @Entity('ledger_entries')
 @Index(['accountId'])
 @Index(['referenceType', 'referenceId'])
 @Index(['referenceType', 'referenceId', 'entryType', 'accountId'], { unique: true })
 @Index(['createdAt'])
+@Index(['workspaceId', 'accountId'])
+@Index(['workspaceId', 'createdAt'])
 export class LedgerEntryEntity {
   @PrimaryColumn('uuid')
   id!: string;
 
   @Column('uuid')
   accountId!: string;
+
+  /**
+   * Workspace ID for financial isolation
+   * All entries in a workspace are isolated from other workspaces
+   * This enables multi-workspace earnings tracking per rider
+   */
+  @Column('uuid', { nullable: true })
+  workspaceId!: string | null;
 
   @Column('enum', { enum: LedgerEntryType })
   entryType!: LedgerEntryType;
@@ -57,6 +68,7 @@ export class LedgerEntryEntity {
   toDomain(): {
     ledgerEntryId: string;
     accountId: string;
+    workspaceId: string | null;
     entryType: LedgerEntryType;
     category: LedgerCategory;
     amount: number;
@@ -71,6 +83,7 @@ export class LedgerEntryEntity {
     return {
       ledgerEntryId: this.id,
       accountId: this.accountId,
+      workspaceId: this.workspaceId,
       entryType: this.entryType,
       category: this.category,
       amount: parseFloat(this.amount),
@@ -87,6 +100,7 @@ export class LedgerEntryEntity {
   static fromDomain(data: {
     ledgerEntryId: string;
     accountId: string;
+    workspaceId?: string | null;
     entryType: LedgerEntryType;
     category: LedgerCategory;
     amount: number;
@@ -101,6 +115,7 @@ export class LedgerEntryEntity {
     const entity = new LedgerEntryEntity();
     entity.id = data.ledgerEntryId;
     entity.accountId = data.accountId;
+    entity.workspaceId = data.workspaceId ?? null;
     entity.entryType = data.entryType;
     entity.category = data.category;
     entity.amount = data.amount.toFixed(2);
