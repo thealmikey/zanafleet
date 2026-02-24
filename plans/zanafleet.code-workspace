@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "zanafleet",
+			"path": ".."
+		}
+	],
+	"settings": {
+		"makefile.configureOnOpen": true
+	}
+}
