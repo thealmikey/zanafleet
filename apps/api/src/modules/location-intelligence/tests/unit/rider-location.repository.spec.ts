@@ -66,7 +66,7 @@ describe('RiderLocationRepository', () => {
 
     repository = new RiderLocationRepository(
       mockDataSource as DataSource,
-      mockH3Service as H3Service,
+      mockH3Service as H3Service
     );
   });
 
@@ -251,7 +251,7 @@ describe('RiderLocationRepository', () => {
       const closeRider = {
         riderId: 'close',
         latitude: -1.2925,
-        longitude: 36.8220,
+        longitude: 36.822,
         h3IndexFine: 'fine1',
         h3IndexMedium: 'medium1',
         h3IndexCoarse: 'coarse1',
@@ -306,7 +306,7 @@ describe('RiderLocationRepository', () => {
         {
           riderId: 'closest',
           latitude: -1.2922,
-          longitude: 36.8220,
+          longitude: 36.822,
           h3IndexFine: 'fine2',
           h3IndexMedium: 'medium2',
           h3IndexCoarse: 'coarse2',
@@ -372,8 +372,8 @@ describe('RiderLocationRepository', () => {
       const polygon: GeoPoint[] = [
         { latitude: -1.29, longitude: 36.82 },
         { latitude: -1.29, longitude: 36.83 },
-        { latitude: -1.30, longitude: 36.83 },
-        { latitude: -1.30, longitude: 36.82 },
+        { latitude: -1.3, longitude: 36.83 },
+        { latitude: -1.3, longitude: 36.82 },
       ];
 
       await repository.findRidersInPolygon(polygon);
@@ -382,7 +382,7 @@ describe('RiderLocationRepository', () => {
       expect(sql).toContain('ST_Contains');
       expect(sql).toContain('ST_GeomFromText($1)');
       expect(params[0]).toBe(
-        'POLYGON((36.82 -1.29, 36.83 -1.29, 36.83 -1.3, 36.82 -1.3, 36.82 -1.29))',
+        'POLYGON((36.82 -1.29, 36.83 -1.29, 36.83 -1.3, 36.82 -1.3, 36.82 -1.29))'
       );
     });
   });
@@ -426,7 +426,7 @@ describe('RiderLocationRepository', () => {
       const result = await repository.getRiderPath(
         'rider-123',
         new Date('2024-01-15T10:00:00Z'),
-        new Date('2024-01-15T11:00:00Z'),
+        new Date('2024-01-15T11:00:00Z')
       );
 
       expect(result).toHaveLength(1);

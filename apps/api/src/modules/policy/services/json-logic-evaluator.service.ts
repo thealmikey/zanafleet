@@ -300,11 +300,7 @@ export class JsonLogicEvaluatorService {
   /**
    * Build a detailed reason string explaining why the condition matched or didn't match.
    */
-  private buildReason(
-    condition: PolicyCondition,
-    data: EvaluationData,
-    matched: boolean
-  ): string {
+  private buildReason(condition: PolicyCondition, data: EvaluationData, matched: boolean): string {
     const parts: string[] = [];
     this.collectReasonParts(condition, data, parts);
 

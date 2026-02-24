@@ -27,7 +27,10 @@ export interface MoveProfile {
 /**
  * Default move profile configurations based on house size
  */
-export const MOVE_PROFILE_DEFAULTS: Record<HouseSize, Omit<MoveProfile, 'fragilityFactor' | 'specialHandling' | 'floorCount' | 'packingService'>> = {
+export const MOVE_PROFILE_DEFAULTS: Record<
+  HouseSize,
+  Omit<MoveProfile, 'fragilityFactor' | 'specialHandling' | 'floorCount' | 'packingService'>
+> = {
   [HouseSize.STUDIO]: {
     estimatedVolumeM3: 8,
     laborRequirement: 2,
@@ -75,7 +78,7 @@ export function houseSizeToMoveProfile(
   }
 ): MoveProfile {
   const defaults = MOVE_PROFILE_DEFAULTS[houseSize];
-  
+
   // Determine distance category based on actual distance
   let distanceCategory: MoveProfile['distanceCategory'] = 'local';
   if (options?.distanceKm !== undefined) {
@@ -134,19 +137,19 @@ export function estimateMoveDuration(moveProfile: MoveProfile, distanceKm: numbe
 
   // Base loading/unloading time
   const loadingMinutes = moveProfile.estimatedVolumeM3 * baseTimePerM3[moveProfile.fragilityFactor];
-  
+
   // Travel time (assuming average 40 km/h in urban areas)
   const travelMinutes = (distanceKm / 40) * 60;
-  
+
   // Floor adjustment (extra time per floor for stairs)
   const floorAdjustment = (moveProfile.floorCount ?? 1) * 15;
-  
+
   // Special handling time
   const specialHandlingMinutes = (moveProfile.specialHandling?.length ?? 0) * 30;
 
   // Total time with buffer
   const totalMinutes = loadingMinutes + travelMinutes + floorAdjustment + specialHandlingMinutes;
-  
+
   // Add 30% buffer for contingencies
   return Math.round(totalMinutes * 1.3);
 }

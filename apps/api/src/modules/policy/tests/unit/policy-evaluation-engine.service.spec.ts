@@ -22,7 +22,9 @@ describe('PolicyEvaluationEngineService', () => {
   let decisionLogRepository: jest.Mocked<PolicyDecisionLogRepository>;
   let eventBus: jest.Mocked<EventBusService>;
 
-  const createMockPolicy = (overrides: Partial<ReturnType<PolicyEntity['toDomain']>> = {}): PolicyEntity => {
+  const createMockPolicy = (
+    overrides: Partial<ReturnType<PolicyEntity['toDomain']>> = {}
+  ): PolicyEntity => {
     const condition: PolicyCondition = {
       field: 'trigger',
       operator: '==',
@@ -144,7 +146,10 @@ describe('PolicyEvaluationEngineService', () => {
         effect: PolicyEffect.BLOCK,
         conditions: { field: 'trigger', operator: '==', value: 'RIDER_ASSIGNMENT' },
       });
-      policyRepository.findActivePoliciesForTrigger.mockResolvedValue([matchingPolicy, nonMatchingPolicy]);
+      policyRepository.findActivePoliciesForTrigger.mockResolvedValue([
+        matchingPolicy,
+        nonMatchingPolicy,
+      ]);
 
       const context = createContext();
       const result = await service.evaluate(context);
@@ -152,8 +157,12 @@ describe('PolicyEvaluationEngineService', () => {
       expect(result.finalDecision.effect).toBe(PolicyEffect.ALLOW);
       expect(result.finalDecision.policyId).toBe('policy-match');
       expect(result.evaluatedPolicies).toHaveLength(2);
-      expect(result.evaluatedPolicies.find(p => p.policyId === 'policy-match')?.matched).toBe(true);
-      expect(result.evaluatedPolicies.find(p => p.policyId === 'policy-no-match')?.matched).toBe(false);
+      expect(result.evaluatedPolicies.find((p) => p.policyId === 'policy-match')?.matched).toBe(
+        true
+      );
+      expect(result.evaluatedPolicies.find((p) => p.policyId === 'policy-no-match')?.matched).toBe(
+        false
+      );
     });
 
     it('should log decision asynchronously', async () => {
@@ -162,7 +171,7 @@ describe('PolicyEvaluationEngineService', () => {
 
       await service.evaluate(context, { correlationId: 'test-corr-id' });
 
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(decisionLogRepository.create).toHaveBeenCalledTimes(1);
       expect(decisionLogRepository.create).toHaveBeenCalledWith(
@@ -182,7 +191,7 @@ describe('PolicyEvaluationEngineService', () => {
 
       await service.evaluate(context);
 
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(eventBus.publishEvent).toHaveBeenCalledTimes(1);
       expect(eventBus.publishEvent).toHaveBeenCalledWith(
@@ -226,7 +235,10 @@ describe('PolicyEvaluationEngineService', () => {
           priority: 0,
           createdAt: new Date('2024-01-01T00:00:00Z'),
         });
-        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([businessPolicy, riderPolicy]);
+        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([
+          businessPolicy,
+          riderPolicy,
+        ]);
 
         const context = createContext();
         const result = await service.evaluate(context);
@@ -246,7 +258,10 @@ describe('PolicyEvaluationEngineService', () => {
           scope: PolicyScope.SACCO,
           effect: PolicyEffect.BLOCK,
         });
-        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([saccoPolicy, businessPolicy]);
+        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([
+          saccoPolicy,
+          businessPolicy,
+        ]);
 
         const result = await service.evaluate(createContext());
 
@@ -264,7 +279,10 @@ describe('PolicyEvaluationEngineService', () => {
           scope: PolicyScope.NATIONAL,
           effect: PolicyEffect.BLOCK,
         });
-        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([nationalPolicy, saccoPolicy]);
+        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([
+          nationalPolicy,
+          saccoPolicy,
+        ]);
 
         const result = await service.evaluate(createContext());
 
@@ -282,7 +300,10 @@ describe('PolicyEvaluationEngineService', () => {
           scope: PolicyScope.GLOBAL,
           effect: PolicyEffect.BLOCK,
         });
-        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([globalPolicy, nationalPolicy]);
+        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([
+          globalPolicy,
+          nationalPolicy,
+        ]);
 
         const result = await service.evaluate(createContext());
 
@@ -291,11 +312,31 @@ describe('PolicyEvaluationEngineService', () => {
 
       it('should respect full scope hierarchy: RIDER > BUSINESS > SACCO > NATIONAL > GLOBAL', async () => {
         const policies = [
-          createMockPolicy({ policyId: 'global', scope: PolicyScope.GLOBAL, effect: PolicyEffect.ALLOW }),
-          createMockPolicy({ policyId: 'national', scope: PolicyScope.NATIONAL, effect: PolicyEffect.ALLOW }),
-          createMockPolicy({ policyId: 'sacco', scope: PolicyScope.SACCO, effect: PolicyEffect.ALLOW }),
-          createMockPolicy({ policyId: 'business', scope: PolicyScope.BUSINESS, effect: PolicyEffect.ALLOW }),
-          createMockPolicy({ policyId: 'rider', scope: PolicyScope.RIDER, effect: PolicyEffect.BLOCK }),
+          createMockPolicy({
+            policyId: 'global',
+            scope: PolicyScope.GLOBAL,
+            effect: PolicyEffect.ALLOW,
+          }),
+          createMockPolicy({
+            policyId: 'national',
+            scope: PolicyScope.NATIONAL,
+            effect: PolicyEffect.ALLOW,
+          }),
+          createMockPolicy({
+            policyId: 'sacco',
+            scope: PolicyScope.SACCO,
+            effect: PolicyEffect.ALLOW,
+          }),
+          createMockPolicy({
+            policyId: 'business',
+            scope: PolicyScope.BUSINESS,
+            effect: PolicyEffect.ALLOW,
+          }),
+          createMockPolicy({
+            policyId: 'rider',
+            scope: PolicyScope.RIDER,
+            effect: PolicyEffect.BLOCK,
+          }),
         ];
         policyRepository.findActivePoliciesForTrigger.mockResolvedValue(policies);
 
@@ -320,7 +361,10 @@ describe('PolicyEvaluationEngineService', () => {
           priority: 10,
           effect: PolicyEffect.ALLOW,
         });
-        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([lowPriorityPolicy, highPriorityPolicy]);
+        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([
+          lowPriorityPolicy,
+          highPriorityPolicy,
+        ]);
 
         const result = await service.evaluate(createContext());
 
@@ -341,7 +385,10 @@ describe('PolicyEvaluationEngineService', () => {
           priority: 1,
           effect: PolicyEffect.BLOCK,
         });
-        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([highPriorityGlobal, lowPriorityBusiness]);
+        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([
+          highPriorityGlobal,
+          lowPriorityBusiness,
+        ]);
 
         const result = await service.evaluate(createContext());
 
@@ -387,7 +434,10 @@ describe('PolicyEvaluationEngineService', () => {
           priority: 100,
           effect: PolicyEffect.ALLOW,
         });
-        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([lowPriorityBlock, highPriorityAllow]);
+        policyRepository.findActivePoliciesForTrigger.mockResolvedValue([
+          lowPriorityBlock,
+          highPriorityAllow,
+        ]);
 
         const result = await service.evaluate(createContext());
 
@@ -455,7 +505,9 @@ describe('PolicyEvaluationEngineService', () => {
 
   describe('fail-open behavior', () => {
     it('should return ALLOW with failedOpen=true when repository throws and failOpen=true', async () => {
-      policyRepository.findActivePoliciesForTrigger.mockRejectedValue(new Error('Database connection failed'));
+      policyRepository.findActivePoliciesForTrigger.mockRejectedValue(
+        new Error('Database connection failed')
+      );
 
       const result = await service.evaluate(createContext(), { failOpen: true });
 
@@ -468,7 +520,9 @@ describe('PolicyEvaluationEngineService', () => {
     });
 
     it('should default to failOpen=true when not specified', async () => {
-      policyRepository.findActivePoliciesForTrigger.mockRejectedValue(new Error('Unexpected error'));
+      policyRepository.findActivePoliciesForTrigger.mockRejectedValue(
+        new Error('Unexpected error')
+      );
 
       const result = await service.evaluate(createContext());
 
@@ -481,7 +535,7 @@ describe('PolicyEvaluationEngineService', () => {
       policyRepository.findActivePoliciesForTrigger.mockRejectedValue(new Error('DB error'));
 
       await service.evaluate(createContext(), { failOpen: true, correlationId: 'fail-open-corr' });
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(decisionLogRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -497,7 +551,7 @@ describe('PolicyEvaluationEngineService', () => {
       policyRepository.findActivePoliciesForTrigger.mockRejectedValue(new Error('DB error'));
 
       await service.evaluate(createContext(), { failOpen: true });
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(eventBus.publishEvent).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -511,7 +565,9 @@ describe('PolicyEvaluationEngineService', () => {
 
   describe('fail-closed behavior', () => {
     it('should return BLOCK with failedOpen=true when repository throws and failOpen=false', async () => {
-      policyRepository.findActivePoliciesForTrigger.mockRejectedValue(new Error('Database connection failed'));
+      policyRepository.findActivePoliciesForTrigger.mockRejectedValue(
+        new Error('Database connection failed')
+      );
 
       const result = await service.evaluate(createContext(), { failOpen: false });
 
@@ -526,8 +582,11 @@ describe('PolicyEvaluationEngineService', () => {
     it('should still log decision on fail-closed', async () => {
       policyRepository.findActivePoliciesForTrigger.mockRejectedValue(new Error('DB error'));
 
-      await service.evaluate(createContext(), { failOpen: false, correlationId: 'fail-closed-corr' });
-      await new Promise(resolve => setImmediate(resolve));
+      await service.evaluate(createContext(), {
+        failOpen: false,
+        correlationId: 'fail-closed-corr',
+      });
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(decisionLogRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -543,7 +602,7 @@ describe('PolicyEvaluationEngineService', () => {
       policyRepository.findActivePoliciesForTrigger.mockRejectedValue(new Error('DB error'));
 
       await service.evaluate(createContext(), { failOpen: false });
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(eventBus.publishEvent).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -594,7 +653,7 @@ describe('PolicyEvaluationEngineService', () => {
       const context = createContext({ deliveryId: 'delivery-123', riderId: 'rider-456' });
 
       await service.evaluate(context);
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(decisionLogRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -609,7 +668,7 @@ describe('PolicyEvaluationEngineService', () => {
       const context = createContext({ riderId: 'rider-456', businessId: 'business-789' });
 
       await service.evaluate(context);
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(decisionLogRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -624,7 +683,7 @@ describe('PolicyEvaluationEngineService', () => {
       const context = createContext({ businessId: 'business-789' });
 
       await service.evaluate(context);
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(decisionLogRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -639,7 +698,7 @@ describe('PolicyEvaluationEngineService', () => {
       const context = createContext();
 
       await service.evaluate(context);
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(decisionLogRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -661,7 +720,7 @@ describe('PolicyEvaluationEngineService', () => {
 
       const context = createContext({ deliveryId: 'delivery-violation-test' });
       await service.evaluate(context);
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(eventBus.publishEvent).toHaveBeenCalledTimes(2);
       expect(eventBus.publishEvent).toHaveBeenCalledWith(
@@ -686,7 +745,7 @@ describe('PolicyEvaluationEngineService', () => {
 
       const context = createContext({ deliveryId: 'delivery-approval-test' });
       await service.evaluate(context);
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(eventBus.publishEvent).toHaveBeenCalledTimes(2);
       expect(eventBus.publishEvent).toHaveBeenCalledWith(
@@ -709,7 +768,7 @@ describe('PolicyEvaluationEngineService', () => {
       policyRepository.findActivePoliciesForTrigger.mockResolvedValue([allowPolicy]);
 
       await service.evaluate(createContext());
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(eventBus.publishEvent).toHaveBeenCalledTimes(1);
       expect(eventBus.publishEvent).toHaveBeenCalledWith(
@@ -734,7 +793,7 @@ describe('PolicyEvaluationEngineService', () => {
       policyRepository.findActivePoliciesForTrigger.mockResolvedValue([modifyPolicy]);
 
       await service.evaluate(createContext());
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(eventBus.publishEvent).toHaveBeenCalledTimes(1);
       expect(eventBus.publishEvent).not.toHaveBeenCalledWith(
@@ -748,7 +807,7 @@ describe('PolicyEvaluationEngineService', () => {
       policyRepository.findActivePoliciesForTrigger.mockResolvedValue([]);
 
       await service.evaluate(createContext());
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(eventBus.publishEvent).toHaveBeenCalledTimes(1);
       expect(eventBus.publishEvent).not.toHaveBeenCalledWith(
@@ -771,7 +830,7 @@ describe('PolicyEvaluationEngineService', () => {
         riderId: 'rider-456',
       });
       await service.evaluate(context);
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(eventBus.publishEvent).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -792,7 +851,7 @@ describe('PolicyEvaluationEngineService', () => {
       policyRepository.findActivePoliciesForTrigger.mockResolvedValue([blockPolicy]);
 
       await service.evaluate(createContext(), { correlationId: 'corr-violation-123' });
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(eventBus.publishEvent).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -811,7 +870,7 @@ describe('PolicyEvaluationEngineService', () => {
       policyRepository.findActivePoliciesForTrigger.mockResolvedValue([blockPolicy]);
 
       await service.evaluate(createContext());
-      await new Promise(resolve => setImmediate(resolve));
+      await new Promise((resolve) => setImmediate(resolve));
 
       expect(eventBus.publishEvent).toHaveBeenCalledWith(
         expect.objectContaining({

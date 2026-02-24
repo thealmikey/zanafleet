@@ -122,13 +122,9 @@ export class OpenAIVisionProvider implements IVisionProvider {
     this._isAvailable = !!(config.apiKey && config.endpoint);
 
     if (this._isAvailable) {
-      this.logger.log(
-        `OpenAI Vision provider initialized with model: ${this.config.model}`
-      );
+      this.logger.log(`OpenAI Vision provider initialized with model: ${this.config.model}`);
     } else {
-      this.logger.warn(
-        'OpenAI Vision provider not initialized - missing apiKey or endpoint'
-      );
+      this.logger.warn('OpenAI Vision provider not initialized - missing apiKey or endpoint');
     }
   }
 
@@ -278,9 +274,7 @@ export class OpenAIVisionProvider implements IVisionProvider {
       const validation = validateMediaInsight(parsed);
 
       if (!validation.valid) {
-        this.logger.warn(
-          `Invalid MediaInsight response: ${validation.errors.join(', ')}`
-        );
+        this.logger.warn(`Invalid MediaInsight response: ${validation.errors.join(', ')}`);
         return null;
       }
 

@@ -75,7 +75,7 @@ describe('NoOpGeoProvider', () => {
       const reverseResult = provider.reverseGeocode({ latitude: 0, longitude: 0 });
       const distanceResult = provider.calculateDistance(
         { latitude: 0, longitude: 0 },
-        { latitude: 1, longitude: 1 },
+        { latitude: 1, longitude: 1 }
       );
 
       expect(geocodeResult).toBeInstanceOf(Promise);

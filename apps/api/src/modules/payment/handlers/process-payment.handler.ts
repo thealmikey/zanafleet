@@ -1,5 +1,10 @@
 import { EventBusService, NatsSubjects } from '@api/core/event-bus';
-import { LedgerEntryType, LedgerCategory, LedgerReferenceType , RecordLedgerEntryCommand } from '@api/modules/ledger';
+import {
+  LedgerEntryType,
+  LedgerCategory,
+  LedgerReferenceType,
+  RecordLedgerEntryCommand,
+} from '@api/modules/ledger';
 import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus, CommandBus } from '@nestjs/cqrs';
 import { DataSource } from 'typeorm';
@@ -30,7 +35,7 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
     private readonly eventBus: EventBus,
     private readonly commandBus: CommandBus,
     @Optional() private readonly eventBusService?: EventBusService,
-    @Optional() private readonly fraudCheckService?: FraudCheckService,
+    @Optional() private readonly fraudCheckService?: FraudCheckService
   ) {}
 
   async execute(command: ProcessPaymentCommand): Promise<string> {
@@ -42,14 +47,12 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
     });
 
     if (!intent) {
-      throw new NotFoundException(
-        `Payment intent not found: ${command.paymentIntentId}`,
-      );
+      throw new NotFoundException(`Payment intent not found: ${command.paymentIntentId}`);
     }
 
     if (intent.status !== PaymentIntentStatus.CREATED) {
       this.logger.warn(
-        `Payment intent ${intent.id} is not in CREATED status (current: ${intent.status})`,
+        `Payment intent ${intent.id} is not in CREATED status (current: ${intent.status})`
       );
       throw new Error(`Payment intent is not in CREATED status: ${intent.status}`);
     }
@@ -59,7 +62,7 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
 
       if (fraudResult.decision === FraudDecision.BLOCK) {
         this.logger.warn(
-          `Payment intent ${intent.id} blocked by fraud check: ${fraudResult.blockReason}`,
+          `Payment intent ${intent.id} blocked by fraud check: ${fraudResult.blockReason}`
         );
 
         await intentRepo.update(intent.id, { status: PaymentIntentStatus.FAILED });
@@ -88,9 +91,7 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
           this.eventBusService
             .publish(NatsSubjects.Payment.FAILED_V1, failedEvent)
             .catch((error) => {
-              this.logger.error(
-                `Failed to publish PaymentFailedEvent to NATS: ${error.message}`,
-              );
+              this.logger.error(`Failed to publish PaymentFailedEvent to NATS: ${error.message}`);
             });
         }
 
@@ -98,7 +99,7 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
       }
 
       this.logger.debug(
-        `Fraud check passed for payment ${intent.id}: decision=${fraudResult.decision}, risk=${fraudResult.riskLevel}`,
+        `Fraud check passed for payment ${intent.id}: decision=${fraudResult.decision}, risk=${fraudResult.riskLevel}`
       );
     }
 
@@ -130,7 +131,7 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
       amount: intentDomain.amount,
       errorCode: providerResult.errorCode,
       errorMessage: providerResult.errorMessage,
-      rawResponse: providerResult.metadata ,
+      rawResponse: providerResult.metadata,
       createdAt: now,
     });
 
@@ -162,7 +163,7 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
             },
           ],
           correlationId: command.correlationId,
-        }),
+        })
       );
 
       const completedEvent = new PaymentCompletedEventV1({
@@ -186,15 +187,11 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
         this.eventBusService
           .publish(NatsSubjects.Payment.COMPLETED_V1, completedEvent)
           .catch((error) => {
-            this.logger.error(
-              `Failed to publish PaymentCompletedEvent to NATS: ${error.message}`,
-            );
+            this.logger.error(`Failed to publish PaymentCompletedEvent to NATS: ${error.message}`);
           });
       }
 
-      this.logger.log(
-        `Payment completed: ${intent.id}, transaction: ${transactionId}`,
-      );
+      this.logger.log(`Payment completed: ${intent.id}, transaction: ${transactionId}`);
     } else {
       await intentRepo.update(intent.id, { status: PaymentIntentStatus.FAILED });
 
@@ -216,17 +213,13 @@ export class ProcessPaymentCommandHandler implements ICommandHandler<ProcessPaym
       this.eventBus.publish(failedEvent);
 
       if (this.eventBusService) {
-        this.eventBusService
-          .publish(NatsSubjects.Payment.FAILED_V1, failedEvent)
-          .catch((error) => {
-            this.logger.error(
-              `Failed to publish PaymentFailedEvent to NATS: ${error.message}`,
-            );
-          });
+        this.eventBusService.publish(NatsSubjects.Payment.FAILED_V1, failedEvent).catch((error) => {
+          this.logger.error(`Failed to publish PaymentFailedEvent to NATS: ${error.message}`);
+        });
       }
 
       this.logger.warn(
-        `Payment failed: ${intent.id}, error: ${providerResult.errorCode} - ${providerResult.errorMessage}`,
+        `Payment failed: ${intent.id}, error: ${providerResult.errorCode} - ${providerResult.errorMessage}`
       );
     }
 

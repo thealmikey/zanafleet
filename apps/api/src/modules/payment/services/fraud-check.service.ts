@@ -6,7 +6,6 @@ import { Repository, MoreThan } from 'typeorm';
 
 import { PaymentIntentEntity } from '../entities/payment-intent.entity';
 
-
 /**
  * Fraud check decision
  */
@@ -81,10 +80,12 @@ export class FraudCheckService {
     @Optional()
     @InjectRepository(AccountEntity)
     private readonly accountRepository?: Repository<AccountEntity>,
-    @Optional() private readonly policyEngine?: PolicyEvaluationEngineService,
+    @Optional() private readonly policyEngine?: PolicyEvaluationEngineService
   ) {
     if (!this.policyEngine) {
-      this.logger.warn('PolicyEvaluationEngineService not available - policy-based fraud checks disabled');
+      this.logger.warn(
+        'PolicyEvaluationEngineService not available - policy-based fraud checks disabled'
+      );
     }
   }
 
@@ -113,7 +114,7 @@ export class FraudCheckService {
     const { decision, riskLevel, blockReason } = this.aggregateResults(checks);
 
     this.logger.debug(
-      `Fraud check for payment intent ${intent.id}: decision=${decision}, risk=${riskLevel}`,
+      `Fraud check for payment intent ${intent.id}: decision=${decision}, risk=${riskLevel}`
     );
 
     return {
@@ -166,7 +167,7 @@ export class FraudCheckService {
       };
     } catch (error) {
       this.logger.error(
-        `Velocity check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Velocity check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
       return {
         checkName: 'velocity',
@@ -196,9 +197,7 @@ export class FraudCheckService {
       checkName: 'amount_threshold',
       passed,
       riskLevel,
-      reason: passed
-        ? undefined
-        : `Amount ${amount} ${currency} exceeds critical threshold`,
+      reason: passed ? undefined : `Amount ${amount} ${currency} exceeds critical threshold`,
       metadata: {
         amount,
         currency,
@@ -246,7 +245,7 @@ export class FraudCheckService {
       };
     } catch (error) {
       this.logger.error(
-        `Account status check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Account status check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
       return {
         checkName: 'account_status',
@@ -289,9 +288,8 @@ export class FraudCheckService {
         outputs?: Record<string, unknown>;
       };
 
-      const decision = (typeof evalResult.decision === 'string'
-        ? evalResult.decision
-        : evalResult.decision?.effect
+      const decision = (
+        typeof evalResult.decision === 'string' ? evalResult.decision : evalResult.decision?.effect
       )?.toUpperCase();
       const blocked = decision === 'DENY' || decision === 'BLOCK';
 
@@ -316,7 +314,7 @@ export class FraudCheckService {
       };
     } catch (error) {
       this.logger.error(
-        `Policy fraud check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Policy fraud check failed: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
       return {
         checkName: 'policy_evaluation',

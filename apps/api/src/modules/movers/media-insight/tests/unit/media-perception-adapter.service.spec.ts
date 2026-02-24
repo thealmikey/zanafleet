@@ -2,7 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { MediaInsight } from '../../interfaces';
 import { NoopVisionProvider } from '../../providers/noop-vision.provider';
-import { MediaPerceptionAdapter, MediaReference } from '../../services/media-perception-adapter.service';
+import {
+  MediaPerceptionAdapter,
+  MediaReference,
+} from '../../services/media-perception-adapter.service';
 import { MediaPerceptionFeatureService } from '../../services/media-perception-feature.service';
 
 describe('MediaPerceptionAdapter', () => {
@@ -12,7 +15,9 @@ describe('MediaPerceptionAdapter', () => {
 
   const mockMediaInsight: MediaInsight = {
     schemaVersion: '1.0.0',
-    detectedItems: [{ label: 'sofa', category: 'furniture', sizeClass: 'large', quantity: 1, confidence: 0.9 }],
+    detectedItems: [
+      { label: 'sofa', category: 'furniture', sizeClass: 'large', quantity: 1, confidence: 0.9 },
+    ],
     estimatedTotalVolumeM3: 5.5,
     estimatedLaborIntensity: 3,
     fragilityScore: 0.3,
@@ -90,11 +95,13 @@ describe('MediaPerceptionAdapter', () => {
       const result = await adapter.analyzeMedia(mediaRefs);
 
       expect(result.status).toBe('success');
-      expect(result.insight).toEqual(expect.objectContaining({
-        schemaVersion: '1.0.0',
-        detectedItems: expect.any(Array),
-        estimatedTotalVolumeM3: 5.5,
-      }));
+      expect(result.insight).toEqual(
+        expect.objectContaining({
+          schemaVersion: '1.0.0',
+          detectedItems: expect.any(Array),
+          estimatedTotalVolumeM3: 5.5,
+        })
+      );
       expect(result.processingTimeMs).toBeGreaterThanOrEqual(0);
     });
 
@@ -140,7 +147,7 @@ describe('MediaPerceptionAdapter', () => {
       mockNoopProvider.analyze.mockRejectedValue(new Error('Critical failure'));
 
       const mediaRefs: MediaReference[] = [{ url: 'https://example.com/image.jpg', type: 'image' }];
-      
+
       // Should not throw
       await expect(adapter.analyzeMedia(mediaRefs)).resolves.toBeDefined();
     });
@@ -167,8 +174,9 @@ describe('MediaPerceptionAdapter', () => {
         ],
       }).compile();
 
-      const adapterWithUnavailableProvider = module.get<MediaPerceptionAdapter>(MediaPerceptionAdapter);
-      
+      const adapterWithUnavailableProvider =
+        module.get<MediaPerceptionAdapter>(MediaPerceptionAdapter);
+
       const mediaRefs: MediaReference[] = [{ url: 'https://example.com/image.jpg', type: 'image' }];
       const result = await adapterWithUnavailableProvider.analyzeMedia(mediaRefs);
 
@@ -217,7 +225,7 @@ describe('MediaPerceptionAdapter', () => {
         { url: 'https://example.com/video.mp4', type: 'video' },
         { url: 'https://example.com/image2.jpg', type: 'image' },
       ];
-      
+
       await adapter.analyzeMedia(mediaRefs);
 
       // Verify analyze was called with only image URLs
@@ -235,7 +243,7 @@ describe('MediaPerceptionAdapter', () => {
   describe('isEnabled', () => {
     it('should return false when config is disabled', () => {
       mockFeatureService.isEnabled.mockReturnValue(false);
-      
+
       expect(adapter.isEnabled()).toBe(false);
     });
 
@@ -261,8 +269,9 @@ describe('MediaPerceptionAdapter', () => {
         ],
       }).compile();
 
-      const adapterWithUnavailableProvider = module.get<MediaPerceptionAdapter>(MediaPerceptionAdapter);
-      
+      const adapterWithUnavailableProvider =
+        module.get<MediaPerceptionAdapter>(MediaPerceptionAdapter);
+
       expect(adapterWithUnavailableProvider.isEnabled()).toBe(false);
     });
   });
@@ -276,7 +285,7 @@ describe('MediaPerceptionAdapter', () => {
   describe('healthCheck', () => {
     it('should return true when disabled (considered healthy)', async () => {
       mockFeatureService.isEnabled.mockReturnValue(false);
-      
+
       const result = await adapter.healthCheck();
       expect(result).toBe(true);
     });
@@ -284,7 +293,7 @@ describe('MediaPerceptionAdapter', () => {
     it('should delegate to provider healthCheck when enabled', async () => {
       mockFeatureService.isEnabled.mockReturnValue(true);
       mockNoopProvider.healthCheck.mockResolvedValue(true);
-      
+
       // Initialize with enabled config
       await adapter.initialize({
         enabled: true,
@@ -293,7 +302,7 @@ describe('MediaPerceptionAdapter', () => {
           type: 'noop',
         },
       });
-      
+
       const result = await adapter.healthCheck();
       expect(mockNoopProvider.healthCheck).toHaveBeenCalled();
       expect(result).toBe(true);

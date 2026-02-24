@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  UpdateDateColumn,
-  Index,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, UpdateDateColumn, Index } from 'typeorm';
 
 import { GeoJsonPoint } from '../../../core/utils/geo.utils';
 

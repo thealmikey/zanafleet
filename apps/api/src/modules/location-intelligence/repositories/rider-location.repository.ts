@@ -25,10 +25,7 @@ export class RiderLocationRepository {
   /** H3 resolution 9 hexagon approximate width in meters */
   private static readonly H3_RES9_WIDTH_METERS = 300;
 
-  constructor(
-    private readonly dataSource: DataSource,
-    private readonly h3Service: H3Service,
-  ) {}
+  constructor(private readonly dataSource: DataSource, private readonly h3Service: H3Service) {}
 
   /**
    * Insert or update the current location snapshot for a rider.
@@ -78,7 +75,7 @@ export class RiderLocationRepository {
         data.heading ?? null,
         data.speed ?? null,
         data.accuracy ?? null,
-      ],
+      ]
     );
   }
 
@@ -119,7 +116,7 @@ export class RiderLocationRepository {
         data.speed ?? null,
         data.accuracy ?? null,
         data.recordedAt ?? new Date(),
-      ],
+      ]
     );
   }
 
@@ -127,21 +124,19 @@ export class RiderLocationRepository {
    * Find riders near a geographic point using H3 k-ring filtering + haversine refinement.
    * Strategy: First filter by H3 cells (fast index scan), then refine with actual distance.
    */
-  async findNearbyRiders(
-    params: FindNearbyRidersParams,
-  ): Promise<RiderLocationSnapshot[]> {
+  async findNearbyRiders(params: FindNearbyRidersParams): Promise<RiderLocationSnapshot[]> {
     const { point, radiusMeters, limit } = params;
 
     // Calculate H3 k-ring size to cover the search radius
     const kRingSize = Math.max(
       1,
-      Math.ceil(radiusMeters / RiderLocationRepository.H3_RES9_WIDTH_METERS),
+      Math.ceil(radiusMeters / RiderLocationRepository.H3_RES9_WIDTH_METERS)
     );
     const centerH3 = this.h3Service.pointToH3(point, 9);
     const h3Cells = this.h3Service.getNeighbors(centerH3, kRingSize);
 
     this.logger.debug(
-      `Finding nearby riders: radius=${radiusMeters}m, k=${kRingSize}, cells=${h3Cells.length}`,
+      `Finding nearby riders: radius=${radiusMeters}m, k=${kRingSize}, cells=${h3Cells.length}`
     );
 
     // First filter by H3 cells (fast index scan)
@@ -187,7 +182,7 @@ export class RiderLocationRepository {
       FROM rider_location_snapshots
       WHERE h3_index_fine = ANY($1)
       `,
-      [h3Indexes],
+      [h3Indexes]
     );
 
     return rows.map((row) => this.mapRowToSnapshot(row));
@@ -204,9 +199,7 @@ export class RiderLocationRepository {
 
     // Build WKT polygon string (close the ring by repeating the first point)
     const closedPolygon = [...polygon, polygon[0]];
-    const wktPoints = closedPolygon
-      .map((p) => `${p.longitude} ${p.latitude}`)
-      .join(', ');
+    const wktPoints = closedPolygon.map((p) => `${p.longitude} ${p.latitude}`).join(', ');
     const wktPolygon = `POLYGON((${wktPoints}))`;
 
     const rows = await this.dataSource.query<RiderLocationSnapshotRow[]>(
@@ -228,7 +221,7 @@ export class RiderLocationRepository {
         point
       )
       `,
-      [wktPolygon],
+      [wktPolygon]
     );
 
     return rows.map((row) => this.mapRowToSnapshot(row));
@@ -241,7 +234,7 @@ export class RiderLocationRepository {
   async getRiderPath(
     riderId: string,
     startTime: Date,
-    endTime: Date,
+    endTime: Date
   ): Promise<RiderLocationHistory[]> {
     const rows = await this.dataSource.query<RiderLocationHistoryRow[]>(
       `
@@ -263,7 +256,7 @@ export class RiderLocationRepository {
         AND recorded_at <= $3
       ORDER BY recorded_at ASC
       `,
-      [riderId, startTime, endTime],
+      [riderId, startTime, endTime]
     );
 
     return rows.map((row) => this.mapRowToHistory(row));

@@ -9,7 +9,12 @@
 
 import { Injectable, Logger, Optional } from '@nestjs/common';
 
-import type { MediaInsight, MediaInsightErrorCode, MediaInsightStatus , MediaInsightResult } from '../interfaces';
+import type {
+  MediaInsight,
+  MediaInsightErrorCode,
+  MediaInsightStatus,
+  MediaInsightResult,
+} from '../interfaces';
 import { NoopVisionProvider } from '../providers/noop-vision.provider';
 import type { IVisionProvider, VisionProviderConfig } from '../providers/vision-provider.interface';
 
@@ -249,22 +254,14 @@ export class MediaPerceptionAdapter {
         mediaReferences: imageUrls,
       };
 
-      this.logger.log(
-        `Media analysis completed with confidence ${insight.perceptionConfidence}`
-      );
+      this.logger.log(`Media analysis completed with confidence ${insight.perceptionConfidence}`);
 
       return this.createResult('success', insight, undefined, undefined, startTime);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`Media analysis failed: ${errorMessage}`);
 
-      return this.createResult(
-        'failed',
-        null,
-        'PROVIDER_TIMEOUT',
-        errorMessage,
-        startTime
-      );
+      return this.createResult('failed', null, 'PROVIDER_TIMEOUT', errorMessage, startTime);
     }
   }
 

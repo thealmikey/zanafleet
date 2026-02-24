@@ -182,9 +182,7 @@ describe('CreateRiderCommandHandler', () => {
         email: null,
       });
 
-      riderRepository.findOne
-        .mockResolvedValueOnce(null)
-        .mockResolvedValueOnce(existingRider);
+      riderRepository.findOne.mockResolvedValueOnce(null).mockResolvedValueOnce(existingRider);
 
       await expect(handler.execute(command)).rejects.toThrow(ConflictException);
       expect(riderRepository.save).not.toHaveBeenCalled();

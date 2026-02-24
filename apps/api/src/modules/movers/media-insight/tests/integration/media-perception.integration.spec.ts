@@ -26,30 +26,34 @@ describe('Media Perception Feature - Integration', () => {
         {
           provide: IntelligenceSnapshotService,
           useValue: {
-            createInitialSnapshot: jest.fn().mockImplementation((orderId, recommendation, _version) => 
-              Promise.resolve({
-                id: '123',
-                orderId,
-                confidenceScore: recommendation.confidenceScore,
-                moveRecommendation: recommendation,
-                createdAt: new Date(),
-              })
-            ),
-            updateWithMediaInsight: jest.fn().mockImplementation((orderId, mediaInsight, updatedRecommendation) => 
-              Promise.resolve({
-                id: '123',
-                orderId,
-                confidenceScore: updatedRecommendation.confidenceScore,
-                mediaInsightSummary: {
-                  detectedItemCount: mediaInsight.detectedItems.length,
-                  estimatedVolumeM3: mediaInsight.estimatedTotalVolumeM3,
-                  laborIntensity: mediaInsight.estimatedLaborIntensity,
-                  fragilityScore: mediaInsight.fragilityScore,
-                  confidence: mediaInsight.perceptionConfidence,
-                },
-              })
-            ),
-            getSnapshotForOrder: jest.fn().mockImplementation((orderId) => 
+            createInitialSnapshot: jest
+              .fn()
+              .mockImplementation((orderId, recommendation, _version) =>
+                Promise.resolve({
+                  id: '123',
+                  orderId,
+                  confidenceScore: recommendation.confidenceScore,
+                  moveRecommendation: recommendation,
+                  createdAt: new Date(),
+                })
+              ),
+            updateWithMediaInsight: jest
+              .fn()
+              .mockImplementation((orderId, mediaInsight, updatedRecommendation) =>
+                Promise.resolve({
+                  id: '123',
+                  orderId,
+                  confidenceScore: updatedRecommendation.confidenceScore,
+                  mediaInsightSummary: {
+                    detectedItemCount: mediaInsight.detectedItems.length,
+                    estimatedVolumeM3: mediaInsight.estimatedTotalVolumeM3,
+                    laborIntensity: mediaInsight.estimatedLaborIntensity,
+                    fragilityScore: mediaInsight.fragilityScore,
+                    confidence: mediaInsight.perceptionConfidence,
+                  },
+                })
+              ),
+            getSnapshotForOrder: jest.fn().mockImplementation((orderId) =>
               Promise.resolve({
                 id: '123',
                 orderId,
@@ -115,7 +119,7 @@ describe('Media Perception Feature - Integration', () => {
   describe('Snapshot Storage', () => {
     it('should create and retrieve intelligence snapshots', async () => {
       const orderId = 'order-test-123';
-      
+
       // Create snapshot
       const snapshot = await snapshotService.createInitialSnapshot(
         orderId,
@@ -158,7 +162,7 @@ describe('Media Perception Feature - Integration', () => {
 
     it('should update existing snapshots with media insight', async () => {
       const orderId = 'order-test-456';
-      
+
       await snapshotService.createInitialSnapshot(
         orderId,
         {
@@ -193,7 +197,13 @@ describe('Media Perception Feature - Integration', () => {
         {
           schemaVersion: '1.0.0',
           detectedItems: [
-            { label: 'sofa', category: 'furniture', sizeClass: 'large', quantity: 1, confidence: 0.9 },
+            {
+              label: 'sofa',
+              category: 'furniture',
+              sizeClass: 'large',
+              quantity: 1,
+              confidence: 0.9,
+            },
           ],
           estimatedTotalVolumeM3: 15.5,
           estimatedLaborIntensity: 4,
@@ -250,7 +260,7 @@ describe('Media Perception Feature - Integration', () => {
       ];
 
       const result = await adapter.analyzeMedia(mediaRefs);
-      
+
       // Feature should be disabled by default
       expect(result.status).toEqual('skipped');
       expect(result.errorCode).toEqual('FEATURE_DISABLED');

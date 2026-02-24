@@ -62,10 +62,20 @@ export class OrganizationController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new organization', description: 'Create a new organization in the system' })
-  @ApiResponse({ status: 201, description: 'Organization created successfully', schema: { example: { organizationId: 'uuid' } } })
+  @ApiOperation({
+    summary: 'Create a new organization',
+    description: 'Create a new organization in the system',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Organization created successfully',
+    schema: { example: { organizationId: 'uuid' } },
+  })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   async create(@Body() body: CreateOrganizationDto): Promise<{ organizationId: string }> {
     let input: CreateOrganizationCommandInput;
     try {
@@ -86,9 +96,19 @@ export class OrganizationController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get organization by ID', description: 'Retrieve a specific organization by its unique identifier' })
-  @ApiResponse({ status: 200, description: 'Organization retrieved successfully', type: OrganizationDto })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiOperation({
+    summary: 'Get organization by ID',
+    description: 'Retrieve a specific organization by its unique identifier',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Organization retrieved successfully',
+    type: OrganizationDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 404, description: 'Organization not found' })
   @ApiParam({ name: 'id', description: 'Organization unique identifier (UUID)', type: String })
   async findOne(@Param('id', new ParseUUIDPipe()) id: string): Promise<OrganizationDto> {
@@ -104,10 +124,20 @@ export class OrganizationController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update an organization', description: 'Update an existing organization configuration' })
-  @ApiResponse({ status: 200, description: 'Organization updated successfully', type: OrganizationDto })
+  @ApiOperation({
+    summary: 'Update an organization',
+    description: 'Update an existing organization configuration',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Organization updated successfully',
+    type: OrganizationDto,
+  })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 404, description: 'Organization not found' })
   @ApiParam({ name: 'id', description: 'Organization unique identifier (UUID)', type: String })
   async update(
@@ -143,10 +173,16 @@ export class OrganizationController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Delete an organization', description: 'Soft-delete an organization from the system' })
+  @ApiOperation({
+    summary: 'Delete an organization',
+    description: 'Soft-delete an organization from the system',
+  })
   @ApiResponse({ status: 204, description: 'Organization deleted successfully' })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 404, description: 'Organization not found' })
   @ApiParam({ name: 'id', description: 'Organization unique identifier (UUID)', type: String })
   async delete(

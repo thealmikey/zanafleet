@@ -12,10 +12,7 @@ import { PaymentProviderRegistry } from '../providers/payment-provider-registry.
 import { PaymentProvider } from '../providers/payment-provider.interface';
 import { FraudCheckService, FraudDecision, RiskLevel } from '../services/fraud-check.service';
 
-import {
-  PaymentFlowOrchestrator,
-  PaymentInitiationInput,
-} from './payment-flow.orchestrator';
+import { PaymentFlowOrchestrator, PaymentInitiationInput } from './payment-flow.orchestrator';
 
 describe('PaymentFlowOrchestrator', () => {
   let orchestrator: PaymentFlowOrchestrator;
@@ -37,11 +34,13 @@ describe('PaymentFlowOrchestrator', () => {
     handleWebhook: jest.fn(),
   };
 
-  const createMockFraudCheckResult = (overrides: Partial<{
-    decision: FraudDecision;
-    riskLevel: RiskLevel;
-    blockReason?: string;
-  }> = {}) => ({
+  const createMockFraudCheckResult = (
+    overrides: Partial<{
+      decision: FraudDecision;
+      riskLevel: RiskLevel;
+      blockReason?: string;
+    }> = {}
+  ) => ({
     decision: FraudDecision.ALLOW,
     riskLevel: RiskLevel.LOW,
     checks: [],
@@ -50,7 +49,9 @@ describe('PaymentFlowOrchestrator', () => {
     ...overrides,
   });
 
-  const createMockInput = (overrides: Partial<PaymentInitiationInput> = {}): PaymentInitiationInput => ({
+  const createMockInput = (
+    overrides: Partial<PaymentInitiationInput> = {}
+  ): PaymentInitiationInput => ({
     payerAccountId: 'payer-123',
     payeeAccountId: 'payee-456',
     amount: 100,
@@ -206,11 +207,13 @@ describe('PaymentFlowOrchestrator', () => {
 
     it('should block payment when fraud check returns BLOCK decision', async () => {
       providerRegistry.get.mockReturnValue(mockProvider);
-      fraudCheckService.checkPaymentIntent.mockResolvedValue(createMockFraudCheckResult({
-        decision: FraudDecision.BLOCK,
-        riskLevel: RiskLevel.CRITICAL,
-        blockReason: 'Suspicious activity detected',
-      }));
+      fraudCheckService.checkPaymentIntent.mockResolvedValue(
+        createMockFraudCheckResult({
+          decision: FraudDecision.BLOCK,
+          riskLevel: RiskLevel.CRITICAL,
+          blockReason: 'Suspicious activity detected',
+        })
+      );
 
       const input = createMockInput({ preferredProviderId: 'test-provider' });
       const result = await orchestrator.initiatePayment(input);
@@ -223,10 +226,12 @@ describe('PaymentFlowOrchestrator', () => {
 
     it('should proceed with warning when fraud check returns REVIEW decision', async () => {
       providerRegistry.get.mockReturnValue(mockProvider);
-      fraudCheckService.checkPaymentIntent.mockResolvedValue(createMockFraudCheckResult({
-        decision: FraudDecision.REVIEW,
-        riskLevel: RiskLevel.MEDIUM,
-      }));
+      fraudCheckService.checkPaymentIntent.mockResolvedValue(
+        createMockFraudCheckResult({
+          decision: FraudDecision.REVIEW,
+          riskLevel: RiskLevel.MEDIUM,
+        })
+      );
       mockProvider.initiatePayment.mockResolvedValue({
         success: true,
         transactionId: 'txn-review',
@@ -258,7 +263,7 @@ describe('PaymentFlowOrchestrator', () => {
         expect.any(String),
         expect.objectContaining({
           eventType: 'Payment.Intent.CreatedV1',
-        }),
+        })
       );
     });
 
@@ -279,7 +284,7 @@ describe('PaymentFlowOrchestrator', () => {
         expect.any(String),
         expect.objectContaining({
           eventType: 'Payment.Intent.SucceededV1',
-        }),
+        })
       );
     });
 
@@ -299,7 +304,7 @@ describe('PaymentFlowOrchestrator', () => {
         expect.any(String),
         expect.objectContaining({
           eventType: 'Payment.Intent.FailedV1',
-        }),
+        })
       );
     });
   });

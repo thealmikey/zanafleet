@@ -27,4 +27,4 @@ import { ActivitySeederService } from './services/activity-seeder.service';
   providers: [CreateOrderCommandHandler, CustomerOrderOrchestrator, ActivitySeederService],
   exports: [TypeOrmModule, CreateOrderCommandHandler, CustomerOrderOrchestrator],
 })
-export class OrderModule { }
+export class OrderModule {}

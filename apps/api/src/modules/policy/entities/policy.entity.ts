@@ -1,19 +1,6 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Index,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
-import {
-  PolicyScope,
-  PolicyEffect,
-  PolicyStatus,
-  PolicyTrigger,
-  PolicyCondition,
-} from '../dto';
+import { PolicyScope, PolicyEffect, PolicyStatus, PolicyTrigger, PolicyCondition } from '../dto';
 
 /**
  * Policy Entity

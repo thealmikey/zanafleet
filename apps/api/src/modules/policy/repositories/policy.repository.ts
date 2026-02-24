@@ -44,18 +44,14 @@ export class PolicyRepository {
       .andWhere('policy.status = :status', { status: PolicyStatus.ACTIVE })
       .andWhere(
         new Brackets((qb) => {
-          qb.where('policy.effectiveFrom IS NULL').orWhere(
-            'policy.effectiveFrom <= :now',
-            { now }
-          );
+          qb.where('policy.effectiveFrom IS NULL').orWhere('policy.effectiveFrom <= :now', { now });
         })
       )
       .andWhere(
         new Brackets((qb) => {
-          qb.where('policy.effectiveUntil IS NULL').orWhere(
-            'policy.effectiveUntil >= :now',
-            { now }
-          );
+          qb.where('policy.effectiveUntil IS NULL').orWhere('policy.effectiveUntil >= :now', {
+            now,
+          });
         })
       );
 

@@ -128,17 +128,13 @@ describe('PolicyEnforcementAdapter', () => {
       const candidate3 = createMockCandidate('rider-3');
 
       mockEngine.evaluate
-        .mockResolvedValueOnce(
-          createMockEvaluationResult(createMockDecision(PolicyEffect.ALLOW))
-        )
+        .mockResolvedValueOnce(createMockEvaluationResult(createMockDecision(PolicyEffect.ALLOW)))
         .mockResolvedValueOnce(
           createMockEvaluationResult(
             createMockDecision(PolicyEffect.BLOCK, { reason: 'Blocked rider 2' })
           )
         )
-        .mockResolvedValueOnce(
-          createMockEvaluationResult(createMockDecision(PolicyEffect.ALLOW))
-        );
+        .mockResolvedValueOnce(createMockEvaluationResult(createMockDecision(PolicyEffect.ALLOW)));
 
       const result = await adapter.filterCandidatesByPolicy(
         [candidate1, candidate2, candidate3],
@@ -193,7 +189,7 @@ describe('PolicyEnforcementAdapter', () => {
       await adapter.filterCandidatesByPolicy([candidate], baseContext);
 
       const afterCall = new Date();
-      const calledContext = mockEngine.evaluate.mock.calls[0][0] ;
+      const calledContext = mockEngine.evaluate.mock.calls[0][0];
 
       expect(calledContext.timestamp.getTime()).toBeGreaterThanOrEqual(beforeCall.getTime());
       expect(calledContext.timestamp.getTime()).toBeLessThanOrEqual(afterCall.getTime());
@@ -234,9 +230,7 @@ describe('PolicyEnforcementAdapter', () => {
       const candidate3 = createMockCandidate('rider-3');
 
       mockEngine.evaluate
-        .mockResolvedValueOnce(
-          createMockEvaluationResult(createMockDecision(PolicyEffect.ALLOW))
-        )
+        .mockResolvedValueOnce(createMockEvaluationResult(createMockDecision(PolicyEffect.ALLOW)))
         .mockResolvedValueOnce(
           createMockEvaluationResult(
             createMockDecision(PolicyEffect.BLOCK, { reason: 'Blocked rider 2' })
@@ -354,7 +348,7 @@ describe('PolicyEnforcementAdapter', () => {
 
       await adapter.evaluateDeliveryCreation(baseInput);
 
-      const calledContext = mockEngine.evaluate.mock.calls[0][0] ;
+      const calledContext = mockEngine.evaluate.mock.calls[0][0];
       expect(calledContext.location).toBeUndefined();
     });
   });
@@ -455,10 +449,7 @@ describe('PolicyEnforcementAdapter', () => {
         riderId: defaultRiderId,
       };
 
-      const result = await adapter.evaluate(
-        PolicyTrigger.STATUS_TRANSITION,
-        partialContext
-      );
+      const result = await adapter.evaluate(PolicyTrigger.STATUS_TRANSITION, partialContext);
 
       expect(result).toBe(expectedResult);
       expect(mockEngine.evaluate).toHaveBeenCalledWith(
@@ -483,7 +474,7 @@ describe('PolicyEnforcementAdapter', () => {
         timestamp: customTimestamp,
       });
 
-      const calledContext = mockEngine.evaluate.mock.calls[0][0] ;
+      const calledContext = mockEngine.evaluate.mock.calls[0][0];
       expect(calledContext.timestamp).toEqual(customTimestamp);
     });
 
@@ -498,7 +489,7 @@ describe('PolicyEnforcementAdapter', () => {
       });
 
       const afterCall = new Date();
-      const calledContext = mockEngine.evaluate.mock.calls[0][0] ;
+      const calledContext = mockEngine.evaluate.mock.calls[0][0];
 
       expect(calledContext.timestamp.getTime()).toBeGreaterThanOrEqual(beforeCall.getTime());
       expect(calledContext.timestamp.getTime()).toBeLessThanOrEqual(afterCall.getTime());

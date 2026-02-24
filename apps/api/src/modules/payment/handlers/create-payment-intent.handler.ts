@@ -30,7 +30,7 @@ export class CreatePaymentIntentCommandHandler
     @InjectRepository(PaymentIntentEntity)
     private readonly paymentIntentRepository: Repository<PaymentIntentEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: CreatePaymentIntentCommand): Promise<CreatePaymentIntentResult> {
@@ -39,9 +39,7 @@ export class CreatePaymentIntentCommandHandler
     });
 
     if (existingIntent) {
-      this.logger.log(
-        `Idempotent request: returning existing payment intent ${existingIntent.id}`,
-      );
+      this.logger.log(`Idempotent request: returning existing payment intent ${existingIntent.id}`);
       return {
         paymentIntentId: existingIntent.id,
         isNew: false,
@@ -87,17 +85,13 @@ export class CreatePaymentIntentCommandHandler
     this.eventBus.publish(event);
 
     if (this.eventBusService) {
-      this.eventBusService
-        .publish(NatsSubjects.Payment.INTENT_CREATED_V1, event)
-        .catch((error) => {
-          this.logger.error(
-            `Failed to publish PaymentIntentCreatedEvent to NATS: ${error.message}`,
-          );
-        });
+      this.eventBusService.publish(NatsSubjects.Payment.INTENT_CREATED_V1, event).catch((error) => {
+        this.logger.error(`Failed to publish PaymentIntentCreatedEvent to NATS: ${error.message}`);
+      });
     }
 
     this.logger.log(
-      `Payment intent created: ${paymentIntentId} for ${command.amount} ${command.currency}`,
+      `Payment intent created: ${paymentIntentId} for ${command.amount} ${command.currency}`
     );
 
     return {

@@ -7,13 +7,9 @@ import { GeoPoint } from '../providers/geo-provider.interface';
 import { Neo4jRiderCandidateRepository } from '../repositories/neo4j-rider-candidate.repository';
 import { RiderLocationRepository } from '../repositories/rider-location.repository';
 import { HeatmapCell, HeatmapParams } from '../types/heatmap.types';
-import {
-  FindNearbyCandidatesParams,
-  RiderCandidate,
-} from '../types/rider-candidate.types';
+import { FindNearbyCandidatesParams, RiderCandidate } from '../types/rider-candidate.types';
 
 import { HeatmapService } from './heatmap.service';
-
 
 /**
  * Time range for historical queries.
@@ -40,7 +36,7 @@ export class LocationIntelligenceService {
     private readonly commandBus: CommandBus,
     private readonly riderLocationRepository: RiderLocationRepository,
     private readonly heatmapService: HeatmapService,
-    private readonly riderCandidateRepository: Neo4jRiderCandidateRepository,
+    private readonly riderCandidateRepository: Neo4jRiderCandidateRepository
   ) {}
 
   /**
@@ -60,15 +56,13 @@ export class LocationIntelligenceService {
    * @param params - Search parameters including location, radius, and optional filters
    * @returns Array of rider candidates sorted by distance
    */
-  async findNearbyRiders(
-    params: FindNearbyCandidatesParams,
-  ): Promise<RiderCandidate[]> {
+  async findNearbyRiders(params: FindNearbyCandidatesParams): Promise<RiderCandidate[]> {
     return this.riderCandidateRepository.findNearbyRiders(
       params.latitude,
       params.longitude,
       params.radiusMeters,
       params.now,
-      params.limit,
+      params.limit
     );
   }
 
@@ -92,12 +86,10 @@ export class LocationIntelligenceService {
     const history = await this.riderLocationRepository.getRiderPath(
       riderId,
       timeRange.start,
-      timeRange.end,
+      timeRange.end
     );
 
-    this.logger.debug(
-      `Retrieved ${history.length} path points for rider ${riderId}`,
-    );
+    this.logger.debug(`Retrieved ${history.length} path points for rider ${riderId}`);
 
     return history.map((h) => ({
       latitude: h.latitude,

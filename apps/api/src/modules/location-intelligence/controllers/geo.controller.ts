@@ -9,8 +9,14 @@ import {
   BadRequestException,
   Header,
 } from '@nestjs/common';
-import { GeoPoint, GeoBounds, ETAResult, DistanceResult, ZoneCluster, Address } from '@zanafleet/contracts';
-
+import {
+  GeoPoint,
+  GeoBounds,
+  ETAResult,
+  DistanceResult,
+  ZoneCluster,
+  Address,
+} from '@zanafleet/contracts';
 
 import { GeoQueryCoordinator } from '../coordinators/geo-query.coordinator';
 import { HeatmapCell } from '../types/heatmap.types';
@@ -20,7 +26,7 @@ import { RiderCandidate } from '../types/rider-candidate.types';
 @UseGuards(CapabilityGuard)
 @RequireCapability('geo.read')
 export class GeoController {
-  constructor(private readonly geoQueryCoordinator: GeoQueryCoordinator) { }
+  constructor(private readonly geoQueryCoordinator: GeoQueryCoordinator) {}
 
   @Get('nearby-riders')
   @Header('Cache-Control', 'public, max-age=30')
@@ -45,9 +51,7 @@ export class GeoController {
 
   @Get('search')
   @Header('Cache-Control', 'public, max-age=300')
-  async searchAddress(
-    @Query('q') query: string
-  ): Promise<Address[]> {
+  async searchAddress(@Query('q') query: string): Promise<Address[]> {
     if (!query || query.length < 3) {
       return [];
     }

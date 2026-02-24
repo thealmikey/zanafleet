@@ -48,7 +48,7 @@ export class UpdateRiderLocationHandler
     private readonly eventBusService: EventBusService,
     private readonly redisService: RedisService,
     private readonly dataSource: DataSource,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {
     this.rateLimitMs = this.configService.get<number>('RIDER_LOCATION_RATE_LIMIT_MS', 3000);
   }
@@ -105,7 +105,7 @@ export class UpdateRiderLocationHandler
     await this.eventBusService.publishEvent(event);
 
     this.logger.debug(
-      `Updated location for rider ${riderId}: [${latitude}, ${longitude}] -> H3 fine: ${h3Indices.fine}`,
+      `Updated location for rider ${riderId}: [${latitude}, ${longitude}] -> H3 fine: ${h3Indices.fine}`
     );
 
     return {
@@ -120,13 +120,11 @@ export class UpdateRiderLocationHandler
    */
   private validateCoordinates(latitude: number, longitude: number): void {
     if (latitude < -90 || latitude > 90) {
-      throw new BadRequestException(
-        `Invalid latitude: ${latitude}. Must be between -90 and 90.`,
-      );
+      throw new BadRequestException(`Invalid latitude: ${latitude}. Must be between -90 and 90.`);
     }
     if (longitude < -180 || longitude > 180) {
       throw new BadRequestException(
-        `Invalid longitude: ${longitude}. Must be between -180 and 180.`,
+        `Invalid longitude: ${longitude}. Must be between -180 and 180.`
       );
     }
   }

@@ -3,7 +3,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import type { MoveRecommendation } from '../../../../movers/intelligence/intelligence-context';
-import { IntelligenceSnapshotEntity, ProfileSource } from '../../entities/intelligence-snapshot.entity';
+import {
+  IntelligenceSnapshotEntity,
+  ProfileSource,
+} from '../../entities/intelligence-snapshot.entity';
 import { IntelligenceSnapshotService } from '../../services/intelligence-snapshot.service';
 
 describe('IntelligenceSnapshotService', () => {
@@ -37,7 +40,13 @@ describe('IntelligenceSnapshotService', () => {
       confidenceScore: 0.85,
       reasoningChain: [],
     } as unknown as Record<string, unknown>,
-    mediaInsightSummary: { detectedItemCount: 5, estimatedVolumeM3: 10, laborIntensity: 3, fragilityScore: 0.5, confidence: 0.85 },
+    mediaInsightSummary: {
+      detectedItemCount: 5,
+      estimatedVolumeM3: 10,
+      laborIntensity: 3,
+      fragilityScore: 0.5,
+      confidence: 0.85,
+    },
     mediaInsightFull: null,
     confidenceScore: 0.85,
     intelligenceVersion: '1.0.0',
@@ -137,13 +146,15 @@ describe('IntelligenceSnapshotService', () => {
 
       const result = await service.getSnapshotSummary('order-456');
 
-      expect(result).toEqual(expect.objectContaining({
-        snapshotId: 'snapshot-123',
-        orderId: 'order-456',
-        hasMediaInsight: false,
-        confidenceScore: 0.85,
-        profileSource: 'legacy',
-      }));
+      expect(result).toEqual(
+        expect.objectContaining({
+          snapshotId: 'snapshot-123',
+          orderId: 'order-456',
+          hasMediaInsight: false,
+          confidenceScore: 0.85,
+          profileSource: 'legacy',
+        })
+      );
     });
   });
 
@@ -153,7 +164,7 @@ describe('IntelligenceSnapshotService', () => {
 
       expect(mockRepository.update).toHaveBeenCalledWith(
         { orderId: 'order-456' },
-        { isStale: true },
+        { isStale: true }
       );
     });
   });

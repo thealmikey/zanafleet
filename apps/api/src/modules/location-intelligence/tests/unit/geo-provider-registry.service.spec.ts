@@ -101,7 +101,7 @@ describe('GeoProviderRegistry', () => {
   describe('setDefault', () => {
     it('should throw when provider is not registered', () => {
       expect(() => registry.setDefault('nonexistent')).toThrow(
-        "Cannot set default: provider 'nonexistent' is not registered",
+        "Cannot set default: provider 'nonexistent' is not registered"
       );
     });
 

@@ -12,7 +12,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import type { MoveRecommendation } from '../../intelligence/intelligence-context';
-import { IntelligenceSnapshotEntity, ProfileSource } from '../entities/intelligence-snapshot.entity';
+import {
+  IntelligenceSnapshotEntity,
+  ProfileSource,
+} from '../entities/intelligence-snapshot.entity';
 import type { MediaInsight } from '../interfaces';
 
 /**
@@ -53,7 +56,7 @@ export class IntelligenceSnapshotService {
 
   constructor(
     @InjectRepository(IntelligenceSnapshotEntity)
-    private readonly snapshotRepository: Repository<IntelligenceSnapshotEntity>,
+    private readonly snapshotRepository: Repository<IntelligenceSnapshotEntity>
   ) {}
 
   /**
@@ -70,7 +73,7 @@ export class IntelligenceSnapshotService {
   async createInitialSnapshot(
     orderId: string,
     recommendation: MoveRecommendation,
-    version: string,
+    version: string
   ): Promise<IntelligenceSnapshotEntity> {
     this.logger.debug(`Creating initial snapshot for order ${orderId}`);
 
@@ -105,7 +108,7 @@ export class IntelligenceSnapshotService {
   async updateWithMediaInsight(
     orderId: string,
     mediaInsight: MediaInsight,
-    updatedRecommendation?: MoveRecommendation,
+    updatedRecommendation?: MoveRecommendation
   ): Promise<IntelligenceSnapshotEntity | null> {
     this.logger.debug(`Updating snapshot with media insight for order ${orderId}`);
 
@@ -132,8 +135,7 @@ export class IntelligenceSnapshotService {
       snapshot.profileSource = 'media-enhanced';
 
       if (updatedRecommendation) {
-        snapshot.moveRecommendation =
-          updatedRecommendation as unknown as Record<string, unknown>;
+        snapshot.moveRecommendation = updatedRecommendation as unknown as Record<string, unknown>;
         snapshot.confidenceScore = updatedRecommendation.confidenceScore;
       }
 
@@ -144,7 +146,7 @@ export class IntelligenceSnapshotService {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(
-        `Failed to update snapshot with media insight for order ${orderId}: ${errorMessage}`,
+        `Failed to update snapshot with media insight for order ${orderId}: ${errorMessage}`
       );
       return null;
     }
@@ -223,7 +225,7 @@ export class IntelligenceSnapshotService {
   private async createSnapshotWithMedia(
     orderId: string,
     mediaInsight: MediaInsight,
-    recommendation?: MoveRecommendation,
+    recommendation?: MoveRecommendation
   ): Promise<IntelligenceSnapshotEntity> {
     const snapshot = this.snapshotRepository.create({
       orderId,

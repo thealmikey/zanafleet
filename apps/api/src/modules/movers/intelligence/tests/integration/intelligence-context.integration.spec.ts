@@ -36,8 +36,20 @@ describe('Intelligence Context with Media Insight - Integration', () => {
               insight: {
                 schemaVersion: '1.0.0',
                 detectedItems: [
-                  { label: 'sofa', category: 'furniture', sizeClass: 'large', quantity: 1, confidence: 0.9 },
-                  { label: 'fridge', category: 'appliance', sizeClass: 'large', quantity: 1, confidence: 0.85 },
+                  {
+                    label: 'sofa',
+                    category: 'furniture',
+                    sizeClass: 'large',
+                    quantity: 1,
+                    confidence: 0.9,
+                  },
+                  {
+                    label: 'fridge',
+                    category: 'appliance',
+                    sizeClass: 'large',
+                    quantity: 1,
+                    confidence: 0.85,
+                  },
                 ],
                 estimatedTotalVolumeM3: 15.5,
                 estimatedLaborIntensity: 4,
@@ -103,9 +115,7 @@ describe('Intelligence Context with Media Insight - Integration', () => {
           latitude: 0,
           longitude: 0,
         },
-        mediaRefs: [
-          { url: 'https://example.com/image.jpg', type: 'image' as const },
-        ],
+        mediaRefs: [{ url: 'https://example.com/image.jpg', type: 'image' as const }],
       };
 
       const context = await contextBuilder.buildFromEstimateRequest(order);

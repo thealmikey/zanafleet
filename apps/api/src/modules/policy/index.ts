@@ -19,18 +19,11 @@ export type {
   RiderAssignmentInput,
 } from './services/policy-enforcement.adapter';
 
-export {
-  PolicyEvaluationEngineService,
-} from './services/policy-evaluation-engine.service';
+export { PolicyEvaluationEngineService } from './services/policy-evaluation-engine.service';
 export type { EvaluationOptions } from './services/policy-evaluation-engine.service';
 
 // DTOs & Types
-export {
-  PolicyScope,
-  PolicyEffect,
-  PolicyStatus,
-  PolicyTrigger,
-} from './dto/policy.enums';
+export { PolicyScope, PolicyEffect, PolicyStatus, PolicyTrigger } from './dto/policy.enums';
 
 export type {
   PolicyCondition,

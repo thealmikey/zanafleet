@@ -1,10 +1,4 @@
-import {
-  PolicyScope,
-  PolicyEffect,
-  PolicyStatus,
-  PolicyTrigger,
-  PolicyCondition,
-} from '../../dto';
+import { PolicyScope, PolicyEffect, PolicyStatus, PolicyTrigger, PolicyCondition } from '../../dto';
 import { PolicyEntity } from '../../entities/policy.entity';
 
 describe('PolicyEntity', () => {

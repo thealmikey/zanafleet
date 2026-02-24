@@ -2,7 +2,7 @@ import { Injectable, Logger, Optional } from '@nestjs/common';
 
 import { calculateDemandMultiplier, PolicyAdjustment } from '../domain/move-estimate';
 import { MoveProfile } from '../domain/move-profile';
-import { HouseSizeEnum , LocationInput } from '../dto/movers-estimate-request.dto';
+import { HouseSizeEnum, LocationInput } from '../dto/movers-estimate-request.dto';
 import type { MediaInsight } from '../media-insight';
 import {
   MediaPerceptionAdapter,
@@ -25,7 +25,7 @@ import {
 
 /**
  * IntelligenceContextBuilder
- * 
+ *
  * Service responsible for building IntelligenceContext objects by aggregating
  * data from existing services without modifying their behavior or the Order
  * entities they wrap. Follows the composition pattern and dependency inversion
@@ -41,7 +41,10 @@ export class IntelligenceContextBuilder {
     private readonly locationNormalizationService: LocationNormalizationService,
     @Optional() private readonly mediaPerceptionAdapter: MediaPerceptionAdapter,
     @Optional() private readonly featureService: MediaPerceptionFeatureService,
-    @Optional() private readonly config: { confidenceThreshold: number } = { confidenceThreshold: DEFAULT_MEDIA_PERCEPTION_CONFIG.confidenceThreshold }
+    @Optional()
+    private readonly config: { confidenceThreshold: number } = {
+      confidenceThreshold: DEFAULT_MEDIA_PERCEPTION_CONFIG.confidenceThreshold,
+    }
   ) {}
 
   /**
@@ -198,10 +201,14 @@ export class IntelligenceContextBuilder {
   /**
    * Build available vehicles from move profile
    */
-  async buildAvailableVehicles(moveProfile: MoveProfile): Promise<IntelligenceContext['availableVehicles']> {
+  async buildAvailableVehicles(
+    moveProfile: MoveProfile
+  ): Promise<IntelligenceContext['availableVehicles']> {
     this.logger.debug(`Building available vehicles for move profile`);
 
-    const vehicleRecommendations = await this.vehicleMatchingService.findMatchingVehicles(moveProfile);
+    const vehicleRecommendations = await this.vehicleMatchingService.findMatchingVehicles(
+      moveProfile
+    );
 
     return vehicleRecommendations.map((rec) => rec.capacityProfile);
   }
@@ -310,7 +317,9 @@ export class IntelligenceContextBuilder {
         destination: normalizedDestination,
       };
     } catch (error) {
-      this.logger.warn(`Failed to normalize locations: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.warn(
+        `Failed to normalize locations: ${error instanceof Error ? error.message : String(error)}`
+      );
       return undefined;
     }
   }
@@ -359,7 +368,8 @@ export class IntelligenceContextBuilder {
     }
 
     // Get confidence threshold from feature service or fallback to config
-    const confidenceThreshold = this.featureService?.getConfidenceThreshold() ?? this.config.confidenceThreshold;
+    const confidenceThreshold =
+      this.featureService?.getConfidenceThreshold() ?? this.config.confidenceThreshold;
 
     // Only return if confidence meets threshold
     if (result.insight.perceptionConfidence < confidenceThreshold) {
@@ -401,10 +411,7 @@ export class IntelligenceContextBuilder {
     }
 
     // Adjust laborRequirement using estimatedLaborIntensity
-    if (
-      mediaInsight.estimatedLaborIntensity >= 1 &&
-      mediaInsight.estimatedLaborIntensity <= 5
-    ) {
+    if (mediaInsight.estimatedLaborIntensity >= 1 && mediaInsight.estimatedLaborIntensity <= 5) {
       refinedProfile.laborRequirement = mediaInsight.estimatedLaborIntensity;
       mergeDetails.laborAdjusted = true;
     }
@@ -417,16 +424,11 @@ export class IntelligenceContextBuilder {
 
     // Add detectedItems to specialHandling
     const specialItems = mediaInsight.detectedItems
-      .filter(
-        (item) => item.category === 'fragile' || mediaInsight.specialHandlingRequired
-      )
+      .filter((item) => item.category === 'fragile' || mediaInsight.specialHandlingRequired)
       .map((item) => item.label);
 
     if (specialItems.length > 0) {
-      refinedProfile.specialHandling = [
-        ...(baseProfile.specialHandling ?? []),
-        ...specialItems,
-      ];
+      refinedProfile.specialHandling = [...(baseProfile.specialHandling ?? []), ...specialItems];
       mergeDetails.itemsAdded = specialItems.length;
     }
 

@@ -87,8 +87,10 @@ describe('RecordLedgerEntryCommandHandler', () => {
     it('should calculate correct balanceAfter for new accounts', async () => {
       await handler.execute(validCommand);
 
-      const savedEntities = mockRepository.save.mock.calls.map((call) => call[0]) as LedgerEntryEntity[];
-      
+      const savedEntities = mockRepository.save.mock.calls.map(
+        (call) => call[0]
+      ) as LedgerEntryEntity[];
+
       const debitEntry = savedEntities.find((e) => e.entryType === LedgerEntryType.DEBIT);
       const creditEntry = savedEntities.find((e) => e.entryType === LedgerEntryType.CREDIT);
 
@@ -99,19 +101,23 @@ describe('RecordLedgerEntryCommandHandler', () => {
     it('should calculate correct balanceAfter for existing accounts', async () => {
       const existingEntry = new LedgerEntryEntity();
       existingEntry.balanceAfter = '500.00';
-      
+
       const mockQueryBuilderWithExisting = {
         where: jest.fn().mockReturnThis(),
         orderBy: jest.fn().mockReturnThis(),
-        getOne: jest.fn()
-          .mockResolvedValueOnce(existingEntry)
-          .mockResolvedValueOnce(null),
+        getOne: jest.fn().mockResolvedValueOnce(existingEntry).mockResolvedValueOnce(null),
       };
-      mockRepository.createQueryBuilder.mockReturnValue(mockQueryBuilderWithExisting as unknown as ReturnType<Repository<LedgerEntryEntity>['createQueryBuilder']>);
+      mockRepository.createQueryBuilder.mockReturnValue(
+        mockQueryBuilderWithExisting as unknown as ReturnType<
+          Repository<LedgerEntryEntity>['createQueryBuilder']
+        >
+      );
 
       await handler.execute(validCommand);
 
-      const savedEntities = mockRepository.save.mock.calls.map((call) => call[0]) as LedgerEntryEntity[];
+      const savedEntities = mockRepository.save.mock.calls.map(
+        (call) => call[0]
+      ) as LedgerEntryEntity[];
       const debitEntry = savedEntities.find((e) => e.entryType === LedgerEntryType.DEBIT);
 
       expect(debitEntry?.balanceAfter).toBe('400.00');
@@ -135,7 +141,7 @@ describe('RecordLedgerEntryCommandHandler', () => {
       expect(result).toHaveLength(2);
       result.forEach((id) => {
         expect(id).toMatch(
-          /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+          /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
         );
       });
     });
@@ -152,7 +158,7 @@ describe('RecordLedgerEntryCommandHandler', () => {
       handler = new RecordLedgerEntryCommandHandler(
         mockDataSource,
         mockEventBus,
-        mockEventBusService,
+        mockEventBusService
       );
     });
 
@@ -162,7 +168,7 @@ describe('RecordLedgerEntryCommandHandler', () => {
       expect(mockEventBusService.publish).toHaveBeenCalledTimes(1);
       expect(mockEventBusService.publish).toHaveBeenCalledWith(
         'ledger.events.entry-recorded-v1',
-        expect.any(LedgerEntryRecordedEventV1),
+        expect.any(LedgerEntryRecordedEventV1)
       );
     });
 

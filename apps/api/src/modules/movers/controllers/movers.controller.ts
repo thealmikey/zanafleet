@@ -1,8 +1,18 @@
-import { Controller, Get, Post, Body, Query, HttpException, HttpStatus, Logger, Inject } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Query,
+  HttpException,
+  HttpStatus,
+  Logger,
+  Inject,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 
-import { 
-  MovingQuoteRequest, 
+import {
+  MovingQuoteRequest,
   MovingQuote,
   LocationSuggestion,
   QuotePreAuthorizationRequest,
@@ -10,7 +20,11 @@ import {
   MoversEstimateRequestDto,
   validateMoversEstimateRequest,
 } from '../dto';
-import { MoversEstimateResponseDto, createEstimateSuccessResponse, createEstimateErrorResponse } from '../dto/movers-estimate-response.dto';
+import {
+  MoversEstimateResponseDto,
+  createEstimateSuccessResponse,
+  createEstimateErrorResponse,
+} from '../dto/movers-estimate-response.dto';
 import { MoversQuoteOrchestrator } from '../orchestrators/movers-quote.orchestrator';
 import { LOCATION_AUTOCOMPLETE_PROVIDER, LocationAutocompleteProvider } from '../providers';
 import { MoversPricingService } from '../services/movers-pricing.service';
@@ -18,7 +32,7 @@ import { VehicleRecommendationService } from '../services/vehicle-recommendation
 
 /**
  * Movers Controller
- * 
+ *
  * REST API endpoints for the Movers homepage experience.
  */
 @Controller('mover')
@@ -26,10 +40,11 @@ export class MoversController {
   private readonly logger = new Logger(MoversController.name);
 
   constructor(
-    @Inject(LOCATION_AUTOCOMPLETE_PROVIDER) private readonly locationProvider: LocationAutocompleteProvider,
+    @Inject(LOCATION_AUTOCOMPLETE_PROVIDER)
+    private readonly locationProvider: LocationAutocompleteProvider,
     private readonly vehicleRecommendationService: VehicleRecommendationService,
     private readonly pricingService: MoversPricingService,
-    private readonly quoteOrchestrator: MoversQuoteOrchestrator,
+    private readonly quoteOrchestrator: MoversQuoteOrchestrator
   ) {}
 
   /**
@@ -43,10 +58,10 @@ export class MoversController {
     @Query('q') query: string,
     @Query('lat') latitude?: string,
     @Query('lng') longitude?: string,
-    @Query('limit') limit?: string,
+    @Query('limit') limit?: string
   ): Promise<LocationSuggestion[]> {
     this.logger.debug(`Location search: ${query} (lat: ${latitude}, lng: ${longitude})`);
-    
+
     if (!query || query.length < 2) {
       return [];
     }
@@ -60,7 +75,9 @@ export class MoversController {
 
       return suggestions;
     } catch (error) {
-      this.logger.error(`Location search failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Location search failed: ${error instanceof Error ? error.message : String(error)}`
+      );
       return [];
     }
   }
@@ -72,10 +89,10 @@ export class MoversController {
    */
   @Post('quote')
   @Throttle({ public: { limit: 10, ttl: 60000 } })
-  async calculateQuote(
-    @Body() request: MovingQuoteRequest,
-  ): Promise<MovingQuote> {
-    this.logger.log(`Calculating quote for: ${request.movingFrom.formattedAddress} → ${request.movingTo.formattedAddress}`);
+  async calculateQuote(@Body() request: MovingQuoteRequest): Promise<MovingQuote> {
+    this.logger.log(
+      `Calculating quote for: ${request.movingFrom.formattedAddress} → ${request.movingTo.formattedAddress}`
+    );
 
     // Validate required fields
     if (!request.movingFrom || !request.movingTo) {
@@ -99,7 +116,7 @@ export class MoversController {
       const vehicles = await this.vehicleRecommendationService.recommendVehicles(
         request.currentHouseSize,
         request.destinationHouseSize,
-        distanceKm,
+        distanceKm
       );
 
       // Calculate pricing
@@ -111,8 +128,10 @@ export class MoversController {
         vehicles,
       };
     } catch (error) {
-      this.logger.error(`Quote calculation failed: ${error instanceof Error ? error.message : String(error)}`);
-      
+      this.logger.error(
+        `Quote calculation failed: ${error instanceof Error ? error.message : String(error)}`
+      );
+
       throw new HttpException(
         'Failed to calculate quote. Please try again.',
         HttpStatus.INTERNAL_SERVER_ERROR
@@ -129,7 +148,7 @@ export class MoversController {
   @Post('estimate')
   @Throttle({ public: { limit: 5, ttl: 60000 } })
   async createEstimate(
-    @Body() request: MoversEstimateRequestDto,
+    @Body() request: MoversEstimateRequestDto
   ): Promise<MoversEstimateResponseDto> {
     const startTime = Date.now();
     this.logger.log(
@@ -150,7 +169,7 @@ export class MoversController {
 
       this.logger.log(
         `Estimate ${estimate.quoteId} created in ${processingTimeMs}ms. ` +
-        `Total: ${estimate.priceBreakdown.currency} ${estimate.priceBreakdown.total}`
+          `Total: ${estimate.priceBreakdown.currency} ${estimate.priceBreakdown.total}`
       );
 
       return createEstimateSuccessResponse(estimate, processingTimeMs);
@@ -170,7 +189,7 @@ export class MoversController {
   @Post('quote/pre-authorize')
   @Throttle({ public: { limit: 5, ttl: 60000 } })
   async preAuthorizeQuote(
-    @Body() _request: QuotePreAuthorizationRequest,
+    @Body() _request: QuotePreAuthorizationRequest
   ): Promise<QuotePreAuthorizationResponse> {
     this.logger.log(`Pre-authorizing quote`);
 
@@ -185,21 +204,18 @@ export class MoversController {
   /**
    * Haversine formula for calculating distance between two points
    */
-  private haversineDistance(
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ): number {
+  private haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
     const R = 6371; // Earth's radius in kilometers
     const dLat = this.toRad(lat2 - lat1);
     const dLon = this.toRad(lon2 - lon1);
-    
-    const a = 
+
+    const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(this.toRad(lat1)) * Math.cos(this.toRad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    
+      Math.cos(this.toRad(lat1)) *
+        Math.cos(this.toRad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   }

@@ -1,15 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import {
-  MoveProfile,
-  houseSizeToMoveProfile,
-  estimateMoveDuration,
-} from '../domain/move-profile';
+import { MoveProfile, houseSizeToMoveProfile, estimateMoveDuration } from '../domain/move-profile';
 import { HouseSizeEnum, mapHouseSizeEnumToHouseSize } from '../dto/movers-estimate-request.dto';
 
 /**
  * AI Move Profile Service
- * 
+ *
  * Service that provides AI-driven interpretation of house sizes
  * and move requirements. This simulates AI behavior with configurable
  * intelligence levels and contextual adjustments.
@@ -20,7 +16,7 @@ export class AIMoveProfileService {
 
   /**
    * Interpret house size to a detailed move profile
-   * 
+   *
    * @param houseSize - The size of the residence
    * @param options - Optional parameters for customization
    * @returns Detailed move profile
@@ -99,15 +95,19 @@ export class AIMoveProfileService {
     // Combine profiles (take the larger values)
     const combinedProfile: MoveProfile = {
       estimatedVolumeM3: Math.max(fromProfile.estimatedVolumeM3, toProfile.estimatedVolumeM3),
-      fragilityFactor: this.getHigherFragility(fromProfile.fragilityFactor, toProfile.fragilityFactor),
+      fragilityFactor: this.getHigherFragility(
+        fromProfile.fragilityFactor,
+        toProfile.fragilityFactor
+      ),
       laborRequirement: Math.max(fromProfile.laborRequirement, toProfile.laborRequirement),
-      specialHandling: this.mergeSpecialHandling(fromProfile.specialHandling, toProfile.specialHandling),
+      specialHandling: this.mergeSpecialHandling(
+        fromProfile.specialHandling,
+        toProfile.specialHandling
+      ),
       floorCount: Math.max(fromProfile.floorCount ?? 1, toProfile.floorCount ?? 1),
       packingService: fromProfile.packingService || toProfile.packingService,
-      estimatedWeightKg: Math.max(
-        fromProfile.estimatedWeightKg ?? 0,
-        toProfile.estimatedWeightKg ?? 0
-      ) || undefined,
+      estimatedWeightKg:
+        Math.max(fromProfile.estimatedWeightKg ?? 0, toProfile.estimatedWeightKg ?? 0) || undefined,
       distanceCategory: fromProfile.distanceCategory,
     };
 
@@ -117,10 +117,7 @@ export class AIMoveProfileService {
   /**
    * Estimate move duration based on profile and distance
    */
-  async estimateDuration(
-    moveProfile: MoveProfile,
-    distanceKm: number
-  ): Promise<number> {
+  async estimateDuration(moveProfile: MoveProfile, distanceKm: number): Promise<number> {
     return estimateMoveDuration(moveProfile, distanceKm);
   }
 
@@ -145,10 +142,7 @@ export class AIMoveProfileService {
     if (options?.floorCount && options.floorCount > 3) {
       // High-rise buildings may need additional labor
       profile.laborRequirement += 1;
-      profile.specialHandling = [
-        ...(profile.specialHandling ?? []),
-        'high-rise-access',
-      ];
+      profile.specialHandling = [...(profile.specialHandling ?? []), 'high-rise-access'];
     }
 
     // Adjust for packing service
@@ -201,10 +195,7 @@ export class AIMoveProfileService {
   /**
    * Merge special handling arrays, removing duplicates
    */
-  private mergeSpecialHandling(
-    a?: string[],
-    b?: string[]
-  ): string[] | undefined {
+  private mergeSpecialHandling(a?: string[], b?: string[]): string[] | undefined {
     const combined = new Set([...(a ?? []), ...(b ?? [])]);
     return combined.size > 0 ? Array.from(combined) : undefined;
   }

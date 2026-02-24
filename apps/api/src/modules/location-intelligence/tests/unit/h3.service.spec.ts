@@ -8,7 +8,6 @@ import {
   H3_RESOLUTION_COARSE,
 } from '../../types/h3.types';
 
-
 describe('H3Service', () => {
   let service: H3Service;
 

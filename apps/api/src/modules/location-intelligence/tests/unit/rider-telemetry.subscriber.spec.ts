@@ -38,28 +38,28 @@ describe('RiderTelemetrySubscriber', () => {
       it('should reject missing riderId', () => {
         const payload = { ...validPayload, riderId: undefined };
         expect(() => subscriber.validateAndTransform(payload as Record<string, unknown>)).toThrow(
-          'Missing or invalid riderId',
+          'Missing or invalid riderId'
         );
       });
 
       it('should reject empty riderId', () => {
         const payload = { ...validPayload, riderId: '' };
         expect(() => subscriber.validateAndTransform(payload)).toThrow(
-          'Missing or invalid riderId',
+          'Missing or invalid riderId'
         );
       });
 
       it('should reject whitespace-only riderId', () => {
         const payload = { ...validPayload, riderId: '   ' };
         expect(() => subscriber.validateAndTransform(payload)).toThrow(
-          'Missing or invalid riderId',
+          'Missing or invalid riderId'
         );
       });
 
       it('should reject non-string riderId', () => {
         const payload = { ...validPayload, riderId: 123 };
         expect(() => subscriber.validateAndTransform(payload as Record<string, unknown>)).toThrow(
-          'Missing or invalid riderId',
+          'Missing or invalid riderId'
         );
       });
 
@@ -74,28 +74,28 @@ describe('RiderTelemetrySubscriber', () => {
       it('should reject missing latitude', () => {
         const payload = { ...validPayload, latitude: undefined };
         expect(() => subscriber.validateAndTransform(payload as Record<string, unknown>)).toThrow(
-          'Missing or invalid latitude',
+          'Missing or invalid latitude'
         );
       });
 
       it('should reject non-number latitude', () => {
         const payload = { ...validPayload, latitude: 'invalid' };
         expect(() => subscriber.validateAndTransform(payload as Record<string, unknown>)).toThrow(
-          'Missing or invalid latitude',
+          'Missing or invalid latitude'
         );
       });
 
       it('should reject NaN latitude', () => {
         const payload = { ...validPayload, latitude: NaN };
         expect(() => subscriber.validateAndTransform(payload)).toThrow(
-          'Missing or invalid latitude',
+          'Missing or invalid latitude'
         );
       });
 
       it('should reject Infinity latitude', () => {
         const payload = { ...validPayload, latitude: Infinity };
         expect(() => subscriber.validateAndTransform(payload)).toThrow(
-          'Missing or invalid latitude',
+          'Missing or invalid latitude'
         );
       });
 
@@ -111,10 +111,10 @@ describe('RiderTelemetrySubscriber', () => {
 
       it('should accept latitude at boundaries', () => {
         expect(() =>
-          subscriber.validateAndTransform({ ...validPayload, latitude: -90 }),
+          subscriber.validateAndTransform({ ...validPayload, latitude: -90 })
         ).not.toThrow();
         expect(() =>
-          subscriber.validateAndTransform({ ...validPayload, latitude: 90 }),
+          subscriber.validateAndTransform({ ...validPayload, latitude: 90 })
         ).not.toThrow();
       });
     });
@@ -123,14 +123,14 @@ describe('RiderTelemetrySubscriber', () => {
       it('should reject missing longitude', () => {
         const payload = { ...validPayload, longitude: undefined };
         expect(() => subscriber.validateAndTransform(payload as Record<string, unknown>)).toThrow(
-          'Missing or invalid longitude',
+          'Missing or invalid longitude'
         );
       });
 
       it('should reject non-number longitude', () => {
         const payload = { ...validPayload, longitude: 'invalid' };
         expect(() => subscriber.validateAndTransform(payload as Record<string, unknown>)).toThrow(
-          'Missing or invalid longitude',
+          'Missing or invalid longitude'
         );
       });
 
@@ -146,10 +146,10 @@ describe('RiderTelemetrySubscriber', () => {
 
       it('should accept longitude at boundaries', () => {
         expect(() =>
-          subscriber.validateAndTransform({ ...validPayload, longitude: -180 }),
+          subscriber.validateAndTransform({ ...validPayload, longitude: -180 })
         ).not.toThrow();
         expect(() =>
-          subscriber.validateAndTransform({ ...validPayload, longitude: 180 }),
+          subscriber.validateAndTransform({ ...validPayload, longitude: 180 })
         ).not.toThrow();
       });
     });
@@ -261,17 +261,14 @@ describe('RiderTelemetrySubscriber', () => {
       const invalidPayload = { riderId: 123 };
 
       await expect(
-        subscriber.handleRiderTelemetry(invalidPayload as Record<string, unknown>, mockContext),
+        subscriber.handleRiderTelemetry(invalidPayload as Record<string, unknown>, mockContext)
       ).resolves.not.toThrow();
     });
 
     it('should not dispatch command on invalid message', async () => {
       const invalidPayload = { riderId: 123 };
 
-      await subscriber.handleRiderTelemetry(
-        invalidPayload as Record<string, unknown>,
-        mockContext,
-      );
+      await subscriber.handleRiderTelemetry(invalidPayload as Record<string, unknown>, mockContext);
 
       expect(mockCommandBus.execute).not.toHaveBeenCalled();
     });
@@ -280,7 +277,7 @@ describe('RiderTelemetrySubscriber', () => {
       mockCommandBus.execute.mockRejectedValue(new Error('Command failed'));
 
       await expect(
-        subscriber.handleRiderTelemetry(validPayload, mockContext),
+        subscriber.handleRiderTelemetry(validPayload, mockContext)
       ).resolves.not.toThrow();
     });
   });
@@ -315,15 +312,15 @@ describe('RiderTelemetrySubscriber', () => {
     it('should flush when batch size reached', async () => {
       await batchSubscriber.handleRiderTelemetry(
         { ...validPayload, riderId: 'rider-1' },
-        mockContext,
+        mockContext
       );
       await batchSubscriber.handleRiderTelemetry(
         { ...validPayload, riderId: 'rider-2' },
-        mockContext,
+        mockContext
       );
       await batchSubscriber.handleRiderTelemetry(
         { ...validPayload, riderId: 'rider-3' },
-        mockContext,
+        mockContext
       );
 
       expect(mockCommandBus.execute).toHaveBeenCalledTimes(3);
@@ -349,15 +346,15 @@ describe('RiderTelemetrySubscriber', () => {
 
       await batchSubscriber.handleRiderTelemetry(
         { ...validPayload, riderId: 'rider-1' },
-        mockContext,
+        mockContext
       );
       await batchSubscriber.handleRiderTelemetry(
         { ...validPayload, riderId: 'rider-2' },
-        mockContext,
+        mockContext
       );
       await batchSubscriber.handleRiderTelemetry(
         { ...validPayload, riderId: 'rider-3' },
-        mockContext,
+        mockContext
       );
 
       expect(mockCommandBus.execute).toHaveBeenCalledTimes(3);

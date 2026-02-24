@@ -5,7 +5,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { VehicleType } from '@zanafleet/contracts';
 import request from 'supertest';
 
-
 import { GeoController } from '../../controllers/geo.controller';
 import { GeoQueryCoordinator } from '../../coordinators/geo-query.coordinator';
 
@@ -34,10 +33,7 @@ describe('GeoController (e2e)', () => {
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [GeoController],
-      providers: [
-        Reflector,
-        { provide: GeoQueryCoordinator, useValue: mockGeoQueryCoordinator },
-      ],
+      providers: [Reflector, { provide: GeoQueryCoordinator, useValue: mockGeoQueryCoordinator }],
     })
       .overrideGuard(CapabilityGuard)
       .useValue({
@@ -116,7 +112,7 @@ describe('GeoController (e2e)', () => {
     it('should return 200 with heatmap cells and Cache-Control header', async () => {
       const mockHeatmap = [
         { h3Index: '8928308280fffff', value: 5, center: { latitude: -1.29, longitude: 36.82 } },
-        { h3Index: '8928308281fffff', value: 3, center: { latitude: -1.30, longitude: 36.83 } },
+        { h3Index: '8928308281fffff', value: 3, center: { latitude: -1.3, longitude: 36.83 } },
       ];
       mockGeoQueryCoordinator.getDemandHeatmap.mockResolvedValue(mockHeatmap);
 
@@ -131,7 +127,7 @@ describe('GeoController (e2e)', () => {
           minLat: -1.35,
           maxLat: -1.25,
           minLng: 36.75,
-          maxLng: 36.90,
+          maxLng: 36.9,
         },
         resolution: 9,
       });
@@ -149,7 +145,7 @@ describe('GeoController (e2e)', () => {
           minLat: -1.35,
           maxLat: -1.25,
           minLng: 36.75,
-          maxLng: 36.90,
+          maxLng: 36.9,
         },
         resolution: 9,
       });
@@ -161,7 +157,7 @@ describe('GeoController (e2e)', () => {
       const mockClusters = [
         {
           zoneId: 'zone-0-0',
-          center: { latitude: -1.30, longitude: 36.80 },
+          center: { latitude: -1.3, longitude: 36.8 },
           bounds: { minLat: -1.35, maxLat: -1.25, minLng: 36.75, maxLng: 36.85 },
           riderCount: 5,
           averageLoad: 0.6,
@@ -179,7 +175,7 @@ describe('GeoController (e2e)', () => {
         minLat: -1.35,
         maxLat: -1.25,
         minLng: 36.75,
-        maxLng: 36.90,
+        maxLng: 36.9,
       });
     });
   });
@@ -206,7 +202,7 @@ describe('GeoController (e2e)', () => {
       expect(response.headers['cache-control']).toContain('max-age=15');
       expect(mockGeoQueryCoordinator.calculateETA).toHaveBeenCalledWith(
         { latitude: -1.2921, longitude: 36.8219 },
-        { latitude: -1.3000, longitude: 36.8300 }
+        { latitude: -1.3, longitude: 36.83 }
       );
     });
   });
@@ -231,7 +227,7 @@ describe('GeoController (e2e)', () => {
       expect(response.headers['cache-control']).toContain('max-age=60');
       expect(mockGeoQueryCoordinator.calculateRouteDistance).toHaveBeenCalledWith(
         { latitude: -1.2921, longitude: 36.8219 },
-        { latitude: -1.3000, longitude: 36.8300 }
+        { latitude: -1.3, longitude: 36.83 }
       );
     });
   });

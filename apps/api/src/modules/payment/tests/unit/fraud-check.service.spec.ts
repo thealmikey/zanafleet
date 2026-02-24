@@ -4,11 +4,7 @@ import { Repository } from 'typeorm';
 
 import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../../dto/payment.enums';
 import { PaymentIntentEntity } from '../../entities/payment-intent.entity';
-import {
-  FraudCheckService,
-  FraudDecision,
-  RiskLevel,
-} from '../../services/fraud-check.service';
+import { FraudCheckService, FraudDecision, RiskLevel } from '../../services/fraud-check.service';
 
 describe('FraudCheckService', () => {
   let service: FraudCheckService;
@@ -16,7 +12,9 @@ describe('FraudCheckService', () => {
   let mockAccountRepo: jest.Mocked<Repository<AccountEntity>>;
   let mockPolicyEngine: jest.Mocked<PolicyEvaluationEngineService>;
 
-  const createPaymentIntent = (overrides?: Partial<ReturnType<PaymentIntentEntity['toDomain']>>): PaymentIntentEntity => {
+  const createPaymentIntent = (
+    overrides?: Partial<ReturnType<PaymentIntentEntity['toDomain']>>
+  ): PaymentIntentEntity => {
     const entity = new PaymentIntentEntity();
     entity.id = '550e8400-e29b-41d4-a716-446655440000';
     entity.payerAccountId = '660e8400-e29b-41d4-a716-446655440001';

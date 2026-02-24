@@ -1,17 +1,6 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  Index,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, CreateDateColumn, Index } from 'typeorm';
 
-import {
-  PolicyEffect,
-  PolicyScope,
-  PolicyTrigger,
-  EvaluationContext,
-} from '../dto';
+import { PolicyEffect, PolicyScope, PolicyTrigger, EvaluationContext } from '../dto';
 
 /**
  * EvaluatedPolicyLogEntry Interface

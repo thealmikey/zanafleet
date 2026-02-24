@@ -43,7 +43,7 @@ describe('VehicleMatchingService', () => {
       const vehicles = await service.findMatchingVehicles(moveProfile);
 
       expect(vehicles.length).toBeGreaterThan(0);
-      
+
       // Verify sorted by match score descending
       for (let i = 1; i < vehicles.length; i++) {
         expect(vehicles[i - 1].matchScore).toBeGreaterThanOrEqual(vehicles[i].matchScore);
@@ -76,7 +76,7 @@ describe('VehicleMatchingService', () => {
       const vehicles = await service.findMatchingVehicles(moveProfile);
 
       expect(vehicles.length).toBeGreaterThan(0);
-      
+
       // All returned vehicles should be available or limited
       for (const vehicle of vehicles) {
         expect(['available', 'limited']).toContain(vehicle.availabilityStatus);
@@ -109,13 +109,15 @@ describe('VehicleMatchingService', () => {
       const vehicles = await service.findMatchingVehicles(moveProfile);
 
       expect(vehicles.length).toBeGreaterThan(0);
-      
+
       // Climate controlled vehicles should have higher prices
-      const climateControlled = vehicles.find(v => v.capacityProfile.climateControlled);
+      const climateControlled = vehicles.find((v) => v.capacityProfile.climateControlled);
       if (climateControlled) {
-        const nonClimateControlled = vehicles.find(v => !v.capacityProfile.climateControlled);
+        const nonClimateControlled = vehicles.find((v) => !v.capacityProfile.climateControlled);
         if (nonClimateControlled) {
-          expect(climateControlled.estimatedPrice).toBeGreaterThan(nonClimateControlled.estimatedPrice);
+          expect(climateControlled.estimatedPrice).toBeGreaterThan(
+            nonClimateControlled.estimatedPrice
+          );
         }
       }
     });

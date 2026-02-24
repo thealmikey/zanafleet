@@ -32,7 +32,7 @@ export class Neo4jRiderCandidateRepository implements RiderCandidateRepository {
 
   constructor(
     private readonly riderLocationRepository: RiderLocationRepository,
-    private readonly neo4jService: Neo4jService,
+    private readonly neo4jService: Neo4jService
   ) {}
 
   /**
@@ -49,7 +49,7 @@ export class Neo4jRiderCandidateRepository implements RiderCandidateRepository {
     longitude: number,
     radiusMeters: number,
     now?: Date,
-    limit?: number,
+    limit?: number
   ): Promise<RiderCandidate[]> {
     const currentTime = now ?? new Date();
 
@@ -87,7 +87,7 @@ export class Neo4jRiderCandidateRepository implements RiderCandidateRepository {
    */
   private async getRiderMetadata(
     riderIds: string[],
-    now: Date,
+    now: Date
   ): Promise<Map<string, RiderMetadata>> {
     const session = this.neo4jService.getReadSession();
     const metadata = new Map<string, RiderMetadata>();
@@ -110,7 +110,7 @@ export class Neo4jRiderCandidateRepository implements RiderCandidateRepository {
             ELSE NULL END
           ) AS busyWindows
         `,
-        { riderIds, now: now.toISOString() },
+        { riderIds, now: now.toISOString() }
       );
 
       for (const record of result.records) {
@@ -125,7 +125,7 @@ export class Neo4jRiderCandidateRepository implements RiderCandidateRepository {
         const busyWindows: TimeWindow[] = rawWindows
           .filter(
             (w): w is { start: string; end: string } =>
-              w !== null && w.start !== null && w.end !== null,
+              w !== null && w.start !== null && w.end !== null
           )
           .map((w) => ({
             start: new Date(w.start),
@@ -136,11 +136,13 @@ export class Neo4jRiderCandidateRepository implements RiderCandidateRepository {
       }
 
       this.logger.debug(
-        `Retrieved metadata for ${metadata.size}/${riderIds.length} riders from Neo4j`,
+        `Retrieved metadata for ${metadata.size}/${riderIds.length} riders from Neo4j`
       );
     } catch (error) {
       this.logger.error(
-        `Failed to retrieve rider metadata from Neo4j: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to retrieve rider metadata from Neo4j: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`
       );
     } finally {
       await session.close();

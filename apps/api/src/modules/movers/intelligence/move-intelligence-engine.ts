@@ -32,7 +32,7 @@ const SCORING_WEIGHTS = {
 
 /**
  * MoveIntelligenceEngine - Reasoning layer for move recommendations
- * 
+ *
  * Implements three-phase operation:
  * 1. Feasibility Analysis - validate vehicles satisfy MoveProfile requirements
  * 2. Optimization Scoring - weighted criteria evaluation
@@ -52,7 +52,10 @@ export class MoveIntelligenceEngine {
     const startTime = Date.now();
 
     // Phase 1: Feasibility Analysis
-    const feasibilityResult = this.analyzeFeasibility(context.moveProfile, context.availableVehicles);
+    const feasibilityResult = this.analyzeFeasibility(
+      context.moveProfile,
+      context.availableVehicles
+    );
     reasoningChain.push(...feasibilityResult.reasoningSteps);
 
     if (!feasibilityResult.isFeasible) {
@@ -76,7 +79,9 @@ export class MoveIntelligenceEngine {
     );
 
     const elapsedMs = Date.now() - startTime;
-    this.logger.log(`Recommendation generated in ${elapsedMs}ms with confidence ${recommendation.confidenceScore}`);
+    this.logger.log(
+      `Recommendation generated in ${elapsedMs}ms with confidence ${recommendation.confidenceScore}`
+    );
 
     return recommendation;
   }
@@ -93,7 +98,8 @@ export class MoveIntelligenceEngine {
     reasoningSteps: ReasoningStep[];
   } {
     const reasoningSteps: ReasoningStep[] = [];
-    const capableVehicles: Array<{ vehicle: VehicleCapabilityProfile; requirements: string[] }> = [];
+    const capableVehicles: Array<{ vehicle: VehicleCapabilityProfile; requirements: string[] }> =
+      [];
 
     reasoningSteps.push({
       stepName: 'feasibility_analysis_start',
@@ -157,14 +163,18 @@ export class MoveIntelligenceEngine {
 
     // Check volume capacity
     if (vehicle.maxVolumeM3 >= moveProfile.estimatedVolumeM3) {
-      requirements.push(`Volume: ${vehicle.maxVolumeM3}m3 >= ${moveProfile.estimatedVolumeM3}m3 required`);
+      requirements.push(
+        `Volume: ${vehicle.maxVolumeM3}m3 >= ${moveProfile.estimatedVolumeM3}m3 required`
+      );
     } else {
       issues.push(`Volume: ${vehicle.maxVolumeM3}m3 < ${moveProfile.estimatedVolumeM3}m3 required`);
     }
 
     // Check crew capacity
     if (vehicle.crewCapacity >= moveProfile.laborRequirement) {
-      requirements.push(`Crew: ${vehicle.crewCapacity} >= ${moveProfile.laborRequirement} required`);
+      requirements.push(
+        `Crew: ${vehicle.crewCapacity} >= ${moveProfile.laborRequirement} required`
+      );
     } else {
       issues.push(`Crew: ${vehicle.crewCapacity} < ${moveProfile.laborRequirement} required`);
     }
@@ -320,10 +330,7 @@ export class MoveIntelligenceEngine {
   /**
    * Calculate labor fit score (0-100)
    */
-  private calculateLaborScore(
-    vehicle: VehicleCapabilityProfile,
-    moveProfile: MoveProfile
-  ): number {
+  private calculateLaborScore(vehicle: VehicleCapabilityProfile, moveProfile: MoveProfile): number {
     const laborRatio = vehicle.crewCapacity / moveProfile.laborRequirement;
     let score = 100;
 
@@ -383,9 +390,7 @@ export class MoveIntelligenceEngine {
 
     // Bonus for special features that aren't required
     if (vehicle.specialFeatures) {
-      const extras = vehicle.specialFeatures.filter(
-        (f) => !requiredFeatures.includes(f)
-      ).length;
+      const extras = vehicle.specialFeatures.filter((f) => !requiredFeatures.includes(f)).length;
       score += Math.min(extras * 3, 15); // Up to 15 bonus points
     }
 
@@ -401,7 +406,7 @@ export class MoveIntelligenceEngine {
     demandSignals: DemandSignals
   ): number {
     // Base score on vehicle size (smaller = potentially cheaper)
-    const sizeScore = Math.max(0, 100 - (vehicle.maxVolumeM3 * 0.5));
+    const sizeScore = Math.max(0, 100 - vehicle.maxVolumeM3 * 0.5);
 
     // Adjust for demand (high demand = lower availability = lower score)
     const demandPenalty = (demandSignals.demandMultiplier - 1) * 20;
@@ -506,9 +511,10 @@ export class MoveIntelligenceEngine {
   /**
    * Generate reason for alternative vehicle
    */
-  private generateAlternativeReason(
-    alt: { vehicle: VehicleCapabilityProfile; totalScore: number }
-  ): string {
+  private generateAlternativeReason(alt: {
+    vehicle: VehicleCapabilityProfile;
+    totalScore: number;
+  }): string {
     const reasons: string[] = [];
 
     if (alt.totalScore >= 80) {
@@ -610,7 +616,8 @@ export class MoveIntelligenceEngine {
     }
 
     // Total adjustment
-    const totalAdjustment = baseAdjustment + demandAdjustment + complexityAdjustment + policyAdjustment;
+    const totalAdjustment =
+      baseAdjustment + demandAdjustment + complexityAdjustment + policyAdjustment;
 
     reasoningSteps.push({
       stepName: 'pricing_adjustment_complete',
@@ -687,9 +694,7 @@ export class MoveIntelligenceEngine {
   /**
    * Assess risk factors for the move
    */
-  private assessRisk(
-    moveProfile: MoveProfile
-  ): {
+  private assessRisk(moveProfile: MoveProfile): {
     assessment: RiskAssessment;
     reasoningSteps: ReasoningStep[];
   } {
@@ -772,7 +777,9 @@ export class MoveIntelligenceEngine {
       regional: 1.0,
       'long-distance': 1.5,
     };
-    overallRiskScore = Math.round(overallRiskScore * distanceRiskMultiplier[moveProfile.distanceCategory]);
+    overallRiskScore = Math.round(
+      overallRiskScore * distanceRiskMultiplier[moveProfile.distanceCategory]
+    );
 
     // Cap overall score at 100
     overallRiskScore = Math.min(overallRiskScore, 100);
@@ -861,7 +868,7 @@ export class MoveIntelligenceEngine {
       recommendationTimestamp: new Date().toISOString(),
       intelligenceVersion: INTELLIGENCE_VERSION,
       vehicleRecommendation: {
-        selectedVehicle: context.availableVehicles[0] ?? {} as VehicleCapabilityProfile,
+        selectedVehicle: context.availableVehicles[0] ?? ({} as VehicleCapabilityProfile),
         matchScore: 0,
         alternativeVehicles: [],
       },

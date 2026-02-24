@@ -14,7 +14,12 @@ import { ProcessPaymentCommandHandler } from '../../handlers/process-payment.han
 import { PaymentStatus } from '../../providers/dto/payment-provider.types';
 import { PaymentProviderRegistry } from '../../providers/payment-provider-registry.service';
 import { PaymentProvider } from '../../providers/payment-provider.interface';
-import { FraudCheckService, FraudDecision, RiskLevel, FraudCheckResult } from '../../services/fraud-check.service';
+import {
+  FraudCheckService,
+  FraudDecision,
+  RiskLevel,
+  FraudCheckResult,
+} from '../../services/fraud-check.service';
 
 describe('ProcessPaymentCommandHandler', () => {
   let handler: ProcessPaymentCommandHandler;
@@ -118,7 +123,7 @@ describe('ProcessPaymentCommandHandler', () => {
         mockEventBus,
         mockCommandBus,
         mockEventBusService,
-        mockFraudCheckService,
+        mockFraudCheckService
       );
 
       mockIntentRepo.findOne.mockResolvedValue(existingIntent());
@@ -139,7 +144,7 @@ describe('ProcessPaymentCommandHandler', () => {
           amount: 100,
           currency: 'USD',
           idempotencyKey: 'idem-key-123',
-        }),
+        })
       );
     });
 
@@ -166,8 +171,7 @@ describe('ProcessPaymentCommandHandler', () => {
       await handler.execute(validCommand);
 
       expect(mockCommandBus.execute).toHaveBeenCalledTimes(1);
-      const ledgerCommand = mockCommandBus.execute.mock
-        .calls[0][0] as RecordLedgerEntryCommand;
+      const ledgerCommand = mockCommandBus.execute.mock.calls[0][0] as RecordLedgerEntryCommand;
       expect(ledgerCommand.entries).toHaveLength(2);
 
       const debitEntry = ledgerCommand.entries.find((e) => e.entryType === 'DEBIT');
@@ -193,7 +197,7 @@ describe('ProcessPaymentCommandHandler', () => {
 
       expect(mockEventBusService.publish).toHaveBeenCalledWith(
         'payment.events.completed-v1',
-        expect.any(PaymentCompletedEventV1),
+        expect.any(PaymentCompletedEventV1)
       );
     });
 
@@ -202,7 +206,7 @@ describe('ProcessPaymentCommandHandler', () => {
 
       expect(result).toBeDefined();
       expect(result).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       );
     });
   });
@@ -215,7 +219,7 @@ describe('ProcessPaymentCommandHandler', () => {
         mockEventBus,
         mockCommandBus,
         mockEventBusService,
-        mockFraudCheckService,
+        mockFraudCheckService
       );
 
       mockIntentRepo.findOne.mockResolvedValue(existingIntent());
@@ -271,7 +275,7 @@ describe('ProcessPaymentCommandHandler', () => {
         mockEventBus,
         mockCommandBus,
         mockEventBusService,
-        mockFraudCheckService,
+        mockFraudCheckService
       );
 
       mockIntentRepo.findOne.mockResolvedValue(existingIntent());
@@ -296,10 +300,9 @@ describe('ProcessPaymentCommandHandler', () => {
 
       expect(result).toBeDefined();
       expect(mockProvider.initiatePayment).not.toHaveBeenCalled();
-      expect(mockIntentRepo.update).toHaveBeenCalledWith(
-        validCommand.paymentIntentId,
-        { status: PaymentIntentStatus.FAILED },
-      );
+      expect(mockIntentRepo.update).toHaveBeenCalledWith(validCommand.paymentIntentId, {
+        status: PaymentIntentStatus.FAILED,
+      });
 
       const failedEvent = mockEventBus.publish.mock.calls[0][0] as PaymentFailedEventV1;
       expect(failedEvent.errorCode).toBe('FRAUD_CHECK_BLOCKED');
@@ -343,7 +346,7 @@ describe('ProcessPaymentCommandHandler', () => {
         mockEventBus,
         mockCommandBus,
         undefined,
-        undefined,
+        undefined
       );
     });
 
@@ -359,7 +362,7 @@ describe('ProcessPaymentCommandHandler', () => {
       mockIntentRepo.findOne.mockResolvedValue(processingIntent);
 
       await expect(handler.execute(validCommand)).rejects.toThrow(
-        'Payment intent is not in CREATED status',
+        'Payment intent is not in CREATED status'
       );
     });
 
@@ -379,7 +382,7 @@ describe('ProcessPaymentCommandHandler', () => {
         mockEventBus,
         mockCommandBus,
         undefined,
-        undefined,
+        undefined
       );
 
       mockIntentRepo.findOne.mockResolvedValue(existingIntent());

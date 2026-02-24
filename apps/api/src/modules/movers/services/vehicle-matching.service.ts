@@ -14,9 +14,9 @@ import { NormalizedLocation } from './location-normalization.service';
 
 /**
  * VehicleMatchingService
- * 
+ *
  * Service for matching vehicles to move requirements.
- * Finds available vehicles and filters them based on capacity 
+ * Finds available vehicles and filters them based on capacity
  * and capability requirements.
  */
 @Injectable()
@@ -25,7 +25,7 @@ export class VehicleMatchingService {
 
   /**
    * Find matching vehicles for a move profile near a location
-   * 
+   *
    * @param moveProfile - The move requirements
    * @param _origin - The origin location (reserved for future geo-search)
    * @param _radiusKm - Search radius in kilometers (reserved for future geo-search)
@@ -38,7 +38,7 @@ export class VehicleMatchingService {
   ): Promise<VehicleRecommendation[]> {
     this.logger.debug(
       `Finding vehicles for move profile: ${moveProfile.estimatedVolumeM3}m3, ` +
-      `${moveProfile.laborRequirement} laborers`
+        `${moveProfile.laborRequirement} laborers`
     );
 
     // Get default vehicles for demo/testing
@@ -50,9 +50,7 @@ export class VehicleMatchingService {
     // Calculate match scores and rank
     const recommendations = this.rankByMatchScore(matchingVehicles, moveProfile);
 
-    this.logger.log(
-      `Found ${recommendations.length} matching vehicles for the move profile`
-    );
+    this.logger.log(`Found ${recommendations.length} matching vehicles for the move profile`);
 
     return recommendations;
   }
@@ -152,19 +150,19 @@ export class VehicleMatchingService {
   ): number {
     // Base price by vehicle size
     const basePriceBySize: Record<number, number> = {
-      12: 2500,   // Cargo van
-      20: 4000,   // Small truck
-      35: 6500,   // Medium truck
-      50: 9000,   // Large truck
-      55: 11000,  // Box truck
+      12: 2500, // Cargo van
+      20: 4000, // Small truck
+      35: 6500, // Medium truck
+      50: 9000, // Large truck
+      55: 11000, // Box truck
     };
 
     // Find closest base price
     const basePrice = Object.entries(basePriceBySize).reduce(
       (closest, [capacity, price]) => {
         const diff = Math.abs(vehicle.maxVolumeM3 - Number(capacity));
-        return diff < Math.abs(vehicle.maxVolumeM3 - closest.capacity) 
-          ? { capacity: Number(capacity), price } 
+        return diff < Math.abs(vehicle.maxVolumeM3 - closest.capacity)
+          ? { capacity: Number(capacity), price }
           : closest;
       },
       { capacity: 0, price: 5000 }
@@ -192,25 +190,22 @@ export class VehicleMatchingService {
   /**
    * Estimate duration based on vehicle capabilities
    */
-  private estimateDuration(
-    vehicle: VehicleCapabilityProfile,
-    moveProfile: MoveProfile
-  ): number {
+  private estimateDuration(vehicle: VehicleCapabilityProfile, moveProfile: MoveProfile): number {
     // Base duration by vehicle size (minutes)
     const baseDurationBySize: Record<number, number> = {
-      12: 180,   // ~3 hours
-      20: 270,   // ~4.5 hours
-      35: 360,   // ~6 hours
-      50: 450,   // ~7.5 hours
-      55: 540,   // ~9 hours
+      12: 180, // ~3 hours
+      20: 270, // ~4.5 hours
+      35: 360, // ~6 hours
+      50: 450, // ~7.5 hours
+      55: 540, // ~9 hours
     };
 
     // Find closest base duration
     const baseDuration = Object.entries(baseDurationBySize).reduce(
       (closest, [capacity, duration]) => {
         const diff = Math.abs(vehicle.maxVolumeM3 - Number(capacity));
-        return diff < Math.abs(vehicle.maxVolumeM3 - closest.capacity) 
-          ? { capacity: Number(capacity), duration } 
+        return diff < Math.abs(vehicle.maxVolumeM3 - closest.capacity)
+          ? { capacity: Number(capacity), duration }
           : closest;
       },
       { capacity: 0, duration: 300 }

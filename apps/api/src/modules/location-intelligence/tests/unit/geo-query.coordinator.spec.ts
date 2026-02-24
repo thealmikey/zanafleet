@@ -15,9 +15,7 @@ describe('GeoQueryCoordinator', () => {
   let heatmapService: jest.Mocked<HeatmapService>;
   let eventBusService: jest.Mocked<EventBusService>;
 
-  const createMockRiderCandidate = (
-    overrides: Partial<RiderCandidate> = {},
-  ): RiderCandidate => ({
+  const createMockRiderCandidate = (overrides: Partial<RiderCandidate> = {}): RiderCandidate => ({
     riderId: 'rider-123',
     lastKnownLocation: { latitude: -1.2921, longitude: 36.8219 },
     lastSeenAt: new Date(),
@@ -26,9 +24,7 @@ describe('GeoQueryCoordinator', () => {
     ...overrides,
   });
 
-  const createMockHeatmapCell = (
-    overrides: Partial<HeatmapCell> = {},
-  ): HeatmapCell => ({
+  const createMockHeatmapCell = (overrides: Partial<HeatmapCell> = {}): HeatmapCell => ({
     h3Index: '8928308280fffff',
     center: { latitude: -1.2921, longitude: 36.8219 },
     count: 5,
@@ -144,7 +140,7 @@ describe('GeoQueryCoordinator', () => {
           payload: expect.objectContaining({
             queryType: 'findNearbyRiders',
           }),
-        }),
+        })
       );
     });
 
@@ -266,7 +262,7 @@ describe('GeoQueryCoordinator', () => {
           payload: expect.objectContaining({
             queryType: 'calculateETA',
           }),
-        }),
+        })
       );
     });
   });
@@ -430,7 +426,7 @@ describe('GeoQueryCoordinator', () => {
           payload: expect.objectContaining({
             queryType: 'isWithinServiceArea',
           }),
-        }),
+        })
       );
     });
   });

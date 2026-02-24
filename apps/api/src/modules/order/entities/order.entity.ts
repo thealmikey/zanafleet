@@ -1,7 +1,6 @@
 import { OrderStatus, PaymentStatus } from '@zanafleet/contracts';
 import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
-
 @Entity('orders')
 @Index(['businessId'])
 @Index(['workspaceId'])

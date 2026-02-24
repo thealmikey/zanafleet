@@ -58,7 +58,7 @@ export class CreatePaymentIntentCommand {
   }
 
   static safeValidate(
-    input: unknown,
+    input: unknown
   ): z.SafeParseReturnType<unknown, CreatePaymentIntentCommandInput> {
     return CreatePaymentIntentCommandSchema.safeParse(input);
   }

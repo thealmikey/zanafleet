@@ -8,7 +8,7 @@ import { VehicleMatchingService } from '../../services/vehicle-matching.service'
 
 /**
  * Integration tests for the Move Intelligence Layer
- * 
+ *
  * These tests verify the complete flow from context building
  * through recommendation generation.
  */
@@ -63,36 +63,38 @@ describe('MoveIntelligenceEngine Integration', () => {
         {
           provide: AIMoveProfileService,
           useValue: {
-            interpretMoveRequirements: jest.fn().mockImplementation((_fromHouseSize, _toHouseSize, options) => {
-              // Return dynamic profile based on options
-              const hasSpecialItems = options.specialItems && options.specialItems.length > 0;
-              const isLongDistance = options.distanceKm && options.distanceKm > 100;
+            interpretMoveRequirements: jest
+              .fn()
+              .mockImplementation((_fromHouseSize, _toHouseSize, options) => {
+                // Return dynamic profile based on options
+                const hasSpecialItems = options.specialItems && options.specialItems.length > 0;
+                const isLongDistance = options.distanceKm && options.distanceKm > 100;
 
-              return Promise.resolve({
-                fromProfile: {
-                  estimatedVolumeM3: 25,
-                  fragilityFactor: options.fragilityLevel || 'medium',
-                  laborRequirement: 3,
-                  distanceCategory: isLongDistance ? 'long-distance' : 'local',
-                },
-                toProfile: {
-                  estimatedVolumeM3: 20,
-                  fragilityFactor: options.fragilityLevel || 'low',
-                  laborRequirement: 2,
-                  distanceCategory: isLongDistance ? 'long-distance' : 'local',
-                },
-                combinedProfile: {
-                  estimatedVolumeM3: 25,
-                  fragilityFactor: options.fragilityLevel || 'medium',
-                  laborRequirement: 3,
-                  floorCount: options.fromFloorCount || 1,
-                  packingService: !!options.packingService,
-                  estimatedWeightKg: 700,
-                  distanceCategory: isLongDistance ? 'long-distance' : 'local',
-                  specialHandling: hasSpecialItems ? options.specialItems : [],
-                },
-              });
-            }),
+                return Promise.resolve({
+                  fromProfile: {
+                    estimatedVolumeM3: 25,
+                    fragilityFactor: options.fragilityLevel || 'medium',
+                    laborRequirement: 3,
+                    distanceCategory: isLongDistance ? 'long-distance' : 'local',
+                  },
+                  toProfile: {
+                    estimatedVolumeM3: 20,
+                    fragilityFactor: options.fragilityLevel || 'low',
+                    laborRequirement: 2,
+                    distanceCategory: isLongDistance ? 'long-distance' : 'local',
+                  },
+                  combinedProfile: {
+                    estimatedVolumeM3: 25,
+                    fragilityFactor: options.fragilityLevel || 'medium',
+                    laborRequirement: 3,
+                    floorCount: options.fromFloorCount || 1,
+                    packingService: !!options.packingService,
+                    estimatedWeightKg: 700,
+                    distanceCategory: isLongDistance ? 'long-distance' : 'local',
+                    specialHandling: hasSpecialItems ? options.specialItems : [],
+                  },
+                });
+              }),
           },
         },
         {
@@ -131,8 +133,8 @@ describe('MoveIntelligenceEngine Integration', () => {
         toLocation: {
           placeId: 'dest-001',
           formattedAddress: '456 Destination Ave, Nairobi',
-          latitude: -1.3000,
-          longitude: 36.8500,
+          latitude: -1.3,
+          longitude: 36.85,
         },
         requestedDate: new Date('2024-06-15'),
         fragilityLevel: 'medium',
@@ -167,8 +169,8 @@ describe('MoveIntelligenceEngine Integration', () => {
         toLocation: {
           placeId: 'dest-001',
           formattedAddress: '456 Destination Ave, Nairobi',
-          latitude: -1.3000,
-          longitude: 36.8500,
+          latitude: -1.3,
+          longitude: 36.85,
         },
         requestedDate: new Date('2024-12-23'),
         fragilityLevel: 'high',
@@ -201,8 +203,8 @@ describe('MoveIntelligenceEngine Integration', () => {
         toLocation: {
           placeId: 'dest-001',
           formattedAddress: '456 Destination Ave, Nairobi',
-          latitude: -1.3000,
-          longitude: 36.8500,
+          latitude: -1.3,
+          longitude: 36.85,
         },
         requestedDate: new Date('2024-06-15'), // Saturday
       });
@@ -261,8 +263,8 @@ describe('MoveIntelligenceEngine Integration', () => {
         toLocation: {
           placeId: 'dest-001',
           formattedAddress: '456 Destination Ave, Nairobi',
-          latitude: -1.3000,
-          longitude: 36.8500,
+          latitude: -1.3,
+          longitude: 36.85,
         },
       });
 

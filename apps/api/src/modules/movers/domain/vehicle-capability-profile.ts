@@ -46,7 +46,10 @@ export enum VehicleType {
 /**
  * Default vehicle capability profiles by type
  */
-export const VEHICLE_CAPABILITY_DEFAULTS: Record<VehicleType, Omit<VehicleCapabilityProfile, 'vehicleId' | 'vehicleYear' | 'vehicleMake' | 'vehicleModel'>> = {
+export const VEHICLE_CAPABILITY_DEFAULTS: Record<
+  VehicleType,
+  Omit<VehicleCapabilityProfile, 'vehicleId' | 'vehicleYear' | 'vehicleMake' | 'vehicleModel'>
+> = {
   [VehicleType.CARGO_VAN]: {
     maxVolumeM3: 12,
     allowedLoadType: ['standard', 'boxes', 'furniture'],
@@ -141,8 +144,8 @@ export function canAccommodateMove(
   }
 
   // Check load type compatibility
-  const hasCompatibleLoadType = requiredLoadTypes.some(
-    (loadType) => vehicleProfile.allowedLoadType.includes(loadType)
+  const hasCompatibleLoadType = requiredLoadTypes.some((loadType) =>
+    vehicleProfile.allowedLoadType.includes(loadType)
   );
   if (!hasCompatibleLoadType) {
     return false;

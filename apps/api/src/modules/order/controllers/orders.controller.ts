@@ -1,10 +1,6 @@
 import { RequireCapability } from '@api/core/api/decorators';
 import { CapabilityGuard } from '@api/core/api/guards';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
+import { parseQueryParams, createPaginationMeta, RawQueryParams } from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -35,7 +31,10 @@ import {
 } from '@nestjs/swagger';
 
 import { CreateOrderCommand } from '../commands/create-order.command';
-import { CustomerOrderOrchestrator, PlaceCustomerOrderInput } from '../coordinators/customer-order.orchestrator';
+import {
+  CustomerOrderOrchestrator,
+  PlaceCustomerOrderInput,
+} from '../coordinators/customer-order.orchestrator';
 import { OrderEntity } from '../entities/order.entity';
 
 export class CreateOrderDto {
@@ -93,15 +92,22 @@ export class OrdersController {
     private readonly customerOrderOrchestrator: CustomerOrderOrchestrator,
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>
-  ) { }
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @RequireCapability('order.manage')
   @ApiOperation({ summary: 'Create a new order', description: 'Create a new order in the system' })
-  @ApiResponse({ status: 201, description: 'Order created successfully', schema: { example: { id: 'uuid' } } })
+  @ApiResponse({
+    status: 201,
+    description: 'Order created successfully',
+    schema: { example: { id: 'uuid' } },
+  })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   async create(@Body() dto: CreateOrderDto): Promise<{ id: string }> {
     const validated = CreateOrderCommand.validate(dto);
@@ -112,10 +118,16 @@ export class OrdersController {
   @Post('customer')
   @HttpCode(HttpStatus.CREATED)
   @RequireCapability('order.place')
-  @ApiOperation({ summary: 'Place customer order', description: 'Place an order on behalf of a customer' })
+  @ApiOperation({
+    summary: 'Place customer order',
+    description: 'Place an order on behalf of a customer',
+  })
   @ApiResponse({ status: 201, description: 'Customer order placed successfully' })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   async placeCustomerOrder(@Body() dto: PlaceCustomerOrderInput): Promise<any> {
     return this.customerOrderOrchestrator.placeOrder(dto);
@@ -123,9 +135,15 @@ export class OrdersController {
 
   @Get(':id')
   @RequireCapability('order.manage')
-  @ApiOperation({ summary: 'Get order by ID', description: 'Retrieve a specific order by its unique identifier' })
+  @ApiOperation({
+    summary: 'Get order by ID',
+    description: 'Retrieve a specific order by its unique identifier',
+  })
   @ApiResponse({ status: 200, description: 'Order retrieved successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiParam({ name: 'id', description: 'Order unique identifier (UUID)', type: String })
@@ -138,15 +156,29 @@ export class OrdersController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List all orders', description: 'Retrieve all orders with pagination, sorting, filtering, and search' })
+  @ApiOperation({
+    summary: 'List all orders',
+    description: 'Retrieve all orders with pagination, sorting, filtering, and search',
+  })
   @ApiResponse({ status: 200, description: 'Orders retrieved successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number (1-based)', type: Number })
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
-  @ApiQuery({ name: 'sort', required: false, description: 'Sort field and order (e.g., createdAt:desc)' })
+  @ApiQuery({
+    name: 'sort',
+    required: false,
+    description: 'Sort field and order (e.g., createdAt:desc)',
+  })
   @ApiQuery({ name: 'filter', required: false, description: 'Filter criteria as JSON' })
-  @ApiQuery({ name: 'search', required: false, description: 'Search term for customer name, phone, or item summary' })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Search term for customer name, phone, or item summary',
+  })
   async findAll(@Query() query: RawQueryParams): Promise<{
     data: ReturnType<OrderEntity['toDomain']>[];
     meta: ReturnType<typeof createPaginationMeta>;
@@ -184,7 +216,10 @@ export class OrdersController {
   @RequireCapability('order.manage')
   @ApiOperation({ summary: 'Update an order', description: 'Update an existing order information' })
   @ApiResponse({ status: 200, description: 'Order updated successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiParam({ name: 'id', description: 'Order unique identifier (UUID)', type: String })
@@ -207,8 +242,15 @@ export class OrdersController {
   @HttpCode(HttpStatus.OK)
   @RequireCapability('order.manage')
   @ApiOperation({ summary: 'Delete an order', description: 'Remove an order from the system' })
-  @ApiResponse({ status: 200, description: 'Order deleted successfully', schema: { example: { deleted: true } } })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Order deleted successfully',
+    schema: { example: { deleted: true } },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiParam({ name: 'id', description: 'Order unique identifier (UUID)', type: String })

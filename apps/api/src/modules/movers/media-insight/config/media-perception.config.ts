@@ -96,7 +96,7 @@ export const mediaPerceptionConfig = registerAs(
       fragilityDetection: process.env.MEDIA_FEATURE_FRAGILITY !== 'false',
       itemDetection: process.env.MEDIA_FEATURE_ITEMS !== 'false',
     },
-  }),
+  })
 );
 
 /**

@@ -397,9 +397,7 @@ describe('PolicyEvaluationEngineService (Integration)', () => {
 
       const context = createContext({ deliveryId: 'delivery-concurrent-001' });
 
-      const evaluationPromises = Array.from({ length: 10 }, () =>
-        service.evaluate(context)
-      );
+      const evaluationPromises = Array.from({ length: 10 }, () => service.evaluate(context));
 
       const results = await Promise.all(evaluationPromises);
 
@@ -558,9 +556,7 @@ describe('PolicyEvaluationEngineService (Integration)', () => {
 
       for (const result of results) {
         expect(result.evaluationFailed).toBe(false);
-        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(
-          result.finalDecision.effect
-        );
+        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(result.finalDecision.effect);
       }
     });
 
@@ -594,9 +590,7 @@ describe('PolicyEvaluationEngineService (Integration)', () => {
 
       for (const result of results) {
         expect(result.evaluationFailed).toBe(false);
-        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(
-          result.finalDecision.effect
-        );
+        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(result.finalDecision.effect);
       }
     });
 
@@ -634,9 +628,7 @@ describe('PolicyEvaluationEngineService (Integration)', () => {
 
       for (const result of results) {
         expect(result.evaluationFailed).toBe(false);
-        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(
-          result.finalDecision.effect
-        );
+        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(result.finalDecision.effect);
       }
     });
 
@@ -677,9 +669,7 @@ describe('PolicyEvaluationEngineService (Integration)', () => {
 
       for (const result of results) {
         expect(result.evaluationFailed).toBe(false);
-        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(
-          result.finalDecision.effect
-        );
+        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(result.finalDecision.effect);
         expect(result.processingTimeMs).toBeGreaterThanOrEqual(0);
       }
     });
@@ -729,9 +719,7 @@ describe('PolicyEvaluationEngineService (Integration)', () => {
 
       for (const result of results) {
         expect(result.evaluationFailed).toBe(false);
-        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(
-          result.finalDecision.effect
-        );
+        expect([PolicyEffect.ALLOW, PolicyEffect.BLOCK]).toContain(result.finalDecision.effect);
       }
 
       await new Promise((resolve) => setTimeout(resolve, 200));

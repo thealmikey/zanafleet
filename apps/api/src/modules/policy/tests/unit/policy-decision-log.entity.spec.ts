@@ -1,9 +1,4 @@
-import {
-  PolicyEffect,
-  PolicyScope,
-  PolicyTrigger,
-  EvaluationContext,
-} from '../../dto';
+import { PolicyEffect, PolicyScope, PolicyTrigger, EvaluationContext } from '../../dto';
 import {
   PolicyDecisionLogEntity,
   EvaluatedPolicyLogEntry,
@@ -255,8 +250,8 @@ describe('PolicyDecisionLogEntity', () => {
         saccoId: 'sacco-complex',
         timestamp: new Date('2024-02-20T15:30:00Z'),
         location: {
-          latitude: -1.3000,
-          longitude: 36.8000,
+          latitude: -1.3,
+          longitude: 36.8,
         },
         metadata: {
           previousStatus: 'Requested',
@@ -444,7 +439,9 @@ describe('PolicyDecisionLogEntity', () => {
 
     it('should only expose fromDomain for creation (no update method)', () => {
       expect(PolicyDecisionLogEntity.fromDomain).toBeDefined();
-      expect((PolicyDecisionLogEntity as unknown as Record<string, unknown>).update).toBeUndefined();
+      expect(
+        (PolicyDecisionLogEntity as unknown as Record<string, unknown>).update
+      ).toBeUndefined();
     });
   });
 });

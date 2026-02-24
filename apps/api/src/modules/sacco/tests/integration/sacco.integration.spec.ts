@@ -6,7 +6,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-
 import { CreateSaccoCommand } from '../../commands/create-sacco.command';
 import { SaccoModule } from '../../sacco.module';
 
@@ -143,10 +142,7 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
       // Verify Neo4j node exists
       const session = neo4jService.getReadSession();
       try {
-        const result = await session.run(
-          'MATCH (s:Sacco {id: $saccoId}) RETURN s',
-          { saccoId }
-        );
+        const result = await session.run('MATCH (s:Sacco {id: $saccoId}) RETURN s', { saccoId });
         expect(result.records.length).toBe(1);
         const node = result.records[0].get('s').properties;
         expect(node.name).toBe(name);

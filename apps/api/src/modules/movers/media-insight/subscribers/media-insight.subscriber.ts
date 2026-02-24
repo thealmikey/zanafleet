@@ -11,7 +11,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Ctx, MessagePattern, NatsContext, Payload } from '@nestjs/microservices';
 
 import { NatsSubjects } from '../../../../core/event-bus/event-bus.constants';
-import { BaseEvent, SerializedEvent } from '../../../../core/event-bus/interfaces/base-event.interface';
+import {
+  BaseEvent,
+  SerializedEvent,
+} from '../../../../core/event-bus/interfaces/base-event.interface';
 import { EventLoggerService } from '../../../../core/event-bus/services/event-logger.service';
 import { IdempotencyService } from '../../../../core/event-bus/services/idempotency.service';
 import { MediaInsightEvents } from '../events/media-insight.events';
@@ -37,7 +40,7 @@ export class MediaInsightSubscriber {
   constructor(
     private readonly snapshotService: IntelligenceSnapshotService,
     private readonly idempotencyService: IdempotencyService,
-    private readonly eventLogger: EventLoggerService,
+    private readonly eventLogger: EventLoggerService
   ) {}
 
   /**
@@ -51,7 +54,7 @@ export class MediaInsightSubscriber {
   @MessagePattern(NatsSubjects.Movers.MediaInsight.ALL)
   async handleMediaInsightEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     const subject = context.getSubject();
     this.logger.debug(`Received event on subject: ${subject}`);
@@ -113,9 +116,7 @@ export class MediaInsightSubscriber {
       this.eventLogger.logProcessed(event as unknown as BaseEvent, 'IntelligenceSnapshotService');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      this.logger.error(
-        `Failed to process media insight for order ${orderId}: ${errorMessage}`,
-      );
+      this.logger.error(`Failed to process media insight for order ${orderId}: ${errorMessage}`);
       // Never throw from event handlers - just log the error
     }
   }
@@ -133,9 +134,7 @@ export class MediaInsightSubscriber {
     const errorCode = data.payload.errorCode as string;
     const errorMessage = data.payload.errorMessage as string;
 
-    this.logger.warn(
-      `Media insight failed for order ${orderId}: ${errorCode} - ${errorMessage}`,
-    );
+    this.logger.warn(`Media insight failed for order ${orderId}: ${errorCode} - ${errorMessage}`);
 
     // Could trigger alerting, fallback logic, or retry mechanisms here
     // For now, just log the failure for monitoring purposes

@@ -9,7 +9,10 @@ import {
   EvaluationResult,
 } from '../dto';
 
-import { PolicyEvaluationEngineService, EvaluationOptions } from './policy-evaluation-engine.service';
+import {
+  PolicyEvaluationEngineService,
+  EvaluationOptions,
+} from './policy-evaluation-engine.service';
 
 /**
  * Result of filtering candidates by policy.
@@ -96,7 +99,11 @@ export class PolicyEnforcementAdapter {
   ): Promise<FilterCandidatesResult> {
     const allowed: RankedCandidate[] = [];
     const blocked: Array<{ candidate: RankedCandidate; reason: string }> = [];
-    const requiresApproval: Array<{ candidate: RankedCandidate; reason: string; approvalRoles?: string[] }> = [];
+    const requiresApproval: Array<{
+      candidate: RankedCandidate;
+      reason: string;
+      approvalRoles?: string[];
+    }> = [];
     const timestamp = context.scheduledTime ?? new Date();
 
     for (const candidate of candidates) {
@@ -141,9 +148,7 @@ export class PolicyEnforcementAdapter {
    * @param input - The delivery creation input
    * @returns Result indicating if creation is allowed and any approval requirements
    */
-  async evaluateDeliveryCreation(
-    input: DeliveryCreationInput
-  ): Promise<DeliveryCreationResult> {
+  async evaluateDeliveryCreation(input: DeliveryCreationInput): Promise<DeliveryCreationResult> {
     const evalContext: EvaluationContext = {
       trigger: PolicyTrigger.DELIVERY_CREATION,
       workspaceId: input.workspaceId,
@@ -163,8 +168,7 @@ export class PolicyEnforcementAdapter {
     const result = await this.engine.evaluate(evalContext);
     const effect = result.finalDecision.effect;
 
-    const allowed =
-      effect === PolicyEffect.ALLOW || effect === PolicyEffect.MODIFY;
+    const allowed = effect === PolicyEffect.ALLOW || effect === PolicyEffect.MODIFY;
 
     const response: DeliveryCreationResult = {
       allowed,
@@ -187,9 +191,7 @@ export class PolicyEnforcementAdapter {
    * @param input - The rider assignment input
    * @returns Result indicating if assignment is allowed and any modifications
    */
-  async evaluateRiderAssignment(
-    input: RiderAssignmentInput
-  ): Promise<RiderAssignmentResult> {
+  async evaluateRiderAssignment(input: RiderAssignmentInput): Promise<RiderAssignmentResult> {
     const evalContext: EvaluationContext = {
       trigger: PolicyTrigger.RIDER_ASSIGNMENT,
       workspaceId: input.workspaceId,
@@ -201,8 +203,7 @@ export class PolicyEnforcementAdapter {
     const result = await this.engine.evaluate(evalContext);
     const effect = result.finalDecision.effect;
 
-    const allowed =
-      effect === PolicyEffect.ALLOW || effect === PolicyEffect.MODIFY;
+    const allowed = effect === PolicyEffect.ALLOW || effect === PolicyEffect.MODIFY;
 
     const response: RiderAssignmentResult = {
       allowed,

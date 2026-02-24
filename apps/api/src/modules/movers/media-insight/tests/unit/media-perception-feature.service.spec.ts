@@ -143,7 +143,9 @@ describe('MediaPerceptionFeatureService', () => {
 
     it('should return false when confidence below threshold', async () => {
       const mockConfigService = {
-        get: jest.fn().mockReturnValue(createMockConfig({ enabled: true, overrideThreshold: 0.85 })),
+        get: jest
+          .fn()
+          .mockReturnValue(createMockConfig({ enabled: true, overrideThreshold: 0.85 })),
       } as any;
 
       const module: TestingModule = await Test.createTestingModule({
@@ -162,7 +164,9 @@ describe('MediaPerceptionFeatureService', () => {
 
     it('should return true when confidence meets threshold', async () => {
       const mockConfigService = {
-        get: jest.fn().mockReturnValue(createMockConfig({ enabled: true, overrideThreshold: 0.85 })),
+        get: jest
+          .fn()
+          .mockReturnValue(createMockConfig({ enabled: true, overrideThreshold: 0.85 })),
       } as any;
 
       const module: TestingModule = await Test.createTestingModule({
@@ -222,15 +226,17 @@ describe('MediaPerceptionFeatureService', () => {
 
     it('should return false when sub-feature is disabled', async () => {
       const mockConfigService = {
-        get: jest.fn().mockReturnValue(createMockConfig({
-          enabled: true,
-          features: {
-            volumeEstimation: false,
-            laborEstimation: true,
-            fragilityDetection: true,
-            itemDetection: true,
-          },
-        })),
+        get: jest.fn().mockReturnValue(
+          createMockConfig({
+            enabled: true,
+            features: {
+              volumeEstimation: false,
+              laborEstimation: true,
+              fragilityDetection: true,
+              itemDetection: true,
+            },
+          })
+        ),
       } as any;
 
       const module: TestingModule = await Test.createTestingModule({

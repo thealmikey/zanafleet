@@ -24,10 +24,7 @@ import { DisputeEntity } from '../../entities/dispute.entity';
 import { PaymentIntentEntity } from '../../entities/payment-intent.entity';
 import { PaymentTransactionEntity } from '../../entities/payment-transaction.entity';
 import { RefundEntity } from '../../entities/refund.entity';
-import {
-  PaymentStatus,
-  ProviderCapability,
-} from '../../providers/dto/payment-provider.types';
+import { PaymentStatus, ProviderCapability } from '../../providers/dto/payment-provider.types';
 import { PaymentProviderRegistry } from '../../providers/payment-provider-registry.service';
 import { PaymentProvider } from '../../providers/payment-provider.interface';
 
@@ -54,7 +51,7 @@ describe('RefundDisputeCoordinator', () => {
   };
 
   const createMockPaymentIntent = (
-    overrides: Partial<PaymentIntentEntity> = {},
+    overrides: Partial<PaymentIntentEntity> = {}
   ): PaymentIntentEntity => {
     const entity = new PaymentIntentEntity();
     entity.id = 'payment-intent-123';
@@ -73,9 +70,7 @@ describe('RefundDisputeCoordinator', () => {
     return entity;
   };
 
-  const createMockDispute = (
-    overrides: Partial<DisputeEntity> = {},
-  ): DisputeEntity => {
+  const createMockDispute = (overrides: Partial<DisputeEntity> = {}): DisputeEntity => {
     const entity = new DisputeEntity();
     entity.id = 'dispute-123';
     entity.deliveryId = 'delivery-123';
@@ -92,9 +87,7 @@ describe('RefundDisputeCoordinator', () => {
     return entity;
   };
 
-  const createMockRefund = (
-    overrides: Partial<RefundEntity> = {},
-  ): RefundEntity => {
+  const createMockRefund = (overrides: Partial<RefundEntity> = {}): RefundEntity => {
     const entity = new RefundEntity();
     entity.id = 'refund-123';
     entity.paymentIntentId = 'payment-intent-123';
@@ -114,7 +107,7 @@ describe('RefundDisputeCoordinator', () => {
   };
 
   const createMockTransaction = (
-    overrides: Partial<PaymentTransactionEntity> = {},
+    overrides: Partial<PaymentTransactionEntity> = {}
   ): PaymentTransactionEntity => {
     const entity = new PaymentTransactionEntity();
     entity.id = 'transaction-123';
@@ -192,7 +185,7 @@ describe('RefundDisputeCoordinator', () => {
 
   describe('openDispute', () => {
     const createOpenDisputeInput = (
-      overrides: Partial<OpenDisputeInput> = {},
+      overrides: Partial<OpenDisputeInput> = {}
     ): OpenDisputeInput => ({
       deliveryId: 'delivery-123',
       paymentIntentId: 'payment-intent-123',
@@ -219,7 +212,7 @@ describe('RefundDisputeCoordinator', () => {
           deliveryId: 'delivery-123',
           reason: DisputeReason.DELIVERY_NOT_RECEIVED,
           status: DisputeStatus.OPEN,
-        }),
+        })
       );
     });
 
@@ -250,7 +243,7 @@ describe('RefundDisputeCoordinator', () => {
             deliveryId: 'delivery-123',
             reason: DisputeReason.DELIVERY_NOT_RECEIVED,
           }),
-        }),
+        })
       );
     });
   });
@@ -267,7 +260,9 @@ describe('RefundDisputeCoordinator', () => {
       transactionRepository.findOne.mockResolvedValue(transaction);
       refundRepository.save.mockImplementation(async (entity) => entity as RefundEntity);
       refundRepository.update.mockResolvedValue({ affected: 1 } as any);
-      refundRepository.findOne.mockResolvedValue(createMockRefund({ status: RefundStatus.COMPLETED }));
+      refundRepository.findOne.mockResolvedValue(
+        createMockRefund({ status: RefundStatus.COMPLETED })
+      );
       providerRegistry.get.mockReturnValue(mockProvider);
       mockProvider.refund.mockResolvedValue({
         success: true,
@@ -288,7 +283,7 @@ describe('RefundDisputeCoordinator', () => {
         expect.objectContaining({
           status: DisputeStatus.RESOLVED,
           resolutionType: DisputeResolutionType.FULL_REFUND,
-        }),
+        })
       );
     });
 
@@ -311,7 +306,7 @@ describe('RefundDisputeCoordinator', () => {
         'payment.events.dispute-resolved-v1',
         expect.objectContaining({
           eventType: 'Payment.Dispute.ResolvedV1',
-        }),
+        })
       );
     });
 
@@ -323,7 +318,7 @@ describe('RefundDisputeCoordinator', () => {
         coordinator.resolveDispute('dispute-123', {
           resolutionType: DisputeResolutionType.NO_REFUND,
           resolvedBy: 'support-agent-001',
-        }),
+        })
       ).rejects.toThrow('Cannot resolve dispute');
     });
 
@@ -334,7 +329,7 @@ describe('RefundDisputeCoordinator', () => {
         coordinator.resolveDispute('non-existent', {
           resolutionType: DisputeResolutionType.NO_REFUND,
           resolvedBy: 'support-agent-001',
-        }),
+        })
       ).rejects.toThrow('not found');
     });
   });
@@ -352,7 +347,7 @@ describe('RefundDisputeCoordinator', () => {
         expect.objectContaining({
           status: DisputeStatus.ESCALATED,
           escalationReason: 'Customer requested manager review',
-        }),
+        })
       );
     });
 
@@ -370,7 +365,7 @@ describe('RefundDisputeCoordinator', () => {
           payload: expect.objectContaining({
             escalationReason: 'High-value customer',
           }),
-        }),
+        })
       );
     });
 
@@ -378,9 +373,9 @@ describe('RefundDisputeCoordinator', () => {
       const dispute = createMockDispute({ status: DisputeStatus.RESOLVED });
       disputeRepository.findOne.mockResolvedValue(dispute);
 
-      await expect(
-        coordinator.escalateDispute('dispute-123', 'Some reason'),
-      ).rejects.toThrow('Cannot escalate dispute');
+      await expect(coordinator.escalateDispute('dispute-123', 'Some reason')).rejects.toThrow(
+        'Cannot escalate dispute'
+      );
     });
   });
 
@@ -418,7 +413,7 @@ describe('RefundDisputeCoordinator', () => {
       coordinator.updateConfig({ autoApprovalThreshold: 1000 });
 
       refundRepository.findOne.mockResolvedValue(
-        createMockRefund({ status: RefundStatus.COMPLETED }),
+        createMockRefund({ status: RefundStatus.COMPLETED })
       );
 
       const input = createRefundInput({ refundAmount: 500 });
@@ -447,7 +442,7 @@ describe('RefundDisputeCoordinator', () => {
         createMockRefund({
           status: RefundStatus.COMPLETED,
           refundType: RefundType.FULL,
-        }),
+        })
       );
 
       const input = createRefundInput({ refundAmount: 1000 });
@@ -458,7 +453,7 @@ describe('RefundDisputeCoordinator', () => {
       expect(refundRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
           refundType: RefundType.FULL,
-        }),
+        })
       );
     });
 
@@ -470,7 +465,7 @@ describe('RefundDisputeCoordinator', () => {
           status: RefundStatus.COMPLETED,
           refundType: RefundType.PARTIAL,
           refundAmount: '250.00',
-        }),
+        })
       );
 
       const input = createRefundInput({ refundAmount: 250 });
@@ -480,7 +475,7 @@ describe('RefundDisputeCoordinator', () => {
       expect(refundRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
           refundType: RefundType.PARTIAL,
-        }),
+        })
       );
     });
 
@@ -488,15 +483,13 @@ describe('RefundDisputeCoordinator', () => {
       coordinator.updateConfig({ autoApprovalThreshold: 2000 });
 
       refundRepository.findOne.mockResolvedValue(
-        createMockRefund({ status: RefundStatus.COMPLETED }),
+        createMockRefund({ status: RefundStatus.COMPLETED })
       );
 
       const input = createRefundInput({ refundAmount: 500 });
       await coordinator.processRefund(input);
 
-      expect(commandBus.execute).toHaveBeenCalledWith(
-        expect.any(RecordLedgerEntryCommand),
-      );
+      expect(commandBus.execute).toHaveBeenCalledWith(expect.any(RecordLedgerEntryCommand));
 
       const command = commandBus.execute.mock.calls[0][0] as RecordLedgerEntryCommand;
       expect(command.entries).toHaveLength(2);
@@ -508,7 +501,7 @@ describe('RefundDisputeCoordinator', () => {
       coordinator.updateConfig({ autoApprovalThreshold: 2000 });
 
       refundRepository.findOne.mockResolvedValue(
-        createMockRefund({ status: RefundStatus.COMPLETED }),
+        createMockRefund({ status: RefundStatus.COMPLETED })
       );
 
       const input = createRefundInput({ refundAmount: 500 });
@@ -534,7 +527,7 @@ describe('RefundDisputeCoordinator', () => {
       coordinator.updateConfig({ autoApprovalThreshold: 2000 });
 
       refundRepository.findOne.mockResolvedValue(
-        createMockRefund({ status: RefundStatus.COMPLETED }),
+        createMockRefund({ status: RefundStatus.COMPLETED })
       );
 
       const input = createRefundInput({ refundAmount: 500 });
@@ -544,7 +537,7 @@ describe('RefundDisputeCoordinator', () => {
         'payment.events.refund-processed-v1',
         expect.objectContaining({
           eventType: 'Payment.Refund.ProcessedV1',
-        }),
+        })
       );
     });
 
@@ -606,7 +599,7 @@ describe('RefundDisputeCoordinator', () => {
         expect.objectContaining({
           status: RefundStatus.APPROVED,
           approvedBy: 'supervisor-001',
-        }),
+        })
       );
     });
 
@@ -626,7 +619,7 @@ describe('RefundDisputeCoordinator', () => {
         'payment.events.refund-approved-v1',
         expect.objectContaining({
           eventType: 'Payment.Refund.ApprovedV1',
-        }),
+        })
       );
     });
 
@@ -656,18 +649,14 @@ describe('RefundDisputeCoordinator', () => {
       refundRepository.findOne.mockResolvedValue(pendingRefund);
       refundRepository.update.mockResolvedValue({ affected: 1 } as any);
 
-      await coordinator.rejectRefund(
-        'refund-123',
-        'supervisor-001',
-        'Insufficient evidence',
-      );
+      await coordinator.rejectRefund('refund-123', 'supervisor-001', 'Insufficient evidence');
 
       expect(refundRepository.update).toHaveBeenCalledWith(
         'refund-123',
         expect.objectContaining({
           status: RefundStatus.REJECTED,
           failureReason: expect.stringContaining('Insufficient evidence'),
-        }),
+        })
       );
     });
 
@@ -676,7 +665,7 @@ describe('RefundDisputeCoordinator', () => {
       refundRepository.findOne.mockResolvedValue(completedRefund);
 
       await expect(
-        coordinator.rejectRefund('refund-123', 'supervisor-001', 'Some reason'),
+        coordinator.rejectRefund('refund-123', 'supervisor-001', 'Some reason')
       ).rejects.toThrow('Cannot reject refund');
     });
   });
@@ -710,50 +699,44 @@ describe('RefundDisputeCoordinator', () => {
 
   describe('dispute state machine', () => {
     it('should validate OPEN -> UNDER_REVIEW transition', () => {
-      expect(
-        coordinator.isValidTransition(DisputeStatus.OPEN, DisputeStatus.UNDER_REVIEW),
-      ).toBe(true);
+      expect(coordinator.isValidTransition(DisputeStatus.OPEN, DisputeStatus.UNDER_REVIEW)).toBe(
+        true
+      );
     });
 
     it('should validate OPEN -> RESOLVED transition', () => {
-      expect(
-        coordinator.isValidTransition(DisputeStatus.OPEN, DisputeStatus.RESOLVED),
-      ).toBe(true);
+      expect(coordinator.isValidTransition(DisputeStatus.OPEN, DisputeStatus.RESOLVED)).toBe(true);
     });
 
     it('should validate OPEN -> ESCALATED transition', () => {
-      expect(
-        coordinator.isValidTransition(DisputeStatus.OPEN, DisputeStatus.ESCALATED),
-      ).toBe(true);
+      expect(coordinator.isValidTransition(DisputeStatus.OPEN, DisputeStatus.ESCALATED)).toBe(true);
     });
 
     it('should validate UNDER_REVIEW -> RESOLVED transition', () => {
       expect(
-        coordinator.isValidTransition(DisputeStatus.UNDER_REVIEW, DisputeStatus.RESOLVED),
+        coordinator.isValidTransition(DisputeStatus.UNDER_REVIEW, DisputeStatus.RESOLVED)
       ).toBe(true);
     });
 
     it('should validate UNDER_REVIEW -> ESCALATED transition', () => {
       expect(
-        coordinator.isValidTransition(DisputeStatus.UNDER_REVIEW, DisputeStatus.ESCALATED),
+        coordinator.isValidTransition(DisputeStatus.UNDER_REVIEW, DisputeStatus.ESCALATED)
       ).toBe(true);
     });
 
     it('should reject RESOLVED -> OPEN transition', () => {
-      expect(
-        coordinator.isValidTransition(DisputeStatus.RESOLVED, DisputeStatus.OPEN),
-      ).toBe(false);
+      expect(coordinator.isValidTransition(DisputeStatus.RESOLVED, DisputeStatus.OPEN)).toBe(false);
     });
 
     it('should reject ESCALATED -> OPEN transition', () => {
-      expect(
-        coordinator.isValidTransition(DisputeStatus.ESCALATED, DisputeStatus.OPEN),
-      ).toBe(false);
+      expect(coordinator.isValidTransition(DisputeStatus.ESCALATED, DisputeStatus.OPEN)).toBe(
+        false
+      );
     });
 
     it('should reject RESOLVED -> UNDER_REVIEW transition', () => {
       expect(
-        coordinator.isValidTransition(DisputeStatus.RESOLVED, DisputeStatus.UNDER_REVIEW),
+        coordinator.isValidTransition(DisputeStatus.RESOLVED, DisputeStatus.UNDER_REVIEW)
       ).toBe(false);
     });
   });
@@ -799,18 +782,14 @@ describe('RefundDisputeCoordinator', () => {
       disputeRepository.findOne.mockResolvedValue(dispute);
       disputeRepository.update.mockResolvedValue({ affected: 1 } as any);
 
-      await coordinator.updateDisputeStatus(
-        'dispute-123',
-        DisputeStatus.UNDER_REVIEW,
-        'agent-001',
-      );
+      await coordinator.updateDisputeStatus('dispute-123', DisputeStatus.UNDER_REVIEW, 'agent-001');
 
       expect(disputeRepository.update).toHaveBeenCalledWith(
         'dispute-123',
         expect.objectContaining({
           status: DisputeStatus.UNDER_REVIEW,
           assignedTo: 'agent-001',
-        }),
+        })
       );
     });
 
@@ -819,7 +798,7 @@ describe('RefundDisputeCoordinator', () => {
       disputeRepository.findOne.mockResolvedValue(dispute);
 
       await expect(
-        coordinator.updateDisputeStatus('dispute-123', DisputeStatus.OPEN),
+        coordinator.updateDisputeStatus('dispute-123', DisputeStatus.OPEN)
       ).rejects.toThrow('Invalid transition');
     });
   });

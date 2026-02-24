@@ -119,8 +119,8 @@ describe('IntelligenceContextBuilder', () => {
       const toLocation = {
         placeId: 'dest-001',
         formattedAddress: '456 Destination Ave, Nairobi',
-        latitude: -1.3000,
-        longitude: 36.8500,
+        latitude: -1.3,
+        longitude: 36.85,
       };
 
       const result = await builder.buildFromEstimateRequest({
@@ -162,8 +162,8 @@ describe('IntelligenceContextBuilder', () => {
       const toLocation = {
         placeId: 'dest-001',
         formattedAddress: '456 Destination Ave, Nairobi',
-        latitude: -1.3000,
-        longitude: 36.8500,
+        latitude: -1.3,
+        longitude: 36.85,
       };
 
       const result = await builder.buildFromEstimateRequest({
@@ -184,7 +184,9 @@ describe('IntelligenceContextBuilder', () => {
     });
 
     it('should handle missing location normalization gracefully', async () => {
-      locationNormalizationService.normalize.mockRejectedValueOnce(new Error('Invalid coordinates'));
+      locationNormalizationService.normalize.mockRejectedValueOnce(
+        new Error('Invalid coordinates')
+      );
 
       const fromLocation = {
         placeId: 'origin-001',
@@ -196,8 +198,8 @@ describe('IntelligenceContextBuilder', () => {
       const toLocation = {
         placeId: 'dest-001',
         formattedAddress: '456 Destination Ave',
-        latitude: -1.3000,
-        longitude: 36.8500,
+        latitude: -1.3,
+        longitude: 36.85,
       };
 
       const result = await builder.buildFromEstimateRequest({
@@ -221,8 +223,8 @@ describe('IntelligenceContextBuilder', () => {
       const toLocation = {
         placeId: 'dest-001',
         formattedAddress: '456 Destination Ave, Nairobi',
-        latitude: -1.3000,
-        longitude: 36.8500,
+        latitude: -1.3,
+        longitude: 36.85,
       };
 
       const result = await builder.buildFromEstimateRequest({

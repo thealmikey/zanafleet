@@ -1,8 +1,4 @@
-import {
-  PaymentIntentStatus,
-  PaymentFlowType,
-  PaymentMethod,
-} from '../../dto/payment.enums';
+import { PaymentIntentStatus, PaymentFlowType, PaymentMethod } from '../../dto/payment.enums';
 import { PaymentIntentEntity } from '../../entities/payment-intent.entity';
 
 describe('PaymentIntentEntity', () => {

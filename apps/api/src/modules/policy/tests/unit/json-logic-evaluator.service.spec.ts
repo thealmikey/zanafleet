@@ -1287,11 +1287,23 @@ describe('JsonLogicEvaluatorService', () => {
         metadata: { custom: 'value' },
       });
 
-      expect(service.evaluate({ field: 'actorId', operator: '==', value: 'actor-123' }, context).matched).toBe(true);
-      expect(service.evaluate({ field: 'deliveryId', operator: '==', value: 'delivery-789' }, context).matched).toBe(true);
-      expect(service.evaluate({ field: 'riderId', operator: '==', value: 'rider-abc' }, context).matched).toBe(true);
-      expect(service.evaluate({ field: 'businessId', operator: '==', value: 'business-def' }, context).matched).toBe(true);
-      expect(service.evaluate({ field: 'saccoId', operator: '==', value: 'sacco-ghi' }, context).matched).toBe(true);
+      expect(
+        service.evaluate({ field: 'actorId', operator: '==', value: 'actor-123' }, context).matched
+      ).toBe(true);
+      expect(
+        service.evaluate({ field: 'deliveryId', operator: '==', value: 'delivery-789' }, context)
+          .matched
+      ).toBe(true);
+      expect(
+        service.evaluate({ field: 'riderId', operator: '==', value: 'rider-abc' }, context).matched
+      ).toBe(true);
+      expect(
+        service.evaluate({ field: 'businessId', operator: '==', value: 'business-def' }, context)
+          .matched
+      ).toBe(true);
+      expect(
+        service.evaluate({ field: 'saccoId', operator: '==', value: 'sacco-ghi' }, context).matched
+      ).toBe(true);
     });
   });
 
@@ -1304,7 +1316,11 @@ describe('JsonLogicEvaluatorService', () => {
       currentDayOfWeek: 6, // Saturday
       activeEvents: [
         { eventId: 'evt-1', eventType: CalendarEventType.PUBLIC_HOLIDAY, title: 'Christmas Day' },
-        { eventId: 'evt-2', eventType: CalendarEventType.BUSINESS_CLOSURE, title: 'Company Holiday' },
+        {
+          eventId: 'evt-2',
+          eventType: CalendarEventType.BUSINESS_CLOSURE,
+          title: 'Company Holiday',
+        },
       ],
       activeOverrides: [
         { overrideId: 'ovr-1', exceptionType: 'PREMIUM_MERCHANT' },
@@ -1455,7 +1471,11 @@ describe('JsonLogicEvaluatorService', () => {
             isWorkingHours: baseCalendar.isWorkingHours,
             isWeekend: baseCalendar.isWeekend,
             currentDayOfWeek: baseCalendar.currentDayOfWeek,
-            activeEvents: [] as Array<{ eventId: string; eventType: CalendarEventType; title: string }>,
+            activeEvents: [] as Array<{
+              eventId: string;
+              eventType: CalendarEventType;
+              title: string;
+            }>,
             activeOverrides: baseCalendar.activeOverrides,
           },
         });
@@ -1535,12 +1555,16 @@ describe('JsonLogicEvaluatorService', () => {
               operator: 'NOT',
               value: null,
               children: [
-                { field: 'calendar.activeOverrides', operator: 'hasOverride', value: 'PREMIUM_MERCHANT' },
+                {
+                  field: 'calendar.activeOverrides',
+                  operator: 'hasOverride',
+                  value: 'PREMIUM_MERCHANT',
+                },
               ],
             },
           ],
         };
-        
+
         // Context WITH premium merchant override - should NOT match (blocked by NOT)
         const contextWithOverride = createContext({
           calendarContext: createCalendarContext(),

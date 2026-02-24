@@ -41,10 +41,7 @@ export class RiderTelemetrySubscriber implements OnModuleDestroy {
   private batchBuffer: RiderTelemetryData[] = [];
   private batchTimeout: NodeJS.Timeout | null = null;
 
-  constructor(
-    private readonly commandBus: CommandBus,
-    batchConfig?: BatchConfig,
-  ) {
+  constructor(private readonly commandBus: CommandBus, batchConfig?: BatchConfig) {
     this.batchEnabled = !!batchConfig;
     this.batchConfig = batchConfig ?? DEFAULT_BATCH_CONFIG;
   }
@@ -56,7 +53,7 @@ export class RiderTelemetrySubscriber implements OnModuleDestroy {
   @MessagePattern(NatsSubjects.Location.RIDER_TELEMETRY_V1)
   async handleRiderTelemetry(
     @Payload() data: Record<string, unknown>,
-    @Ctx() _context: NatsContext,
+    @Ctx() _context: NatsContext
   ): Promise<void> {
     try {
       const telemetry = this.validateAndTransform(data);
@@ -68,8 +65,10 @@ export class RiderTelemetrySubscriber implements OnModuleDestroy {
       }
     } catch (error) {
       this.logger.error(
-        `Failed to process rider telemetry: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        error instanceof Error ? error.stack : undefined,
+        `Failed to process rider telemetry: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`,
+        error instanceof Error ? error.stack : undefined
       );
     }
   }
@@ -180,14 +179,12 @@ export class RiderTelemetrySubscriber implements OnModuleDestroy {
     this.logger.debug(`Flushing batch of ${batch.length} telemetry messages`);
 
     const results = await Promise.allSettled(
-      batch.map((telemetry) => this.processMessage(telemetry)),
+      batch.map((telemetry) => this.processMessage(telemetry))
     );
 
     const failures = results.filter((r) => r.status === 'rejected');
     if (failures.length > 0) {
-      this.logger.warn(
-        `${failures.length}/${batch.length} batch messages failed to process`,
-      );
+      this.logger.warn(`${failures.length}/${batch.length} batch messages failed to process`);
     }
   }
 

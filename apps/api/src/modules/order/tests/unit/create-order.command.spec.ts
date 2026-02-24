@@ -1,7 +1,4 @@
-import {
-  CreateOrderCommand,
-  CreateOrderCommandSchema,
-} from '../../commands/create-order.command';
+import { CreateOrderCommand, CreateOrderCommandSchema } from '../../commands/create-order.command';
 
 describe('CreateOrderCommand - Schema', () => {
   it('should validate minimal valid input', () => {

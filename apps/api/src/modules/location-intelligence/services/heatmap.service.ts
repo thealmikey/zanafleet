@@ -2,11 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 
 import { GeoPoint } from '../providers/geo-provider.interface';
-import {
-  H3_RESOLUTION_FINE,
-  H3_RESOLUTION_MEDIUM,
-  H3_RESOLUTION_COARSE,
-} from '../types/h3.types';
+import { H3_RESOLUTION_FINE, H3_RESOLUTION_MEDIUM, H3_RESOLUTION_COARSE } from '../types/h3.types';
 import {
   HeatmapParams,
   HistoricalHeatmapParams,
@@ -35,10 +31,7 @@ const RESOLUTION_COLUMNS: Record<H3Resolution, string> = {
 export class HeatmapService {
   private readonly logger = new Logger(HeatmapService.name);
 
-  constructor(
-    private readonly dataSource: DataSource,
-    private readonly h3Service: H3Service,
-  ) {}
+  constructor(private readonly dataSource: DataSource, private readonly h3Service: H3Service) {}
 
   /**
    * Get a heatmap of current rider activity aggregated by H3 cells.
@@ -50,9 +43,7 @@ export class HeatmapService {
     const { boundingBox, resolution } = params;
     const h3Column = this.getH3ColumnForResolution(resolution);
 
-    this.logger.debug(
-      `Generating activity heatmap: resolution=${resolution}, column=${h3Column}`,
-    );
+    this.logger.debug(`Generating activity heatmap: resolution=${resolution}, column=${h3Column}`);
 
     const rows = await this.dataSource.query<AggregatedCellRow[]>(
       `
@@ -64,7 +55,7 @@ export class HeatmapService {
         AND longitude >= $3 AND longitude <= $4
       GROUP BY ${h3Column}
       `,
-      [boundingBox.minLat, boundingBox.maxLat, boundingBox.minLng, boundingBox.maxLng],
+      [boundingBox.minLat, boundingBox.maxLat, boundingBox.minLng, boundingBox.maxLng]
     );
 
     return this.enrichCells(rows, boundingBox);
@@ -81,7 +72,7 @@ export class HeatmapService {
     const h3Column = this.getH3ColumnForResolution(resolution);
 
     this.logger.debug(
-      `Generating historical heatmap: resolution=${resolution}, range=${startTime.toISOString()}-${endTime.toISOString()}`,
+      `Generating historical heatmap: resolution=${resolution}, range=${startTime.toISOString()}-${endTime.toISOString()}`
     );
 
     const rows = await this.dataSource.query<AggregatedCellRow[]>(
@@ -102,7 +93,7 @@ export class HeatmapService {
         boundingBox.maxLng,
         startTime,
         endTime,
-      ],
+      ]
     );
 
     return this.enrichCells(rows, boundingBox);
@@ -129,10 +120,7 @@ export class HeatmapService {
    * @param boundingBox - Bounding box for filtering
    * @returns Enriched heatmap cells
    */
-  private enrichCells(
-    rows: AggregatedCellRow[],
-    boundingBox: BoundingBox,
-  ): HeatmapCell[] {
+  private enrichCells(rows: AggregatedCellRow[], boundingBox: BoundingBox): HeatmapCell[] {
     const cells: HeatmapCell[] = [];
 
     for (const row of rows) {

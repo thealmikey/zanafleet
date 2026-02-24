@@ -60,7 +60,10 @@ describe('SaccoController (e2e)', () => {
       .overrideGuard(CapabilityGuard)
       .useValue({
         canActivate: async (): Promise<boolean> => {
-          const result = await mockCapabilityAccessController.hasCapability('test-actor', 'sacco.manage');
+          const result = await mockCapabilityAccessController.hasCapability(
+            'test-actor',
+            'sacco.manage'
+          );
           if (!result) {
             throw new ForbiddenException('Missing required capability: sacco.manage');
           }
@@ -106,9 +109,7 @@ describe('SaccoController (e2e)', () => {
       const mockEntity = createMockSaccoEntity();
       mockRepository.findOne.mockResolvedValue(mockEntity);
 
-      const response = await request(app.getHttpServer())
-        .get('/saccos/sacco-123')
-        .expect(200);
+      const response = await request(app.getHttpServer()).get('/saccos/sacco-123').expect(200);
 
       expect(response.body).toMatchObject({
         saccoId: 'sacco-123',
@@ -120,15 +121,16 @@ describe('SaccoController (e2e)', () => {
     it('should return 404 when sacco not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await request(app.getHttpServer())
-        .get('/saccos/non-existent')
-        .expect(404);
+      await request(app.getHttpServer()).get('/saccos/non-existent').expect(404);
     });
   });
 
   describe('GET /saccos', () => {
     it('should return 200 with data and meta respecting pagination', async () => {
-      const mockEntities = [createMockSaccoEntity({ id: 'sacco-1' }), createMockSaccoEntity({ id: 'sacco-2' })];
+      const mockEntities = [
+        createMockSaccoEntity({ id: 'sacco-1' }),
+        createMockSaccoEntity({ id: 'sacco-2' }),
+      ];
       mockRepository.findAndCount.mockResolvedValue([mockEntities, 2]);
 
       const response = await request(app.getHttpServer())

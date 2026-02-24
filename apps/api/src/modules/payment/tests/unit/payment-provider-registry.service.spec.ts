@@ -15,7 +15,7 @@ class MockPaymentProvider implements PaymentProvider {
     public readonly providerId: string,
     public readonly displayName: string,
     public readonly supportedCurrencies: string[],
-    public readonly capabilities: ProviderCapability[],
+    public readonly capabilities: ProviderCapability[]
   ) {}
 
   async initiatePayment(_intent: PaymentIntentData): Promise<PaymentInitiationResult> {
@@ -125,7 +125,7 @@ describe('PaymentProviderRegistry', () => {
   describe('setDefault', () => {
     it('should throw when provider does not exist', () => {
       expect(() => registry.setDefault('nonexistent')).toThrow(
-        'Payment provider not found: nonexistent',
+        'Payment provider not found: nonexistent'
       );
     });
 
@@ -152,15 +152,19 @@ describe('PaymentProviderRegistry', () => {
     });
 
     it('should return only providers with specified capability', () => {
-      const stripeProvider = new MockPaymentProvider('stripe', 'Stripe', ['USD'], [
-        'CARD',
-        'WALLET',
-      ]);
+      const stripeProvider = new MockPaymentProvider(
+        'stripe',
+        'Stripe',
+        ['USD'],
+        ['CARD', 'WALLET']
+      );
       const mpesaProvider = new MockPaymentProvider('mpesa', 'M-Pesa', ['KES'], ['MOBILE_MONEY']);
-      const multiProvider = new MockPaymentProvider('multi', 'Multi', ['USD', 'KES'], [
-        'CARD',
-        'MOBILE_MONEY',
-      ]);
+      const multiProvider = new MockPaymentProvider(
+        'multi',
+        'Multi',
+        ['USD', 'KES'],
+        ['CARD', 'MOBILE_MONEY']
+      );
 
       registry.register(stripeProvider);
       registry.register(mpesaProvider);
@@ -219,15 +223,19 @@ describe('PaymentProviderRegistry', () => {
 
   describe('multiple providers', () => {
     it('should support multiple providers with one default', () => {
-      const stripe = new MockPaymentProvider('stripe', 'Stripe', ['USD', 'EUR'], [
-        'CARD',
-        'WALLET',
-      ]);
+      const stripe = new MockPaymentProvider(
+        'stripe',
+        'Stripe',
+        ['USD', 'EUR'],
+        ['CARD', 'WALLET']
+      );
       const mpesa = new MockPaymentProvider('mpesa', 'M-Pesa', ['KES'], ['MOBILE_MONEY']);
-      const paypal = new MockPaymentProvider('paypal', 'PayPal', ['USD', 'EUR', 'GBP'], [
-        'CARD',
-        'WALLET',
-      ]);
+      const paypal = new MockPaymentProvider(
+        'paypal',
+        'PayPal',
+        ['USD', 'EUR', 'GBP'],
+        ['CARD', 'WALLET']
+      );
 
       registry.register(stripe, true);
       registry.register(mpesa);

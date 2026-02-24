@@ -157,8 +157,8 @@ describe('MoversQuoteOrchestrator', () => {
     it('should apply demand multiplier for weekend dates', async () => {
       // Request for Saturday
       const saturday = new Date();
-      saturday.setDate(saturday.getDate() + (6 - saturday.getDay() + 7) % 7 + 7);
-      
+      saturday.setDate(saturday.getDate() + ((6 - saturday.getDay() + 7) % 7) + 7);
+
       const request: MoversEstimateRequestDto = {
         ...createMockRequest(),
         requestedDate: saturday.toISOString(),
@@ -177,7 +177,7 @@ describe('MoversQuoteOrchestrator', () => {
       const afterTime = Date.now();
 
       const validUntil = new Date(estimate.validUntil).getTime();
-      
+
       // Should be between 23 and 25 hours from now
       expect(validUntil).toBeGreaterThan(beforeTime + 23 * 60 * 60 * 1000);
       expect(validUntil).toBeLessThan(afterTime + 25 * 60 * 60 * 1000);

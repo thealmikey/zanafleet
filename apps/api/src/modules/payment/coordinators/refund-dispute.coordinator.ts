@@ -127,7 +127,7 @@ export class RefundDisputeCoordinator {
     private readonly transactionRepository: Repository<PaymentTransactionEntity>,
     @Optional() private readonly commandBus?: CommandBus,
     @Optional() private readonly providerRegistry?: PaymentProviderRegistry,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async openDispute(input: OpenDisputeInput): Promise<DisputeResult> {
@@ -187,10 +187,7 @@ export class RefundDisputeCoordinator {
     }
   }
 
-  async resolveDispute(
-    disputeId: string,
-    resolution: DisputeResolution,
-  ): Promise<void> {
+  async resolveDispute(disputeId: string, resolution: DisputeResolution): Promise<void> {
     this.logger.log(`Resolving dispute ${disputeId}`);
 
     const dispute = await this.disputeRepository.findOne({
@@ -202,9 +199,7 @@ export class RefundDisputeCoordinator {
     }
 
     if (!this.isValidTransition(dispute.status, DisputeStatus.RESOLVED)) {
-      throw new Error(
-        `Cannot resolve dispute with status ${dispute.status}`,
-      );
+      throw new Error(`Cannot resolve dispute with status ${dispute.status}`);
     }
 
     const now = new Date();
@@ -222,8 +217,7 @@ export class RefundDisputeCoordinator {
       resolution.resolutionType === DisputeResolutionType.FULL_REFUND ||
       resolution.resolutionType === DisputeResolutionType.PARTIAL_REFUND
     ) {
-      const refundAmount =
-        resolution.refundAmount ?? parseFloat(dispute.disputedAmount);
+      const refundAmount = resolution.refundAmount ?? parseFloat(dispute.disputedAmount);
 
       if (dispute.paymentIntentId) {
         await this.processRefund({
@@ -261,9 +255,7 @@ export class RefundDisputeCoordinator {
     }
 
     if (!this.isValidTransition(dispute.status, DisputeStatus.ESCALATED)) {
-      throw new Error(
-        `Cannot escalate dispute with status ${dispute.status}`,
-      );
+      throw new Error(`Cannot escalate dispute with status ${dispute.status}`);
     }
 
     const now = new Date();
@@ -302,14 +294,9 @@ export class RefundDisputeCoordinator {
       const refundType =
         input.refundAmount >= originalAmount ? RefundType.FULL : RefundType.PARTIAL;
 
-      const requiresApproval = this.checkRequiresApproval(
-        input.refundAmount,
-        refundType,
-      );
+      const requiresApproval = this.checkRequiresApproval(input.refundAmount, refundType);
 
-      const initialStatus = requiresApproval
-        ? RefundStatus.PENDING
-        : RefundStatus.APPROVED;
+      const initialStatus = requiresApproval ? RefundStatus.PENDING : RefundStatus.APPROVED;
 
       const refund = RefundEntity.fromDomain({
         refundId,
@@ -420,11 +407,7 @@ export class RefundDisputeCoordinator {
     };
   }
 
-  async rejectRefund(
-    refundId: string,
-    rejectedBy: string,
-    reason: string,
-  ): Promise<void> {
+  async rejectRefund(refundId: string, rejectedBy: string, reason: string): Promise<void> {
     this.logger.log(`Rejecting refund ${refundId}`);
 
     const refund = await this.refundRepository.findOne({
@@ -493,7 +476,7 @@ export class RefundDisputeCoordinator {
   async updateDisputeStatus(
     disputeId: string,
     newStatus: DisputeStatus,
-    assignedTo?: string,
+    assignedTo?: string
   ): Promise<void> {
     const dispute = await this.disputeRepository.findOne({
       where: { id: disputeId },
@@ -504,9 +487,7 @@ export class RefundDisputeCoordinator {
     }
 
     if (!this.isValidTransition(dispute.status, newStatus)) {
-      throw new Error(
-        `Invalid transition from ${dispute.status} to ${newStatus}`,
-      );
+      throw new Error(`Invalid transition from ${dispute.status} to ${newStatus}`);
     }
 
     const updates: {
@@ -534,16 +515,11 @@ export class RefundDisputeCoordinator {
   }
 
   isValidTransition(from: DisputeStatus, to: DisputeStatus): boolean {
-    return VALID_DISPUTE_TRANSITIONS.some(
-      (t) => t.from.includes(from) && t.to === to,
-    );
+    return VALID_DISPUTE_TRANSITIONS.some((t) => t.from.includes(from) && t.to === to);
   }
 
   private checkRequiresApproval(amount: number, refundType: RefundType): boolean {
-    if (
-      this.config.requireApprovalForFullRefund &&
-      refundType === RefundType.FULL
-    ) {
+    if (this.config.requireApprovalForFullRefund && refundType === RefundType.FULL) {
       return true;
     }
 
@@ -552,7 +528,7 @@ export class RefundDisputeCoordinator {
 
   private async executeRefund(
     refund: RefundEntity,
-    paymentIntent: PaymentIntentEntity,
+    paymentIntent: PaymentIntentEntity
   ): Promise<ProcessRefundResult> {
     const refundId = refund.id;
 
@@ -578,13 +554,11 @@ export class RefundDisputeCoordinator {
           if (transaction?.providerTransactionId) {
             const providerResult = await provider.refund(
               transaction.providerTransactionId,
-              parseFloat(refund.refundAmount),
+              parseFloat(refund.refundAmount)
             );
 
             if (!providerResult.success) {
-              throw new Error(
-                providerResult.errorMessage ?? 'Provider refund failed',
-              );
+              throw new Error(providerResult.errorMessage ?? 'Provider refund failed');
             }
 
             providerRefundId = providerResult.refundId;
@@ -628,7 +602,7 @@ export class RefundDisputeCoordinator {
 
       await this.emitRefundFailedEvent(
         refund,
-        error instanceof Error ? error.message : 'Refund execution failed',
+        error instanceof Error ? error.message : 'Refund execution failed'
       );
 
       return {
@@ -642,7 +616,7 @@ export class RefundDisputeCoordinator {
 
   private async executeLedgerCompensation(
     refund: RefundEntity,
-    paymentIntent: PaymentIntentEntity,
+    paymentIntent: PaymentIntentEntity
   ): Promise<void> {
     if (!this.commandBus) {
       this.logger.warn('CommandBus not available, skipping ledger compensation');
@@ -674,7 +648,7 @@ export class RefundDisputeCoordinator {
             description: `Refund ${refund.id} for payment ${paymentIntent.id}`,
           },
         ],
-      }),
+      })
     );
 
     await this.refundRepository.update(refund.id, {
@@ -682,10 +656,7 @@ export class RefundDisputeCoordinator {
     });
   }
 
-  private async emitDisputeOpenedEvent(
-    dispute: DisputeEntity,
-    openedBy: string,
-  ): Promise<void> {
+  private async emitDisputeOpenedEvent(dispute: DisputeEntity, openedBy: string): Promise<void> {
     if (!this.eventBusService) {
       return;
     }
@@ -719,7 +690,7 @@ export class RefundDisputeCoordinator {
 
   private async emitDisputeResolvedEvent(
     dispute: DisputeEntity,
-    resolution: DisputeResolution,
+    resolution: DisputeResolution
   ): Promise<void> {
     if (!this.eventBusService) {
       return;
@@ -751,10 +722,7 @@ export class RefundDisputeCoordinator {
       });
   }
 
-  private async emitDisputeEscalatedEvent(
-    dispute: DisputeEntity,
-    reason: string,
-  ): Promise<void> {
+  private async emitDisputeEscalatedEvent(dispute: DisputeEntity, reason: string): Promise<void> {
     if (!this.eventBusService) {
       return;
     }
@@ -818,10 +786,7 @@ export class RefundDisputeCoordinator {
       });
   }
 
-  private async emitRefundApprovedEvent(
-    refund: RefundEntity,
-    approvedBy: string,
-  ): Promise<void> {
+  private async emitRefundApprovedEvent(refund: RefundEntity, approvedBy: string): Promise<void> {
     if (!this.eventBusService) {
       return;
     }
@@ -885,10 +850,7 @@ export class RefundDisputeCoordinator {
       });
   }
 
-  private async emitRefundFailedEvent(
-    refund: RefundEntity,
-    reason: string,
-  ): Promise<void> {
+  private async emitRefundFailedEvent(refund: RefundEntity, reason: string): Promise<void> {
     if (!this.eventBusService) {
       return;
     }

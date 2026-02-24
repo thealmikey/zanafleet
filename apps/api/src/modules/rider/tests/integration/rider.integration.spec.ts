@@ -7,7 +7,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { VehicleType } from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
 
-
 import { CreateSaccoCommand } from '../../../sacco/commands/create-sacco.command';
 import { SaccoModule } from '../../../sacco/sacco.module';
 import { CreateRiderCommand } from '../../commands/create-rider.command';
@@ -69,7 +68,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
     if (neo4jService) {
       const session = neo4jService.getWriteSession();
       try {
-        await session.run("MATCH (r:Rider) WHERE r.fullName STARTS WITH 'Test Rider' DETACH DELETE r");
+        await session.run(
+          "MATCH (r:Rider) WHERE r.fullName STARTS WITH 'Test Rider' DETACH DELETE r"
+        );
         await session.run("MATCH (s:Sacco) WHERE s.name STARTS WITH 'Test Sacco' DETACH DELETE s");
       } finally {
         await session.close();
@@ -86,7 +87,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         administrativeArea: 'Nairobi',
         country: 'Kenya',
       };
-      const phone = `+2547${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
+      const phone = `+2547${Math.floor(Math.random() * 100000000)
+        .toString()
+        .padStart(8, '0')}`;
       const nationalId = `ID${uuidv4().slice(0, 8)}`;
       const command = new CreateRiderCommand({
         fullName: `Test Rider ${uuidv4().slice(0, 8)}`,
@@ -123,7 +126,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
       const saccoId = await commandBus.execute(saccoCommand);
 
       // Create rider with sacco but without location
-      const phone = `+2547${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
+      const phone = `+2547${Math.floor(Math.random() * 100000000)
+        .toString()
+        .padStart(8, '0')}`;
       const nationalId = `ID${uuidv4().slice(0, 8)}`;
       const command = new CreateRiderCommand({
         fullName: `Test Rider ${uuidv4().slice(0, 8)}`,
@@ -153,7 +158,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         administrativeArea: 'Nairobi',
         country: 'Kenya',
       };
-      const phone = `+2547${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
+      const phone = `+2547${Math.floor(Math.random() * 100000000)
+        .toString()
+        .padStart(8, '0')}`;
       const nationalId = `ID${uuidv4().slice(0, 8)}`;
       const invalidSaccoId = uuidv4();
       const command = new CreateRiderCommand({
@@ -184,7 +191,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         administrativeArea: 'Mombasa',
         country: 'Kenya',
       };
-      const phone = `+2547${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
+      const phone = `+2547${Math.floor(Math.random() * 100000000)
+        .toString()
+        .padStart(8, '0')}`;
       const command1 = new CreateRiderCommand({
         fullName: `Test Rider ${uuidv4().slice(0, 8)}`,
         nationalId: `ID${uuidv4().slice(0, 8)}`,
@@ -228,7 +237,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
       const command1 = new CreateRiderCommand({
         fullName: `Test Rider ${uuidv4().slice(0, 8)}`,
         nationalId,
-        phone: `+2547${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`,
+        phone: `+2547${Math.floor(Math.random() * 100000000)
+          .toString()
+          .padStart(8, '0')}`,
         location: nairobiLocation,
         vehicleType: VehicleType.Bike,
         saccoId: null,
@@ -237,7 +248,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
       const command2 = new CreateRiderCommand({
         fullName: `Test Rider ${uuidv4().slice(0, 8)}`,
         nationalId, // Same national ID
-        phone: `+2547${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`,
+        phone: `+2547${Math.floor(Math.random() * 100000000)
+          .toString()
+          .padStart(8, '0')}`,
         location: mombasaLocation,
         vehicleType: VehicleType.Car,
         saccoId: null,
@@ -268,7 +281,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
 
       // Create rider with sacco
       const fullName = `Test Rider ${uuidv4().slice(0, 8)}`;
-      const phone = `+2547${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
+      const phone = `+2547${Math.floor(Math.random() * 100000000)
+        .toString()
+        .padStart(8, '0')}`;
       const nationalId = `ID${uuidv4().slice(0, 8)}`;
       const command = new CreateRiderCommand({
         fullName,
@@ -289,10 +304,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
       const session = neo4jService.getReadSession();
       try {
         // Verify Rider node with separate location properties
-        const riderResult = await session.run(
-          'MATCH (r:Rider {id: $riderId}) RETURN r',
-          { riderId }
-        );
+        const riderResult = await session.run('MATCH (r:Rider {id: $riderId}) RETURN r', {
+          riderId,
+        });
         expect(riderResult.records.length).toBe(1);
         const riderNode = riderResult.records[0].get('r').properties;
         expect(riderNode.fullName).toBe(fullName);

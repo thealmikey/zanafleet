@@ -3,7 +3,12 @@
  * Shared types for payment provider abstraction
  */
 
-export type ProviderCapability = 'CARD' | 'MOBILE_MONEY' | 'BANK_TRANSFER' | 'WALLET' | 'TOKENIZATION';
+export type ProviderCapability =
+  | 'CARD'
+  | 'MOBILE_MONEY'
+  | 'BANK_TRANSFER'
+  | 'WALLET'
+  | 'TOKENIZATION';
 
 export interface PaymentIntentData {
   amount: number;

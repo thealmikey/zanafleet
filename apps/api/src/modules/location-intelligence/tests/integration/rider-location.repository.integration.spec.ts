@@ -171,14 +171,12 @@ describeWithDb('RiderLocationRepository Integration', () => {
 
   async function cleanupTestData(): Promise<void> {
     const riderIds = TEST_RIDERS.map((r) => r.id);
-    await dataSource.query(
-      'DELETE FROM rider_location_history WHERE rider_id = ANY($1)',
-      [riderIds],
-    );
-    await dataSource.query(
-      'DELETE FROM rider_location_snapshots WHERE rider_id = ANY($1)',
-      [riderIds],
-    );
+    await dataSource.query('DELETE FROM rider_location_history WHERE rider_id = ANY($1)', [
+      riderIds,
+    ]);
+    await dataSource.query('DELETE FROM rider_location_snapshots WHERE rider_id = ANY($1)', [
+      riderIds,
+    ]);
   }
 
   async function insertTestRiders(): Promise<void> {
@@ -211,7 +209,7 @@ describeWithDb('RiderLocationRepository Integration', () => {
           90,
           10,
           5,
-        ],
+        ]
       );
     }
   }
@@ -294,9 +292,7 @@ describeWithDb('RiderLocationRepository Integration', () => {
       });
 
       for (let i = 1; i < results.length; i++) {
-        expect(results[i].distanceMeters).toBeGreaterThanOrEqual(
-          results[i - 1].distanceMeters!,
-        );
+        expect(results[i].distanceMeters).toBeGreaterThanOrEqual(results[i - 1].distanceMeters!);
       }
     });
 
@@ -387,10 +383,10 @@ describeWithDb('RiderLocationRepository Integration', () => {
   describe('findRidersInPolygon', () => {
     it('should find riders within a polygon around center', async () => {
       const polygon: GeoPoint[] = [
-        { latitude: -1.290, longitude: 36.820 },
-        { latitude: -1.290, longitude: 36.825 },
+        { latitude: -1.29, longitude: 36.82 },
+        { latitude: -1.29, longitude: 36.825 },
         { latitude: -1.295, longitude: 36.825 },
-        { latitude: -1.295, longitude: 36.820 },
+        { latitude: -1.295, longitude: 36.82 },
       ];
 
       const results = await repository.findRidersInPolygon(polygon);
@@ -402,9 +398,9 @@ describeWithDb('RiderLocationRepository Integration', () => {
 
     it('should exclude riders outside the polygon', async () => {
       const smallPolygon: GeoPoint[] = [
-        { latitude: -1.2920, longitude: 36.8218 },
-        { latitude: -1.2920, longitude: 36.8220 },
-        { latitude: -1.2922, longitude: 36.8220 },
+        { latitude: -1.292, longitude: 36.8218 },
+        { latitude: -1.292, longitude: 36.822 },
+        { latitude: -1.2922, longitude: 36.822 },
         { latitude: -1.2922, longitude: 36.8218 },
       ];
 
@@ -421,7 +417,7 @@ describeWithDb('RiderLocationRepository Integration', () => {
       const testRiderId = uuidv4();
       const locationData = {
         riderId: testRiderId,
-        latitude: -1.30,
+        latitude: -1.3,
         longitude: 36.83,
         heading: 45,
         speed: 15,
@@ -432,7 +428,7 @@ describeWithDb('RiderLocationRepository Integration', () => {
       await repository.upsertSnapshot(locationData);
 
       let results = await repository.findNearbyRiders({
-        point: { latitude: -1.30, longitude: 36.83 },
+        point: { latitude: -1.3, longitude: 36.83 },
         radiusMeters: 100,
       });
       let rider = results.find((r) => r.riderId === testRiderId);
@@ -478,7 +474,7 @@ describeWithDb('RiderLocationRepository Integration', () => {
       const history = await repository.getRiderPath(
         testRiderId,
         new Date('2024-01-15T09:00:00Z'),
-        new Date('2024-01-15T11:00:00Z'),
+        new Date('2024-01-15T11:00:00Z')
       );
 
       expect(history.length).toBe(3);
@@ -497,7 +493,7 @@ describeWithDb('RiderLocationRepository Integration', () => {
       const baseTime = new Date('2024-01-15T10:00:00Z');
 
       const points = [
-        { lat: -1.290, lng: 36.820, time: 0 },
+        { lat: -1.29, lng: 36.82, time: 0 },
         { lat: -1.291, lng: 36.821, time: 60000 },
         { lat: -1.292, lng: 36.822, time: 120000 },
         { lat: -1.293, lng: 36.823, time: 180000 },
@@ -515,11 +511,11 @@ describeWithDb('RiderLocationRepository Integration', () => {
       const path = await repository.getRiderPath(
         testRiderId,
         new Date('2024-01-15T09:00:00Z'),
-        new Date('2024-01-15T11:00:00Z'),
+        new Date('2024-01-15T11:00:00Z')
       );
 
       expect(path.length).toBe(4);
-      expect(path[0].latitude).toBeCloseTo(-1.290, 3);
+      expect(path[0].latitude).toBeCloseTo(-1.29, 3);
       expect(path[3].latitude).toBeCloseTo(-1.293, 3);
 
       await dataSource.query('DELETE FROM rider_location_history WHERE rider_id = $1', [
@@ -552,7 +548,7 @@ describeWithDb('RiderLocationRepository Integration', () => {
       const path = await repository.getRiderPath(
         testRiderId,
         new Date('2024-01-15T10:00:00Z'),
-        new Date('2024-01-15T11:00:00Z'),
+        new Date('2024-01-15T11:00:00Z')
       );
 
       expect(path.length).toBe(1);

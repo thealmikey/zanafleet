@@ -32,7 +32,7 @@ export interface RiderCandidateRepository {
     longitude: number,
     radiusMeters: number,
     now?: Date,
-    limit?: number,
+    limit?: number
   ): Promise<RiderCandidate[]>;
 }
 

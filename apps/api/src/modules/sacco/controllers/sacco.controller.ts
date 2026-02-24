@@ -1,10 +1,6 @@
 import { RequireCapability } from '@api/core/api/decorators';
 import { CapabilityGuard } from '@api/core/api/guards';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
+import { parseQueryParams, createPaginationMeta, RawQueryParams } from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -23,7 +19,6 @@ import { CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { LocationData } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
-
 
 import { CreateSaccoCommand } from '../commands/create-sacco.command';
 import { SaccoEntity } from '../entities/sacco.entity';
@@ -77,7 +72,7 @@ export class SaccoController {
     const order = sort ? { [sort.field]: sort.order } : undefined;
 
     const [entities, total] = await this.saccoRepository.findAndCount({
-      where: filter ,
+      where: filter,
       order,
       skip: pagination.offset,
       take: pagination.limit,

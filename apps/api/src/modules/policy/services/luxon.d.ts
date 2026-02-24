@@ -21,7 +21,7 @@ declare module 'luxon' {
     static fromJSDate(date: Date, options?: { zone?: string }): DateTime;
     static fromISO(text: string, options?: { zone?: string }): DateTime;
     static now(): DateTime;
-    
+
     readonly hour: number;
     readonly minute: number;
     readonly second: number;
@@ -29,7 +29,7 @@ declare module 'luxon' {
     readonly day: number;
     readonly month: number;
     readonly year: number;
-    
+
     toJSDate(): Date;
     toISO(): string | null;
     setZone(zone: string): DateTime;

@@ -23,7 +23,11 @@ import {
   ApiPropertyOptional,
 } from '@nestjs/swagger';
 
-import { PaymentFlowOrchestrator, PaymentFlowResult, CaptureResult } from '../coordinators/payment-flow.orchestrator';
+import {
+  PaymentFlowOrchestrator,
+  PaymentFlowResult,
+  CaptureResult,
+} from '../coordinators/payment-flow.orchestrator';
 import {
   RefundDisputeCoordinator,
   DisputeResult,
@@ -127,7 +131,10 @@ export class UpdateDisputeDto {
   @ApiProperty({ enum: ['resolve', 'escalate'], description: 'Action to take on the dispute' })
   action!: 'resolve' | 'escalate';
 
-  @ApiPropertyOptional({ enum: DisputeResolutionType, description: 'Resolution type (required for resolve action)' })
+  @ApiPropertyOptional({
+    enum: DisputeResolutionType,
+    description: 'Resolution type (required for resolve action)',
+  })
   resolutionType?: DisputeResolutionType;
 
   @ApiPropertyOptional({ description: 'Notes about the resolution' })
@@ -161,10 +168,16 @@ export class PaymentController {
 
   @Post('intents')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create payment intent', description: 'Initiate a new payment transaction' })
+  @ApiOperation({
+    summary: 'Create payment intent',
+    description: 'Initiate a new payment transaction',
+  })
   @ApiResponse({ status: 201, description: 'Payment intent created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   async createIntent(@Body() dto: CreatePaymentIntentDto): Promise<PaymentFlowResult> {
     return this.paymentFlowOrchestrator.initiatePayment({
@@ -184,9 +197,15 @@ export class PaymentController {
 
   @Post('intents/:id/capture')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Capture payment', description: 'Capture a previously authorized payment' })
+  @ApiOperation({
+    summary: 'Capture payment',
+    description: 'Capture a previously authorized payment',
+  })
   @ApiResponse({ status: 200, description: 'Payment captured successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Payment intent not found' })
   @ApiParam({ name: 'id', description: 'Payment intent unique identifier', type: String })
@@ -210,8 +229,14 @@ export class PaymentController {
   @ApiOperation({ summary: 'Process refund', description: 'Process a refund for a payment' })
   @ApiResponse({ status: 200, description: 'Refund processed successfully' })
   @ApiResponse({ status: 400, description: 'Invalid request body or policy violation' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability or policy violation' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Missing required capability or policy violation',
+  })
   async processRefund(@Body() dto: ProcessRefundDto): Promise<ProcessRefundResult> {
     const result = await this.refundDisputeCoordinator.processRefund({
       paymentIntentId: dto.paymentIntentId,
@@ -229,10 +254,16 @@ export class PaymentController {
 
   @Post('disputes')
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Open dispute', description: 'Open a dispute for a payment or delivery' })
+  @ApiOperation({
+    summary: 'Open dispute',
+    description: 'Open a dispute for a payment or delivery',
+  })
   @ApiResponse({ status: 201, description: 'Dispute opened successfully' })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   async openDispute(@Body() dto: OpenDisputeDto): Promise<DisputeResult> {
     return this.refundDisputeCoordinator.openDispute({
@@ -249,10 +280,20 @@ export class PaymentController {
 
   @Patch('disputes/:id')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Update dispute', description: 'Resolve or escalate an existing dispute' })
-  @ApiResponse({ status: 200, description: 'Dispute updated successfully', schema: { example: { success: true } } })
+  @ApiOperation({
+    summary: 'Update dispute',
+    description: 'Resolve or escalate an existing dispute',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Dispute updated successfully',
+    schema: { example: { success: true } },
+  })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Dispute not found' })
   @ApiParam({ name: 'id', description: 'Dispute unique identifier', type: String })

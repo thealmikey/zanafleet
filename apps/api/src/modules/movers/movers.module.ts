@@ -18,7 +18,7 @@ import { VehicleRecommendationService } from './services/vehicle-recommendation.
 
 /**
  * Movers Module
- * 
+ *
  * Provides the Movers homepage experience including:
  * - Location autocomplete
  * - AI-powered move profile interpretation
@@ -28,13 +28,7 @@ import { VehicleRecommendationService } from './services/vehicle-recommendation.
  * - Move intelligence layer for recommendations
  */
 @Module({
-  imports: [
-    CqrsModule,
-    LocationIntelligenceModule,
-    AssetModule,
-    PolicyModule,
-    EventBusModule,
-  ],
+  imports: [CqrsModule, LocationIntelligenceModule, AssetModule, PolicyModule, EventBusModule],
   controllers: [MoversController],
   providers: [
     VehicleRecommendationService,

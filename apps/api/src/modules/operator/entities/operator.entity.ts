@@ -1,12 +1,12 @@
 import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    CreateDateColumn,
-    UpdateDateColumn,
-    OneToOne,
-    JoinColumn,
-    Index,
+  Entity,
+  PrimaryColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToOne,
+  JoinColumn,
+  Index,
 } from 'typeorm';
 
 import { ActorEntity } from '../../actor/entities/actor.entity';
@@ -19,47 +19,47 @@ import { ActorEntity } from '../../actor/entities/actor.entity';
 @Entity('operators')
 @Index(['actorId'])
 export class OperatorEntity {
-    @PrimaryColumn('uuid')
-    id!: string;
+  @PrimaryColumn('uuid')
+  id!: string;
 
-    @Column('uuid')
-    actorId!: string;
+  @Column('uuid')
+  actorId!: string;
 
-    @OneToOne(() => ActorEntity)
-    @JoinColumn({ name: 'actor_id' })
-    actor?: ActorEntity;
+  @OneToOne(() => ActorEntity)
+  @JoinColumn({ name: 'actor_id' })
+  actor?: ActorEntity;
 
-    @Column('text', { array: true, default: () => 'ARRAY[]::text[]' })
-    skills!: string[];
+  @Column('text', { array: true, default: () => 'ARRAY[]::text[]' })
+  skills!: string[];
 
-    @Column('jsonb', { nullable: true })
-    certifications?: Record<string, unknown>[];
+  @Column('jsonb', { nullable: true })
+  certifications?: Record<string, unknown>[];
 
-    @Column('float', { default: 0 })
-    reputationScore!: number;
+  @Column('float', { default: 0 })
+  reputationScore!: number;
 
-    @Column('jsonb', { nullable: true })
-    careerHistory?: Record<string, unknown>;
+  @Column('jsonb', { nullable: true })
+  careerHistory?: Record<string, unknown>;
 
-    @CreateDateColumn({ type: 'timestamp with time zone' })
-    createdAt!: Date;
+  @CreateDateColumn({ type: 'timestamp with time zone' })
+  createdAt!: Date;
 
-    @UpdateDateColumn({ type: 'timestamp with time zone' })
-    updatedAt!: Date;
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
+  updatedAt!: Date;
 
-    /**
-     * Convert entity to domain-compatible object
-     */
-    toDomain() {
-        return {
-            operatorId: this.id,
-            actorId: this.actorId,
-            skills: this.skills,
-            certifications: this.certifications,
-            reputationScore: this.reputationScore,
-            careerHistory: this.careerHistory,
-            createdAt: this.createdAt,
-            updatedAt: this.updatedAt,
-        };
-    }
+  /**
+   * Convert entity to domain-compatible object
+   */
+  toDomain() {
+    return {
+      operatorId: this.id,
+      actorId: this.actorId,
+      skills: this.skills,
+      certifications: this.certifications,
+      reputationScore: this.reputationScore,
+      careerHistory: this.careerHistory,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    };
+  }
 }

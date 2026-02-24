@@ -68,7 +68,7 @@ export class PaymentTransactionEntity {
       paymentIntentId: this.paymentIntentId,
       providerId: this.providerId,
       providerTransactionId: this.providerTransactionId,
-      status: this.status ,
+      status: this.status,
       amount: parseFloat(this.amount),
       providerFee: this.providerFee ? parseFloat(this.providerFee) : null,
       errorCode: this.errorCode,

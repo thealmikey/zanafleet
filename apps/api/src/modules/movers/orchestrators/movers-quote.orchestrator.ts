@@ -6,19 +6,22 @@ import { MoveEstimate, calculateDemandMultiplier, PolicyAdjustment } from '../do
 import { MoveProfile } from '../domain/move-profile';
 import { MoversEstimateRequestDto } from '../dto/movers-estimate-request.dto';
 import { AIMoveProfileService } from '../services/ai-move-profile.service';
-import { LocationNormalizationService, NormalizedLocation } from '../services/location-normalization.service';
+import {
+  LocationNormalizationService,
+  NormalizedLocation,
+} from '../services/location-normalization.service';
 import { VehicleMatchingService } from '../services/vehicle-matching.service';
 
 /**
  * MoversQuoteOrchestrator
- * 
+ *
  * Orchestrates the moving quote estimation process by coordinating:
  * 1. Location normalization
  * 2. AI-driven move profile interpretation
  * 3. Vehicle matching
  * 4. Policy engine integration
  * 5. Pricing computation
- * 
+ *
  * This is the main orchestration layer for the movers estimate workflow.
  */
 @Injectable()
@@ -28,12 +31,12 @@ export class MoversQuoteOrchestrator {
   constructor(
     private readonly locationService: LocationNormalizationService,
     private readonly aiMoveProfileService: AIMoveProfileService,
-    private readonly vehicleMatchingService: VehicleMatchingService,
+    private readonly vehicleMatchingService: VehicleMatchingService
   ) {}
 
   /**
    * Create a comprehensive move estimate based on the request
-   * 
+   *
    * @param request - The estimate request with locations and preferences
    * @returns A complete MoveEstimate with vehicles, pricing, and policy adjustments
    */
@@ -41,7 +44,9 @@ export class MoversQuoteOrchestrator {
     const startTime = Date.now();
     const quoteId = `quote_${randomUUID().slice(0, 8)}`;
 
-    this.logger.log(`Creating estimate ${quoteId} for move from ${request.fromLocation.formattedAddress}`);
+    this.logger.log(
+      `Creating estimate ${quoteId} for move from ${request.fromLocation.formattedAddress}`
+    );
 
     try {
       // Step 1: Normalize input locations
@@ -51,29 +56,35 @@ export class MoversQuoteOrchestrator {
       ]);
 
       // Step 2: Calculate distance between locations
-      const distanceResult = this.locationService.calculateDistance(normalizedOrigin, normalizedDestination);
+      const distanceResult = this.locationService.calculateDistance(
+        normalizedOrigin,
+        normalizedDestination
+      );
 
       // Step 3: Use AI to interpret house sizes → MoveProfile
-      const moveProfile = await this.aiMoveProfileService.interpretHouseSize(request.fromHouseSize, {
-        fragilityLevel: request.fragilityLevel,
-        floorCount: request.fromFloorCount,
-        packingService: request.includePacking,
-        specialItems: request.specialItems,
-        distanceKm: distanceResult.distanceKm,
-      });
+      const moveProfile = await this.aiMoveProfileService.interpretHouseSize(
+        request.fromHouseSize,
+        {
+          fragilityLevel: request.fragilityLevel,
+          floorCount: request.fromFloorCount,
+          packingService: request.includePacking,
+          specialItems: request.specialItems,
+          distanceKm: distanceResult.distanceKm,
+        }
+      );
 
       // Step 4: Search for and match vehicles
       const recommendedVehicles = await this.vehicleMatchingService.findMatchingVehicles(
         moveProfile,
         normalizedOrigin,
-        50, // 50km radius
+        50 // 50km radius
       );
 
       // Step 5: Apply policy adjustments
       const policyAdjustments = await this.applyPolicyAdjustments(
         moveProfile,
         normalizedOrigin,
-        request.requestedDate ? new Date(request.requestedDate) : undefined,
+        request.requestedDate ? new Date(request.requestedDate) : undefined
       );
 
       // Step 6: Compute pricing
@@ -82,11 +93,15 @@ export class MoversQuoteOrchestrator {
         distanceResult.distanceKm,
         recommendedVehicles,
         policyAdjustments,
-        request.requestedDate ? new Date(request.requestedDate) : undefined,
+        request.requestedDate ? new Date(request.requestedDate) : undefined
       );
 
       // Step 7: Generate explanation
-      const explanation = this.generateExplanation(moveProfile, distanceResult, recommendedVehicles);
+      const explanation = this.generateExplanation(
+        moveProfile,
+        distanceResult,
+        recommendedVehicles
+      );
 
       // Step 8: Calculate validity period (typically 24 hours)
       const validUntil = new Date();
@@ -98,8 +113,8 @@ export class MoversQuoteOrchestrator {
         recommendedVehicles,
         priceBreakdown,
         policyAdjustments,
-        demandMultiplier: request.requestedDate 
-          ? calculateDemandMultiplier(new Date(request.requestedDate)) 
+        demandMultiplier: request.requestedDate
+          ? calculateDemandMultiplier(new Date(request.requestedDate))
           : undefined,
         explanation,
         validUntil: validUntil.toISOString(),
@@ -111,7 +126,7 @@ export class MoversQuoteOrchestrator {
 
       this.logger.log(
         `Estimate ${quoteId} created successfully in ${Date.now() - startTime}ms. ` +
-        `Total: ${priceBreakdown.currency} ${priceBreakdown.total}`
+          `Total: ${priceBreakdown.currency} ${priceBreakdown.total}`
       );
 
       return estimate;
@@ -238,7 +253,7 @@ export class MoversQuoteOrchestrator {
       distanceCharge: Math.round(distanceCharge * 100) / 100,
       volumeCharge: Math.round(volumeCharge * 100) / 100,
       laborCharge: Math.round(laborCharge * 100) / 100,
-      fuelSurcharge: Math.round((subtotal * (fuelSurchargePercent / 100)) * 100) / 100,
+      fuelSurcharge: Math.round(subtotal * (fuelSurchargePercent / 100) * 100) / 100,
       discounts: -discountAmount,
       taxes: Math.round(taxes * 100) / 100,
       total: Math.round(total * 100) / 100,
@@ -254,9 +269,10 @@ export class MoversQuoteOrchestrator {
     distanceResult: { distanceKm: number; travelTimeMinutes: number },
     vehicles: MoveEstimate['recommendedVehicles']
   ): string {
-    const vehicleInfo = vehicles.length > 0
-      ? `Recommended vehicle: ${vehicles[0].type} (${vehicles[0].capacityProfile.maxVolumeM3}m³ capacity)`
-      : 'Vehicle matching in progress';
+    const vehicleInfo =
+      vehicles.length > 0
+        ? `Recommended vehicle: ${vehicles[0].type} (${vehicles[0].capacityProfile.maxVolumeM3}m³ capacity)`
+        : 'Vehicle matching in progress';
 
     return `
 Based on your ${moveProfile.estimatedVolumeM3}m³ move, we've analyzed your requirements:
@@ -313,8 +329,8 @@ Price includes all applicable taxes and surcharges. This quote is valid for 24 h
     // This is for async analytics and demand tracking
     this.logger.debug(
       `Estimate event published: quoteId=${estimate.quoteId}, ` +
-      `total=${estimate.priceBreakdown.total}, ` +
-      `processingTimeMs=${processingTimeMs}`
+        `total=${estimate.priceBreakdown.total}, ` +
+        `processingTimeMs=${processingTimeMs}`
     );
   }
 }

@@ -6,10 +6,10 @@ import { LocationAutocompleteProvider } from './location-autocomplete.interface'
 
 /**
  * Default Location Autocomplete Provider
- * 
+ *
  * A no-op implementation that provides mock/simulated location data
  * for development and testing purposes.
- * 
+ *
  * In production, this should be replaced with a real provider:
  * - Google Places Autocomplete
  * - Mapbox Geocoding API
@@ -19,9 +19,9 @@ import { LocationAutocompleteProvider } from './location-autocomplete.interface'
 export class DefaultLocationAutocompleteProvider implements LocationAutocompleteProvider {
   readonly providerId = 'default';
   readonly displayName = 'Default Location Provider (Mock)';
-  
+
   private readonly logger = new Logger(DefaultLocationAutocompleteProvider.name);
-  
+
   private readonly mockLocations: LocationSuggestion[] = [
     {
       placeId: 'nairobi-downtown',
@@ -77,7 +77,7 @@ export class DefaultLocationAutocompleteProvider implements LocationAutocomplete
       placeId: 'nakuru',
       formattedAddress: 'Nakuru, Kenya',
       latitude: -0.3031,
-      longitude: 36.0800,
+      longitude: 36.08,
       locality: 'Nakuru',
       region: 'Nakuru County',
       country: 'Kenya',
@@ -95,21 +95,25 @@ export class DefaultLocationAutocompleteProvider implements LocationAutocomplete
     },
   ];
 
-  async searchSuggestions(query: string, _options?: LocationSearchOptions): Promise<LocationSuggestion[]> {
+  async searchSuggestions(
+    query: string,
+    _options?: LocationSearchOptions
+  ): Promise<LocationSuggestion[]> {
     this.logger.debug(`Searching for locations matching: ${query}`);
-    
+
     if (!query || query.length < 2) {
       return [];
     }
 
     const lowerQuery = query.toLowerCase();
-    
+
     // Filter and sort by relevance
-    const matches = this.mockLocations.filter(location => 
-      location.formattedAddress.toLowerCase().includes(lowerQuery) ||
-      location.locality?.toLowerCase().includes(lowerQuery) ||
-      location.region?.toLowerCase().includes(lowerQuery) ||
-      location.country?.toLowerCase().includes(lowerQuery)
+    const matches = this.mockLocations.filter(
+      (location) =>
+        location.formattedAddress.toLowerCase().includes(lowerQuery) ||
+        location.locality?.toLowerCase().includes(lowerQuery) ||
+        location.region?.toLowerCase().includes(lowerQuery) ||
+        location.country?.toLowerCase().includes(lowerQuery)
     );
 
     // Sort: exact matches first, then prefix matches, then contains
@@ -132,14 +136,14 @@ export class DefaultLocationAutocompleteProvider implements LocationAutocomplete
 
   async getPlaceDetails(placeId: string): Promise<LocationSuggestion | null> {
     this.logger.debug(`Getting details for place: ${placeId}`);
-    
-    const location = this.mockLocations.find(loc => loc.placeId === placeId);
+
+    const location = this.mockLocations.find((loc) => loc.placeId === placeId);
     return location || null;
   }
 
   async validateServiceArea(latitude: number, longitude: number): Promise<boolean> {
     this.logger.debug(`Validating service area for: ${latitude}, ${longitude}`);
-    
+
     // Kenya bounds (simplified)
     const kenyaBounds = {
       minLat: -4.7,

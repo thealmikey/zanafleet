@@ -12,10 +12,7 @@ import {
   LedgerReferenceType,
   AccountType,
 } from '../../dto/ledger.enums';
-import {
-  RevenueDistributionInput,
-  SplitContext,
-} from '../../dto/revenue-distribution.types';
+import { RevenueDistributionInput, SplitContext } from '../../dto/revenue-distribution.types';
 import { LedgerService } from '../../services/ledger.service';
 import { RevenueDistributionEngine } from '../../services/revenue-distribution.engine';
 
@@ -27,7 +24,7 @@ describe('RevenueDistributionEngine', () => {
   let policyEngine: jest.Mocked<PolicyEvaluationEngineService>;
 
   const createMockInput = (
-    overrides: Partial<RevenueDistributionInput> = {},
+    overrides: Partial<RevenueDistributionInput> = {}
   ): RevenueDistributionInput => ({
     deliveryId: 'delivery-123',
     totalAmount: 1000,
@@ -128,7 +125,7 @@ describe('RevenueDistributionEngine', () => {
 
       expect(splits.platformAmount).toBe(100);
       expect(splits.riderAmount).toBe(850);
-      expect(splits.appliedRates.platformRate).toBe(0.10);
+      expect(splits.appliedRates.platformRate).toBe(0.1);
     });
 
     it('should exclude sacco amount when no saccoId provided', () => {
@@ -162,7 +159,7 @@ describe('RevenueDistributionEngine', () => {
         deliveryType: DeliveryType.STANDARD,
         saccoId: 'sacco-001',
         customRates: {
-          platformRate: 0.10,
+          platformRate: 0.1,
           saccoRate: 0.08,
           riderRate: 0.82,
         },
@@ -180,9 +177,9 @@ describe('RevenueDistributionEngine', () => {
         deliveryType: DeliveryType.STANDARD,
         saccoId: 'sacco-001',
         customRates: {
-          platformRate: 0.20,
-          saccoRate: 0.10,
-          riderRate: 0.90,
+          platformRate: 0.2,
+          saccoRate: 0.1,
+          riderRate: 0.9,
         },
       };
 
@@ -233,27 +230,25 @@ describe('RevenueDistributionEngine', () => {
 
       await engine.distributeDeliveryRevenue(input);
 
-      expect(commandBus.execute).toHaveBeenCalledWith(
-        expect.any(RecordLedgerEntryCommand),
-      );
+      expect(commandBus.execute).toHaveBeenCalledWith(expect.any(RecordLedgerEntryCommand));
 
       const command = commandBus.execute.mock.calls[0][0] as RecordLedgerEntryCommand;
       expect(command.entries.length).toBeGreaterThanOrEqual(4);
-      
+
       const platformCredit = command.entries.find(
-        (e) => e.accountId === 'platform-acc-001' && e.entryType === LedgerEntryType.CREDIT,
+        (e) => e.accountId === 'platform-acc-001' && e.entryType === LedgerEntryType.CREDIT
       );
       expect(platformCredit).toBeDefined();
       expect(platformCredit?.category).toBe(LedgerCategory.PLATFORM_FEE);
 
       const riderCredit = command.entries.find(
-        (e) => e.accountId === 'rider-acc-001' && e.entryType === LedgerEntryType.CREDIT,
+        (e) => e.accountId === 'rider-acc-001' && e.entryType === LedgerEntryType.CREDIT
       );
       expect(riderCredit).toBeDefined();
       expect(riderCredit?.category).toBe(LedgerCategory.RIDER_EARNING);
 
       const saccoCredit = command.entries.find(
-        (e) => e.accountId === 'sacco-acc-001' && e.entryType === LedgerEntryType.CREDIT,
+        (e) => e.accountId === 'sacco-acc-001' && e.entryType === LedgerEntryType.CREDIT
       );
       expect(saccoCredit).toBeDefined();
       expect(saccoCredit?.category).toBe(LedgerCategory.SACCO_COMMISSION);
@@ -272,7 +267,7 @@ describe('RevenueDistributionEngine', () => {
             deliveryId: 'delivery-123',
             totalAmount: 1000,
           }),
-        }),
+        })
       );
     });
 
@@ -282,7 +277,7 @@ describe('RevenueDistributionEngine', () => {
       await engine.distributeDeliveryRevenue(input);
 
       const earningsEventCalls = eventBusService.publish.mock.calls.filter(
-        (call) => call[0] === 'ledger.events.earnings-accrued-v1',
+        (call) => call[0] === 'ledger.events.earnings-accrued-v1'
       );
 
       expect(earningsEventCalls.length).toBe(3);
@@ -302,7 +297,7 @@ describe('RevenueDistributionEngine', () => {
 
       const command = commandBus.execute.mock.calls[0][0] as RecordLedgerEntryCommand;
       const campaignDebit = command.entries.find(
-        (e) => e.accountId === 'campaign-acc-001' && e.entryType === LedgerEntryType.DEBIT,
+        (e) => e.accountId === 'campaign-acc-001' && e.entryType === LedgerEntryType.DEBIT
       );
       expect(campaignDebit).toBeDefined();
       expect(campaignDebit?.category).toBe(LedgerCategory.CAMPAIGN_SUBSIDY);
@@ -337,7 +332,7 @@ describe('RevenueDistributionEngine', () => {
           trigger: 'REVENUE_DISTRIBUTION',
           resourceType: 'delivery',
           resourceId: 'delivery-123',
-        }),
+        })
       );
     });
 
@@ -363,7 +358,9 @@ describe('RevenueDistributionEngine', () => {
       expect(result.splits.saccoAmount).toBe(0);
 
       const command = commandBus.execute.mock.calls[0][0] as RecordLedgerEntryCommand;
-      const saccoEntry = command.entries.find((e) => e.category === LedgerCategory.SACCO_COMMISSION);
+      const saccoEntry = command.entries.find(
+        (e) => e.category === LedgerCategory.SACCO_COMMISSION
+      );
       expect(saccoEntry).toBeUndefined();
     });
   });
@@ -535,9 +532,9 @@ describe('RevenueDistributionEngine', () => {
           reason: 'Policy matched for premium sacco tier',
         },
         policyOutputs: {
-          platformRate: 0.20,
-          saccoRate: 0.10,
-          riderRate: 0.70,
+          platformRate: 0.2,
+          saccoRate: 0.1,
+          riderRate: 0.7,
         },
         matchedPolicies: [{ policyId: 'custom-sacco-policy' }],
         processingTimeMs: 10,
@@ -562,7 +559,7 @@ describe('RevenueDistributionEngine', () => {
           attributes: expect.objectContaining({
             saccoTier: 'premium',
           }),
-        }),
+        })
       );
     });
 
@@ -594,9 +591,8 @@ describe('RevenueDistributionEngine', () => {
         ],
       }).compile();
 
-      const engineWithoutPolicy = moduleWithoutPolicy.get<RevenueDistributionEngine>(
-        RevenueDistributionEngine,
-      );
+      const engineWithoutPolicy =
+        moduleWithoutPolicy.get<RevenueDistributionEngine>(RevenueDistributionEngine);
 
       ledgerService.getBalance.mockResolvedValue({
         accountId: 'rider-acc-001',
@@ -667,7 +663,7 @@ describe('RevenueDistributionEngine', () => {
         expect.any(String),
         expect.objectContaining({
           correlationId: 'corr-123-456',
-        }),
+        })
       );
     });
   });

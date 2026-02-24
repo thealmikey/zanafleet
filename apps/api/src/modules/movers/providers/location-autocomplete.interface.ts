@@ -18,10 +18,10 @@ export interface LocationSearchOptions {
 
 /**
  * Location Autocomplete Provider Interface
- * 
+ *
  * Abstract interface for location autocomplete services.
  * Implementations can wrap various providers (Google Maps, Mapbox, OpenStreetMap, etc.)
- * 
+ *
  * This follows the provider abstraction pattern used elsewhere in the codebase:
  * - GeoProvider (location-intelligence module)
  * - PaymentProvider (payment module)
@@ -39,10 +39,7 @@ export interface LocationAutocompleteProvider {
    * @param options - Optional search parameters
    * @returns Array of location suggestions sorted by relevance
    */
-  searchSuggestions(
-    query: string,
-    options?: LocationSearchOptions
-  ): Promise<LocationSuggestion[]>;
+  searchSuggestions(query: string, options?: LocationSearchOptions): Promise<LocationSuggestion[]>;
 
   /**
    * Get detailed location information for a selected place

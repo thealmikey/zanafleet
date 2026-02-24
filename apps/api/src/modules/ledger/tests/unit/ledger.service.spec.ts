@@ -104,7 +104,7 @@ describe('LedgerService', () => {
 
       const result = await service.getEntriesByReference(
         LedgerReferenceType.PAYMENT,
-        '770e8400-e29b-41d4-a716-446655440002',
+        '770e8400-e29b-41d4-a716-446655440002'
       );
 
       expect(result).toHaveLength(1);

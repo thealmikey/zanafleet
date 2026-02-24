@@ -35,7 +35,7 @@ export const RecordLedgerEntryCommandSchema = z.object({
           .reduce((sum, e) => sum + e.amount, 0);
         return Math.abs(totalDebit - totalCredit) < 0.01;
       },
-      { message: 'Total debits must equal total credits for double-entry bookkeeping' },
+      { message: 'Total debits must equal total credits for double-entry bookkeeping' }
     ),
   correlationId: z.string().uuid().optional(),
 });
@@ -66,7 +66,7 @@ export class RecordLedgerEntryCommand {
   }
 
   static safeValidate(
-    input: unknown,
+    input: unknown
   ): z.SafeParseReturnType<unknown, RecordLedgerEntryCommandInput> {
     return RecordLedgerEntryCommandSchema.safeParse(input);
   }

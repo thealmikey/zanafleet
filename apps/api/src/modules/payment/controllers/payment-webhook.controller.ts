@@ -28,7 +28,7 @@ export class PaymentWebhookController {
   async handleWebhook(
     @Param('providerId') providerId: string,
     @Body() payload: unknown,
-    @Headers('x-webhook-signature') signature?: string,
+    @Headers('x-webhook-signature') signature?: string
   ): Promise<{ received: boolean }> {
     const provider = this.providerRegistry.get(providerId);
 
@@ -45,13 +45,15 @@ export class PaymentWebhookController {
     try {
       const result = await provider.handleWebhook(payload);
       this.logger.log(
-        `Webhook processed for provider ${providerId}: ${result.eventType}, acknowledged: ${result.acknowledged}`,
+        `Webhook processed for provider ${providerId}: ${result.eventType}, acknowledged: ${result.acknowledged}`
       );
 
       return { received: result.acknowledged };
     } catch (error) {
       this.logger.error(
-        `Error processing webhook for provider ${providerId}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Error processing webhook for provider ${providerId}: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`
       );
       throw error;
     }

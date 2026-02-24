@@ -36,7 +36,7 @@ const DEFAULT_COMMISSION_RATES: DefaultCommissionRates = {
   [DeliveryType.STANDARD]: {
     platformRate: 0.15,
     saccoRate: 0.05,
-    riderRate: 0.80,
+    riderRate: 0.8,
   },
   [DeliveryType.EXPRESS]: {
     platformRate: 0.18,
@@ -49,7 +49,7 @@ const DEFAULT_COMMISSION_RATES: DefaultCommissionRates = {
     riderRate: 0.83,
   },
   [DeliveryType.BULK]: {
-    platformRate: 0.10,
+    platformRate: 0.1,
     saccoRate: 0.05,
     riderRate: 0.85,
   },
@@ -65,17 +65,15 @@ export class RevenueDistributionEngine {
     private readonly ledgerService: LedgerService,
     private readonly commandBus: CommandBus,
     @Optional() private readonly eventBusService?: EventBusService,
-    @Optional() private readonly policyEngine?: PolicyEvaluationEngineService,
+    @Optional() private readonly policyEngine?: PolicyEvaluationEngineService
   ) {}
 
-  async distributeDeliveryRevenue(
-    input: RevenueDistributionInput,
-  ): Promise<DistributionResult> {
+  async distributeDeliveryRevenue(input: RevenueDistributionInput): Promise<DistributionResult> {
     const distributionId = uuidv4();
     const now = new Date();
 
     this.logger.log(
-      `Starting revenue distribution ${distributionId} for delivery ${input.deliveryId}`,
+      `Starting revenue distribution ${distributionId} for delivery ${input.deliveryId}`
     );
 
     try {
@@ -88,23 +86,11 @@ export class RevenueDistributionEngine {
 
       this.validateSplits(splits, input.totalAmount);
 
-      const ledgerEntries = await this.executeLedgerTransfers(
-        distributionId,
-        input,
-        splits,
-      );
+      const ledgerEntries = await this.executeLedgerTransfers(distributionId, input, splits);
 
-      await this.emitDistributionEvents(
-        distributionId,
-        input,
-        splits,
-        ledgerEntries,
-        now,
-      );
+      await this.emitDistributionEvents(distributionId, input, splits, ledgerEntries, now);
 
-      this.logger.log(
-        `Revenue distribution ${distributionId} completed successfully`,
-      );
+      this.logger.log(`Revenue distribution ${distributionId} completed successfully`);
 
       return {
         success: true,
@@ -116,7 +102,9 @@ export class RevenueDistributionEngine {
       };
     } catch (error) {
       this.logger.error(
-        `Revenue distribution ${distributionId} failed: ${error instanceof Error ? error.message : String(error)}`,
+        `Revenue distribution ${distributionId} failed: ${
+          error instanceof Error ? error.message : String(error)
+        }`
       );
 
       return {
@@ -149,7 +137,7 @@ export class RevenueDistributionEngine {
     const subtotal = platformAmount + saccoAmount + riderAmount - campaignSubsidyAmount;
     const totalDistributed = totalAmount + campaignSubsidyAmount;
     const rounding = this.roundToTwoDecimals(totalDistributed - subtotal - campaignSubsidyAmount);
-    
+
     if (Math.abs(rounding) > 0.01) {
       riderAmount = this.roundToTwoDecimals(riderAmount + rounding);
     }
@@ -159,9 +147,7 @@ export class RevenueDistributionEngine {
       saccoAmount,
       platformAmount,
       campaignSubsidyAmount,
-      totalDistributed: this.roundToTwoDecimals(
-        platformAmount + saccoAmount + riderAmount,
-      ),
+      totalDistributed: this.roundToTwoDecimals(platformAmount + saccoAmount + riderAmount),
       appliedRates: {
         ...appliedRates,
         campaignSubsidyRate: campaignSubsidyAmount / totalAmount,
@@ -181,7 +167,7 @@ export class RevenueDistributionEngine {
             LedgerCategory.RIDER_EARNING,
             LedgerCategory.SACCO_COMMISSION,
             LedgerCategory.PLATFORM_FEE,
-          ].includes(e.category as LedgerCategory),
+          ].includes(e.category as LedgerCategory)
       )
       .reduce((sum, e) => sum + e.amount, 0);
 
@@ -206,16 +192,12 @@ export class RevenueDistributionEngine {
             LedgerCategory.RIDER_EARNING,
             LedgerCategory.SACCO_COMMISSION,
             LedgerCategory.PLATFORM_FEE,
-          ].includes(e.category as LedgerCategory),
+          ].includes(e.category as LedgerCategory)
       )
       .reduce((sum, e) => sum + e.amount, 0);
 
     const totalPaid = entries
-      .filter(
-        (e) =>
-          e.entryType === LedgerEntryType.DEBIT &&
-          e.category === LedgerCategory.PAYOUT,
-      )
+      .filter((e) => e.entryType === LedgerEntryType.DEBIT && e.category === LedgerCategory.PAYOUT)
       .reduce((sum, e) => sum + e.amount, 0);
 
     const pendingAmount = this.roundToTwoDecimals(totalEarned - totalPaid);
@@ -243,13 +225,12 @@ export class RevenueDistributionEngine {
   }
 
   private getBaseRates(deliveryType: DeliveryType): CommissionRateSet {
-    return DEFAULT_COMMISSION_RATES[deliveryType] ?? DEFAULT_COMMISSION_RATES[DeliveryType.STANDARD];
+    return (
+      DEFAULT_COMMISSION_RATES[deliveryType] ?? DEFAULT_COMMISSION_RATES[DeliveryType.STANDARD]
+    );
   }
 
-  private applyCustomRates(
-    baseRates: CommissionRateSet,
-    context: SplitContext,
-  ): CommissionRateSet {
+  private applyCustomRates(baseRates: CommissionRateSet, context: SplitContext): CommissionRateSet {
     if (!context.customRates) {
       return baseRates;
     }
@@ -272,7 +253,7 @@ export class RevenueDistributionEngine {
 
   private async applyPolicyOverrides(
     splits: RevenueSplits,
-    input: RevenueDistributionInput,
+    input: RevenueDistributionInput
   ): Promise<RevenueSplits> {
     if (!this.policyEngine) {
       return splits;
@@ -297,11 +278,13 @@ export class RevenueDistributionEngine {
       };
 
       const result = await this.policyEngine.evaluate(
-        policyContext as Parameters<typeof this.policyEngine.evaluate>[0],
+        policyContext as Parameters<typeof this.policyEngine.evaluate>[0]
       );
 
-      const finalDecision = (result as unknown as { finalDecision?: { effect?: string } }).finalDecision;
-      const policyOutputs = (result as unknown as { policyOutputs?: Record<string, unknown> }).policyOutputs;
+      const finalDecision = (result as unknown as { finalDecision?: { effect?: string } })
+        .finalDecision;
+      const policyOutputs = (result as unknown as { policyOutputs?: Record<string, unknown> })
+        .policyOutputs;
 
       if (finalDecision?.effect === 'ALLOW' && policyOutputs) {
         if (typeof policyOutputs.platformRate === 'number') {
@@ -327,7 +310,9 @@ export class RevenueDistributionEngine {
       }
     } catch (error) {
       this.logger.warn(
-        `Policy evaluation failed, using default splits: ${error instanceof Error ? error.message : String(error)}`,
+        `Policy evaluation failed, using default splits: ${
+          error instanceof Error ? error.message : String(error)
+        }`
       );
     }
 
@@ -340,7 +325,7 @@ export class RevenueDistributionEngine {
 
     if (Math.abs(distributed - expected) > 0.02) {
       throw new Error(
-        `Split validation failed: distributed ${distributed} != expected ${expected}`,
+        `Split validation failed: distributed ${distributed} != expected ${expected}`
       );
     }
 
@@ -352,7 +337,7 @@ export class RevenueDistributionEngine {
   private async executeLedgerTransfers(
     distributionId: string,
     input: RevenueDistributionInput,
-    splits: RevenueSplits,
+    splits: RevenueSplits
   ): Promise<LedgerEntryReference[]> {
     const entries: LedgerEntryReference[] = [];
     const ledgerEntries: Array<{
@@ -451,7 +436,7 @@ export class RevenueDistributionEngine {
         referenceId: input.deliveryId,
         entries: ledgerEntries,
         correlationId: input.correlationId,
-      }),
+      })
     );
 
     return entries;
@@ -462,7 +447,7 @@ export class RevenueDistributionEngine {
     input: RevenueDistributionInput,
     splits: RevenueSplits,
     ledgerEntries: LedgerEntryReference[],
-    distributedAt: Date,
+    distributedAt: Date
   ): Promise<void> {
     if (!this.eventBusService) {
       return;
@@ -489,7 +474,7 @@ export class RevenueDistributionEngine {
 
     for (const entry of ledgerEntries.filter((e) => e.entryType === 'CREDIT')) {
       const balance = await this.ledgerService.getBalance(entry.accountId);
-      
+
       const earningsEvent = new EarningsAccruedEventV1({
         eventId: uuidv4(),
         accountId: entry.accountId,
@@ -527,9 +512,7 @@ export class RevenueDistributionEngine {
     };
   }
 
-  private inferAccountType(
-    entries: Array<{ category: string }>,
-  ): AccountType {
+  private inferAccountType(entries: Array<{ category: string }>): AccountType {
     if (entries.some((e) => e.category === LedgerCategory.RIDER_EARNING)) {
       return AccountType.RIDER;
     }

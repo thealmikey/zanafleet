@@ -83,12 +83,12 @@ export class PaymentFlowOrchestrator {
     private readonly paymentTransactionRepository: Repository<PaymentTransactionEntity>,
     private readonly providerRegistry: PaymentProviderRegistry,
     private readonly fraudCheckService: FraudCheckService,
-    private readonly eventBus: EventBusService,
+    private readonly eventBus: EventBusService
   ) {}
 
   async initiatePayment(
     input: PaymentInitiationInput,
-    retryConfig: Partial<RetryConfig> = {},
+    retryConfig: Partial<RetryConfig> = {}
   ): Promise<PaymentFlowResult> {
     const config = { ...DEFAULT_RETRY_CONFIG, ...retryConfig };
     const intentId = uuidv4();
@@ -99,14 +99,14 @@ export class PaymentFlowOrchestrator {
       const provider = await this.selectProvider(
         input.currency,
         input.paymentMethod,
-        input.preferredProviderId,
+        input.preferredProviderId
       );
 
       if (!provider) {
         return this.createFailedResult(
           intentId,
           'No suitable payment provider available',
-          PaymentIntentStatus.FAILED,
+          PaymentIntentStatus.FAILED
         );
       }
 
@@ -116,12 +116,15 @@ export class PaymentFlowOrchestrator {
 
       if (fraudResult.decision === FraudDecision.BLOCK) {
         await this.updateIntentStatus(intentId, PaymentIntentStatus.FAILED);
-        await this.emitPaymentFailedEvent(intent, `Fraud check blocked: ${fraudResult.blockReason}`);
+        await this.emitPaymentFailedEvent(
+          intent,
+          `Fraud check blocked: ${fraudResult.blockReason}`
+        );
 
         return this.createFailedResult(
           intentId,
           `Payment blocked by fraud check: ${fraudResult.blockReason}`,
-          PaymentIntentStatus.FAILED,
+          PaymentIntentStatus.FAILED
         );
       }
 
@@ -135,13 +138,14 @@ export class PaymentFlowOrchestrator {
       const paymentData = this.buildPaymentIntentData(intent);
       const { result, error, attempts } = await this.executeWithRetry(
         () => provider.initiatePayment(paymentData),
-        config,
+        config
       );
 
       if (error || !result?.success) {
-        const errorMessage = error?.message 
-          || (typeof result?.metadata?.error === 'string' ? result.metadata.error : undefined) 
-          || 'Payment initiation failed';
+        const errorMessage =
+          error?.message ||
+          (typeof result?.metadata?.error === 'string' ? result.metadata.error : undefined) ||
+          'Payment initiation failed';
         await this.updateIntentStatus(intentId, PaymentIntentStatus.FAILED);
         await this.emitPaymentFailedEvent(intent, errorMessage);
 
@@ -151,7 +155,7 @@ export class PaymentFlowOrchestrator {
           intentId,
           errorMessage,
           PaymentIntentStatus.FAILED,
-          config.maxRetries - attempts,
+          config.maxRetries - attempts
         );
       }
 
@@ -175,7 +179,7 @@ export class PaymentFlowOrchestrator {
       return this.createFailedResult(
         intentId,
         error instanceof Error ? error.message : 'Unexpected error during payment',
-        PaymentIntentStatus.FAILED,
+        PaymentIntentStatus.FAILED
       );
     }
   }
@@ -237,7 +241,7 @@ export class PaymentFlowOrchestrator {
   async handleProviderCallback(
     providerId: string,
     payload: unknown,
-    signature?: string,
+    signature?: string
   ): Promise<void> {
     this.logger.log(`Handling callback from provider: ${providerId}`);
 
@@ -264,7 +268,7 @@ export class PaymentFlowOrchestrator {
 
   async retryFailedPayment(
     intentId: string,
-    retryConfig: Partial<RetryConfig> = {},
+    retryConfig: Partial<RetryConfig> = {}
   ): Promise<PaymentFlowResult> {
     this.logger.log(`Retrying failed payment: ${intentId}`);
 
@@ -276,7 +280,7 @@ export class PaymentFlowOrchestrator {
       return this.createFailedResult(
         intentId,
         'Payment intent not found',
-        PaymentIntentStatus.FAILED,
+        PaymentIntentStatus.FAILED
       );
     }
 
@@ -284,7 +288,7 @@ export class PaymentFlowOrchestrator {
       return this.createFailedResult(
         intentId,
         `Cannot retry payment with status: ${intent.status}`,
-        intent.status,
+        intent.status
       );
     }
 
@@ -296,21 +300,21 @@ export class PaymentFlowOrchestrator {
         intentId,
         'Maximum retry attempts exceeded',
         PaymentIntentStatus.FAILED,
-        0,
+        0
       );
     }
 
     const provider = await this.selectProvider(
       intent.currency,
-      intent.paymentMethod ,
-      intent.providerId,
+      intent.paymentMethod,
+      intent.providerId
     );
 
     if (!provider) {
       return this.createFailedResult(
         intentId,
         'No suitable payment provider available for retry',
-        PaymentIntentStatus.FAILED,
+        PaymentIntentStatus.FAILED
       );
     }
 
@@ -322,7 +326,7 @@ export class PaymentFlowOrchestrator {
 
     const { result, error, attempts } = await this.executeWithRetry(
       () => provider.initiatePayment(paymentData),
-      { ...config, maxRetries: remainingRetries },
+      { ...config, maxRetries: remainingRetries }
     );
 
     const totalAttempts = currentAttempts + attempts;
@@ -337,7 +341,7 @@ export class PaymentFlowOrchestrator {
         intentId,
         errorMessage,
         PaymentIntentStatus.FAILED,
-        config.maxRetries - totalAttempts,
+        config.maxRetries - totalAttempts
       );
     }
 
@@ -364,23 +368,21 @@ export class PaymentFlowOrchestrator {
   private async selectProvider(
     currency: string,
     paymentMethod: PaymentMethod,
-    preferredProviderId?: string,
+    preferredProviderId?: string
   ): Promise<PaymentProvider | undefined> {
     if (preferredProviderId) {
       const preferred = this.providerRegistry.get(preferredProviderId);
       if (preferred && this.providerSupportsCurrency(preferred, currency)) {
         return preferred;
       }
-      this.logger.warn(
-        `Preferred provider ${preferredProviderId} not suitable, falling back`,
-      );
+      this.logger.warn(`Preferred provider ${preferredProviderId} not suitable, falling back`);
     }
 
     const capability = this.mapPaymentMethodToCapability(paymentMethod);
     const capableProviders = this.providerRegistry.getByCapability(capability);
 
     const suitableProvider = capableProviders.find((p) =>
-      this.providerSupportsCurrency(p, currency),
+      this.providerSupportsCurrency(p, currency)
     );
 
     if (suitableProvider) {
@@ -412,7 +414,7 @@ export class PaymentFlowOrchestrator {
   private async createPaymentIntent(
     intentId: string,
     input: PaymentInitiationInput,
-    providerId: string,
+    providerId: string
   ): Promise<PaymentIntentEntity> {
     const intent = this.paymentIntentRepository.create({
       id: intentId,
@@ -446,7 +448,7 @@ export class PaymentFlowOrchestrator {
   private async recordTransaction(
     intent: PaymentIntentEntity,
     result: PaymentInitiationResult,
-    providerId: string,
+    providerId: string
   ): Promise<void> {
     const transaction = this.paymentTransactionRepository.create({
       id: result.transactionId,
@@ -462,10 +464,7 @@ export class PaymentFlowOrchestrator {
     await this.paymentTransactionRepository.save(transaction);
   }
 
-  private async updateIntentStatus(
-    intentId: string,
-    status: PaymentIntentStatus,
-  ): Promise<void> {
+  private async updateIntentStatus(intentId: string, status: PaymentIntentStatus): Promise<void> {
     await this.paymentIntentRepository.update(intentId, {
       status,
       updatedAt: new Date(),
@@ -475,7 +474,7 @@ export class PaymentFlowOrchestrator {
   private async syncTransactionStatus(
     transactionId: string,
     _providerId: string,
-    result: WebhookProcessingResult,
+    result: WebhookProcessingResult
   ): Promise<void> {
     const transaction = await this.paymentTransactionRepository.findOne({
       where: { id: transactionId },
@@ -516,7 +515,7 @@ export class PaymentFlowOrchestrator {
 
   private async executeWithRetry<T>(
     operation: () => Promise<T>,
-    config: RetryConfig,
+    config: RetryConfig
   ): Promise<{ result?: T; error?: Error; attempts: number }> {
     let lastError: Error | undefined;
 
@@ -548,11 +547,7 @@ export class PaymentFlowOrchestrator {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  private updateRetryState(
-    intentId: string,
-    attempts: number,
-    config: RetryConfig,
-  ): void {
+  private updateRetryState(intentId: string, attempts: number, config: RetryConfig): void {
     const state: RetryState = {
       intentId,
       attempts,
@@ -573,7 +568,7 @@ export class PaymentFlowOrchestrator {
     intentId: string,
     error: string,
     status: PaymentIntentStatus,
-    retriesRemaining?: number,
+    retriesRemaining?: number
   ): PaymentFlowResult {
     return {
       success: false,
@@ -609,7 +604,7 @@ export class PaymentFlowOrchestrator {
 
   private async emitPaymentSucceededEvent(
     intent: PaymentIntentEntity,
-    result: PaymentInitiationResult,
+    result: PaymentInitiationResult
   ): Promise<void> {
     const event = {
       eventId: uuidv4(),
@@ -631,10 +626,7 @@ export class PaymentFlowOrchestrator {
     await this.eventBus.publish(NatsSubjects.Payment.COMPLETED_V1, event);
   }
 
-  private async emitPaymentFailedEvent(
-    intent: PaymentIntentEntity,
-    reason: string,
-  ): Promise<void> {
+  private async emitPaymentFailedEvent(intent: PaymentIntentEntity, reason: string): Promise<void> {
     const event = {
       eventId: uuidv4(),
       eventVersion: '1',

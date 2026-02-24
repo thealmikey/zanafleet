@@ -42,7 +42,7 @@ export interface DistanceResult {
 
 /**
  * LocationNormalizationService
- * 
+ *
  * Service for normalizing and validating location inputs.
  * This service ensures consistent location data format across the movers module.
  */
@@ -92,9 +92,7 @@ export class LocationNormalizationService {
    * Normalize multiple locations in batch
    */
   async normalizeBatch(inputs: LocationInput[]): Promise<NormalizedLocation[]> {
-    const results = await Promise.all(
-      inputs.map(async (input) => this.normalize(input))
-    );
+    const results = await Promise.all(inputs.map(async (input) => this.normalize(input)));
     return results;
   }
 
@@ -151,7 +149,7 @@ export class LocationNormalizationService {
     if (longitude >= 33 && longitude <= 42 && latitude >= -5 && latitude <= 6) {
       return 'Africa/Nairobi';
     }
-    
+
     // Default to UTC
     return 'UTC';
   }
@@ -166,20 +164,17 @@ export class LocationNormalizationService {
   /**
    * Haversine formula for calculating distance between two points
    */
-  private haversineDistance(
-    lat1: number,
-    lon1: number,
-    lat2: number,
-    lon2: number
-  ): number {
+  private haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
     const R = 6371; // Earth's radius in kilometers
     const dLat = this.toRad(lat2 - lat1);
     const dLon = this.toRad(lon2 - lon1);
 
     const a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(this.toRad(lat1)) * Math.cos(this.toRad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      Math.cos(this.toRad(lat1)) *
+        Math.cos(this.toRad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
 
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;

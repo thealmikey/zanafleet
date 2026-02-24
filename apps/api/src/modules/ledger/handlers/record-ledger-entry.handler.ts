@@ -7,10 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { RecordLedgerEntryCommand } from '../commands/record-ledger-entry.command';
 import { LedgerEntryType } from '../dto/ledger.enums';
 import { LedgerEntryEntity } from '../entities/ledger-entry.entity';
-import {
-  LedgerEntryRecordedEventV1,
-  LedgerEntryData,
-} from '../events/ledger-entry-recorded.event';
+import { LedgerEntryRecordedEventV1, LedgerEntryData } from '../events/ledger-entry-recorded.event';
 
 /**
  * RecordLedgerEntryCommandHandler
@@ -19,15 +16,13 @@ import {
  */
 @Injectable()
 @CommandHandler(RecordLedgerEntryCommand)
-export class RecordLedgerEntryCommandHandler
-  implements ICommandHandler<RecordLedgerEntryCommand>
-{
+export class RecordLedgerEntryCommandHandler implements ICommandHandler<RecordLedgerEntryCommand> {
   private readonly logger = new Logger(RecordLedgerEntryCommandHandler.name);
 
   constructor(
     private readonly dataSource: DataSource,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: RecordLedgerEntryCommand): Promise<string[]> {
@@ -39,14 +34,10 @@ export class RecordLedgerEntryCommandHandler
       const ledgerRepo = manager.getRepository(LedgerEntryEntity);
 
       // Acquire advisory locks for all accounts in sorted order to prevent deadlocks
-      const uniqueAccountIds = [
-        ...new Set(command.entries.map((e) => e.accountId)),
-      ].sort();
+      const uniqueAccountIds = [...new Set(command.entries.map((e) => e.accountId))].sort();
 
       for (const accountId of uniqueAccountIds) {
-        await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [
-          accountId,
-        ]);
+        await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [accountId]);
       }
 
       for (const entry of command.entries) {
@@ -110,17 +101,13 @@ export class RecordLedgerEntryCommandHandler
     this.eventBus.publish(event);
 
     if (this.eventBusService) {
-      this.eventBusService
-        .publish(NatsSubjects.Ledger.ENTRY_RECORDED_V1, event)
-        .catch((error) => {
-          this.logger.error(
-            `Failed to publish LedgerEntryRecordedEvent to NATS: ${error.message}`,
-          );
-        });
+      this.eventBusService.publish(NatsSubjects.Ledger.ENTRY_RECORDED_V1, event).catch((error) => {
+        this.logger.error(`Failed to publish LedgerEntryRecordedEvent to NATS: ${error.message}`);
+      });
     }
 
     this.logger.log(
-      `Recorded ${entryIds.length} ledger entries for reference: ${command.referenceType}/${command.referenceId}`,
+      `Recorded ${entryIds.length} ledger entries for reference: ${command.referenceType}/${command.referenceId}`
     );
 
     return entryIds;

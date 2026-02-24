@@ -14,7 +14,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { EventBusService } from '../../../../core/event-bus/event-bus.service';
 import { AnalyzeMediaCommand } from '../commands/analyze-media.command';
 import { MediaInsightEvents } from '../events/media-insight.events';
-import { MediaPerceptionAdapter, MediaReference } from '../services/media-perception-adapter.service';
+import {
+  MediaPerceptionAdapter,
+  MediaReference,
+} from '../services/media-perception-adapter.service';
 
 /**
  * AnalyzeMediaHandler
@@ -35,7 +38,7 @@ export class AnalyzeMediaHandler implements ICommandHandler<AnalyzeMediaCommand>
 
   constructor(
     private readonly mediaPerceptionAdapter: MediaPerceptionAdapter,
-    private readonly eventBus: EventBusService,
+    private readonly eventBus: EventBusService
   ) {}
 
   /**
@@ -74,11 +77,11 @@ export class AnalyzeMediaHandler implements ICommandHandler<AnalyzeMediaCommand>
             },
             correlationId,
             causationId,
-          }),
+          })
         );
 
         this.logger.debug(
-          `Media analysis completed for order ${orderId} in ${result.processingTimeMs}ms`,
+          `Media analysis completed for order ${orderId} in ${result.processingTimeMs}ms`
         );
       } else {
         // Emit failure event
@@ -93,11 +96,11 @@ export class AnalyzeMediaHandler implements ICommandHandler<AnalyzeMediaCommand>
             },
             correlationId,
             causationId,
-          }),
+          })
         );
 
         this.logger.warn(
-          `Media analysis failed for order ${orderId}: ${result.errorCode} - ${result.errorMessage}`,
+          `Media analysis failed for order ${orderId}: ${result.errorCode} - ${result.errorMessage}`
         );
       }
     } catch (error) {
@@ -116,7 +119,7 @@ export class AnalyzeMediaHandler implements ICommandHandler<AnalyzeMediaCommand>
           },
           correlationId,
           causationId,
-        }),
+        })
       );
     }
   }

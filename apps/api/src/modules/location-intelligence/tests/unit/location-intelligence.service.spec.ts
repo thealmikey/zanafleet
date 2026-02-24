@@ -43,7 +43,7 @@ describe('LocationIntelligenceService', () => {
       mockCommandBus,
       mockRiderLocationRepo,
       mockHeatmapService,
-      mockCandidateRepo,
+      mockCandidateRepo
     );
   });
 
@@ -85,7 +85,7 @@ describe('LocationIntelligenceService', () => {
       },
       {
         riderId: 'rider-2',
-        lastKnownLocation: { latitude: -1.30, longitude: 36.83 },
+        lastKnownLocation: { latitude: -1.3, longitude: 36.83 },
         lastSeenAt: new Date(),
         vehicleType: VehicleType.Car,
         busyWindows: [{ start: new Date(), end: new Date() }],
@@ -106,7 +106,7 @@ describe('LocationIntelligenceService', () => {
         36.8219,
         5000,
         undefined,
-        undefined,
+        undefined
       );
       expect(result).toEqual(mockCandidates);
     });
@@ -128,7 +128,7 @@ describe('LocationIntelligenceService', () => {
         36.8219,
         3000,
         now,
-        10,
+        10
       );
     });
 
@@ -158,9 +158,9 @@ describe('LocationIntelligenceService', () => {
     const params: HeatmapParams = {
       boundingBox: {
         minLat: -1.35,
-        maxLat: -1.20,
-        minLng: 36.70,
-        maxLng: 36.90,
+        maxLat: -1.2,
+        minLng: 36.7,
+        maxLng: 36.9,
       },
       resolution: H3_RESOLUTION_MEDIUM,
     };
@@ -201,7 +201,7 @@ describe('LocationIntelligenceService', () => {
       {
         id: 'hist-2',
         riderId: 'rider-123',
-        latitude: -1.30,
+        latitude: -1.3,
         longitude: 36.83,
         h3IndexFine: 'fine2',
         h3IndexMedium: 'med2',
@@ -224,11 +224,11 @@ describe('LocationIntelligenceService', () => {
       expect(mockRiderLocationRepo.getRiderPath).toHaveBeenCalledWith(
         'rider-123',
         new Date('2024-01-15T10:00:00Z'),
-        new Date('2024-01-15T11:00:00Z'),
+        new Date('2024-01-15T11:00:00Z')
       );
       expect(result).toEqual([
         { latitude: -1.29, longitude: 36.82 },
-        { latitude: -1.30, longitude: 36.83 },
+        { latitude: -1.3, longitude: 36.83 },
       ]);
     });
 

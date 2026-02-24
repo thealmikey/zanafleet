@@ -1,10 +1,6 @@
 import { GeoPoint } from '../providers/geo-provider.interface';
 
-import {
-  H3_RESOLUTION_FINE,
-  H3_RESOLUTION_MEDIUM,
-  H3_RESOLUTION_COARSE,
-} from './h3.types';
+import { H3_RESOLUTION_FINE, H3_RESOLUTION_MEDIUM, H3_RESOLUTION_COARSE } from './h3.types';
 
 /**
  * Bounding box for geographic viewport filtering.

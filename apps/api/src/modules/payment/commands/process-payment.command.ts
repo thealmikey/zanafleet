@@ -27,9 +27,7 @@ export class ProcessPaymentCommand {
     return ProcessPaymentCommandSchema.parse(input);
   }
 
-  static safeValidate(
-    input: unknown,
-  ): z.SafeParseReturnType<unknown, ProcessPaymentCommandInput> {
+  static safeValidate(input: unknown): z.SafeParseReturnType<unknown, ProcessPaymentCommandInput> {
     return ProcessPaymentCommandSchema.safeParse(input);
   }
 }

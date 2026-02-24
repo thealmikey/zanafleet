@@ -18,7 +18,7 @@ describe('CreateOrderCommandHandler', () => {
   let repo: jest.Mocked<Repository<OrderEntity>>;
   let eventBus: { publish: jest.Mock };
 
-  const { v4: uuidv4 } = jest.requireMock('uuid') ;
+  const { v4: uuidv4 } = jest.requireMock('uuid');
 
   beforeEach(async () => {
     uuidv4.mockReset();

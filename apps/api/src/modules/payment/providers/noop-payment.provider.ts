@@ -23,16 +23,11 @@ export class NoOpPaymentProvider implements PaymentProvider {
   readonly providerId = 'noop';
   readonly displayName = 'No-Op Payment Provider';
   readonly supportedCurrencies = ['USD', 'EUR', 'GBP', 'KES'];
-  readonly capabilities: ProviderCapability[] = [
-    'CARD',
-    'MOBILE_MONEY',
-    'BANK_TRANSFER',
-    'WALLET',
-  ];
+  readonly capabilities: ProviderCapability[] = ['CARD', 'MOBILE_MONEY', 'BANK_TRANSFER', 'WALLET'];
 
   async initiatePayment(intent: PaymentIntentData): Promise<PaymentInitiationResult> {
     this.logger.debug(
-      `NoOp initiatePayment called for amount: ${intent.amount} ${intent.currency}`,
+      `NoOp initiatePayment called for amount: ${intent.amount} ${intent.currency}`
     );
 
     return {
@@ -55,9 +50,7 @@ export class NoOpPaymentProvider implements PaymentProvider {
   }
 
   async refund(transactionId: string, amount: number): Promise<RefundResult> {
-    this.logger.debug(
-      `NoOp refund called for transaction: ${transactionId}, amount: ${amount}`,
-    );
+    this.logger.debug(`NoOp refund called for transaction: ${transactionId}, amount: ${amount}`);
 
     return {
       success: true,

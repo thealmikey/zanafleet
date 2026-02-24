@@ -7,7 +7,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { OrderStatus } from '@zanafleet/contracts';
 import request from 'supertest';
 
-
 import { OrdersController } from '../../controllers/orders.controller';
 import { CustomerOrderOrchestrator } from '../../coordinators/customer-order.orchestrator';
 import { OrderEntity } from '../../entities/order.entity';
@@ -109,9 +108,7 @@ describe('OrdersController (e2e)', () => {
       const mockEntity = createMockOrderEntity();
       mockRepository.findOne.mockResolvedValue(mockEntity);
 
-      const response = await request(app.getHttpServer())
-        .get('/orders/order-123')
-        .expect(200);
+      const response = await request(app.getHttpServer()).get('/orders/order-123').expect(200);
 
       expect(response.body).toMatchObject({
         orderId: 'order-123',
@@ -152,9 +149,7 @@ describe('OrdersController (e2e)', () => {
     it('should return 200 with updated domain payload', async () => {
       const mockEntity = createMockOrderEntity();
       const updatedEntity = createMockOrderEntity({ itemSummary: 'Updated item' });
-      mockRepository.findOne
-        .mockResolvedValueOnce(mockEntity)
-        .mockResolvedValueOnce(updatedEntity);
+      mockRepository.findOne.mockResolvedValueOnce(mockEntity).mockResolvedValueOnce(updatedEntity);
       mockRepository.update.mockResolvedValue({ affected: 1 });
 
       const response = await request(app.getHttpServer())
@@ -182,9 +177,7 @@ describe('OrdersController (e2e)', () => {
     it('should return 200 with deleted: true', async () => {
       mockRepository.delete.mockResolvedValue({ affected: 1 });
 
-      const response = await request(app.getHttpServer())
-        .delete('/orders/order-123')
-        .expect(200);
+      const response = await request(app.getHttpServer()).delete('/orders/order-123').expect(200);
 
       expect(response.body).toEqual({ deleted: true });
     });

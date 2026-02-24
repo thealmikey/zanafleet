@@ -8,11 +8,7 @@ import {
   H3_RESOLUTION_MEDIUM,
   H3_RESOLUTION_COARSE,
 } from '../../types/h3.types';
-import {
-  BoundingBox,
-  HeatmapParams,
-  HistoricalHeatmapParams,
-} from '../../types/heatmap.types';
+import { BoundingBox, HeatmapParams, HistoricalHeatmapParams } from '../../types/heatmap.types';
 
 describe('HeatmapService', () => {
   let service: HeatmapService;
@@ -21,18 +17,18 @@ describe('HeatmapService', () => {
 
   const nairobiBoundingBox: BoundingBox = {
     minLat: -1.35,
-    maxLat: -1.20,
-    minLng: 36.70,
-    maxLng: 36.90,
+    maxLat: -1.2,
+    minLng: 36.7,
+    maxLng: 36.9,
   };
 
   const mockCenterPoint: GeoPoint = { latitude: -1.2921, longitude: 36.8219 };
   const mockPolygon: GeoPoint[] = [
-    { latitude: -1.290, longitude: 36.820 },
+    { latitude: -1.29, longitude: 36.82 },
     { latitude: -1.291, longitude: 36.822 },
     { latitude: -1.293, longitude: 36.823 },
     { latitude: -1.294, longitude: 36.822 },
-    { latitude: -1.293, longitude: 36.820 },
+    { latitude: -1.293, longitude: 36.82 },
     { latitude: -1.291, longitude: 36.819 },
   ];
 
@@ -67,39 +63,39 @@ describe('HeatmapService', () => {
 
     it('should throw error for unsupported resolution', () => {
       expect(() => service.getH3ColumnForResolution(3 as never)).toThrow(
-        'Unsupported H3 resolution: 3',
+        'Unsupported H3 resolution: 3'
       );
     });
   });
 
   describe('isPointInBoundingBox', () => {
     it('should return true for point inside bounding box', () => {
-      const point: GeoPoint = { latitude: -1.28, longitude: 36.80 };
+      const point: GeoPoint = { latitude: -1.28, longitude: 36.8 };
       expect(service.isPointInBoundingBox(point, nairobiBoundingBox)).toBe(true);
     });
 
     it('should return true for point on bounding box boundary', () => {
-      const point: GeoPoint = { latitude: -1.35, longitude: 36.70 };
+      const point: GeoPoint = { latitude: -1.35, longitude: 36.7 };
       expect(service.isPointInBoundingBox(point, nairobiBoundingBox)).toBe(true);
     });
 
     it('should return false for point outside bounding box (south)', () => {
-      const point: GeoPoint = { latitude: -1.40, longitude: 36.80 };
+      const point: GeoPoint = { latitude: -1.4, longitude: 36.8 };
       expect(service.isPointInBoundingBox(point, nairobiBoundingBox)).toBe(false);
     });
 
     it('should return false for point outside bounding box (north)', () => {
-      const point: GeoPoint = { latitude: -1.10, longitude: 36.80 };
+      const point: GeoPoint = { latitude: -1.1, longitude: 36.8 };
       expect(service.isPointInBoundingBox(point, nairobiBoundingBox)).toBe(false);
     });
 
     it('should return false for point outside bounding box (west)', () => {
-      const point: GeoPoint = { latitude: -1.28, longitude: 36.60 };
+      const point: GeoPoint = { latitude: -1.28, longitude: 36.6 };
       expect(service.isPointInBoundingBox(point, nairobiBoundingBox)).toBe(false);
     });
 
     it('should return false for point outside bounding box (east)', () => {
-      const point: GeoPoint = { latitude: -1.28, longitude: 37.00 };
+      const point: GeoPoint = { latitude: -1.28, longitude: 37.0 };
       expect(service.isPointInBoundingBox(point, nairobiBoundingBox)).toBe(false);
     });
   });
@@ -144,9 +140,7 @@ describe('HeatmapService', () => {
     });
 
     it('should enrich cells with center and polygon', async () => {
-      mockDataSource.query.mockResolvedValue([
-        { h3Index: '8728342a9ffffff', count: 5 },
-      ]);
+      mockDataSource.query.mockResolvedValue([{ h3Index: '8728342a9ffffff', count: 5 }]);
 
       const params: HeatmapParams = {
         boundingBox: nairobiBoundingBox,
@@ -261,9 +255,7 @@ describe('HeatmapService', () => {
     });
 
     it('should enrich historical cells with geometry', async () => {
-      mockDataSource.query.mockResolvedValue([
-        { h3Index: '8528342bfffffff', count: 15 },
-      ]);
+      mockDataSource.query.mockResolvedValue([{ h3Index: '8528342bfffffff', count: 15 }]);
 
       const result = await service.getHistoricalHeatmap({
         boundingBox: nairobiBoundingBox,
@@ -285,9 +277,7 @@ describe('HeatmapService', () => {
       const outsidePoint: GeoPoint = { latitude: 0, longitude: 0 };
       mockH3Service.h3ToPoint.mockReturnValueOnce(outsidePoint);
 
-      mockDataSource.query.mockResolvedValue([
-        { h3Index: 'outside', count: 100 },
-      ]);
+      mockDataSource.query.mockResolvedValue([{ h3Index: 'outside', count: 100 }]);
 
       const result = await service.getHistoricalHeatmap({
         boundingBox: nairobiBoundingBox,
@@ -322,7 +312,7 @@ describe('HeatmapService', () => {
         resolution: H3_RESOLUTION_FINE,
       });
 
-      const query = mockDataSource.query.mock.calls[0][0] ;
+      const query = mockDataSource.query.mock.calls[0][0];
       expect(query).toContain('h3_index_fine');
       expect(query).not.toContain('h3_index_medium');
       expect(query).not.toContain('h3_index_coarse');
@@ -336,7 +326,7 @@ describe('HeatmapService', () => {
         resolution: H3_RESOLUTION_MEDIUM,
       });
 
-      const query = mockDataSource.query.mock.calls[0][0] ;
+      const query = mockDataSource.query.mock.calls[0][0];
       expect(query).toContain('h3_index_medium');
     });
 
@@ -348,7 +338,7 @@ describe('HeatmapService', () => {
         resolution: H3_RESOLUTION_COARSE,
       });
 
-      const query = mockDataSource.query.mock.calls[0][0] ;
+      const query = mockDataSource.query.mock.calls[0][0];
       expect(query).toContain('h3_index_coarse');
     });
   });

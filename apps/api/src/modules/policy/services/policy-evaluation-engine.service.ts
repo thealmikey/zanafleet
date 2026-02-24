@@ -4,7 +4,10 @@ import { Injectable, Logger, Optional } from '@nestjs/common';
 import { BindingTargetType } from '@zanafleet/contracts';
 
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
-import { CalendarEventRepository, RegionFilter } from '../../calendar/repositories/calendar-event.repository';
+import {
+  CalendarEventRepository,
+  RegionFilter,
+} from '../../calendar/repositories/calendar-event.repository';
 import { CalendarBindingService } from '../../calendar/services/calendar-binding.service';
 import { SchedulingConstraintService } from '../../calendar/services/scheduling-constraint.service';
 import {
@@ -149,7 +152,10 @@ export class PolicyEvaluationEngineService {
       const processingTimeMs = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : String(error);
 
-      this.logger.error(`Policy evaluation failed: ${errorMessage}`, error instanceof Error ? error.stack : undefined);
+      this.logger.error(
+        `Policy evaluation failed: ${errorMessage}`,
+        error instanceof Error ? error.stack : undefined
+      );
 
       const result = failOpen
         ? this.createFailOpenResult(processingTimeMs, errorMessage)
@@ -170,7 +176,11 @@ export class PolicyEvaluationEngineService {
    * @returns The enriched context with calendarContext populated
    */
   async enrichWithCalendarContext(context: EvaluationContext): Promise<EvaluationContext> {
-    if (!this.schedulingConstraintService || !this.calendarBindingService || !this.calendarEventRepository) {
+    if (
+      !this.schedulingConstraintService ||
+      !this.calendarBindingService ||
+      !this.calendarEventRepository
+    ) {
       this.logger.warn('Calendar services not available, skipping calendar enrichment');
       return context;
     }
@@ -206,7 +216,8 @@ export class PolicyEvaluationEngineService {
       const regionFilter: RegionFilter | undefined = context.metadata?.region
         ? {
             country: (context.metadata.region as Record<string, string>).country,
-            administrativeArea: (context.metadata.region as Record<string, string>).administrativeArea,
+            administrativeArea: (context.metadata.region as Record<string, string>)
+              .administrativeArea,
             locality: (context.metadata.region as Record<string, string>).locality,
           }
         : undefined;
@@ -231,7 +242,7 @@ export class PolicyEvaluationEngineService {
 
       const activeEvents = activeEventsEntities.map((e) => ({
         eventId: e.id,
-        eventType: e.eventType ,
+        eventType: e.eventType,
         title: e.title,
       }));
 
@@ -265,7 +276,9 @@ export class PolicyEvaluationEngineService {
       };
     } catch (error) {
       this.logger.error(
-        `Failed to enrich calendar context: ${error instanceof Error ? error.message : String(error)}`
+        `Failed to enrich calendar context: ${
+          error instanceof Error ? error.message : String(error)
+        }`
       );
       return context;
     }
@@ -274,7 +287,10 @@ export class PolicyEvaluationEngineService {
   /**
    * Determine the calendar target type and ID from the evaluation context.
    */
-  private determineCalendarTarget(context: EvaluationContext): { targetType: BindingTargetType; targetId: string } {
+  private determineCalendarTarget(context: EvaluationContext): {
+    targetType: BindingTargetType;
+    targetId: string;
+  } {
     if (context.riderId) {
       return { targetType: BindingTargetType.RIDER, targetId: context.riderId };
     }
@@ -531,7 +547,9 @@ export class PolicyEvaluationEngineService {
 
     this.eventBus.publishEvent(violationEvent).catch((err) => {
       this.logger.error(
-        `Failed to publish policy violation event: ${err instanceof Error ? err.message : String(err)}`
+        `Failed to publish policy violation event: ${
+          err instanceof Error ? err.message : String(err)
+        }`
       );
     });
   }

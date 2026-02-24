@@ -30,12 +30,7 @@ const VALID_ITEM_CATEGORIES: readonly ItemCategory[] = [
 /**
  * Valid size class values for validation.
  */
-const VALID_SIZE_CLASSES: readonly SizeClass[] = [
-  'small',
-  'medium',
-  'large',
-  'extra-large',
-];
+const VALID_SIZE_CLASSES: readonly SizeClass[] = ['small', 'medium', 'large', 'extra-large'];
 
 /**
  * Type guard for MediaInsightV1.
@@ -158,15 +153,11 @@ function validateDetectedItem(item: unknown): { valid: boolean; errors: string[]
   }
 
   if (!VALID_ITEM_CATEGORIES.includes(detectedItem.category as ItemCategory)) {
-    errors.push(
-      `DetectedItem.category must be one of: ${VALID_ITEM_CATEGORIES.join(', ')}`
-    );
+    errors.push(`DetectedItem.category must be one of: ${VALID_ITEM_CATEGORIES.join(', ')}`);
   }
 
   if (!VALID_SIZE_CLASSES.includes(detectedItem.sizeClass as SizeClass)) {
-    errors.push(
-      `DetectedItem.sizeClass must be one of: ${VALID_SIZE_CLASSES.join(', ')}`
-    );
+    errors.push(`DetectedItem.sizeClass must be one of: ${VALID_SIZE_CLASSES.join(', ')}`);
   }
 
   if (typeof detectedItem.quantity !== 'number' || detectedItem.quantity < 1) {

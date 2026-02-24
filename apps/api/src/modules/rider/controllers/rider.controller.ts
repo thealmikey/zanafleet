@@ -1,10 +1,6 @@
 import { RequireCapability } from '@api/core/api/decorators';
 import { CapabilityGuard } from '@api/core/api/guards';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
+import { parseQueryParams, createPaginationMeta, RawQueryParams } from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -103,10 +99,20 @@ export class RiderController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new rider', description: 'Register a new rider in the workspace' })
-  @ApiResponse({ status: 201, description: 'Rider created successfully', schema: { example: { id: 'uuid' } } })
+  @ApiOperation({
+    summary: 'Create a new rider',
+    description: 'Register a new rider in the workspace',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Rider created successfully',
+    schema: { example: { id: 'uuid' } },
+  })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   async create(@Body() dto: CreateRiderDto): Promise<{ id: string }> {
     const validated = CreateRiderCommand.validate(dto);
@@ -115,9 +121,15 @@ export class RiderController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get rider by ID', description: 'Retrieve a specific rider by their unique identifier' })
+  @ApiOperation({
+    summary: 'Get rider by ID',
+    description: 'Retrieve a specific rider by their unique identifier',
+  })
   @ApiResponse({ status: 200, description: 'Rider retrieved successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Rider not found' })
   @ApiParam({ name: 'id', description: 'Rider unique identifier (UUID)', type: String })
@@ -130,13 +142,23 @@ export class RiderController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List all riders', description: 'Retrieve all riders with pagination, sorting, and filtering' })
+  @ApiOperation({
+    summary: 'List all riders',
+    description: 'Retrieve all riders with pagination, sorting, and filtering',
+  })
   @ApiResponse({ status: 200, description: 'Riders retrieved successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number (1-based)', type: Number })
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
-  @ApiQuery({ name: 'sort', required: false, description: 'Sort field and order (e.g., createdAt:desc)' })
+  @ApiQuery({
+    name: 'sort',
+    required: false,
+    description: 'Sort field and order (e.g., createdAt:desc)',
+  })
   @ApiQuery({ name: 'filter', required: false, description: 'Filter criteria as JSON' })
   async findAll(@Query() query: RawQueryParams): Promise<{
     data: ReturnType<RiderEntity['toDomain']>[];
@@ -147,7 +169,7 @@ export class RiderController {
     const order = sort ? { [sort.field]: sort.order } : undefined;
 
     const [entities, total] = await this.riderRepository.findAndCount({
-      where: filter ,
+      where: filter,
       order,
       skip: pagination.offset,
       take: pagination.limit,
@@ -162,7 +184,10 @@ export class RiderController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a rider', description: 'Update an existing rider information' })
   @ApiResponse({ status: 200, description: 'Rider updated successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Rider not found' })
   @ApiParam({ name: 'id', description: 'Rider unique identifier (UUID)', type: String })
@@ -184,8 +209,15 @@ export class RiderController {
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a rider', description: 'Remove a rider from the system' })
-  @ApiResponse({ status: 200, description: 'Rider deleted successfully', schema: { example: { deleted: true } } })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Rider deleted successfully',
+    schema: { example: { deleted: true } },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Rider not found' })
   @ApiParam({ name: 'id', description: 'Rider unique identifier (UUID)', type: String })

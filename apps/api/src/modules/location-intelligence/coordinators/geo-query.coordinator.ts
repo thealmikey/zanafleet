@@ -59,8 +59,8 @@ export class GeoQueryCoordinator {
     private readonly locationIntelligenceService: LocationIntelligenceService,
     private readonly heatmapService: HeatmapService,
     private readonly registry: GeoProviderRegistry,
-    @Optional() private readonly eventBusService?: EventBusService,
-  ) { }
+    @Optional() private readonly eventBusService?: EventBusService
+  ) {}
 
   /**
    * Find nearby riders within the specified radius.
@@ -118,9 +118,9 @@ export class GeoQueryCoordinator {
     const results: Address[] = [];
 
     if (point) {
-      // If we got a point, try to reverse geocode it to get the full address details if needed, 
-      // or construct a basic Address object. 
-      // Ideally, geocode should return Address details. 
+      // If we got a point, try to reverse geocode it to get the full address details if needed,
+      // or construct a basic Address object.
+      // Ideally, geocode should return Address details.
       // Let's rely on reverseGeocode for now to get the details from the point
       const address = await provider.reverseGeocode(point);
       if (address) {
@@ -172,10 +172,11 @@ export class GeoQueryCoordinator {
       longitude: (bounds.minLng + bounds.maxLng) / 2,
     };
 
-    const radiusMeters = this.calculateHaversineDistance(
-      { latitude: bounds.minLat, longitude: bounds.minLng },
-      { latitude: bounds.maxLat, longitude: bounds.maxLng },
-    ) / 2;
+    const radiusMeters =
+      this.calculateHaversineDistance(
+        { latitude: bounds.minLat, longitude: bounds.minLng },
+        { latitude: bounds.maxLat, longitude: bounds.maxLng }
+      ) / 2;
 
     const riders = await this.locationIntelligenceService.findNearbyRiders({
       latitude: center.latitude,
@@ -214,10 +215,7 @@ export class GeoQueryCoordinator {
   /**
    * Calculate route distance between two points using Haversine formula.
    */
-  async calculateRouteDistance(
-    origin: GeoPoint,
-    destination: GeoPoint,
-  ): Promise<DistanceResult> {
+  async calculateRouteDistance(origin: GeoPoint, destination: GeoPoint): Promise<DistanceResult> {
     const distanceMeters = this.calculateHaversineDistance(origin, destination);
     const confidence = this.determineConfidence(distanceMeters);
 
@@ -235,7 +233,9 @@ export class GeoQueryCoordinator {
    * Currently returns true for all points (placeholder implementation).
    */
   async isWithinServiceArea(point: GeoPoint, areaId: string): Promise<boolean> {
-    this.logger.debug(`Checking service area ${areaId} for point: ${point.latitude}, ${point.longitude}`);
+    this.logger.debug(
+      `Checking service area ${areaId} for point: ${point.latitude}, ${point.longitude}`
+    );
 
     await this.emitQueryExecutedEvent('isWithinServiceArea', { point, areaId });
 
@@ -292,10 +292,7 @@ export class GeoQueryCoordinator {
     };
   }
 
-  private clusterRidersIntoZones(
-    riders: RiderCandidate[],
-    bounds: GeoBounds,
-  ): ZoneCluster[] {
+  private clusterRidersIntoZones(riders: RiderCandidate[], bounds: GeoBounds): ZoneCluster[] {
     const gridSize = this.config.defaultGridSize;
     const latStep = (bounds.maxLat - bounds.minLat) / gridSize;
     const lngStep = (bounds.maxLng - bounds.minLng) / gridSize;
@@ -320,13 +317,10 @@ export class GeoQueryCoordinator {
         continue;
       }
 
-      const row = Math.min(
-        Math.floor((location.latitude - bounds.minLat) / latStep),
-        gridSize - 1,
-      );
+      const row = Math.min(Math.floor((location.latitude - bounds.minLat) / latStep), gridSize - 1);
       const col = Math.min(
         Math.floor((location.longitude - bounds.minLng) / lngStep),
-        gridSize - 1,
+        gridSize - 1
       );
 
       const key = `${row}-${col}`;
@@ -361,7 +355,7 @@ export class GeoQueryCoordinator {
         };
 
         const busyCount = cellRiders.filter(
-          (r) => r.busyWindows && r.busyWindows.length > 0,
+          (r) => r.busyWindows && r.busyWindows.length > 0
         ).length;
         const averageLoad = cellRiders.length > 0 ? busyCount / cellRiders.length : 0;
 
@@ -418,10 +412,7 @@ export class GeoQueryCoordinator {
     this.cache.set(key, entry);
   }
 
-  private async emitQueryExecutedEvent(
-    queryType: string,
-    params: unknown,
-  ): Promise<void> {
+  private async emitQueryExecutedEvent(queryType: string, params: unknown): Promise<void> {
     if (!this.eventBusService) {
       return;
     }

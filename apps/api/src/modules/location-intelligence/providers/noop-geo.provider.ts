@@ -24,7 +24,7 @@ export class NoOpGeoProvider implements GeoProvider {
 
   async calculateDistance(from: GeoPoint, to: GeoPoint): Promise<number> {
     this.logger.debug(
-      `NoOp calculateDistance called from (${from.latitude}, ${from.longitude}) to (${to.latitude}, ${to.longitude})`,
+      `NoOp calculateDistance called from (${from.latitude}, ${from.longitude}) to (${to.latitude}, ${to.longitude})`
     );
     return 0;
   }

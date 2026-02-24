@@ -84,7 +84,7 @@ describe('UpdateRiderLocationHandler', () => {
       mockEventBus,
       mockRedisService,
       mockDataSource,
-      mockConfigService,
+      mockConfigService
     );
   });
 
@@ -179,7 +179,7 @@ describe('UpdateRiderLocationHandler', () => {
           accuracy: validTelemetry.accuracy,
           recordedAt: validTelemetry.timestamp,
         },
-        expect.anything(),
+        expect.anything()
       );
     });
 
@@ -198,7 +198,7 @@ describe('UpdateRiderLocationHandler', () => {
           accuracy: validTelemetry.accuracy,
           recordedAt: validTelemetry.timestamp,
         },
-        expect.anything(),
+        expect.anything()
       );
     });
 
@@ -260,7 +260,7 @@ describe('UpdateRiderLocationHandler', () => {
           speed: null,
           accuracy: null,
         }),
-        expect.anything(),
+        expect.anything()
       );
     });
   });
@@ -313,11 +313,11 @@ describe('UpdateRiderLocationHandler', () => {
       expect(result.updated).toBe(true);
       expect(mockRedisService.setRateLimitKey).toHaveBeenCalledWith(
         'rate_limit:rider:rider-123',
-        expect.any(Number),
+        expect.any(Number)
       );
       expect(mockRedisService.setRateLimitKey).toHaveBeenCalledWith(
         'rate_limit:rider:rider-different',
-        expect.any(Number),
+        expect.any(Number)
       );
     });
   });

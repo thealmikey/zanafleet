@@ -6,22 +6,10 @@
  * from @zanafleet/contracts to ensure consistency across packages.
  */
 
-export {
-  PolicyScope,
-  PolicyEffect,
-  PolicyStatus,
-  PolicyTrigger,
-} from './policy.enums';
+export { PolicyScope, PolicyEffect, PolicyStatus, PolicyTrigger } from './policy.enums';
 
-export type {
-  PolicyCondition,
-  PolicyDecision,
-} from './policy.types';
+export type { PolicyCondition, PolicyDecision } from './policy.types';
 
-export type {
-  EvaluationContext,
-  EvaluatedPolicy,
-  EvaluationResult,
-} from './policy.types';
+export type { EvaluationContext, EvaluatedPolicy, EvaluationResult } from './policy.types';
 
 export type { EvaluatedPolicyLogEntry } from '../entities/policy-decision-log.entity';

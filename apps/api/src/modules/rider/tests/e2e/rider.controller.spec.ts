@@ -7,7 +7,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { VehicleType } from '@zanafleet/contracts';
 import request from 'supertest';
 
-
 import { RiderController } from '../../controllers/rider.controller';
 import { RiderEntity } from '../../entities/rider.entity';
 
@@ -66,7 +65,10 @@ describe('RiderController (e2e)', () => {
       .overrideGuard(CapabilityGuard)
       .useValue({
         canActivate: async (): Promise<boolean> => {
-          const result = await mockCapabilityAccessController.hasCapability('test-actor', 'rider.manage');
+          const result = await mockCapabilityAccessController.hasCapability(
+            'test-actor',
+            'rider.manage'
+          );
           if (!result) {
             throw new ForbiddenException('Missing required capability: rider.manage');
           }
@@ -114,9 +116,7 @@ describe('RiderController (e2e)', () => {
       const mockEntity = createMockRiderEntity();
       mockRepository.findOne.mockResolvedValue(mockEntity);
 
-      const response = await request(app.getHttpServer())
-        .get('/riders/rider-123')
-        .expect(200);
+      const response = await request(app.getHttpServer()).get('/riders/rider-123').expect(200);
 
       expect(response.body).toMatchObject({
         riderId: 'rider-123',
@@ -129,15 +129,16 @@ describe('RiderController (e2e)', () => {
     it('should return 404 when rider not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await request(app.getHttpServer())
-        .get('/riders/non-existent')
-        .expect(404);
+      await request(app.getHttpServer()).get('/riders/non-existent').expect(404);
     });
   });
 
   describe('GET /riders', () => {
     it('should return 200 with data and meta respecting pagination', async () => {
-      const mockEntities = [createMockRiderEntity({ id: 'rider-1' }), createMockRiderEntity({ id: 'rider-2' })];
+      const mockEntities = [
+        createMockRiderEntity({ id: 'rider-1' }),
+        createMockRiderEntity({ id: 'rider-2' }),
+      ];
       mockRepository.findAndCount.mockResolvedValue([mockEntities, 2]);
 
       const response = await request(app.getHttpServer())

@@ -30,7 +30,7 @@ describe('Neo4jRiderCandidateRepository', () => {
     },
     {
       riderId: 'rider-2',
-      latitude: -1.30,
+      latitude: -1.3,
       longitude: 36.83,
       h3IndexFine: 'fine2',
       h3IndexMedium: 'med2',
@@ -65,10 +65,7 @@ describe('Neo4jRiderCandidateRepository', () => {
       getDriver: jest.fn(),
     } as unknown as jest.Mocked<Neo4jService>;
 
-    repository = new Neo4jRiderCandidateRepository(
-      mockRiderLocationRepo,
-      mockNeo4jService,
-    );
+    repository = new Neo4jRiderCandidateRepository(mockRiderLocationRepo, mockNeo4jService);
   });
 
   describe('findNearbyRiders', () => {
@@ -136,7 +133,7 @@ describe('Neo4jRiderCandidateRepository', () => {
       });
       expect(result[1]).toEqual({
         riderId: 'rider-2',
-        lastKnownLocation: { latitude: -1.30, longitude: 36.83 },
+        lastKnownLocation: { latitude: -1.3, longitude: 36.83 },
         lastSeenAt: new Date('2024-01-15T10:01:00Z'),
         vehicleType: VehicleType.Bike,
         busyWindows: [
@@ -255,10 +252,10 @@ describe('Neo4jRiderCandidateRepository', () => {
       await repository.findNearbyRiders(-1.29, 36.82, 5000, now);
 
       expect(mockRiderLocationRepo.findNearbyRiders).toHaveBeenCalled();
-      expect(mockSession.run).toHaveBeenCalledWith(
-        expect.stringContaining('MATCH (r:Rider)'),
-        { riderIds: ['rider-1', 'rider-2'], now: '2024-01-15T12:00:00.000Z' },
-      );
+      expect(mockSession.run).toHaveBeenCalledWith(expect.stringContaining('MATCH (r:Rider)'), {
+        riderIds: ['rider-1', 'rider-2'],
+        now: '2024-01-15T12:00:00.000Z',
+      });
     });
 
     it('should pass now parameter to Neo4j query for time-based filtering', async () => {
@@ -269,11 +266,11 @@ describe('Neo4jRiderCandidateRepository', () => {
 
       expect(mockSession.run).toHaveBeenCalledWith(
         expect.stringContaining('d.scheduledPickupTime <= $now'),
-        expect.objectContaining({ now: '2024-01-15T14:30:00.000Z' }),
+        expect.objectContaining({ now: '2024-01-15T14:30:00.000Z' })
       );
       expect(mockSession.run).toHaveBeenCalledWith(
         expect.stringContaining('d.scheduledDropoffTime >= $now'),
-        expect.objectContaining({ now: '2024-01-15T14:30:00.000Z' }),
+        expect.objectContaining({ now: '2024-01-15T14:30:00.000Z' })
       );
     });
 
@@ -284,7 +281,7 @@ describe('Neo4jRiderCandidateRepository', () => {
 
       expect(mockSession.run).toHaveBeenCalledWith(
         expect.stringContaining('MATCH (r:Rider)'),
-        expect.objectContaining({ riderIds: ['rider-1', 'rider-2'] }),
+        expect.objectContaining({ riderIds: ['rider-1', 'rider-2'] })
       );
     });
   });

@@ -74,7 +74,7 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
 export class LocationIntelligenceModule implements OnModuleInit {
   constructor(
     private readonly registry: GeoProviderRegistry,
-    private readonly noOpProvider: NoOpGeoProvider,
+    private readonly noOpProvider: NoOpGeoProvider
   ) {}
 
   onModuleInit(): void {

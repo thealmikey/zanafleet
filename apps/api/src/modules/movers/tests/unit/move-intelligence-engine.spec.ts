@@ -3,7 +3,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MoveProfile } from '../../domain/move-profile';
 import { VehicleCapabilityProfile } from '../../domain/vehicle-capability-profile';
 import { IntelligenceContext } from '../../intelligence/intelligence-context';
-import { MoveIntelligenceEngine, INTELLIGENCE_VERSION } from '../../intelligence/move-intelligence-engine';
+import {
+  MoveIntelligenceEngine,
+  INTELLIGENCE_VERSION,
+} from '../../intelligence/move-intelligence-engine';
 
 describe('MoveIntelligenceEngine', () => {
   let engine: MoveIntelligenceEngine;
@@ -20,7 +23,9 @@ describe('MoveIntelligenceEngine', () => {
     ...overrides,
   });
 
-  const createMockVehicle = (overrides?: Partial<VehicleCapabilityProfile>): VehicleCapabilityProfile => ({
+  const createMockVehicle = (
+    overrides?: Partial<VehicleCapabilityProfile>
+  ): VehicleCapabilityProfile => ({
     vehicleId: 'test-vehicle-001',
     maxVolumeM3: 40,
     allowedLoadType: ['standard', 'boxes', 'furniture'],
@@ -150,8 +155,12 @@ describe('MoveIntelligenceEngine', () => {
 
       const recommendation = await engine.generateRecommendation(context);
 
-      expect(recommendation.riskAssessment.requiredPrecautions).toContain('Verify elevator availability');
-      expect(recommendation.riskAssessment.requiredPrecautions).toContain('Additional movers for stairs');
+      expect(recommendation.riskAssessment.requiredPrecautions).toContain(
+        'Verify elevator availability'
+      );
+      expect(recommendation.riskAssessment.requiredPrecautions).toContain(
+        'Additional movers for stairs'
+      );
     });
 
     it('should handle special items in risk assessment', async () => {

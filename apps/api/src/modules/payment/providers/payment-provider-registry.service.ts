@@ -20,7 +20,7 @@ export class PaymentProviderRegistry {
     }
     this.providers.set(provider.providerId, provider);
     this.logger.log(
-      `Registered payment provider: ${provider.providerId} (${provider.displayName})`,
+      `Registered payment provider: ${provider.providerId} (${provider.displayName})`
     );
 
     if (setAsDefault || this.defaultProviderId === null) {
@@ -50,7 +50,7 @@ export class PaymentProviderRegistry {
 
   getByCapability(capability: ProviderCapability): PaymentProvider[] {
     return Array.from(this.providers.values()).filter((provider) =>
-      provider.capabilities.includes(capability),
+      provider.capabilities.includes(capability)
     );
   }
 

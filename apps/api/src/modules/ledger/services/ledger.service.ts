@@ -34,7 +34,7 @@ export interface LedgerEntryRecord {
 export class LedgerService {
   constructor(
     @InjectRepository(LedgerEntryEntity)
-    private readonly ledgerEntryRepository: Repository<LedgerEntryEntity>,
+    private readonly ledgerEntryRepository: Repository<LedgerEntryEntity>
   ) {}
 
   async getBalance(accountId: string): Promise<AccountBalance | null> {
@@ -56,7 +56,7 @@ export class LedgerService {
 
   async getEntriesByAccount(
     accountId: string,
-    options?: { limit?: number; offset?: number },
+    options?: { limit?: number; offset?: number }
   ): Promise<LedgerEntryRecord[]> {
     const entries = await this.ledgerEntryRepository.find({
       where: { accountId },
@@ -82,7 +82,7 @@ export class LedgerService {
 
   async getEntriesByReference(
     referenceType: LedgerReferenceType,
-    referenceId: string,
+    referenceId: string
   ): Promise<LedgerEntryRecord[]> {
     const entries = await this.ledgerEntryRepository.find({
       where: { referenceType, referenceId },
@@ -125,7 +125,7 @@ export class LedgerService {
         }
         return acc;
       },
-      { totalDebit: 0, totalCredit: 0 },
+      { totalDebit: 0, totalCredit: 0 }
     );
 
     return {

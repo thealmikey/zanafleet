@@ -23,14 +23,7 @@ import {
 /**
  * Item category enum values for DTO validation.
  */
-const ITEM_CATEGORIES = [
-  'furniture',
-  'appliance',
-  'fragile',
-  'box',
-  'vehicle',
-  'other',
-] as const;
+const ITEM_CATEGORIES = ['furniture', 'appliance', 'fragile', 'box', 'vehicle', 'other'] as const;
 
 /**
  * Size class enum values for DTO validation.

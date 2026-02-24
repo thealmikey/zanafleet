@@ -6,7 +6,6 @@ import { OrderStatus } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-
 import { CreateOrderCommand } from '../commands/create-order.command';
 import { OrderEntity } from '../entities/order.entity';
 import { OrderCreatedEventV1 } from '../events/order-created.event';
@@ -26,7 +25,7 @@ export class CreateOrderCommandHandler implements ICommandHandler<CreateOrderCom
     @InjectRepository(OrderEntity)
     private readonly orderRepository: Repository<OrderEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: CreateOrderCommand): Promise<string> {

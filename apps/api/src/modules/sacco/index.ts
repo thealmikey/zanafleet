@@ -4,7 +4,11 @@
  */
 
 export { SaccoEntity } from './entities/sacco.entity';
-export { CreateSaccoCommand, CreateSaccoCommandSchema, type CreateSaccoCommandInput } from './commands/create-sacco.command';
+export {
+  CreateSaccoCommand,
+  CreateSaccoCommandSchema,
+  type CreateSaccoCommandInput,
+} from './commands/create-sacco.command';
 export { SaccoCreatedEventV1 } from './events/sacco-created.event';
 export { CreateSaccoCommandHandler } from './handlers/create-sacco.handler';
 export { SaccoNeo4jProjection, SaccoNeo4jInitializer } from './projections/sacco-neo4j.projection';
