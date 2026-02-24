@@ -11,12 +11,24 @@ import { MembershipRole } from '@api/modules/workspace/dto/workspace.enums';
  * Source of context resolution request
  */
 export type ContextSource =
-  | 'job_event' // From job-related event
-  | 'assignment' // From job assignment
-  | 'notification' // From notification origin
-  | 'user_action' // From explicit user action
-  | 'active_job' // From currently active job
-  | 'route_access'; // From API route access
+  | 'job_event'
+  | 'assignment'
+  | 'notification'
+  | 'user_action'
+  | 'active_job'
+  | 'route_access';
+
+/**
+ * Delivery status enum (inline to avoid import issues in some contexts)
+ */
+export const DeliveryStatus = {
+  Requested: 'Requested',
+  Assigned: 'Assigned',
+  PickedUp: 'PickedUp',
+  InTransit: 'InTransit',
+  Delivered: 'Delivered',
+  Cancelled: 'Cancelled',
+} as const;
 
 /**
  * Inferred intent from context
@@ -54,6 +66,8 @@ export interface ContextResolutionRequest {
   route?: string;
   action?: string;
   explicitWorkspaceId?: string;
+  resourceId?: string;
+  resourceType?: string;
 }
 
 /**
@@ -121,6 +135,8 @@ export interface JobFeedRequest {
   status?: string[];
   limit?: number;
   offset?: number;
+  distanceRadiusMeters?: number;
+  jobTypes?: JobType[];
 }
 
 /**
@@ -130,6 +146,13 @@ export interface JobFeedResponse {
   jobs: JobFeedItem[];
   total: number;
   hasMore: boolean;
+  workspaces: WorkspaceJobCount[];
+}
+
+export interface WorkspaceJobCount {
+  workspaceId: string;
+  workspaceName: string;
+  jobCount: number;
 }
 
 /**
@@ -141,14 +164,34 @@ export interface JobScoreFactors {
   slaUrgencyWeight: number;
   acceptanceProbabilityWeight: number;
   preferenceMatchWeight: number;
+  ratingWeight: number;
+}
+
+export interface ScoringConfig {
+  weights: JobScoreFactors;
+  factors: {
+    maxDistanceMeters: number;
+    maxEarningsDiff: number;
+    slaWindowMinutes: number;
+  };
 }
 
 export const DEFAULT_JOB_SCORE_FACTORS: JobScoreFactors = {
-  distanceWeight: -1, // Negative = closer is better
-  earningsWeight: 1, // Positive = higher is better
-  slaUrgencyWeight: 0.5, // Within SLA = slightly better
-  acceptanceProbabilityWeight: 0.3,
-  preferenceMatchWeight: 0.2,
+  distanceWeight: -0.3, // Negative = closer is better
+  earningsWeight: 0.25,
+  slaUrgencyWeight: 0.2,
+  acceptanceProbabilityWeight: 0.15,
+  preferenceMatchWeight: 0.1,
+  ratingWeight: 0.1,
+};
+
+export const DEFAULT_SCORING_CONFIG: ScoringConfig = {
+  weights: DEFAULT_JOB_SCORE_FACTORS,
+  factors: {
+    maxDistanceMeters: 10000,
+    maxEarningsDiff: 500,
+    slaWindowMinutes: 120,
+  },
 };
 
 /**
@@ -160,9 +203,193 @@ export interface ConflictCheck {
   lockedJobIds: string[];
 }
 
+/**
+ * Job conflict details
+ */
 export interface JobConflict {
-  type: 'double_booking' | 'sla_conflict' | 'policy_violation';
+  type: ConflictType;
   existingJobId: string;
   proposedJobId: string;
+  severity: 'blocking' | 'warning';
+  message: string;
+  resolution?: ConflictResolution;
+}
+
+export enum ConflictType {
+  DOUBLE_BOOKING = 'double_booking',
+  SLA_VIOLATION = 'sla_violation',
+  POLICY_VIOLATION = 'policy_violation',
+  ZONE_RESTRICTION = 'zone_restriction',
+  CAPABILITY_MISMATCH = 'capability_mismatch',
+}
+
+export interface ConflictResolution {
+  action: 'block' | 'warn' | 'auto_resolve';
+  suggestedAlternative?: string;
+}
+
+/**
+ * Time window for conflict detection
+ */
+export interface TimeWindow {
+  start: Date;
+  end: Date;
+  bufferMinutes: number;
+}
+
+/**
+ * Authorization types
+ */
+export interface AuthorizationRequest {
+  actorId: string;
+  action: string;
+  resource: string;
+  resourceId?: string;
+  workspaceId: string;
+}
+
+export interface AuthorizationResult {
+  allowed: boolean;
+  reason?: AuthorizationRejectionReason;
+  role?: MembershipRole;
+}
+
+export type AuthorizationRejectionReason =
+  | 'ACTOR_NOT_IN_WORKSPACE'
+  | 'INSUFFICIENT_PERMISSIONS'
+  | 'RESOURCE_ACCESS_DENIED'
+  | 'CROSS_WORKSPACE_ESCALATION_BLOCKED';
+
+/**
+ * Role permissions mapping
+ */
+export const ROLE_PERMISSIONS: Record<MembershipRole, string[]> = {
+  [MembershipRole.RIDER]: [
+    'job:view_own',
+    'job:accept',
+    'job:complete',
+    'job:view_available',
+    'earnings:view_own',
+    'earnings:view_by_workspace',
+    'profile:view_own',
+    'profile:update_own',
+    'notification:view_own',
+  ],
+  [MembershipRole.ADMIN]: [
+    'workspace:view',
+    'workspace:manage',
+    'member:view',
+    'member:invite',
+    'member:remove',
+    'role:assign',
+    'policy:view',
+    'policy:manage',
+    'job:view_all',
+    'job:assign',
+    'job:reassign',
+    'analytics:view_workspace',
+  ],
+  [MembershipRole.OPS]: [
+    'job:view_all',
+    'job:assign',
+    'job:reassign',
+    'rider:view_all',
+    'rider:manage_status',
+    'analytics:view_all',
+  ],
+  [MembershipRole.BUSINESS_OWNER]: [
+    'workspace:view',
+    'job:view_all',
+    'job:create',
+    'job:assign',
+    'job:cancel',
+    'earnings:view_workspace',
+    'analytics:view_workspace',
+    'rider:view_workspace',
+    'shop:manage',
+  ],
+};
+
+/**
+ * Route role mapping
+ */
+export interface RouteRoleMapping {
+  pattern: RegExp;
+  role: MembershipRole;
+  workspaceSource:
+    | 'active_job_or_default'
+    | 'job_id'
+    | 'order_id'
+    | 'shop_id'
+    | 'route_param'
+    | 'default';
+  workspaceParamName?: string;
+}
+
+/**
+ * Active job status values (for querying) - using inline DeliveryStatus
+ */
+export const ACTIVE_JOB_STATUSES = [
+  DeliveryStatus.Assigned,
+  DeliveryStatus.PickedUp,
+  DeliveryStatus.InTransit,
+] as const;
+
+/**
+ * Feed request job status - using inline DeliveryStatus
+ */
+export const FEED_JOB_STATUSES = [DeliveryStatus.Requested, DeliveryStatus.Assigned] as const;
+
+/**
+ * Notification context types
+ */
+export interface NotificationContext {
+  notificationId: string;
+  workspaceId: string;
+  actorId: string;
+  entityType: string;
+  entityId: string;
+  action: string;
+  deepLink: string;
+}
+
+export interface NotificationDelivery {
+  delivery: 'immediate' | 'deferred';
+  requiresContextSwitch: boolean;
+  targetWorkspace: string;
+  contextSource?: string;
+  message?: string;
+}
+
+/**
+ * Job offer for simultaneous resolution
+ */
+export interface JobOffer {
+  jobId: string;
+  job: JobFeedItem;
+  offeredAt: Date;
+  expiresAt: Date;
+}
+
+export interface OfferResolution {
+  selectedJob: JobFeedItem;
+  rejectedJobs: JobFeedItem[];
   reason: string;
+}
+
+/**
+ * Actor profile for scoring
+ */
+export interface ActorProfile {
+  actorId: string;
+  historicalAcceptanceRate?: number;
+  preferences?: ActorPreferences;
+  averageRating?: number;
+}
+
+export interface ActorPreferences {
+  preferredDistanceMeters?: number;
+  preferredEarningsMin?: number;
+  preferredZones?: string[];
+  preferredJobTypes?: JobType[];
 }
