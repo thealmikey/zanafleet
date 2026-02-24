@@ -120,3 +120,6 @@ export class ProcessDefinitionEntity {
     return e;
   }
 }
+
+// Re-export ProcessState for backward compatibility
+export { ProcessState } from './process-state.enum';
