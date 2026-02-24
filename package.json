@@ -91,7 +91,8 @@
     "@nestjs/cli": "^10.0.0",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
-    "@swc/cli": "^0.8.0",
+    "@playwright/test": "^1.58.2",
+    "@swc/cli": "^0.5.0",
     "@swc/core": "^1.15.13",
     "@swc/jest": "^0.2.39",
     "@types/bcrypt": "^5.0.2",
@@ -127,7 +128,7 @@
   "lint-staged": {
     "*.{ts,tsx,js,json,md}": [
       "prettier --write",
-      "eslint --fix"
+      "oxlint --fix"
     ]
   },
   "msw": {
