@@ -10,9 +10,12 @@ import { MembershipRole } from '../dto/workspace.enums';
  * - Composite primary key (actorId + workspaceId)
  * - Indexed on workspaceId for efficient lookups
  * - Role enum for type-safe membership roles
+ * - defaultWorkspaceId for login context resolution
  */
 @Entity('memberships')
 @Index(['workspaceId'])
+@Index(['actorId'])
+@Index(['defaultWorkspace'])
 export class MembershipEntity {
   @PrimaryColumn('uuid')
   actorId!: string;
@@ -30,6 +33,13 @@ export class MembershipEntity {
   since!: Date;
 
   /**
+   * If true, this is the actor's default workspace on login.
+   * Only ONE membership should have this set to true per actor.
+   */
+  @Column({ type: 'boolean', default: false })
+  defaultWorkspace!: boolean;
+
+  /**
    * Convert entity to domain object
    */
   toDomain(): {
@@ -37,12 +47,14 @@ export class MembershipEntity {
     workspaceId: string;
     role: MembershipRole;
     since: Date;
+    defaultWorkspace: boolean;
   } {
     return {
       actorId: this.actorId,
       workspaceId: this.workspaceId,
       role: this.role,
       since: this.since,
+      defaultWorkspace: this.defaultWorkspace,
     };
   }
 
@@ -54,12 +66,14 @@ export class MembershipEntity {
     workspaceId: string;
     role: MembershipRole;
     since: Date;
+    defaultWorkspace?: boolean;
   }): MembershipEntity {
     const entity = new MembershipEntity();
     entity.actorId = data.actorId;
     entity.workspaceId = data.workspaceId;
     entity.role = data.role;
     entity.since = data.since;
+    entity.defaultWorkspace = data.defaultWorkspace ?? false;
     return entity;
   }
 }
