@@ -9,12 +9,18 @@ import { WorkspaceEntity } from '@api/modules/workspace/entities/workspace.entit
 
 import {
   ConflictCheck,
+  ConflictType,
   DEFAULT_JOB_SCORE_FACTORS,
+  DEFAULT_SCORING_CONFIG,
   JobConflict,
   JobFeedItem,
   JobFeedRequest,
   JobFeedResponse,
   JobScoreFactors,
+  ScoringConfig,
+  WorkspaceJobCount,
+  ACTIVE_JOB_STATUSES,
+  FEED_JOB_STATUSES,
 } from '../context.types';
 
 // Delivery status values (inline to avoid import issues)
@@ -56,7 +62,8 @@ export class UnifiedJobFeedService {
    */
   async getJobFeed(
     request: JobFeedRequest,
-    scoreFactors: JobScoreFactors = DEFAULT_JOB_SCORE_FACTORS
+    scoreFactors: JobScoreFactors = DEFAULT_JOB_SCORE_FACTORS,
+    scoringConfig: ScoringConfig = DEFAULT_SCORING_CONFIG
   ): Promise<JobFeedResponse> {
     const { actorId, roles, workspaces, status, limit = 20, offset = 0 } = request;
 
@@ -64,15 +71,18 @@ export class UnifiedJobFeedService {
     const accessibleWorkspaces = await this.getAccessibleWorkspaces(actorId, roles, workspaces);
 
     if (accessibleWorkspaces.length === 0) {
-      return { jobs: [], total: 0, hasMore: false };
+      return { jobs: [], total: 0, hasMore: false, workspaces: [] };
     }
 
     // 2. Get active jobs from those workspaces
-    const jobStatuses = status ?? ['REQUESTED', 'ASSIGNED'];
+    const jobStatuses = status
+      ? status
+      : [FEED_JOB_STATUSES[0], FEED_JOB_STATUSES[1]];
+
     const deliveries = await this.deliveryRepository.find({
       where: {
         workspaceId: In(accessibleWorkspaces.map((w) => w.workspaceId)),
-        status: In(jobStatuses as (typeof DeliveryStatus)['Assigned'][]),
+        status: In(jobStatuses as readonly string[]),
       },
       take: limit * 2, // Fetch extra for scoring
       order: { scheduledPickupTime: 'ASC' },
@@ -90,7 +100,7 @@ export class UnifiedJobFeedService {
           const workspace = accessibleWorkspaces.find(
             (w) => w.workspaceId === delivery.workspaceId
           );
-          return this.scoreJob(delivery, workspace?.workspaceName ?? 'Unknown', scoreFactors);
+          return this.scoreJob(delivery, workspace?.workspaceName ?? 'Unknown', scoreFactors, scoringConfig);
         })
     );
 
@@ -101,10 +111,18 @@ export class UnifiedJobFeedService {
     const total = scoredJobs.length;
     const paginatedJobs = scoredJobs.slice(offset, offset + limit);
 
+    // 7. Build workspace job counts
+    const workspaceJobCounts: WorkspaceJobCount[] = accessibleWorkspaces.map((w) => ({
+      workspaceId: w.workspaceId,
+      workspaceName: w.workspaceName,
+      jobCount: deliveries.filter((d) => d.workspaceId === w.workspaceId).length,
+    }));
+
     return {
       jobs: paginatedJobs,
       total,
       hasMore: offset + limit < total,
+      workspaces: workspaceJobCounts,
     };
   }
 
@@ -114,18 +132,19 @@ export class UnifiedJobFeedService {
   private async scoreJob(
     delivery: DeliveryEntity,
     workspaceName: string,
-    factors: JobScoreFactors
+    factors: JobScoreFactors,
+    config: ScoringConfig
   ): Promise<JobFeedItem> {
     // Calculate individual factor scores (normalized 0-1)
 
     // Distance score (closer = higher, so we use 1 - normalized distance)
-    const distanceScore = 0.7; // Would calculate from actual rider location
+    const distanceScore = this.normalizeDistance(delivery.scheduledPickupTime ? 3000 : 5000, config.factors.maxDistanceMeters);
 
     // Earnings score (normalized 0-1 based on typical range)
     const earningsScore = 0.6; // Would calculate from delivery pricing
 
     // SLA urgency (higher when approaching deadline but not yet expired)
-    const slaScore = this.calculateSlaScore(delivery.scheduledPickupTime);
+    const slaScore = this.calculateSlaScore(delivery.scheduledDropoffTime, config.factors.slaWindowMinutes);
 
     // Acceptance probability (based on historical acceptance rate)
     const acceptanceScore = 0.5; // Would calculate from rider history
@@ -133,13 +152,17 @@ export class UnifiedJobFeedService {
     // Preference match (would compare with rider preferences)
     const preferenceScore = 0.8;
 
+    // Rating score (business rating)
+    const ratingScore = 0.7; // Would fetch from business entity
+
     // Weighted sum
     const score =
       distanceScore * factors.distanceWeight * -1 + // Negative weight means closer is better
       earningsScore * factors.earningsWeight +
       slaScore * factors.slaUrgencyWeight +
       acceptanceScore * factors.acceptanceProbabilityWeight +
-      preferenceScore * factors.preferenceMatchWeight;
+      preferenceScore * factors.preferenceMatchWeight +
+      ratingScore * factors.ratingWeight;
 
     return {
       jobId: delivery.id,
@@ -147,9 +170,9 @@ export class UnifiedJobFeedService {
       workspaceId: delivery.workspaceId,
       workspaceName,
       status: delivery.status,
-      score: Math.max(0, score),
+      score: Math.max(0, (score + 1) * 50), // Scale to 0-100
       earnings: 0, // Would fetch from pricing
-      distanceMeters: undefined, // Would calculate
+      distanceMeters: undefined, // Would calculate from rider location
       slaDeadline: delivery.scheduledDropoffTime ?? undefined,
       scheduledPickup: delivery.scheduledPickupTime ?? undefined,
       pickupLocation: undefined,
@@ -162,19 +185,27 @@ export class UnifiedJobFeedService {
   }
 
   /**
+   * Normalize distance to 0-1 score
+   */
+  private normalizeDistance(distanceMeters: number, maxDistance: number): number {
+    if (!distanceMeters || distanceMeters <= 0) return 1;
+    return Math.max(0, 1 - distanceMeters / maxDistance);
+  }
+
+  /**
    * Calculate SLA urgency score
    */
-  private calculateSlaScore(scheduledTime: Date | null): number {
-    if (!scheduledTime) return 0.5; // No SLA = neutral
+  private calculateSlaScore(slaDeadline: Date | null, windowMinutes: number): number {
+    if (!slaDeadline) return 0.5; // No SLA = neutral
 
     const now = new Date();
-    const diff = scheduledTime.getTime() - now.getTime();
+    const diff = slaDeadline.getTime() - now.getTime();
     const minutesRemaining = diff / (1000 * 60);
 
     if (minutesRemaining < 0) return 0; // Expired
-    if (minutesRemaining > 120) return 0.3; // Plenty of time
-    if (minutesRemaining > 60) return 0.7; // Getting urgent
-    if (minutesRemaining > 30) return 1.0; // Critical
+    if (minutesRemaining > windowMinutes) return 0.3; // Plenty of time
+    if (minutesRemaining > windowMinutes * 0.5) return 0.7; // Getting urgent
+    if (minutesRemaining > windowMinutes * 0.25) return 1.0; // Critical
     return 0.9; // Past optimal but not expired
   }
 
@@ -216,19 +247,12 @@ export class UnifiedJobFeedService {
   /**
    * Get actor's currently active job assignments
    */
-  private async getActorActiveAssignments(actorId: string) {
-    const activeStatuses = [
-      DeliveryStatus.Assigned,
-      DeliveryStatus.PickedUp,
-      DeliveryStatus.InTransit,
-    ];
-
+  private async getActorActiveAssignments(actorId: string): Promise<DeliveryEntity[]> {
     return this.deliveryRepository.find({
       where: {
         assignedRiderId: actorId,
-        status: In(activeStatuses as (typeof DeliveryStatus)['Assigned'][]),
+        status: In([...ACTIVE_JOB_STATUSES] as unknown as string[]),
       },
-      select: ['id'],
     });
   }
 
@@ -243,7 +267,7 @@ export class UnifiedJobFeedService {
     const activeAssignments = await this.deliveryRepository.find({
       where: {
         assignedRiderId: actorId,
-        status: In([DeliveryStatus.Assigned, DeliveryStatus.PickedUp, DeliveryStatus.InTransit]),
+        status: In([...ACTIVE_JOB_STATUSES] as unknown as string[]),
       },
     });
 
@@ -265,10 +289,15 @@ export class UnifiedJobFeedService {
       // If proposed job is in same time window as active job -> conflict
       if (this.isTimeConflict(assignment.scheduledPickupTime, proposedJob.scheduledPickupTime)) {
         conflicts.push({
-          type: 'double_booking',
+          type: ConflictType.DOUBLE_BOOKING,
           existingJobId: assignment.id,
           proposedJobId: proposedJobId,
-          reason: 'Time conflict with existing active job',
+          severity: 'blocking',
+          message: 'Time conflict with existing active job',
+          resolution: {
+            action: 'warn',
+            suggestedAlternative: `Complete job ${assignment.id} first, then accept this job`,
+          },
         });
         lockedJobIds.push(assignment.id);
       }
@@ -278,10 +307,14 @@ export class UnifiedJobFeedService {
     const hasSlaConflict = await this.checkSlaConflicts(actorId, proposedJob);
     if (hasSlaConflict) {
       conflicts.push({
-        type: 'sla_conflict',
+        type: ConflictType.SLA_VIOLATION,
         existingJobId: '',
         proposedJobId: proposedJobId,
-        reason: 'Accepting this job would violate SLA on existing assignment',
+        severity: 'blocking',
+        message: 'Accepting this job would violate SLA on existing assignment',
+        resolution: {
+          action: 'block',
+        },
       });
     }
 
@@ -302,7 +335,7 @@ export class UnifiedJobFeedService {
   ): boolean {
     if (!existingTime || !proposedTime) return false;
 
-    const existingEnd = new Date(existingTime.getTime() + 60 * 60 * 1000); // Assume 1 hour
+    const existingEnd = new Date(existingTime.getTime() + 60 * 60 * 1000); // Assume 1 hour duration
     const proposedStart = new Date(proposedTime.getTime() - bufferMinutes * 60 * 1000);
     const proposedEnd = new Date(
       proposedTime.getTime() + 60 * 60 * 1000 + bufferMinutes * 60 * 1000
@@ -318,14 +351,16 @@ export class UnifiedJobFeedService {
     const activeAssignments = await this.deliveryRepository.find({
       where: {
         assignedRiderId: actorId,
-        status: In([DeliveryStatus.Assigned, DeliveryStatus.PickedUp]),
+        status: In([DeliveryStatus.Assigned, DeliveryStatus.PickedUp] as unknown as string[]),
       },
     });
+
+    const now = Date.now();
 
     for (const assignment of activeAssignments) {
       // If current job has tight SLA and proposed job would add more time
       if (assignment.scheduledDropoffTime) {
-        const timeToDropoff = assignment.scheduledDropoffTime.getTime() - Date.now();
+        const timeToDropoff = assignment.scheduledDropoffTime.getTime() - now;
         const estimatedNewJobTime = 30 * 60 * 1000; // 30 minutes estimate
 
         if (timeToDropoff < estimatedNewJobTime) {
@@ -383,3 +418,4 @@ export class UnifiedJobFeedService {
     }));
   }
 }
+
