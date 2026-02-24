@@ -19,6 +19,18 @@ export type ContextSource =
   | 'route_access';
 
 /**
+ * Context source priority for conflict resolution
+ */
+export const CONTEXT_SOURCE_PRIORITY: Record<ContextSource, number> = {
+  active_job: 100, // Highest - from current job
+  job_event: 90, // From job event
+  assignment: 80, // From assignment
+  notification: 70, // From notification deep link
+  user_action: 60, // From explicit user action
+  route_access: 50, // Lowest - from route
+};
+
+/**
  * Delivery status enum (inline to avoid import issues in some contexts)
  */
 export const DeliveryStatus = {
@@ -70,6 +82,93 @@ export interface ContextResolutionRequest {
   resourceType?: string;
 }
 
+// ============================================================================
+// UNIFIED PROFILE MODEL - NEW TYPES
+// ============================================================================
+
+/**
+ * Unified Actor Profile - aggregates all roles across workspaces
+ */
+export interface UnifiedActorProfile {
+  actorId: string;
+  primaryEmail: string;
+
+  // All workspace memberships aggregated
+  workspaceMemberships: WorkspaceRoleBinding[];
+
+  // Computed: Active context for quick lookups
+  activeContexts: ActiveContext[];
+
+  // Computed: Role precedence for conflict resolution
+  rolePrecedence: RolePrecedenceConfig;
+
+  // Preference: Default role per action type
+  rolePreferences: RolePreferenceMap;
+}
+
+/**
+ * Workspace role binding - links actor to workspace with role
+ */
+export interface WorkspaceRoleBinding {
+  workspaceId: string;
+  workspaceName: string;
+  workspaceType: WorkspaceType;
+  role: MembershipRole;
+  isDefault: boolean;
+  joinedAt: Date;
+  permissions: string[];
+}
+
+/**
+ * Workspace types
+ */
+export enum WorkspaceType {
+  SACCO = 'SACCO',
+  BUSINESS = 'BUSINESS',
+  MARKET = 'MARKET',
+  OPS = 'OPS',
+}
+
+/**
+ * Active context - temporary context from job/notification/etc
+ */
+export interface ActiveContext {
+  contextType: 'job' | 'route' | 'notification' | 'websocket';
+  contextId: string;
+  workspaceId: string;
+  role: MembershipRole;
+  expiresAt: Date;
+  metadata: Record<string, unknown>;
+}
+
+/**
+ * Role preference map for action-based defaults
+ */
+export interface RolePreferenceMap {
+  [actionType: string]: RolePreference;
+}
+
+/**
+ * Role preference configuration
+ */
+export interface RolePreference {
+  preferredRole: MembershipRole;
+  preferredWorkspaceId?: string;
+  fallbackRole: MembershipRole;
+}
+
+/**
+ * Role precedence configuration
+ */
+export interface RolePrecedenceConfig {
+  precedence: Record<MembershipRole, number>;
+  defaultRole: MembershipRole;
+}
+
+// ============================================================================
+// RESOLUTION TYPES
+// ============================================================================
+
 /**
  * Role projection for an actor across workspaces
  */
@@ -81,6 +180,7 @@ export interface RoleProjection {
   effectivePermissions: string[];
   allWorkspaces: WorkspaceMembershipInfo[];
   inferredIntent?: ContextIntent;
+  source: ContextSource;
 }
 
 export interface WorkspaceMembershipInfo {
@@ -98,6 +198,115 @@ export interface ContextResolutionResult {
   context?: WorkspaceContext;
   error?: string;
 }
+
+/**
+ * Resolved context from various sources
+ */
+export interface ResolvedContext {
+  workspaceId: string;
+  role: MembershipRole;
+  source: ContextSource;
+  contextId?: string;
+  reasoning: string;
+}
+
+// ============================================================================
+// GUARDRAIL TYPES
+// ============================================================================
+
+/**
+ * Guardrail result
+ */
+export interface GuardrailResult {
+  allowed: boolean;
+  reason?: string;
+  code?: string;
+}
+
+/**
+ * Boundary check result
+ */
+export interface BoundaryCheckResult extends GuardrailResult {}
+
+/**
+ * Contamination check result
+ */
+export interface ContaminationResult extends GuardrailResult {}
+
+/**
+ * Role projection request
+ */
+export interface RoleProjectionRequest {
+  actorId: string;
+  context?: {
+    jobId?: string;
+    notificationId?: string;
+    route?: string;
+    action?: string;
+    resourceId?: string;
+  };
+  explicitWorkspaceId?: string;
+  explicitRole?: MembershipRole;
+}
+
+// ============================================================================
+// CONFLICT RESOLUTION TYPES
+// ============================================================================
+
+/**
+ * Conflict resolution result
+ */
+export interface ConflictResolutionResult {
+  selectedRole: MembershipRole;
+  selectedWorkspaceId: string;
+  reasoning: string;
+}
+
+/**
+ * Stale context handling
+ */
+export interface StaleContextResult {
+  isValid: boolean;
+  refreshedContext?: ActiveContext;
+  error?: string;
+}
+
+// ============================================================================
+// DASHBOARD TYPES
+// ============================================================================
+
+/**
+ * Dashboard merge configuration
+ */
+export interface DashboardMergeConfig {
+  role: MembershipRole;
+  priority: number;
+  dataSources: DashboardDataSource[];
+  layout: 'tabs' | 'sidebar' | 'unified';
+}
+
+/**
+ * Dashboard data source
+ */
+export interface DashboardDataSource {
+  type: string;
+  workspaceScope: 'current' | 'all_rider_workspaces' | 'all_business_workspaces';
+}
+
+/**
+ * Dashboard response
+ */
+export interface DashboardResponse {
+  role: MembershipRole;
+  workspaceId: string;
+  layout: 'tabs' | 'sidebar' | 'unified';
+  data: Record<string, unknown>;
+  availableWorkspaces: WorkspaceMembershipInfo[];
+}
+
+// ============================================================================
+// EXISTING TYPES (preserved)
+// ============================================================================
 
 /**
  * Job feed item for unified aggregation
@@ -261,7 +470,7 @@ export type AuthorizationRejectionReason =
   | 'CROSS_WORKSPACE_ESCALATION_BLOCKED';
 
 /**
- * Role permissions mapping
+ * Role permissions mapping - enhanced with CUSTOMER
  */
 export const ROLE_PERMISSIONS: Record<MembershipRole, string[]> = {
   [MembershipRole.RIDER]: [
@@ -274,6 +483,16 @@ export const ROLE_PERMISSIONS: Record<MembershipRole, string[]> = {
     'profile:view_own',
     'profile:update_own',
     'notification:view_own',
+  ],
+  [MembershipRole.CUSTOMER]: [
+    'order:view_own',
+    'order:create',
+    'order:cancel',
+    'address:view_own',
+    'address:manage',
+    'payment:view_own',
+    'profile:view_own',
+    'profile:update_own',
   ],
   [MembershipRole.ADMIN]: [
     'workspace:view',
@@ -308,6 +527,17 @@ export const ROLE_PERMISSIONS: Record<MembershipRole, string[]> = {
     'rider:view_workspace',
     'shop:manage',
   ],
+};
+
+/**
+ * Role precedence - higher number = higher priority
+ */
+export const ROLE_PRECEDENCE: Record<MembershipRole, number> = {
+  [MembershipRole.ADMIN]: 100,
+  [MembershipRole.OPS]: 80,
+  [MembershipRole.BUSINESS_OWNER]: 60,
+  [MembershipRole.RIDER]: 40,
+  [MembershipRole.CUSTOMER]: 20,
 };
 
 /**

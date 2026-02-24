@@ -2,3 +2,8 @@ export * from './context-resolution.service';
 export * from './notification-context.service';
 export * from './role-projection.service';
 export * from './unified-job-feed.service';
+export * from './privilege-escalation.guard';
+export * from './workspace-boundary.guard';
+export * from './contamination-prevention.service';
+export * from './conflict-resolution.service';
+export * from './smart-dashboard.service';

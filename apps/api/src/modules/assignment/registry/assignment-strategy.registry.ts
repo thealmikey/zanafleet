@@ -7,6 +7,9 @@ import { AssignmentStrategy, AssignmentStrategyType } from '../interfaces';
  *
  * Central registry for all assignment strategies.
  * Provides automatic strategy selection and retrieval.
+ *
+ * @logging This class logs all strategy registration and selection decisions
+ * for observability and debugging purposes.
  */
 @Injectable()
 export class AssignmentStrategyRegistry {
@@ -16,6 +19,8 @@ export class AssignmentStrategyRegistry {
 
   /**
    * Register a strategy with the registry.
+   *
+   * @logging Logs strategy registration with type and name
    */
   register(strategy: AssignmentStrategy): void {
     if (this.strategies.has(strategy.type)) {
@@ -32,40 +37,88 @@ export class AssignmentStrategyRegistry {
 
   /**
    * Get a strategy by type.
+   *
+   * @logging Logs when a strategy is retrieved by type
    */
   get(type: AssignmentStrategyType): AssignmentStrategy | undefined {
-    return this.strategies.get(type);
+    const strategy = this.strategies.get(type);
+
+    if (strategy) {
+      this.logger.debug(`Retrieved strategy ${strategy.name} for type ${type}`);
+    } else {
+      this.logger.warn(`No strategy found for type: ${type}`);
+    }
+
+    return strategy;
   }
 
   /**
    * Get a strategy by name.
+   *
+   * @logging Logs when a strategy is retrieved by name
    */
   getByName(name: string): AssignmentStrategy | undefined {
-    return this.strategiesByName.get(name);
+    const strategy = this.strategiesByName.get(name);
+
+    if (strategy) {
+      this.logger.debug(`Retrieved strategy ${name} by name`);
+    } else {
+      this.logger.warn(`No strategy found for name: ${name}`);
+    }
+
+    return strategy;
   }
 
   /**
    * Get all registered strategies.
+   *
+   * @logging Logs the count of strategies returned
    */
   getAll(): AssignmentStrategy[] {
-    return Array.from(this.strategies.values());
+    const strategies = Array.from(this.strategies.values());
+    this.logger.debug(`Retrieved ${strategies.length} registered strategies`);
+    return strategies;
   }
 
   /**
    * Find the best strategy for a given context.
    * Returns the strategy with the highest priority that can handle the context.
+   *
+   * @logging Logs the selection process including priority scores
    */
-  async findBestStrategy(context: Parameters<AssignmentStrategy['canHandle']>[0]): Promise<AssignmentStrategy | undefined> {
+  async findBestStrategy(
+    context: Parameters<AssignmentStrategy['canHandle']>[0]
+  ): Promise<AssignmentStrategy | undefined> {
     const availableStrategies = this.getAll();
+
+    if (availableStrategies.length === 0) {
+      this.logger.error('No strategies registered - cannot select best strategy');
+      return undefined;
+    }
+
+    this.logger.debug(
+      `Evaluating ${availableStrategies.length} strategies for job ${context.jobId}`
+    );
 
     // Filter strategies that can handle the context
     const capableStrategies: Array<{ strategy: AssignmentStrategy; priority: number }> = [];
 
     for (const strategy of availableStrategies) {
-      const canHandle = await strategy.canHandle(context);
-      if (canHandle) {
-        const priority = strategy.getPriority(context);
-        capableStrategies.push({ strategy, priority });
+      try {
+        const canHandle = await strategy.canHandle(context);
+        if (canHandle) {
+          const priority = strategy.getPriority(context);
+          this.logger.debug(
+            `Strategy ${strategy.name} can handle job ${context.jobId} with priority ${priority}`
+          );
+          capableStrategies.push({ strategy, priority });
+        } else {
+          this.logger.debug(`Strategy ${strategy.name} cannot handle job ${context.jobId}`);
+        }
+      } catch (error) {
+        this.logger.error(
+          `Error checking if strategy ${strategy.name} can handle job ${context.jobId}: ${error}`
+        );
       }
     }
 
@@ -87,6 +140,8 @@ export class AssignmentStrategyRegistry {
 
   /**
    * Get all strategies that can handle a given context.
+   *
+   * @logging Logs the number of capable strategies found
    */
   async findAllCapableStrategies(
     context: Parameters<AssignmentStrategy['canHandle']>[0]
@@ -104,6 +159,10 @@ export class AssignmentStrategyRegistry {
 
     // Sort by priority (highest first)
     capableStrategies.sort((a, b) => b.priority - a.priority);
+
+    this.logger.debug(
+      `Found ${capableStrategies.length} capable strategies for job ${context.jobId}`
+    );
 
     return capableStrategies.map((s) => s.strategy);
   }

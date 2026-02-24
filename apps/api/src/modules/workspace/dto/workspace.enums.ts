@@ -29,4 +29,5 @@ export enum MembershipRole {
   ADMIN = 'ADMIN',
   OPS = 'OPS',
   BUSINESS_OWNER = 'BUSINESS_OWNER',
+  CUSTOMER = 'CUSTOMER',
 }

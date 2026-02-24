@@ -22,6 +22,7 @@ import { SingleWorkerAssignmentStrategy } from '../../strategies/single-worker/s
 
 describe('AssignmentStrategyRegistry', () => {
   let registry: AssignmentStrategyRegistry;
+  let loggerSpy: jest.SpyInstance;
 
   const mockStrategy = {
     type: AssignmentStrategyType.SINGLE_WORKER,
@@ -107,6 +108,9 @@ describe('AssignmentStrategyRegistry', () => {
 
     registry = module.get<AssignmentStrategyRegistry>(AssignmentStrategyRegistry);
 
+    // Spy on logger methods
+    loggerSpy = jest.spyOn((registry as any).logger, 'log');
+
     // Manually register strategies with the registry
     registry.register({
       ...mockStrategy,
@@ -148,6 +152,10 @@ describe('AssignmentStrategyRegistry', () => {
       type: AssignmentStrategyType.FLEET_MATCHING,
       name: 'Fleet Matching',
     });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('get', () => {
@@ -239,6 +247,133 @@ describe('AssignmentStrategyRegistry', () => {
 
       // Assert
       expect(strategies).toHaveLength(8);
+    });
+  });
+
+  describe('findBestStrategy', () => {
+    it('should log strategy selection process', async () => {
+      // Arrange
+      const context: AssignmentContext = {
+        jobId: 'job-123',
+        jobTypeId: 'jobtype-123',
+        jobTypeName: 'Standard Delivery',
+        workspaceId: 'workspace-123',
+        requiredWorkerTypes: [
+          { workerType: 'driver', minWorkers: 1, maxWorkers: 1, required: true },
+        ],
+        currentWorkers: [],
+        destinations: [],
+        constraints: {},
+      };
+
+      // Act
+      const result = await registry.findBestStrategy(context);
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(loggerSpy).toHaveBeenCalled();
+    });
+
+    it('should select highest priority strategy', async () => {
+      // Arrange
+      const lowPriorityStrategy = {
+        type: AssignmentStrategyType.SINGLE_WORKER,
+        name: 'Low Priority',
+        canHandle: jest.fn().mockResolvedValue(true),
+        assign: jest.fn(),
+        validateCandidate: jest.fn().mockResolvedValue({ valid: true, reasons: [] }),
+        getPriority: jest.fn().mockReturnValue(5),
+      };
+
+      const highPriorityStrategy = {
+        type: AssignmentStrategyType.MULTI_WORKER,
+        name: 'High Priority',
+        canHandle: jest.fn().mockResolvedValue(true),
+        assign: jest.fn(),
+        validateCandidate: jest.fn().mockResolvedValue({ valid: true, reasons: [] }),
+        getPriority: jest.fn().mockReturnValue(100),
+      };
+
+      registry.clear();
+      registry.register(lowPriorityStrategy);
+      registry.register(highPriorityStrategy);
+
+      const context: AssignmentContext = {
+        jobId: 'job-456',
+        jobTypeId: 'jobtype-456',
+        jobTypeName: 'Test Job',
+        workspaceId: 'workspace-123',
+        requiredWorkerTypes: [],
+        currentWorkers: [],
+        destinations: [],
+        constraints: {},
+      };
+
+      // Act
+      const result = await registry.findBestStrategy(context);
+
+      // Assert
+      expect(result).toBeDefined();
+      expect(result?.name).toBe('High Priority');
+    });
+
+    it('should return undefined when no strategies can handle', async () => {
+      // Arrange
+      const cannotHandleStrategy = {
+        type: AssignmentStrategyType.SINGLE_WORKER,
+        name: 'Cannot Handle',
+        canHandle: jest.fn().mockResolvedValue(false),
+        assign: jest.fn(),
+        validateCandidate: jest.fn().mockResolvedValue({ valid: true, reasons: [] }),
+        getPriority: jest.fn().mockReturnValue(10),
+      };
+
+      registry.clear();
+      registry.register(cannotHandleStrategy);
+
+      const context: AssignmentContext = {
+        jobId: 'job-789',
+        jobTypeId: 'jobtype-789',
+        jobTypeName: 'Test Job',
+        workspaceId: 'workspace-123',
+        requiredWorkerTypes: [],
+        currentWorkers: [],
+        destinations: [],
+        constraints: {},
+      };
+
+      // Act
+      const result = await registry.findBestStrategy(context);
+
+      // Assert
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe('has', () => {
+    it('should return true for registered strategy', () => {
+      expect(registry.has(AssignmentStrategyType.SINGLE_WORKER)).toBe(true);
+    });
+
+    it('should return false for unregistered strategy', () => {
+      expect(registry.has('nonexistent' as AssignmentStrategyType)).toBe(false);
+    });
+  });
+
+  describe('count', () => {
+    it('should return correct count of strategies', () => {
+      expect(registry.count()).toBe(8);
+    });
+  });
+
+  describe('clear', () => {
+    it('should clear all strategies', () => {
+      // Act
+      registry.clear();
+
+      // Assert
+      expect(registry.count()).toBe(0);
+      expect(registry.getAll()).toHaveLength(0);
     });
   });
 });
