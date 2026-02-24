@@ -4,15 +4,14 @@
  * Defines worker type requirements for a job type
  */
 
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
-import { JobTypeEntity } from './job-type.entity';
+/**
+ * Forward declaration to avoid circular dependency
+ */
+export class JobTypeEntity {
+  [key: string]: unknown;
+}
 
 /**
  * JobTypeWorkerConfigEntity
@@ -30,7 +29,7 @@ export class JobTypeWorkerConfigEntity {
   @Column('uuid')
   jobTypeId!: string;
 
-  @ManyToOne(() => JobTypeEntity, (jt) => jt.workerConfigs, {
+  @ManyToOne('JobTypeEntity', 'workerConfigs', {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'jobTypeId' })

@@ -106,6 +106,48 @@ describe('AssignmentStrategyRegistry', () => {
     }).compile();
 
     registry = module.get<AssignmentStrategyRegistry>(AssignmentStrategyRegistry);
+
+    // Manually register strategies with the registry
+    registry.register({
+      ...mockStrategy,
+      type: AssignmentStrategyType.SINGLE_WORKER,
+      name: 'Single Worker',
+    });
+    registry.register({
+      ...mockStrategy,
+      type: AssignmentStrategyType.MULTI_WORKER,
+      name: 'Multi Worker',
+    });
+    registry.register({
+      ...mockStrategy,
+      type: AssignmentStrategyType.ROUND_ROBIN,
+      name: 'Round Robin',
+    });
+    registry.register({
+      ...mockStrategy,
+      type: AssignmentStrategyType.GEO_NEAREST,
+      name: 'Geo Nearest',
+    });
+    registry.register({
+      ...mockStrategy,
+      type: AssignmentStrategyType.MARKETPLACE_BID,
+      name: 'Marketplace Bid',
+    });
+    registry.register({
+      ...mockStrategy,
+      type: AssignmentStrategyType.MANUAL_OVERRIDE,
+      name: 'Manual Override',
+    });
+    registry.register({
+      ...mockStrategy,
+      type: AssignmentStrategyType.SCHEDULED,
+      name: 'Scheduled',
+    });
+    registry.register({
+      ...mockStrategy,
+      type: AssignmentStrategyType.FLEET_MATCHING,
+      name: 'Fleet Matching',
+    });
   });
 
   describe('get', () => {

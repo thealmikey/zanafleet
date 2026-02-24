@@ -4,16 +4,16 @@
  * Defines configurable metadata fields for a job type
  */
 
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
-import { JobTypeEntity } from './job-type.entity';
 import { MetadataFieldType } from '../dto/job-type.enums';
+
+/**
+ * Forward declaration to avoid circular dependency
+ */
+export class JobTypeEntity {
+  [key: string]: unknown;
+}
 
 /**
  * JobTypeMetadataFieldEntity
@@ -32,7 +32,7 @@ export class JobTypeMetadataFieldEntity {
   @Column('uuid')
   jobTypeId!: string;
 
-  @ManyToOne(() => JobTypeEntity, (jt) => jt.metadataFields, {
+  @ManyToOne('JobTypeEntity', 'metadataFields', {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'jobTypeId' })

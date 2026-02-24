@@ -1,7 +1,7 @@
-import { JobTypeMode, JobTypeStatus, MetadataFieldType } from '../../dto/job-type.enums';
+import { JobTypeMode, JobTypeStatus, MetadataFieldType, Vertical } from '../../dto/job-type.enums';
 import { JobTypeMetadataFieldEntity } from '../../entities/job-type-metadata-field.entity';
 import { JobTypeWorkerConfigEntity } from '../../entities/job-type-worker-config.entity';
-import { JobTypeEntity, Vertical } from '../../entities/job-type.entity';
+import { JobTypeEntity } from '../../entities/job-type.entity';
 
 describe('JobTypeEntity', () => {
   let entity: JobTypeEntity;
@@ -136,7 +136,7 @@ describe('JobTypeWorkerConfigEntity', () => {
       const domain = entity.toDomain();
 
       // Assert
-      expect(domain.workerTypeId).toBe(entity.id);
+      expect(domain.id).toBe(entity.id);
       expect(domain.workerType).toBe('driver');
       expect(domain.minWorkers).toBe(1);
       expect(domain.maxWorkers).toBe(2);
@@ -171,7 +171,7 @@ describe('JobTypeMetadataFieldEntity', () => {
       const domain = entity.toDomain();
 
       // Assert
-      expect(domain.fieldId).toBe(entity.id);
+      expect(domain.id).toBe(entity.id);
       expect(domain.fieldKey).toBe('package_weight');
       expect(domain.displayName).toBe('Package Weight');
       expect(domain.fieldType).toBe(MetadataFieldType.NUMBER);
@@ -190,10 +190,10 @@ describe('JobTypeMetadataFieldEntity', () => {
       // Act
       const domain = entity.toDomain();
 
-      // Assert
-      expect(domain.description).toBeNull();
-      expect(domain.validationRules).toBeNull();
-      expect(domain.displayOrder).toBeNull();
+      // Assert - optional fields are undefined when not set
+      expect(domain.description).toBeUndefined();
+      expect(domain.validationRules).toBeUndefined();
+      expect(domain.displayOrder).toBeUndefined();
     });
   });
 });
