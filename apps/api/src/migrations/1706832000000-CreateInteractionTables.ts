@@ -2,7 +2,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 /**
  * CreateInteractionTables Migration
- * 
+ *
  * Creates the following tables:
  * - interaction_streams: Stores interaction streams (conversations)
  * - interaction_events: Stores individual events within streams

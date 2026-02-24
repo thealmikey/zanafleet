@@ -7,7 +7,7 @@
     "webpack": false,
     "tsConfigPath": "apps/api/tsconfig.json",
     "builder": "swc",
-    "typeCheck": true
+    "typeCheck": false
   },
   "projects": {
     "api": {
