@@ -20,7 +20,10 @@ import { JobTypeMetadataFieldEntity } from './entities/job-type-metadata-field.e
 import { CreateJobTypeHandler } from './handlers/create-job-type.handler';
 import { UpdateJobTypeHandler } from './handlers/update-job-type.handler';
 import { EnableJobTypeHandler } from './handlers/enable-job-type.handler';
-import { JobTypeNeo4jProjection, JobTypeNeo4jInitializer } from './projections/job-type-neo4j.projection';
+import {
+  JobTypeNeo4jProjection,
+  JobTypeNeo4jInitializer,
+} from './projections/job-type-neo4j.projection';
 import { JobTypeService } from './services/job-type.service';
 import { JobTypeSeedService } from './services/job-type-seed.service';
 

@@ -8,10 +8,7 @@ import { CampaignStatus, IncentiveType, FundingSource } from '../dto/incentive.e
 import { CampaignEntity } from '../entities/campaign.entity';
 import { IncentiveApplicationEntity } from '../entities/incentive-application.entity';
 
-import {
-  IncentiveEligibilityService,
-  EligibilityContext,
-} from './incentive-eligibility.service';
+import { IncentiveEligibilityService, EligibilityContext } from './incentive-eligibility.service';
 
 export interface ApplicableIncentive {
   campaign: CampaignEntity;
@@ -55,12 +52,10 @@ export class IncentiveEngineService {
     private readonly campaignRepository: Repository<CampaignEntity>,
     @InjectRepository(IncentiveApplicationEntity)
     private readonly applicationRepository: Repository<IncentiveApplicationEntity>,
-    private readonly eligibilityService: IncentiveEligibilityService,
+    private readonly eligibilityService: IncentiveEligibilityService
   ) {}
 
-  async findApplicableIncentives(
-    context: EligibilityContext,
-  ): Promise<ApplicableIncentive[]> {
+  async findApplicableIncentives(context: EligibilityContext): Promise<ApplicableIncentive[]> {
     const now = context.timestamp;
 
     const activeCampaigns = await this.campaignRepository.find({
@@ -78,10 +73,7 @@ export class IncentiveEngineService {
       const result = this.eligibilityService.evaluateEligibility(campaign, context);
 
       if (result.eligible) {
-        const discountAmount = this.calculateDiscountAmount(
-          campaign,
-          context.orderAmount ?? 0,
-        );
+        const discountAmount = this.calculateDiscountAmount(campaign, context.orderAmount ?? 0);
 
         if (discountAmount > 0) {
           applicableIncentives.push({
@@ -93,7 +85,7 @@ export class IncentiveEngineService {
     }
 
     this.logger.debug(
-      `Found ${applicableIncentives.length} applicable incentives for account ${context.accountId}`,
+      `Found ${applicableIncentives.length} applicable incentives for account ${context.accountId}`
     );
 
     return applicableIncentives;
@@ -136,7 +128,7 @@ export class IncentiveEngineService {
     campaign: CampaignEntity,
     applicationId: string,
     discountAmount: number,
-    currency: string,
+    currency: string
   ): IncentiveChargeResult {
     const campaignDomain = campaign.toDomain();
     const chargeId = uuidv4();
@@ -164,7 +156,7 @@ export class IncentiveEngineService {
     chargeId: string,
     beneficiaryAccountId: string,
     discountAmount: number,
-    currency: string,
+    currency: string
   ): Promise<ApplyIncentiveResult> {
     const campaign = await this.campaignRepository.findOne({
       where: { id: campaignId },
@@ -193,7 +185,7 @@ export class IncentiveEngineService {
     const budgetExhausted = await this.trackBudgetBurn(campaignId, discountAmount);
 
     this.logger.log(
-      `Applied incentive ${applicationId} from campaign ${campaignId} to invoice ${invoiceId}: -${discountAmount} ${currency}`,
+      `Applied incentive ${applicationId} from campaign ${campaignId} to invoice ${invoiceId}: -${discountAmount} ${currency}`
     );
 
     return {

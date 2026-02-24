@@ -32,20 +32,14 @@ export * from './interfaces';
 const CommandHandlers: Type<any>[] = [];
 
 // Event handlers
-const EventHandlers: Type<any>[] = [
-  AISuggestionNeo4jProjection,
-];
+const EventHandlers: Type<any>[] = [AISuggestionNeo4jProjection];
 
 @Module({
   imports: [
     CqrsModule,
     EventBusModule.forFeature(),
     Neo4jModule,
-    TypeOrmModule.forFeature([
-      AISuggestionEntity,
-      AIFeedbackEntity,
-      AITelemetryEntity,
-    ]),
+    TypeOrmModule.forFeature([AISuggestionEntity, AIFeedbackEntity, AITelemetryEntity]),
   ],
   providers: [
     ...CommandHandlers,

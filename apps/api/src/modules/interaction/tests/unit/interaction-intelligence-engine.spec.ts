@@ -1,12 +1,23 @@
-import { InteractionEventEntity, InteractionEventType, InteractionActorType } from '../../entities/interaction-event.entity';
-import { InteractionStreamEntity, InteractionStreamState, InteractionContextType } from '../../entities/interaction-stream.entity';
+import {
+  InteractionEventEntity,
+  InteractionEventType,
+  InteractionActorType,
+} from '../../entities/interaction-event.entity';
+import {
+  InteractionStreamEntity,
+  InteractionStreamState,
+  InteractionContextType,
+} from '../../entities/interaction-stream.entity';
 import {
   InteractionIntelligenceContext,
   IntentType,
   SentimentType,
   AIActionType,
 } from '../../intelligence/interaction-intelligence-context';
-import { InteractionIntelligenceEngine, INTELLIGENCE_ENGINE_VERSION } from '../../intelligence/interaction-intelligence-engine';
+import {
+  InteractionIntelligenceEngine,
+  INTELLIGENCE_ENGINE_VERSION,
+} from '../../intelligence/interaction-intelligence-engine';
 
 describe('InteractionIntelligenceEngine', () => {
   let engine: InteractionIntelligenceEngine;
@@ -109,7 +120,8 @@ describe('InteractionIntelligenceEngine', () => {
     it('should detect frustrated sentiment with strong negative keywords', async () => {
       const context = createMockContext({
         eventType: InteractionEventType.HUMAN_MESSAGE,
-        message: 'This is unacceptable! I am completely frustrated and angry with this useless service',
+        message:
+          'This is unacceptable! I am completely frustrated and angry with this useless service',
       });
       const result = await engine.analyze(context);
 
@@ -294,25 +306,26 @@ function createMockContext(options: {
     close: () => {},
   };
 
-  const mockEvent: InteractionEventEntity | undefined = options.hasCurrentEvent !== false
-    ? {
-        id: 'event-123',
-        streamId: 'stream-123',
-        actorId: 'user-1',
-        actorType: InteractionActorType.USER,
-        eventType: options.eventType || InteractionEventType.HUMAN_MESSAGE,
-        payload: {
-          message: options.message || 'Hello',
-        },
-        createdAt: new Date(),
-        stream: mockStream,
-        getEventTypeDisplayName: () => 'Human Message',
-        isHumanEvent: () => true,
-        isAIEvent: () => false,
-        isExternalEvent: () => false,
-        isSystemEvent: () => false,
-      }
-    : undefined;
+  const mockEvent: InteractionEventEntity | undefined =
+    options.hasCurrentEvent !== false
+      ? {
+          id: 'event-123',
+          streamId: 'stream-123',
+          actorId: 'user-1',
+          actorType: InteractionActorType.USER,
+          eventType: options.eventType || InteractionEventType.HUMAN_MESSAGE,
+          payload: {
+            message: options.message || 'Hello',
+          },
+          createdAt: new Date(),
+          stream: mockStream,
+          getEventTypeDisplayName: () => 'Human Message',
+          isHumanEvent: () => true,
+          isAIEvent: () => false,
+          isExternalEvent: () => false,
+          isSystemEvent: () => false,
+        }
+      : undefined;
 
   return {
     stream: mockStream,

@@ -38,9 +38,7 @@ export class GeoNearestAssignmentStrategy extends BaseAssignmentStrategy {
     context: AssignmentContext,
     candidates: WorkerCandidate[]
   ): Promise<AssignmentResult> {
-    this.logger.log(
-      `Starting geo-nearest assignment for job ${context.jobId}`
-    );
+    this.logger.log(`Starting geo-nearest assignment for job ${context.jobId}`);
 
     if (context.destinations.length === 0) {
       return {
@@ -51,10 +49,7 @@ export class GeoNearestAssignmentStrategy extends BaseAssignmentStrategy {
     }
 
     // Filter valid candidates
-    const validCandidates = await this.filterValidCandidates(
-      candidates,
-      context
-    );
+    const validCandidates = await this.filterValidCandidates(candidates, context);
 
     if (validCandidates.length === 0) {
       return {
@@ -72,10 +67,7 @@ export class GeoNearestAssignmentStrategy extends BaseAssignmentStrategy {
       .filter((c) => c.location)
       .map((candidate) => ({
         candidate,
-        distance: this.calculateDistance(
-          candidate.location!,
-          primaryDestination.location
-        ),
+        distance: this.calculateDistance(candidate.location!, primaryDestination.location),
       }))
       .sort((a, b) => a.distance - b.distance);
 
@@ -91,15 +83,14 @@ export class GeoNearestAssignmentStrategy extends BaseAssignmentStrategy {
     const nearest = candidatesWithDistance[0];
 
     // Check max distance constraint
-    if (
-      context.constraints.maxDistanceKm &&
-      nearest.distance > context.constraints.maxDistanceKm
-    ) {
+    if (context.constraints.maxDistanceKm && nearest.distance > context.constraints.maxDistanceKm) {
       return {
         success: false,
         assignments: [],
         errors: [
-          `Nearest worker is ${nearest.distance.toFixed(1)}km away, exceeds maximum ${context.constraints.maxDistanceKm}km`,
+          `Nearest worker is ${nearest.distance.toFixed(1)}km away, exceeds maximum ${
+            context.constraints.maxDistanceKm
+          }km`,
         ],
       };
     }
@@ -114,7 +105,9 @@ export class GeoNearestAssignmentStrategy extends BaseAssignmentStrategy {
     };
 
     this.logger.log(
-      `Geo-nearest assigned worker ${nearest.candidate.workerId} (${nearest.distance.toFixed(1)}km) to job ${context.jobId}`
+      `Geo-nearest assigned worker ${nearest.candidate.workerId} (${nearest.distance.toFixed(
+        1
+      )}km) to job ${context.jobId}`
     );
 
     return {
@@ -149,10 +142,7 @@ export class GeoNearestAssignmentStrategy extends BaseAssignmentStrategy {
       score -= 100;
     } else if (context.destinations.length > 0) {
       const primaryDestination = context.destinations[0];
-      const distance = this.calculateDistance(
-        candidate.location,
-        primaryDestination.location
-      );
+      const distance = this.calculateDistance(candidate.location, primaryDestination.location);
 
       // Score based on distance
       if (distance <= 1) {
@@ -164,12 +154,11 @@ export class GeoNearestAssignmentStrategy extends BaseAssignmentStrategy {
       }
 
       // Check hard distance constraint
-      if (
-        context.constraints.maxDistanceKm &&
-        distance > context.constraints.maxDistanceKm
-      ) {
+      if (context.constraints.maxDistanceKm && distance > context.constraints.maxDistanceKm) {
         reasons.push(
-          `Worker is ${distance.toFixed(1)}km away, exceeds maximum ${context.constraints.maxDistanceKm}km`
+          `Worker is ${distance.toFixed(1)}km away, exceeds maximum ${
+            context.constraints.maxDistanceKm
+          }km`
         );
         score -= 100;
       }

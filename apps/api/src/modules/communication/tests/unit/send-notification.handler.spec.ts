@@ -61,9 +61,7 @@ describe('SendNotificationCommandHandler', () => {
       ],
     }).compile();
 
-    handler = module.get<SendNotificationCommandHandler>(
-      SendNotificationCommandHandler,
-    );
+    handler = module.get<SendNotificationCommandHandler>(SendNotificationCommandHandler);
 
     // Default all preference checks to enabled
     mockPreferenceService.isEnabled.mockResolvedValue(true);
@@ -81,7 +79,7 @@ describe('SendNotificationCommandHandler', () => {
         NotificationChannel.EMAIL,
         'welcome-template',
         { name: 'John' },
-        'workspace-id-123',
+        'workspace-id-123'
       );
 
       const mockNotification = {
@@ -117,7 +115,7 @@ describe('SendNotificationCommandHandler', () => {
         NotificationChannel.EMAIL,
         'welcome-template',
         { name: 'John' },
-        'workspace-id-123',
+        'workspace-id-123'
       );
 
       const mockNotification = {
@@ -154,7 +152,7 @@ describe('SendNotificationCommandHandler', () => {
             templateId: 'welcome-template',
             recipientType: RecipientType.ACTOR,
           }),
-        }),
+        })
       );
     });
 
@@ -166,7 +164,7 @@ describe('SendNotificationCommandHandler', () => {
         'otp-template',
         { code: '123456' },
         'workspace-id-123',
-        'corr-id-123',
+        'corr-id-123'
       );
 
       const mockNotification = {
@@ -192,9 +190,7 @@ describe('SendNotificationCommandHandler', () => {
 
       await handler.execute(command);
 
-      expect(mockEventBus.publish).toHaveBeenCalledWith(
-        expect.any(NotificationSentEventV1),
-      );
+      expect(mockEventBus.publish).toHaveBeenCalledWith(expect.any(NotificationSentEventV1));
 
       const createdDto = mockNotificationRepository.create.mock.calls[0][0];
       const publishedEvent = mockEventBus.publish.mock.calls[0][0];
@@ -211,7 +207,7 @@ describe('SendNotificationCommandHandler', () => {
         NotificationChannel.PUSH,
         'alert-template',
         {},
-        'workspace-id-123',
+        'workspace-id-123'
       );
 
       const mockNotification = {
@@ -242,7 +238,7 @@ describe('SendNotificationCommandHandler', () => {
         expect.objectContaining({
           status: NotificationStatus.SENT,
           sentAt: expect.any(Date),
-        }),
+        })
       );
     });
 
@@ -254,7 +250,7 @@ describe('SendNotificationCommandHandler', () => {
         'template-123',
         {},
         'workspace-id-123',
-        'corr-id-456',
+        'corr-id-456'
       );
 
       const mockNotification = {
@@ -281,9 +277,7 @@ describe('SendNotificationCommandHandler', () => {
 
       await handler.execute(command);
 
-      expect(mockEventBus.publish).toHaveBeenCalledWith(
-        expect.any(NotificationFailedEventV1),
-      );
+      expect(mockEventBus.publish).toHaveBeenCalledWith(expect.any(NotificationFailedEventV1));
 
       const publishedEvent = mockEventBus.publish.mock.calls[0][0];
       expect(publishedEvent.eventType).toBe('NotificationFailedEvent-V1');
@@ -298,7 +292,7 @@ describe('SendNotificationCommandHandler', () => {
         NotificationChannel.SMS,
         'template-123',
         {},
-        'workspace-id-123',
+        'workspace-id-123'
       );
 
       const mockNotification = {
@@ -330,7 +324,7 @@ describe('SendNotificationCommandHandler', () => {
           status: NotificationStatus.FAILED,
           failedAt: expect.any(Date),
           error: 'Invalid phone number',
-        }),
+        })
       );
     });
 
@@ -342,7 +336,7 @@ describe('SendNotificationCommandHandler', () => {
         'template-123',
         {},
         'workspace-id-123',
-        'corr-id-789',
+        'corr-id-789'
       );
 
       const mockNotification = {
@@ -360,17 +354,11 @@ describe('SendNotificationCommandHandler', () => {
       };
 
       mockNotificationRepository.create.mockReturnValue(mockNotification);
-      mockMessagingService.send.mockRejectedValue(
-        new Error('Database connection failed'),
-      );
+      mockMessagingService.send.mockRejectedValue(new Error('Database connection failed'));
 
-      await expect(handler.execute(command)).rejects.toThrow(
-        'Database connection failed',
-      );
+      await expect(handler.execute(command)).rejects.toThrow('Database connection failed');
 
-      expect(mockEventBus.publish).toHaveBeenCalledWith(
-        expect.any(NotificationFailedEventV1),
-      );
+      expect(mockEventBus.publish).toHaveBeenCalledWith(expect.any(NotificationFailedEventV1));
 
       const publishedEvent = mockEventBus.publish.mock.calls[0][0];
       expect(publishedEvent.error).toBe('Database connection failed');
@@ -384,7 +372,7 @@ describe('SendNotificationCommandHandler', () => {
         NotificationChannel.EMAIL,
         'template-123',
         {},
-        'workspace-id-123',
+        'workspace-id-123'
       );
 
       const notificationId = 'notification-id-123';
@@ -419,7 +407,7 @@ describe('SendNotificationCommandHandler', () => {
         NotificationChannel.EMAIL,
         'welcome-template',
         { firstName: 'John', lastName: 'Doe', city: 'New York' },
-        'workspace-id-123',
+        'workspace-id-123'
       );
 
       const mockNotification = {
@@ -454,7 +442,7 @@ describe('SendNotificationCommandHandler', () => {
         'template-123',
         {},
         'workspace-id-123',
-        'corr-id-123',
+        'corr-id-123'
       );
 
       const mockNotification = {
@@ -483,7 +471,7 @@ describe('SendNotificationCommandHandler', () => {
         'recipient-id-123',
         RecipientType.ACTOR,
         NotificationChannel.EMAIL,
-        'workspace-id-123',
+        'workspace-id-123'
       );
     });
 
@@ -497,15 +485,13 @@ describe('SendNotificationCommandHandler', () => {
         'template-123',
         {},
         'workspace-id-123',
-        'corr-id-123',
+        'corr-id-123'
       );
 
       const result = await handler.execute(command);
 
       expect(mockMessagingService.send).not.toHaveBeenCalled();
-      expect(mockEventBus.publish).toHaveBeenCalledWith(
-        expect.any(NotificationSkippedEventV1),
-      );
+      expect(mockEventBus.publish).toHaveBeenCalledWith(expect.any(NotificationSkippedEventV1));
 
       const publishedEvent = mockEventBus.publish.mock.calls[0][0];
       expect(publishedEvent.eventType).toBe('NotificationSkippedEvent-V1');
@@ -524,7 +510,7 @@ describe('SendNotificationCommandHandler', () => {
         NotificationChannel.SMS,
         'otp-template',
         { code: '123456' },
-        'workspace-id-123',
+        'workspace-id-123'
       );
 
       const mockNotification = {
@@ -549,9 +535,7 @@ describe('SendNotificationCommandHandler', () => {
       await handler.execute(command);
 
       expect(mockMessagingService.send).toHaveBeenCalled();
-      expect(mockEventBus.publish).toHaveBeenCalledWith(
-        expect.any(NotificationSentEventV1),
-      );
+      expect(mockEventBus.publish).toHaveBeenCalledWith(expect.any(NotificationSentEventV1));
     });
   });
 });

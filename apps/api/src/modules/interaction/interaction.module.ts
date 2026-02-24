@@ -29,21 +29,19 @@ export const CommandHandlers = [
 ];
 
 // Event handlers
-export const EventHandlers = [
-  InteractionEventAIOHandler,
-];
+export const EventHandlers = [InteractionEventAIOHandler];
 
 /**
  * InteractionModule
- * 
+ *
  * Provides the Interaction Engine for ZanaFleet.
- * 
+ *
  * Core functionality:
  * - InteractionStream: Contextual threads for user interactions
  * - InteractionEvent: Immutable events (messages, AI responses, etc.)
  * - Adapters: Normalize external input (Slack, WebChat, etc.)
  * - Neo4j Projection: Graph relationships
- * 
+ *
  * Key principles:
  * - Append-only: Events can only be added, never modified
  * - Event-driven: All state changes emit events
@@ -90,7 +88,7 @@ export class InteractionModule implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     this.logger.log('Initializing Interaction Module...');
-    
+
     try {
       await this.neo4jInitializer.initialize();
       this.logger.log('Interaction Module initialized - Neo4j constraints created');

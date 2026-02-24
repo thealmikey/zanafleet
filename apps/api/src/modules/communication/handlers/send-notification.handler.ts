@@ -29,7 +29,7 @@ export class SendNotificationCommandHandler implements ICommandHandler<SendNotif
     private readonly notificationRepository: Repository<NotificationEntity>,
     private readonly messagingService: MessagingService,
     private readonly eventBus: EventBus,
-    private readonly preferenceService: PreferenceService,
+    private readonly preferenceService: PreferenceService
   ) {}
 
   async execute(command: SendNotificationCommand): Promise<{ notificationId: string }> {
@@ -37,7 +37,7 @@ export class SendNotificationCommandHandler implements ICommandHandler<SendNotif
     const eventId = uuidv4();
 
     this.logger.log(
-      `Processing notification command for recipient ${command.recipientId} via ${command.channel}`,
+      `Processing notification command for recipient ${command.recipientId} via ${command.channel}`
     );
 
     // Check if notifications are enabled for this recipient and channel
@@ -45,7 +45,7 @@ export class SendNotificationCommandHandler implements ICommandHandler<SendNotif
       command.recipientId,
       command.recipientType,
       command.channel,
-      command.workspaceId,
+      command.workspaceId
     );
 
     if (!isEnabled) {
@@ -64,7 +64,7 @@ export class SendNotificationCommandHandler implements ICommandHandler<SendNotif
 
       this.eventBus.publish(skippedEvent);
       this.logger.log(
-        `Notification ${notificationId} skipped for recipient ${command.recipientId}: preferences disabled`,
+        `Notification ${notificationId} skipped for recipient ${command.recipientId}: preferences disabled`
       );
 
       return { notificationId };
@@ -108,7 +108,7 @@ export class SendNotificationCommandHandler implements ICommandHandler<SendNotif
 
         this.eventBus.publish(sentEvent);
         this.logger.log(
-          `In-app notification ${notificationId} saved for recipient ${command.recipientId}`,
+          `In-app notification ${notificationId} saved for recipient ${command.recipientId}`
         );
 
         return { notificationId };
@@ -149,9 +149,7 @@ export class SendNotificationCommandHandler implements ICommandHandler<SendNotif
         });
 
         this.eventBus.publish(sentEvent);
-        this.logger.log(
-          `Notification ${notificationId} sent successfully via ${command.channel}`,
-        );
+        this.logger.log(`Notification ${notificationId} sent successfully via ${command.channel}`);
       } else {
         notification.status = NotificationStatus.FAILED;
         notification.failedAt = new Date();
@@ -175,7 +173,7 @@ export class SendNotificationCommandHandler implements ICommandHandler<SendNotif
 
         this.eventBus.publish(failedEvent);
         this.logger.error(
-          `Notification ${notificationId} failed: ${sendResult.error ?? 'Unknown error'}`,
+          `Notification ${notificationId} failed: ${sendResult.error ?? 'Unknown error'}`
         );
       }
 
@@ -203,10 +201,7 @@ export class SendNotificationCommandHandler implements ICommandHandler<SendNotif
     }
   }
 
-  private renderTemplate(
-    template: string,
-    variables: Record<string, unknown>,
-  ): string {
+  private renderTemplate(template: string, variables: Record<string, unknown>): string {
     let rendered = template;
     Object.entries(variables).forEach(([key, value]) => {
       rendered = rendered.replace(`{{${key}}}`, String(value));

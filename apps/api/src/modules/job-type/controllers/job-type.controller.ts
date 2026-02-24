@@ -34,18 +34,15 @@ import { Repository } from 'typeorm';
 
 import { RequireCapability } from '@api/core/api/decorators';
 import { CapabilityGuard } from '@api/core/api/guards';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
+import { parseQueryParams, createPaginationMeta, RawQueryParams } from '@api/core/api/utils';
 
 import { CreateJobTypeCommand } from '../commands/create-job-type.command';
 import { UpdateJobTypeCommand } from '../commands/update-job-type.command';
 import { JobTypeEntity } from '../entities/job-type.entity';
 import { Vertical, JobTypeStatus } from '../dto/job-type.enums';
 
-const UUID_V4_ROUTE_SEGMENT = ':id([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})';
+const UUID_V4_ROUTE_SEGMENT =
+  ':id([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})';
 
 /**
  * Create JobType DTO
@@ -126,8 +123,15 @@ export class JobTypeController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new job type', description: 'Create a new job type entity within the workspace' })
-  @ApiResponse({ status: 201, description: 'Job type created successfully', schema: { example: { id: 'uuid' } } })
+  @ApiOperation({
+    summary: 'Create a new job type',
+    description: 'Create a new job type entity within the workspace',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Job type created successfully',
+    schema: { example: { id: 'uuid' } },
+  })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
@@ -168,7 +172,10 @@ export class JobTypeController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List all job types', description: 'Retrieve all job types with pagination' })
+  @ApiOperation({
+    summary: 'List all job types',
+    description: 'Retrieve all job types with pagination',
+  })
   @ApiResponse({ status: 200, description: 'Job types retrieved successfully' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number (1-based)', type: Number })
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
@@ -237,7 +244,11 @@ export class JobTypeController {
   @Delete(UUID_V4_ROUTE_SEGMENT)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a job type' })
-  @ApiResponse({ status: 200, description: 'Job type deleted successfully', schema: { example: { deleted: true } } })
+  @ApiResponse({
+    status: 200,
+    description: 'Job type deleted successfully',
+    schema: { example: { deleted: true } },
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({ status: 404, description: 'Job type not found' })

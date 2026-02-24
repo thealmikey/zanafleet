@@ -61,9 +61,7 @@ export class CreateInvoiceCommand {
     return CreateInvoiceCommandSchema.parse(input);
   }
 
-  static safeValidate(
-    input: unknown,
-  ): z.SafeParseReturnType<unknown, CreateInvoiceCommandInput> {
+  static safeValidate(input: unknown): z.SafeParseReturnType<unknown, CreateInvoiceCommandInput> {
     return CreateInvoiceCommandSchema.safeParse(input);
   }
 }

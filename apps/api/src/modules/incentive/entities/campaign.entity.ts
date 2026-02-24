@@ -147,7 +147,8 @@ export class CampaignEntity {
     entity.fundingSource = data.fundingSource;
     entity.sponsorAccountId = data.sponsorAccountId ?? null;
     entity.discountValue = data.discountValue.toFixed(2);
-    entity.maxDiscountAmount = data.maxDiscountAmount != null ? data.maxDiscountAmount.toFixed(2) : null;
+    entity.maxDiscountAmount =
+      data.maxDiscountAmount != null ? data.maxDiscountAmount.toFixed(2) : null;
     entity.budgetTotal = data.budgetTotal.toFixed(2);
     entity.budgetUsed = (data.budgetUsed ?? 0).toFixed(2);
     entity.usageLimit = data.usageLimit ?? null;

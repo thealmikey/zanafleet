@@ -36,7 +36,7 @@ export class CreateInteractionEventCommandHandler
     private readonly eventRepository: InteractionEventRepository,
     private readonly streamRepository: InteractionStreamRepository,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -53,7 +53,7 @@ export class CreateInteractionEventCommandHandler
     const now = new Date();
 
     this.logger.log(
-      `Executing CreateInteractionEventCommand: stream=${command.streamId}, type=${command.eventType}`,
+      `Executing CreateInteractionEventCommand: stream=${command.streamId}, type=${command.eventType}`
     );
 
     // Step 1: Verify stream exists (throws NotFoundException if not)

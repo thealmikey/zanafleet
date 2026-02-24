@@ -17,7 +17,7 @@ export class WorkerCandidateService {
   constructor(
     // Inject actor repository for worker data
     @InjectRepository('ActorRepository')
-    private readonly actorRepository: Repository<Record<string, unknown>>,
+    private readonly actorRepository: Repository<Record<string, unknown>>
   ) {}
 
   /**
@@ -74,9 +74,7 @@ export class WorkerCandidateService {
       where: workerIds.map((id) => ({ id })),
     });
 
-    return Promise.all(
-      workers.map((worker) => this.transformToCandidate(worker, {}))
-    );
+    return Promise.all(workers.map((worker) => this.transformToCandidate(worker, {})));
   }
 
   /**
@@ -126,15 +124,18 @@ export class WorkerCandidateService {
       actorId: worker.id as string,
       actorEmail: worker.email as string,
       actorUsername: worker.username as string,
-      location: location ? {
-        latitude: location.latitude,
-        longitude: location.longitude,
-      } : undefined,
+      location: location
+        ? {
+            latitude: location.latitude,
+            longitude: location.longitude,
+          }
+        : undefined,
       currentLoad: (worker.currentLoad as number) || 0,
       maxCapacity: (worker.maxCapacity as number) || 10,
       qualifications: (worker.qualifications as Record<string, unknown>[]) || [],
       rating: (worker.rating as number) || 4.0,
-      availabilityStatus: (worker.availabilityStatus as AvailabilityStatus) || AvailabilityStatus.AVAILABLE,
+      availabilityStatus:
+        (worker.availabilityStatus as AvailabilityStatus) || AvailabilityStatus.AVAILABLE,
       workspaceId: worker.workspaceId as string,
       capabilities: (worker.capabilities as string[]) || [],
     };
@@ -149,4 +150,3 @@ export class WorkerCandidateService {
     return 0;
   }
 }
-

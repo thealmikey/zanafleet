@@ -2,7 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
-import { InteractionEventEntity, InteractionEventType, InteractionActorType } from '../../entities/interaction-event.entity';
+import {
+  InteractionEventEntity,
+  InteractionEventType,
+  InteractionActorType,
+} from '../../entities/interaction-event.entity';
 import { InteractionEventRepository } from '../../repositories/interaction-event.repository';
 
 describe('InteractionEventRepository', () => {
@@ -200,9 +204,7 @@ describe('InteractionEventRepository', () => {
   describe('findByEventType', () => {
     it('should find events by event type', async () => {
       // Arrange
-      const mockEvents = [
-        { id: 'event-1', eventType: InteractionEventType.HUMAN_MESSAGE },
-      ];
+      const mockEvents = [{ id: 'event-1', eventType: InteractionEventType.HUMAN_MESSAGE }];
 
       mockRepository.find.mockResolvedValue(mockEvents);
 

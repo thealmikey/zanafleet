@@ -2,7 +2,7 @@ import { InteractionActorType } from '../entities/interaction-event.entity';
 
 /**
  * Participant Types
- * 
+ *
  * These types represent any entity that can interact within the system.
  * This is a unified abstraction that encompasses:
  * - Human users
@@ -76,7 +76,9 @@ export function isUserParticipant(participant: Participant): participant is User
   return participant.type === InteractionActorType.USER;
 }
 
-export function isOrganizationParticipant(participant: Participant): participant is OrganizationParticipant {
+export function isOrganizationParticipant(
+  participant: Participant
+): participant is OrganizationParticipant {
   return participant.type === InteractionActorType.ORGANIZATION;
 }
 
@@ -97,7 +99,7 @@ export function isAIAgentParticipant(participant: Participant): participant is A
 }
 
 export function isExternalIntegrationParticipant(
-  participant: Participant,
+  participant: Participant
 ): participant is ExternalIntegrationParticipant {
   return participant.type === InteractionActorType.EXTERNAL_INTEGRATION;
 }

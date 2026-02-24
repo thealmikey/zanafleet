@@ -14,7 +14,10 @@ describe('PaymentCompletedListener', () => {
   let mockEventBus: jest.Mocked<EventBus>;
   let mockEventBusService: jest.Mocked<EventBusService>;
 
-  const createPaymentCompletedEvent = (paymentIntentId: string, invoiceId?: string | null): PaymentCompletedEventV1 => {
+  const createPaymentCompletedEvent = (
+    paymentIntentId: string,
+    invoiceId?: string | null
+  ): PaymentCompletedEventV1 => {
     return new PaymentCompletedEventV1({
       eventId: '110e8400-e29b-41d4-a716-446655440010',
       paymentIntentId,
@@ -64,11 +67,7 @@ describe('PaymentCompletedListener', () => {
       publish: jest.fn().mockResolvedValue(undefined),
     } as unknown as jest.Mocked<EventBusService>;
 
-    listener = new PaymentCompletedListener(
-      mockInvoiceRepo,
-      mockEventBus,
-      mockEventBusService,
-    );
+    listener = new PaymentCompletedListener(mockInvoiceRepo, mockEventBus, mockEventBusService);
   });
 
   describe('handle', () => {
@@ -135,7 +134,7 @@ describe('PaymentCompletedListener', () => {
 
       expect(mockEventBusService.publish).toHaveBeenCalledWith(
         'billing.events.invoice-paid-v1',
-        expect.any(InvoicePaidEventV1),
+        expect.any(InvoicePaidEventV1)
       );
     });
   });

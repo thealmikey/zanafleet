@@ -24,7 +24,9 @@ export const CreateInteractionEventCommandSchema = z.object({
   causationId: z.string().uuid().optional(),
 });
 
-export type CreateInteractionEventCommandInput = z.infer<typeof CreateInteractionEventCommandSchema>;
+export type CreateInteractionEventCommandInput = z.infer<
+  typeof CreateInteractionEventCommandSchema
+>;
 
 /**
  * CreateInteractionEventCommand
@@ -62,7 +64,7 @@ export class CreateInteractionEventCommand {
    * Safe validation - returns result object instead of throwing
    */
   static safeValidate(
-    input: unknown,
+    input: unknown
   ): z.SafeParseReturnType<unknown, CreateInteractionEventCommandInput> {
     return CreateInteractionEventCommandSchema.safeParse(input);
   }

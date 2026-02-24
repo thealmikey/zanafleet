@@ -5,32 +5,34 @@ import { IncentiveType, FundingSource } from '../dto/incentive.enums';
 /**
  * Zod schema for CreateCampaignCommand validation
  */
-export const CreateCampaignCommandSchema = z.object({
-  name: z.string().min(1).max(255),
-  description: z.string().optional(),
-  incentiveType: z.nativeEnum(IncentiveType),
-  fundingSource: z.nativeEnum(FundingSource),
-  sponsorAccountId: z.string().uuid().optional(),
-  discountValue: z.number().positive(),
-  maxDiscountAmount: z.number().positive().optional(),
-  budgetTotal: z.number().positive(),
-  usageLimit: z.number().int().positive().optional(),
-  eligibilityRules: z.record(z.unknown()).optional(),
-  validFrom: z.date(),
-  validUntil: z.date(),
-  metadata: z.record(z.unknown()).optional(),
-}).refine(
-  (data) => data.validUntil > data.validFrom,
-  { message: 'validUntil must be after validFrom' },
-).refine(
-  (data) => {
-    if (data.fundingSource !== FundingSource.PLATFORM && !data.sponsorAccountId) {
-      return false;
-    }
-    return true;
-  },
-  { message: 'sponsorAccountId is required for non-platform funding sources' },
-);
+export const CreateCampaignCommandSchema = z
+  .object({
+    name: z.string().min(1).max(255),
+    description: z.string().optional(),
+    incentiveType: z.nativeEnum(IncentiveType),
+    fundingSource: z.nativeEnum(FundingSource),
+    sponsorAccountId: z.string().uuid().optional(),
+    discountValue: z.number().positive(),
+    maxDiscountAmount: z.number().positive().optional(),
+    budgetTotal: z.number().positive(),
+    usageLimit: z.number().int().positive().optional(),
+    eligibilityRules: z.record(z.unknown()).optional(),
+    validFrom: z.date(),
+    validUntil: z.date(),
+    metadata: z.record(z.unknown()).optional(),
+  })
+  .refine((data) => data.validUntil > data.validFrom, {
+    message: 'validUntil must be after validFrom',
+  })
+  .refine(
+    (data) => {
+      if (data.fundingSource !== FundingSource.PLATFORM && !data.sponsorAccountId) {
+        return false;
+      }
+      return true;
+    },
+    { message: 'sponsorAccountId is required for non-platform funding sources' }
+  );
 
 export type CreateCampaignCommandInput = z.infer<typeof CreateCampaignCommandSchema>;
 
@@ -73,9 +75,7 @@ export class CreateCampaignCommand {
     return CreateCampaignCommandSchema.parse(input);
   }
 
-  static safeValidate(
-    input: unknown,
-  ): z.SafeParseReturnType<unknown, CreateCampaignCommandInput> {
+  static safeValidate(input: unknown): z.SafeParseReturnType<unknown, CreateCampaignCommandInput> {
     return CreateCampaignCommandSchema.safeParse(input);
   }
 }

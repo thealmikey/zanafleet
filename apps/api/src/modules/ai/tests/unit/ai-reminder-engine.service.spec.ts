@@ -45,7 +45,9 @@ describe('AIReminderEngineService', () => {
     eventBus = module.get(EventBusService);
   });
 
-  const createMockHangingEvent = (overrides?: Partial<AIHangingStateDetectedEventV1>): AIHangingStateDetectedEventV1 => {
+  const createMockHangingEvent = (
+    overrides?: Partial<AIHangingStateDetectedEventV1>
+  ): AIHangingStateDetectedEventV1 => {
     return new AIHangingStateDetectedEventV1({
       eventId: testUuid(),
       aggregateId: testUuid(),
@@ -100,7 +102,10 @@ describe('AIReminderEngineService', () => {
 
         await service.generateReminderSuggestion(hangingEvent);
 
-        expect(eventBus.publish).toHaveBeenCalledWith('ai.suggestion.generated', expect.any(Object));
+        expect(eventBus.publish).toHaveBeenCalledWith(
+          'ai.suggestion.generated',
+          expect.any(Object)
+        );
       });
 
       it('should set isReminder flag in metadata', async () => {
@@ -278,7 +283,9 @@ describe('AIReminderEngineService', () => {
 
         const savedSuggestion = suggestionStore.createSuggestion.mock.calls[0][0];
         // Critical (3x) should have TTL of 2 hours
-        expect(savedSuggestion.expiresAt.getTime()).toBeGreaterThan(Date.now() + 2 * 60 * 60 * 1000 - 60000);
+        expect(savedSuggestion.expiresAt.getTime()).toBeGreaterThan(
+          Date.now() + 2 * 60 * 60 * 1000 - 60000
+        );
       });
 
       it('should use medium TTL for high severity (>1.5x)', async () => {
@@ -298,7 +305,9 @@ describe('AIReminderEngineService', () => {
 
         const savedSuggestion = suggestionStore.createSuggestion.mock.calls[0][0];
         // High (1.8x) should have TTL of 3 hours
-        expect(savedSuggestion.expiresAt.getTime()).toBeGreaterThan(Date.now() + 3 * 60 * 60 * 1000 - 60000);
+        expect(savedSuggestion.expiresAt.getTime()).toBeGreaterThan(
+          Date.now() + 3 * 60 * 60 * 1000 - 60000
+        );
       });
 
       it('should use default TTL for normal severity', async () => {
@@ -318,7 +327,9 @@ describe('AIReminderEngineService', () => {
 
         const savedSuggestion = suggestionStore.createSuggestion.mock.calls[0][0];
         // Normal (1.2x) should have TTL of 4 hours (default)
-        expect(savedSuggestion.expiresAt.getTime()).toBeGreaterThan(Date.now() + 4 * 60 * 60 * 1000 - 60000);
+        expect(savedSuggestion.expiresAt.getTime()).toBeGreaterThan(
+          Date.now() + 4 * 60 * 60 * 1000 - 60000
+        );
       });
     });
 

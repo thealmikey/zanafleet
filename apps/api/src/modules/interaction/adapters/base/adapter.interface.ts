@@ -1,4 +1,7 @@
-import { InteractionEventType, InteractionActorType } from '../../entities/interaction-event.entity';
+import {
+  InteractionEventType,
+  InteractionActorType,
+} from '../../entities/interaction-event.entity';
 
 /**
  * Adapter Input
@@ -26,15 +29,15 @@ export interface NormalizedEvent {
 
 /**
  * IInteractionAdapter Interface
- * 
+ *
  * Defines the contract for external input adapters.
  * Each adapter normalizes external input into InteractionEvents.
- * 
+ *
  * Adapters MUST:
  * - Only normalize input (no business logic)
  * - Validate input before normalization
  * - Handle missing/invalid input gracefully
- * 
+ *
  * Adapters MUST NOT:
  * - Call domain services
  * - Modify entities directly

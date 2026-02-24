@@ -7,7 +7,11 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { SendNotificationCommand } from '../../commands/send-notification.command';
 import { CommunicationModule } from '../../communication.module';
-import { NotificationChannel, NotificationStatus, RecipientType } from '../../dto/notification.enums';
+import {
+  NotificationChannel,
+  NotificationStatus,
+  RecipientType,
+} from '../../dto/notification.enums';
 import { NotificationEntity } from '../../entities/notification.entity';
 
 const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
@@ -52,7 +56,10 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
     if (module) {
       const entityManager = module.get('EntityManager');
       await entityManager.query('DELETE FROM notifications WHERE "workspaceId" IS NOT NULL');
-      await entityManager.query('DELETE FROM notification_preferences WHERE "recipientId" LIKE $1', ['test-%']);
+      await entityManager.query(
+        'DELETE FROM notification_preferences WHERE "recipientId" LIKE $1',
+        ['test-%']
+      );
     }
 
     // Clean up test data from Neo4j
@@ -79,7 +86,7 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         'welcome',
         { username: 'TestUser', email: 'test@example.com' },
         workspaceId,
-        correlationId,
+        correlationId
       );
 
       const result = await commandBus.execute(command);
@@ -100,7 +107,7 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         NotificationChannel.SMS,
         'rider-onboarded',
         { fullName: 'Test Rider', saccoName: 'Test Sacco' },
-        workspaceId,
+        workspaceId
       );
 
       const result = await commandBus.execute(command);
@@ -129,7 +136,7 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         NotificationChannel.EMAIL,
         'welcome',
         { username: 'TestUser', email: 'test@example.com' },
-        workspaceId,
+        workspaceId
       );
 
       const smsCommand = new SendNotificationCommand(
@@ -138,7 +145,7 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         NotificationChannel.SMS,
         'welcome',
         { username: 'TestUser', email: 'test@example.com' },
-        workspaceId,
+        workspaceId
       );
 
       const [emailResult, smsResult] = await Promise.all([

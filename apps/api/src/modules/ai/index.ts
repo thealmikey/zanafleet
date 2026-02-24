@@ -11,4 +11,8 @@ export * from './events';
 // Entities
 export { AISuggestionEntity } from './entities/ai-suggestion.entity';
 export { AIFeedbackEntity, AIFeedbackType } from './entities/ai-feedback.entity';
-export { AITelemetryEntity, AITelemetryEventType, AITelemetrySeverity } from './entities/ai-telemetry.entity';
+export {
+  AITelemetryEntity,
+  AITelemetryEventType,
+  AITelemetrySeverity,
+} from './entities/ai-telemetry.entity';

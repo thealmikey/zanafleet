@@ -41,16 +41,14 @@ export class BillingCalculatorService {
   private readonly DEFAULT_SERVICE_FEE_PERCENT = 0.1;
   private readonly DEFAULT_TAX_PERCENT = 0.16;
 
-  constructor(
-    @Optional() private readonly pricingSignalService?: PricingSignalService,
-  ) {
+  constructor(@Optional() private readonly pricingSignalService?: PricingSignalService) {
     if (!this.pricingSignalService) {
       this.logger.warn('PricingSignalService not available - dynamic pricing disabled');
     }
   }
 
   async calculateDeliveryChargesWithSignals(
-    input: DeliveryPricingInput,
+    input: DeliveryPricingInput
   ): Promise<CalculatedCharges & { pricingSignals?: PricingSignals }> {
     let pricingSignals: PricingSignals | undefined;
 
@@ -72,7 +70,9 @@ export class BillingCalculatorService {
         }
       } catch (error) {
         this.logger.error(
-          `Failed to get pricing signals: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          `Failed to get pricing signals: ${
+            error instanceof Error ? error.message : 'Unknown error'
+          }`
         );
       }
     }
@@ -180,9 +180,7 @@ export class BillingCalculatorService {
     }
 
     const subtotal = this.roundToTwoDecimals(
-      charges
-        .filter((c) => c.chargeType !== ChargeType.TAX)
-        .reduce((sum, c) => sum + c.amount, 0),
+      charges.filter((c) => c.chargeType !== ChargeType.TAX).reduce((sum, c) => sum + c.amount, 0)
     );
 
     const taxPercent = input.taxPercent ?? this.DEFAULT_TAX_PERCENT;
@@ -202,7 +200,7 @@ export class BillingCalculatorService {
     const grandTotal = this.roundToTwoDecimals(subtotal + tax);
 
     this.logger.debug(
-      `Calculated charges: subtotal=${subtotal}, discounts=${totalDiscounts}, tax=${tax}, grandTotal=${grandTotal}`,
+      `Calculated charges: subtotal=${subtotal}, discounts=${totalDiscounts}, tax=${tax}, grandTotal=${grandTotal}`
     );
 
     return {

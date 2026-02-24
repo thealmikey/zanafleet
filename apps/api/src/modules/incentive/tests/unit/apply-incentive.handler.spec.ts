@@ -12,7 +12,6 @@ import { SponsorshipConsumedEventV1 } from '../../events/sponsorship-consumed.ev
 import { ApplyIncentiveCommandHandler } from '../../handlers/apply-incentive.handler';
 import { IncentiveEngineService } from '../../services/incentive-engine.service';
 
-
 describe('ApplyIncentiveCommandHandler', () => {
   let handler: ApplyIncentiveCommandHandler;
   let mockIncentiveEngine: jest.Mocked<IncentiveEngineService>;
@@ -20,7 +19,9 @@ describe('ApplyIncentiveCommandHandler', () => {
   let mockCommandBus: jest.Mocked<CommandBus>;
   let mockEventBusService: jest.Mocked<EventBusService>;
 
-  const createCampaign = (overrides?: Partial<ReturnType<CampaignEntity['toDomain']>>): CampaignEntity => {
+  const createCampaign = (
+    overrides?: Partial<ReturnType<CampaignEntity['toDomain']>>
+  ): CampaignEntity => {
     const entity = CampaignEntity.fromDomain({
       campaignId: '550e8400-e29b-41d4-a716-446655440000',
       name: 'Test Campaign',
@@ -96,7 +97,7 @@ describe('ApplyIncentiveCommandHandler', () => {
         mockIncentiveEngine,
         mockEventBus,
         mockCommandBus,
-        mockEventBusService,
+        mockEventBusService
       );
 
       mockIncentiveEngine.getCampaign.mockResolvedValue(createCampaign());
@@ -130,7 +131,7 @@ describe('ApplyIncentiveCommandHandler', () => {
 
       const events = mockEventBus.publish.mock.calls.map((call) => call[0]);
       const sponsorshipEvent = events.find(
-        (e) => (e as SponsorshipConsumedEventV1).eventType === 'SponsorshipConsumedEvent-V1',
+        (e) => (e as SponsorshipConsumedEventV1).eventType === 'SponsorshipConsumedEvent-V1'
       );
       expect(sponsorshipEvent).toBeUndefined();
     });
@@ -147,7 +148,7 @@ describe('ApplyIncentiveCommandHandler', () => {
         mockIncentiveEngine,
         mockEventBus,
         mockCommandBus,
-        mockEventBusService,
+        mockEventBusService
       );
 
       mockIncentiveEngine.getCampaign.mockResolvedValue(sponsoredCampaign);
@@ -169,7 +170,7 @@ describe('ApplyIncentiveCommandHandler', () => {
 
       const events = mockEventBus.publish.mock.calls.map((call) => call[0]);
       const sponsorshipEvent = events.find(
-        (e) => (e as SponsorshipConsumedEventV1).eventType === 'SponsorshipConsumedEvent-V1',
+        (e) => (e as SponsorshipConsumedEventV1).eventType === 'SponsorshipConsumedEvent-V1'
       ) as SponsorshipConsumedEventV1;
 
       expect(sponsorshipEvent).toBeDefined();
@@ -184,7 +185,7 @@ describe('ApplyIncentiveCommandHandler', () => {
         mockIncentiveEngine,
         mockEventBus,
         mockCommandBus,
-        mockEventBusService,
+        mockEventBusService
       );
 
       mockIncentiveEngine.getCampaign.mockResolvedValue(createCampaign());
@@ -202,7 +203,7 @@ describe('ApplyIncentiveCommandHandler', () => {
 
       const events = mockEventBus.publish.mock.calls.map((call) => call[0]);
       const exhaustedEvent = events.find(
-        (e) => (e as BudgetExhaustedEventV1).eventType === 'BudgetExhaustedEvent-V1',
+        (e) => (e as BudgetExhaustedEventV1).eventType === 'BudgetExhaustedEvent-V1'
       ) as BudgetExhaustedEventV1;
 
       expect(exhaustedEvent).toBeDefined();
@@ -216,7 +217,7 @@ describe('ApplyIncentiveCommandHandler', () => {
         mockIncentiveEngine,
         mockEventBus,
         mockCommandBus,
-        undefined,
+        undefined
       );
     });
 
@@ -231,7 +232,7 @@ describe('ApplyIncentiveCommandHandler', () => {
       mockIncentiveEngine.calculateDiscountAmount.mockReturnValue(0);
 
       await expect(handler.execute(validCommand)).rejects.toThrow(
-        'Calculated discount amount is zero or negative',
+        'Calculated discount amount is zero or negative'
       );
     });
   });

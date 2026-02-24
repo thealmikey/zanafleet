@@ -157,7 +157,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         iss: 'http://malicious-server/realms/fake',
       };
 
-      await expect(jwtStrategy.validate(invalidIssuerPayload)).rejects.toThrow(UnauthorizedException);
+      await expect(jwtStrategy.validate(invalidIssuerPayload)).rejects.toThrow(
+        UnauthorizedException
+      );
     });
 
     it('should reject tokens without required claims', async () => {

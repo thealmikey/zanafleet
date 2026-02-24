@@ -257,7 +257,11 @@ describe('AI Event Emission Integration', () => {
         capability: 'submit_for_review',
         riskScore: 35,
         riskFactors: [
-          new AIRiskFactor({ factor: 'capability_confidence', weight: 0.25, description: 'Confidence: 75%' }),
+          new AIRiskFactor({
+            factor: 'capability_confidence',
+            weight: 0.25,
+            description: 'Confidence: 75%',
+          }),
         ],
         confidence: 0.75,
       });
@@ -276,9 +280,7 @@ describe('AI Event Emission Integration', () => {
         workflowState: 'pending',
         capability: 'submit_for_review',
         riskScore: 35,
-        riskFactors: [
-          new AIRiskFactor({ factor: 'test', weight: 0.25, description: 'Test' }),
-        ],
+        riskFactors: [new AIRiskFactor({ factor: 'test', weight: 0.25, description: 'Test' })],
         confidence: 0.75,
       });
 

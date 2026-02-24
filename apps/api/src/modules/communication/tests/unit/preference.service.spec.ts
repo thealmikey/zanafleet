@@ -41,7 +41,7 @@ describe('PreferenceService', () => {
       const result = await service.isEnabled(
         'recipient-1',
         RecipientType.ACTOR,
-        NotificationChannel.EMAIL,
+        NotificationChannel.EMAIL
       );
 
       expect(result).toBe(true);
@@ -60,7 +60,7 @@ describe('PreferenceService', () => {
         'recipient-1',
         RecipientType.ACTOR,
         NotificationChannel.EMAIL,
-        'workspace-1',
+        'workspace-1'
       );
 
       expect(result).toBe(false);
@@ -71,9 +71,7 @@ describe('PreferenceService', () => {
       const queryBuilder = {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
-        getOne: jest.fn()
-          .mockResolvedValueOnce(null)
-          .mockResolvedValueOnce(globalPref),
+        getOne: jest.fn().mockResolvedValueOnce(null).mockResolvedValueOnce(globalPref),
       };
       mockPreferenceRepository.createQueryBuilder.mockReturnValue(queryBuilder);
 
@@ -81,7 +79,7 @@ describe('PreferenceService', () => {
         'recipient-1',
         RecipientType.ACTOR,
         NotificationChannel.EMAIL,
-        'workspace-1',
+        'workspace-1'
       );
 
       expect(result).toBe(false);
@@ -99,7 +97,7 @@ describe('PreferenceService', () => {
       const result = await service.isEnabled(
         'recipient-1',
         RecipientType.RIDER,
-        NotificationChannel.SMS,
+        NotificationChannel.SMS
       );
 
       expect(result).toBe(true);
@@ -115,7 +113,7 @@ describe('PreferenceService', () => {
         RecipientType.ACTOR,
         NotificationChannel.EMAIL,
         false,
-        { workspaceId: 'workspace-1', updatedBy: 'actor-123' },
+        { workspaceId: 'workspace-1', updatedBy: 'actor-123' }
       );
 
       expect(mockPreferenceRepository.upsert).toHaveBeenCalledWith(
@@ -130,7 +128,7 @@ describe('PreferenceService', () => {
         {
           conflictPaths: ['recipientId', 'recipientType', 'channel', 'workspaceId'],
           skipUpdateIfNoValuesChanged: false,
-        },
+        }
       );
     });
 
@@ -141,7 +139,7 @@ describe('PreferenceService', () => {
         'recipient-1',
         RecipientType.BUSINESS,
         NotificationChannel.PUSH,
-        true,
+        true
       );
 
       expect(mockPreferenceRepository.upsert).toHaveBeenCalledWith(
@@ -149,7 +147,7 @@ describe('PreferenceService', () => {
           workspaceId: null,
           updatedBy: null,
         }),
-        expect.any(Object),
+        expect.any(Object)
       );
     });
   });

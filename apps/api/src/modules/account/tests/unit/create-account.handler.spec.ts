@@ -70,7 +70,7 @@ describe('CreateAccountCommandHandler', () => {
       expect(result).toBeDefined();
       expect(typeof result).toBe('string');
       expect(result).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       );
     });
 
@@ -92,7 +92,7 @@ describe('CreateAccountCommandHandler', () => {
       expect(mockEventBusService.publish).toHaveBeenCalledTimes(1);
       expect(mockEventBusService.publish).toHaveBeenCalledWith(
         'account.events.created-v1',
-        expect.any(AccountCreatedEventV1),
+        expect.any(AccountCreatedEventV1)
       );
     });
 

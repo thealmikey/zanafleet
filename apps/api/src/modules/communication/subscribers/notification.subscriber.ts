@@ -2,7 +2,10 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Ctx, MessagePattern, NatsContext, Payload } from '@nestjs/microservices';
 
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
-import { BaseEvent, SerializedEvent } from '../../../core/event-bus/interfaces/base-event.interface';
+import {
+  BaseEvent,
+  SerializedEvent,
+} from '../../../core/event-bus/interfaces/base-event.interface';
 import { EventLoggerService } from '../../../core/event-bus/services/event-logger.service';
 import { IdempotencyService } from '../../../core/event-bus/services/idempotency.service';
 import { NotificationFailedEventV1 } from '../events/notification-failed.event';
@@ -24,13 +27,13 @@ export class NotificationSubscriber {
   constructor(
     private readonly projection: NotificationNeo4jProjection,
     private readonly idempotencyService: IdempotencyService,
-    private readonly eventLogger: EventLoggerService,
+    private readonly eventLogger: EventLoggerService
   ) {}
 
   @MessagePattern(NatsSubjects.Notification.ALL)
   async handleNotificationEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     const subject = context.getSubject();
     this.logger.debug(`Received event on subject: ${subject}`);
@@ -47,7 +50,7 @@ export class NotificationSubscriber {
       if (data.eventType === 'NotificationSentEvent-V1') {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         const event: NotificationSentEventV1 = NotificationSentEventV1.fromJSON(
-          data as unknown as Parameters<typeof NotificationSentEventV1.fromJSON>[0],
+          data as unknown as Parameters<typeof NotificationSentEventV1.fromJSON>[0]
         );
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         await this.projection.handle(event);
@@ -55,7 +58,7 @@ export class NotificationSubscriber {
       } else if (data.eventType === 'NotificationFailedEvent-V1') {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         const event: NotificationFailedEventV1 = NotificationFailedEventV1.fromJSON(
-          data as unknown as Parameters<typeof NotificationFailedEventV1.fromJSON>[0],
+          data as unknown as Parameters<typeof NotificationFailedEventV1.fromJSON>[0]
         );
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         await this.projection.handle(event);
@@ -63,7 +66,7 @@ export class NotificationSubscriber {
       } else if (data.eventType === 'NotificationSkippedEvent-V1') {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         const event: NotificationSkippedEventV1 = NotificationSkippedEventV1.fromJSON(
-          data as unknown as Parameters<typeof NotificationSkippedEventV1.fromJSON>[0],
+          data as unknown as Parameters<typeof NotificationSkippedEventV1.fromJSON>[0]
         );
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
         await this.projection.handle(event);

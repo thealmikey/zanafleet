@@ -1,11 +1,16 @@
 import { IncentiveType, CampaignStatus, FundingSource } from '../../dto/incentive.enums';
 import { CampaignEntity } from '../../entities/campaign.entity';
-import { IncentiveEligibilityService, EligibilityContext } from '../../services/incentive-eligibility.service';
+import {
+  IncentiveEligibilityService,
+  EligibilityContext,
+} from '../../services/incentive-eligibility.service';
 
 describe('IncentiveEligibilityService', () => {
   let service: IncentiveEligibilityService;
 
-  const createCampaign = (overrides?: Partial<ReturnType<CampaignEntity['toDomain']>>): CampaignEntity => {
+  const createCampaign = (
+    overrides?: Partial<ReturnType<CampaignEntity['toDomain']>>
+  ): CampaignEntity => {
     return CampaignEntity.fromDomain({
       campaignId: '550e8400-e29b-41d4-a716-446655440000',
       name: 'Test Campaign',

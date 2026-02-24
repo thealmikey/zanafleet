@@ -40,9 +40,7 @@ export class FleetMatchingAssignmentStrategy extends BaseAssignmentStrategy {
     context: AssignmentContext,
     candidates: WorkerCandidate[]
   ): Promise<AssignmentResult> {
-    this.logger.log(
-      `Starting fleet matching assignment for job ${context.jobId}`
-    );
+    this.logger.log(`Starting fleet matching assignment for job ${context.jobId}`);
 
     const fleetId = context.metadata?.fleetId as string | undefined;
     const assignments: AssignmentAssignment[] = [];
@@ -73,10 +71,7 @@ export class FleetMatchingAssignmentStrategy extends BaseAssignmentStrategy {
     }
 
     // Validate candidates
-    const validCandidates = await this.filterValidCandidates(
-      fleetCandidates,
-      context
-    );
+    const validCandidates = await this.filterValidCandidates(fleetCandidates, context);
 
     if (validCandidates.length === 0) {
       return {
@@ -87,10 +82,7 @@ export class FleetMatchingAssignmentStrategy extends BaseAssignmentStrategy {
     }
 
     // Assign workers up to the required count
-    const requiredCount = context.requiredWorkerTypes.reduce(
-      (sum, req) => sum + req.minWorkers,
-      0
-    );
+    const requiredCount = context.requiredWorkerTypes.reduce((sum, req) => sum + req.minWorkers, 0);
 
     let assigned = 0;
     for (const candidate of validCandidates) {
@@ -98,9 +90,7 @@ export class FleetMatchingAssignmentStrategy extends BaseAssignmentStrategy {
         break;
       }
 
-      const role = assigned === 0
-        ? AssignmentWorkerRole.PRIMARY
-        : AssignmentWorkerRole.HELPER;
+      const role = assigned === 0 ? AssignmentWorkerRole.PRIMARY : AssignmentWorkerRole.HELPER;
 
       const assignment: AssignmentAssignment = {
         workerId: candidate.workerId,
@@ -116,14 +106,10 @@ export class FleetMatchingAssignmentStrategy extends BaseAssignmentStrategy {
     }
 
     if (assigned < requiredCount) {
-      warnings.push(
-        `Only assigned ${assigned} of ${requiredCount} required workers from fleet`
-      );
+      warnings.push(`Only assigned ${assigned} of ${requiredCount} required workers from fleet`);
     }
 
-    this.logger.log(
-      `Fleet matching completed: assigned ${assigned} workers from fleet ${fleetId}`
-    );
+    this.logger.log(`Fleet matching completed: assigned ${assigned} workers from fleet ${fleetId}`);
 
     return {
       success: assignments.length > 0,
@@ -177,4 +163,3 @@ export class FleetMatchingAssignmentStrategy extends BaseAssignmentStrategy {
     return 0;
   }
 }
-

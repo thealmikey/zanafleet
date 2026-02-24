@@ -5,7 +5,11 @@ import { AISuggestionFeedbackService } from '../../services/ai-suggestion-feedba
 import { AIFeedbackEntity, AIFeedbackType } from '../../entities/ai-feedback.entity';
 import { AISuggestionEntity } from '../../entities/ai-suggestion.entity';
 import { AISuggestionStatus } from '../../interfaces/ai-suggestion.interface';
-import { createMockFeedbackEntity, createMockSuggestionEntity, testUuid } from '../utils/test-helpers';
+import {
+  createMockFeedbackEntity,
+  createMockSuggestionEntity,
+  testUuid,
+} from '../utils/test-helpers';
 import { createMockRepository, MockRepository } from '../utils/mocks/repository.mock';
 
 describe('AISuggestionFeedbackService', () => {
@@ -64,7 +68,7 @@ describe('AISuggestionFeedbackService', () => {
     it('should store context and capability', async () => {
       const suggestion = createMockSuggestionEntity();
       (suggestionRepository.findOne as jest.Mock).mockResolvedValue(suggestion);
-      
+
       // Mock the saved feedback to return the suggestion's data
       (feedbackRepository.save as jest.Mock).mockResolvedValue({
         id: testUuid(),
@@ -91,7 +95,7 @@ describe('AISuggestionFeedbackService', () => {
     it('should store confidence and riskScore', async () => {
       const suggestion = createMockSuggestionEntity({ confidence: 0.85, riskScore: 30 });
       (suggestionRepository.findOne as jest.Mock).mockResolvedValue(suggestion);
-      
+
       // Mock the saved feedback to return the suggestion's data
       (feedbackRepository.save as jest.Mock).mockResolvedValue({
         id: testUuid(),
@@ -117,7 +121,10 @@ describe('AISuggestionFeedbackService', () => {
     it('should accept with user comment', async () => {
       const suggestion = createMockSuggestionEntity();
       (suggestionRepository.findOne as jest.Mock).mockResolvedValue(suggestion);
-      const feedback = createMockFeedbackEntity({ feedbackType: AIFeedbackType.ACCEPTED, userComment: 'Great suggestion!' });
+      const feedback = createMockFeedbackEntity({
+        feedbackType: AIFeedbackType.ACCEPTED,
+        userComment: 'Great suggestion!',
+      });
       (feedbackRepository.save as jest.Mock).mockResolvedValue(feedback);
 
       const result = await service.recordAccepted(suggestion.id, 'Great suggestion!');
@@ -162,7 +169,10 @@ describe('AISuggestionFeedbackService', () => {
     it('should accept user comment for rejection', async () => {
       const suggestion = createMockSuggestionEntity();
       (suggestionRepository.findOne as jest.Mock).mockResolvedValue(suggestion);
-      const feedback = createMockFeedbackEntity({ feedbackType: AIFeedbackType.REJECTED, userComment: 'Not relevant' });
+      const feedback = createMockFeedbackEntity({
+        feedbackType: AIFeedbackType.REJECTED,
+        userComment: 'Not relevant',
+      });
       (feedbackRepository.save as jest.Mock).mockResolvedValue(feedback);
 
       const result = await service.recordRejected(suggestion.id, 'Not relevant');
@@ -242,9 +252,7 @@ describe('AISuggestionFeedbackService', () => {
 
   describe('getFeedbackByType', () => {
     it('should get feedback by type', async () => {
-      const feedbacks = [
-        createMockFeedbackEntity({ feedbackType: AIFeedbackType.ACCEPTED }),
-      ];
+      const feedbacks = [createMockFeedbackEntity({ feedbackType: AIFeedbackType.ACCEPTED })];
       (feedbackRepository.find as jest.Mock).mockResolvedValue(feedbacks);
 
       const result = await service.getFeedbackByType(AIFeedbackType.ACCEPTED);
@@ -317,7 +325,10 @@ describe('AISuggestionFeedbackService', () => {
       const correlationId = testUuid();
       const suggestion = createMockSuggestionEntity({ correlationId });
       (suggestionRepository.findOne as jest.Mock).mockResolvedValue(suggestion);
-      const feedback = createMockFeedbackEntity({ feedbackType: AIFeedbackType.ACCEPTED, correlationId });
+      const feedback = createMockFeedbackEntity({
+        feedbackType: AIFeedbackType.ACCEPTED,
+        correlationId,
+      });
       (feedbackRepository.save as jest.Mock).mockResolvedValue(feedback);
 
       const result = await service.recordAccepted(suggestion.id);

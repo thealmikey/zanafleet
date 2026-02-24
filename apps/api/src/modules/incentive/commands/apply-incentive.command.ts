@@ -42,9 +42,7 @@ export class ApplyIncentiveCommand {
     return ApplyIncentiveCommandSchema.parse(input);
   }
 
-  static safeValidate(
-    input: unknown,
-  ): z.SafeParseReturnType<unknown, ApplyIncentiveCommandInput> {
+  static safeValidate(input: unknown): z.SafeParseReturnType<unknown, ApplyIncentiveCommandInput> {
     return ApplyIncentiveCommandSchema.safeParse(input);
   }
 }

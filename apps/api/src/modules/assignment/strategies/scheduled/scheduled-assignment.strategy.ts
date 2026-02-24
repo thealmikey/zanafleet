@@ -70,10 +70,7 @@ export class ScheduledAssignmentStrategy extends BaseAssignmentStrategy {
     }
 
     // Filter valid candidates - but be more lenient for scheduled jobs
-    const validCandidates = await this.filterValidCandidates(
-      candidates,
-      context
-    );
+    const validCandidates = await this.filterValidCandidates(candidates, context);
 
     if (validCandidates.length === 0) {
       return {
@@ -147,4 +144,3 @@ export class ScheduledAssignmentStrategy extends BaseAssignmentStrategy {
     return 0;
   }
 }
-

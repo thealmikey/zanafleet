@@ -2,10 +2,18 @@ import {
   NotificationDispatchCoordinator,
   NotificationInput,
 } from '../../coordinators/notification-dispatch.coordinator';
-import { NotificationChannel, NotificationStatus, RecipientType } from '../../dto/notification.enums';
+import {
+  NotificationChannel,
+  NotificationStatus,
+  RecipientType,
+} from '../../dto/notification.enums';
 import { NotificationEntity } from '../../entities/notification.entity';
 import { TemplateEntity } from '../../entities/template.entity';
-import { ChannelProvider, RenderedMessage, Recipient } from '../../providers/channel-provider.interface';
+import {
+  ChannelProvider,
+  RenderedMessage,
+  Recipient,
+} from '../../providers/channel-provider.interface';
 import { NoOpChannelProvider } from '../../providers/noop-channel.provider';
 
 describe('NotificationDispatchCoordinator', () => {
@@ -29,7 +37,7 @@ describe('NotificationDispatchCoordinator', () => {
 
   const createMockTemplate = (
     channel: NotificationChannel,
-    overrides: Partial<TemplateEntity> = {},
+    overrides: Partial<TemplateEntity> = {}
   ): TemplateEntity => {
     const template = new TemplateEntity();
     template.id = `template-${channel.toLowerCase()}`;
@@ -47,9 +55,7 @@ describe('NotificationDispatchCoordinator', () => {
     return template;
   };
 
-  const createMockInput = (
-    overrides: Partial<NotificationInput> = {},
-  ): NotificationInput => ({
+  const createMockInput = (overrides: Partial<NotificationInput> = {}): NotificationInput => ({
     recipientId: 'recipient-123',
     recipientType: RecipientType.RIDER,
     templateName: 'test-template',
@@ -71,18 +77,20 @@ describe('NotificationDispatchCoordinator', () => {
       send?: jest.Mock;
       canDeliver?: jest.Mock;
       isHealthy?: jest.Mock;
-    } = {},
+    } = {}
   ): jest.Mocked<ChannelProvider> => {
     return {
       providerId: overrides.providerId ?? `mock-${channel.toLowerCase()}`,
       channel,
       displayName: `Mock ${channel} Provider`,
-      send: overrides.send ?? jest.fn().mockResolvedValue({
-        success: true,
-        messageId: 'msg-123',
-        providerReference: 'ref-123',
-        deliveredAt: new Date(),
-      }),
+      send:
+        overrides.send ??
+        jest.fn().mockResolvedValue({
+          success: true,
+          messageId: 'msg-123',
+          providerReference: 'ref-123',
+          deliveredAt: new Date(),
+        }),
       canDeliver: overrides.canDeliver ?? jest.fn().mockReturnValue(true),
       isHealthy: overrides.isHealthy ?? jest.fn().mockResolvedValue(true),
     } as jest.Mocked<ChannelProvider>;
@@ -91,12 +99,14 @@ describe('NotificationDispatchCoordinator', () => {
   beforeEach(() => {
     mockTemplateService = {
       findByName: jest.fn(),
-      render: jest.fn().mockImplementation((template: TemplateEntity, variables: Record<string, string>) => ({
-        subject: template.subject.replace(/\{\{(\w+)\}\}/g, (_, key) => variables[key] || ''),
-        body: template.body.replace(/\{\{(\w+)\}\}/g, (_, key) => variables[key] || ''),
-        templateId: template.id,
-        templateVersion: template.version,
-      })),
+      render: jest
+        .fn()
+        .mockImplementation((template: TemplateEntity, variables: Record<string, string>) => ({
+          subject: template.subject.replace(/\{\{(\w+)\}\}/g, (_, key) => variables[key] || ''),
+          body: template.body.replace(/\{\{(\w+)\}\}/g, (_, key) => variables[key] || ''),
+          templateId: template.id,
+          templateVersion: template.version,
+        })),
       validateVariables: jest.fn().mockReturnValue({ isValid: true }),
     };
 
@@ -118,7 +128,7 @@ describe('NotificationDispatchCoordinator', () => {
       mockTemplateService as any,
       mockPreferenceService as any,
       mockNotificationRepository as any,
-      mockEventBusService as any,
+      mockEventBusService as any
     );
   });
 
@@ -132,7 +142,9 @@ describe('NotificationDispatchCoordinator', () => {
       const pushProvider = createMockProvider(NotificationChannel.PUSH);
       coordinator.registerChannelProvider(pushProvider);
 
-      mockTemplateService.findByName.mockResolvedValue(createMockTemplate(NotificationChannel.PUSH));
+      mockTemplateService.findByName.mockResolvedValue(
+        createMockTemplate(NotificationChannel.PUSH)
+      );
 
       const input = createMockInput({ channels: [NotificationChannel.PUSH] });
       const result = await coordinator.dispatch(input);
@@ -148,9 +160,7 @@ describe('NotificationDispatchCoordinator', () => {
       coordinator.registerChannelProvider(pushProvider);
       coordinator.registerChannelProvider(smsProvider);
 
-      mockPreferenceService.isEnabled
-        .mockResolvedValueOnce(false)
-        .mockResolvedValueOnce(true);
+      mockPreferenceService.isEnabled.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
 
       mockTemplateService.findByName.mockResolvedValue(createMockTemplate(NotificationChannel.SMS));
 
@@ -184,7 +194,9 @@ describe('NotificationDispatchCoordinator', () => {
       coordinator.registerChannelProvider(pushProvider);
 
       mockPreferenceService.isEnabled.mockResolvedValue(true);
-      mockTemplateService.findByName.mockResolvedValue(createMockTemplate(NotificationChannel.PUSH));
+      mockTemplateService.findByName.mockResolvedValue(
+        createMockTemplate(NotificationChannel.PUSH)
+      );
 
       const input = createMockInput({
         channels: [NotificationChannel.PUSH],
@@ -195,7 +207,7 @@ describe('NotificationDispatchCoordinator', () => {
         'recipient-123',
         RecipientType.RIDER,
         NotificationChannel.PUSH,
-        'workspace-001',
+        'workspace-001'
       );
     });
   });
@@ -243,7 +255,9 @@ describe('NotificationDispatchCoordinator', () => {
       coordinator.registerChannelProvider(pushProvider);
       coordinator.registerChannelProvider(smsProvider);
 
-      mockTemplateService.findByName.mockResolvedValue(createMockTemplate(NotificationChannel.PUSH));
+      mockTemplateService.findByName.mockResolvedValue(
+        createMockTemplate(NotificationChannel.PUSH)
+      );
 
       coordinator.updateConfig({ enableFallback: false, maxRetries: 1 });
 
@@ -289,7 +303,9 @@ describe('NotificationDispatchCoordinator', () => {
       const pushProvider = createMockProvider(NotificationChannel.PUSH);
       coordinator.registerChannelProvider(pushProvider);
 
-      mockTemplateService.findByName.mockResolvedValue(createMockTemplate(NotificationChannel.PUSH));
+      mockTemplateService.findByName.mockResolvedValue(
+        createMockTemplate(NotificationChannel.PUSH)
+      );
 
       coordinator.updateConfig({
         defaultRateLimit: { maxPerMinute: 5, maxPerHour: 50, maxPerDay: 200 },
@@ -309,7 +325,9 @@ describe('NotificationDispatchCoordinator', () => {
       const pushProvider = createMockProvider(NotificationChannel.PUSH);
       coordinator.registerChannelProvider(pushProvider);
 
-      mockTemplateService.findByName.mockResolvedValue(createMockTemplate(NotificationChannel.PUSH));
+      mockTemplateService.findByName.mockResolvedValue(
+        createMockTemplate(NotificationChannel.PUSH)
+      );
 
       coordinator.updateConfig({
         defaultRateLimit: { maxPerMinute: 2, maxPerHour: 50, maxPerDay: 200 },
@@ -332,7 +350,9 @@ describe('NotificationDispatchCoordinator', () => {
       const pushProvider = createMockProvider(NotificationChannel.PUSH);
       coordinator.registerChannelProvider(pushProvider);
 
-      mockTemplateService.findByName.mockResolvedValue(createMockTemplate(NotificationChannel.PUSH));
+      mockTemplateService.findByName.mockResolvedValue(
+        createMockTemplate(NotificationChannel.PUSH)
+      );
 
       const input = createMockInput({ correlationId: 'corr-123' });
       await coordinator.dispatch(input);
@@ -348,7 +368,7 @@ describe('NotificationDispatchCoordinator', () => {
             workspaceId: 'workspace-001',
           }),
           correlationId: 'corr-123',
-        }),
+        })
       );
     });
 
@@ -361,7 +381,9 @@ describe('NotificationDispatchCoordinator', () => {
       });
       coordinator.registerChannelProvider(pushProvider);
 
-      mockTemplateService.findByName.mockResolvedValue(createMockTemplate(NotificationChannel.PUSH));
+      mockTemplateService.findByName.mockResolvedValue(
+        createMockTemplate(NotificationChannel.PUSH)
+      );
 
       coordinator.updateConfig({ maxRetries: 1, enableFallback: false });
 
@@ -376,7 +398,7 @@ describe('NotificationDispatchCoordinator', () => {
             recipientId: 'recipient-123',
             error: expect.stringContaining('Delivery failed'),
           }),
-        }),
+        })
       );
     });
 
@@ -393,7 +415,7 @@ describe('NotificationDispatchCoordinator', () => {
         'notification.events.skipped-v1',
         expect.objectContaining({
           eventType: 'Communication.Notification.SkippedV1',
-        }),
+        })
       );
     });
   });
@@ -416,7 +438,9 @@ describe('NotificationDispatchCoordinator', () => {
       const pushProvider = createMockProvider(NotificationChannel.PUSH);
       coordinator.registerChannelProvider(pushProvider);
 
-      mockTemplateService.findByName.mockResolvedValue(createMockTemplate(NotificationChannel.PUSH));
+      mockTemplateService.findByName.mockResolvedValue(
+        createMockTemplate(NotificationChannel.PUSH)
+      );
       mockTemplateService.validateVariables.mockReturnValue({
         isValid: false,
       });
@@ -456,7 +480,7 @@ describe('NotificationDispatchCoordinator', () => {
 
       const result = await provider.send(
         { subject: null, body: 'Test' },
-        { recipientId: 'test', recipientType: 'RIDER', phone: '+254700000000' },
+        { recipientId: 'test', recipientType: 'RIDER', phone: '+254700000000' }
       );
 
       expect(result.success).toBe(false);
@@ -468,13 +492,19 @@ describe('NotificationDispatchCoordinator', () => {
       const smsProvider = new NoOpChannelProvider(NotificationChannel.SMS);
       const pushProvider = new NoOpChannelProvider(NotificationChannel.PUSH);
 
-      expect(emailProvider.canDeliver({ recipientId: 'r1', recipientType: 'RIDER', email: 'a@b.com' })).toBe(true);
+      expect(
+        emailProvider.canDeliver({ recipientId: 'r1', recipientType: 'RIDER', email: 'a@b.com' })
+      ).toBe(true);
       expect(emailProvider.canDeliver({ recipientId: 'r1', recipientType: 'RIDER' })).toBe(false);
 
-      expect(smsProvider.canDeliver({ recipientId: 'r1', recipientType: 'RIDER', phone: '+1234' })).toBe(true);
+      expect(
+        smsProvider.canDeliver({ recipientId: 'r1', recipientType: 'RIDER', phone: '+1234' })
+      ).toBe(true);
       expect(smsProvider.canDeliver({ recipientId: 'r1', recipientType: 'RIDER' })).toBe(false);
 
-      expect(pushProvider.canDeliver({ recipientId: 'r1', recipientType: 'RIDER', deviceToken: 'token' })).toBe(true);
+      expect(
+        pushProvider.canDeliver({ recipientId: 'r1', recipientType: 'RIDER', deviceToken: 'token' })
+      ).toBe(true);
       expect(pushProvider.canDeliver({ recipientId: 'r1', recipientType: 'RIDER' })).toBe(false);
     });
   });
@@ -540,7 +570,9 @@ describe('NotificationDispatchCoordinator', () => {
         .mockResolvedValueOnce({ success: true, messageId: 'msg-success' });
 
       coordinator.registerChannelProvider(provider);
-      mockTemplateService.findByName.mockResolvedValue(createMockTemplate(NotificationChannel.PUSH));
+      mockTemplateService.findByName.mockResolvedValue(
+        createMockTemplate(NotificationChannel.PUSH)
+      );
 
       coordinator.updateConfig({ maxRetries: 3, retryDelayMs: 10 });
 
@@ -560,7 +592,9 @@ describe('NotificationDispatchCoordinator', () => {
       });
 
       coordinator.registerChannelProvider(provider);
-      mockTemplateService.findByName.mockResolvedValue(createMockTemplate(NotificationChannel.PUSH));
+      mockTemplateService.findByName.mockResolvedValue(
+        createMockTemplate(NotificationChannel.PUSH)
+      );
 
       coordinator.updateConfig({ maxRetries: 2, retryDelayMs: 10, enableFallback: false });
 

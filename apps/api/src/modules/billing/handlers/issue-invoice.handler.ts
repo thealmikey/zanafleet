@@ -1,8 +1,5 @@
 import { EventBusService, NatsSubjects } from '@api/core/event-bus';
-import {
-  CreatePaymentIntentCommand,
-  PaymentFlowType,
-} from '@api/modules/payment';
+import { CreatePaymentIntentCommand, PaymentFlowType } from '@api/modules/payment';
 import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventBus, CommandBus } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -33,7 +30,7 @@ export class IssueInvoiceCommandHandler implements ICommandHandler<IssueInvoiceC
     private readonly invoiceRepository: Repository<InvoiceEntity>,
     private readonly eventBus: EventBus,
     private readonly commandBus: CommandBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: IssueInvoiceCommand): Promise<IssueInvoiceResult> {
@@ -67,7 +64,7 @@ export class IssueInvoiceCommandHandler implements ICommandHandler<IssueInvoiceC
           deliveryId: invoiceDomain.deliveryId,
           orderId: invoiceDomain.orderId,
         },
-      }),
+      })
     );
 
     await this.invoiceRepository.update(command.invoiceId, {
@@ -89,15 +86,13 @@ export class IssueInvoiceCommandHandler implements ICommandHandler<IssueInvoiceC
     this.eventBus.publish(event);
 
     if (this.eventBusService) {
-      this.eventBusService
-        .publish(NatsSubjects.Billing.INVOICE_ISSUED_V1, event)
-        .catch((error) => {
-          this.logger.error(`Failed to publish InvoiceIssuedEvent to NATS: ${error.message}`);
-        });
+      this.eventBusService.publish(NatsSubjects.Billing.INVOICE_ISSUED_V1, event).catch((error) => {
+        this.logger.error(`Failed to publish InvoiceIssuedEvent to NATS: ${error.message}`);
+      });
     }
 
     this.logger.log(
-      `Invoice issued: ${command.invoiceId}, paymentIntent: ${paymentResult.paymentIntentId}`,
+      `Invoice issued: ${command.invoiceId}, paymentIntent: ${paymentResult.paymentIntentId}`
     );
 
     return {

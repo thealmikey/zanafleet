@@ -1,18 +1,26 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { InteractionEventEntity, InteractionEventType, InteractionActorType } from '../../entities/interaction-event.entity';
-import { InteractionStreamEntity, InteractionStreamState, InteractionContextType } from '../../entities/interaction-stream.entity';
+import {
+  InteractionEventEntity,
+  InteractionEventType,
+  InteractionActorType,
+} from '../../entities/interaction-event.entity';
+import {
+  InteractionStreamEntity,
+  InteractionStreamState,
+  InteractionContextType,
+} from '../../entities/interaction-stream.entity';
 import { InteractionIntelligenceEngine } from '../../intelligence/interaction-intelligence-engine';
 
 /**
  * Integration tests for the Interaction Engine
- * 
+ *
  * These tests verify the end-to-end flow:
  * 1. Create a stream
  * 2. Add events to the stream
  * 3. Verify AI orchestration triggers
  * 4. Verify Neo4j projections
- * 
+ *
  * User Stories covered:
  * - Customer Support Flow
  * - Slack Integration
@@ -107,7 +115,8 @@ describe('Interaction Engine Integration', () => {
         actorType: InteractionActorType.USER,
         eventType: InteractionEventType.HUMAN_MESSAGE,
         payload: {
-          message: 'This is terrible! I am very frustrated with this awful service. I want to speak to a manager immediately!',
+          message:
+            'This is terrible! I am very frustrated with this awful service. I want to speak to a manager immediately!',
         },
         createdAt: new Date(),
       };

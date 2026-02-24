@@ -103,14 +103,18 @@ export class JobTypeUpdatedEventV1 {
     if (this.vertical !== undefined) json.vertical = this.vertical;
     if (this.mode !== undefined) json.mode = this.mode;
     if (this.status !== undefined) json.status = this.status;
-    if (this.workflowDefinitionId !== undefined) json.workflowDefinitionId = this.workflowDefinitionId;
+    if (this.workflowDefinitionId !== undefined)
+      json.workflowDefinitionId = this.workflowDefinitionId;
     if (this.assignmentStrategy !== undefined) json.assignmentStrategy = this.assignmentStrategy;
     if (this.pricingStrategy !== undefined) json.pricingStrategy = this.pricingStrategy;
     if (this.uiLayoutConfig !== undefined) json.uiLayoutConfig = this.uiLayoutConfig;
     if (this.slaRules !== undefined) json.slaRules = this.slaRules;
-    if (this.supportsMultipleWorkers !== undefined) json.supportsMultipleWorkers = this.supportsMultipleWorkers;
-    if (this.supportsMultipleDestinations !== undefined) json.supportsMultipleDestinations = this.supportsMultipleDestinations;
-    if (this.verticalSpecificSettings !== undefined) json.verticalSpecificSettings = this.verticalSpecificSettings;
+    if (this.supportsMultipleWorkers !== undefined)
+      json.supportsMultipleWorkers = this.supportsMultipleWorkers;
+    if (this.supportsMultipleDestinations !== undefined)
+      json.supportsMultipleDestinations = this.supportsMultipleDestinations;
+    if (this.verticalSpecificSettings !== undefined)
+      json.verticalSpecificSettings = this.verticalSpecificSettings;
     if (this.correlationId !== undefined) json.correlationId = this.correlationId;
     if (this.causationId !== undefined) json.causationId = this.causationId;
 
@@ -134,7 +138,10 @@ export class JobTypeUpdatedEventV1 {
       slaRules: data.slaRules as SLARulesConfig | undefined,
       supportsMultipleWorkers: data.supportsMultipleWorkers as boolean | undefined,
       supportsMultipleDestinations: data.supportsMultipleDestinations as boolean | undefined,
-      verticalSpecificSettings: data.verticalSpecificSettings as Record<string, unknown> | null | undefined,
+      verticalSpecificSettings: data.verticalSpecificSettings as
+        | Record<string, unknown>
+        | null
+        | undefined,
       updatedAt: new Date(data.updatedAt as string),
       occurredAt: new Date(data.occurredAt as string),
       correlationId: data.correlationId as string | undefined,

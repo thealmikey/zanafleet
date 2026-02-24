@@ -73,14 +73,21 @@ export class UpdateJobTypeHandler implements ICommandHandler<UpdateJobTypeComman
       if (command.vertical !== undefined) updatePayload.vertical = command.vertical;
       if (command.mode !== undefined) updatePayload.mode = command.mode;
       if (command.status !== undefined) updatePayload.status = command.status;
-      if (command.workflowDefinitionId !== undefined) updatePayload.workflowDefinitionId = command.workflowDefinitionId;
-      if (command.assignmentStrategy !== undefined) updatePayload.assignmentStrategy = command.assignmentStrategy;
-      if (command.pricingStrategy !== undefined) updatePayload.pricingStrategy = command.pricingStrategy;
-      if (command.uiLayoutConfig !== undefined) updatePayload.uiLayoutConfig = command.uiLayoutConfig;
+      if (command.workflowDefinitionId !== undefined)
+        updatePayload.workflowDefinitionId = command.workflowDefinitionId;
+      if (command.assignmentStrategy !== undefined)
+        updatePayload.assignmentStrategy = command.assignmentStrategy;
+      if (command.pricingStrategy !== undefined)
+        updatePayload.pricingStrategy = command.pricingStrategy;
+      if (command.uiLayoutConfig !== undefined)
+        updatePayload.uiLayoutConfig = command.uiLayoutConfig;
       if (command.slaRules !== undefined) updatePayload.slaRules = command.slaRules;
-      if (command.supportsMultipleWorkers !== undefined) updatePayload.supportsMultipleWorkers = command.supportsMultipleWorkers;
-      if (command.supportsMultipleDestinations !== undefined) updatePayload.supportsMultipleDestinations = command.supportsMultipleDestinations;
-      if (command.verticalSpecificSettings !== undefined) updatePayload.verticalSpecificSettings = command.verticalSpecificSettings;
+      if (command.supportsMultipleWorkers !== undefined)
+        updatePayload.supportsMultipleWorkers = command.supportsMultipleWorkers;
+      if (command.supportsMultipleDestinations !== undefined)
+        updatePayload.supportsMultipleDestinations = command.supportsMultipleDestinations;
+      if (command.verticalSpecificSettings !== undefined)
+        updatePayload.verticalSpecificSettings = command.verticalSpecificSettings;
 
       // Step 3: Update job type
       await this.jobTypeRepository.update(command.jobTypeId, updatePayload);

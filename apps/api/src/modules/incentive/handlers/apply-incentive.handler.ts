@@ -30,7 +30,7 @@ export class ApplyIncentiveCommandHandler implements ICommandHandler<ApplyIncent
     private readonly incentiveEngine: IncentiveEngineService,
     private readonly eventBus: EventBus,
     private readonly commandBus: CommandBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: ApplyIncentiveCommand): Promise<ApplyIncentiveResult> {
@@ -44,7 +44,7 @@ export class ApplyIncentiveCommandHandler implements ICommandHandler<ApplyIncent
 
     const discountAmount = this.incentiveEngine.calculateDiscountAmount(
       campaign,
-      command.baseAmount,
+      command.baseAmount
     );
 
     if (discountAmount <= 0) {
@@ -55,7 +55,7 @@ export class ApplyIncentiveCommandHandler implements ICommandHandler<ApplyIncent
       campaign,
       uuidv4(),
       discountAmount,
-      command.currency,
+      command.currency
     );
 
     const result = await this.incentiveEngine.applyToInvoice(
@@ -64,7 +64,7 @@ export class ApplyIncentiveCommandHandler implements ICommandHandler<ApplyIncent
       chargeResult.chargeId,
       command.beneficiaryAccountId,
       discountAmount,
-      command.currency,
+      command.currency
     );
 
     const appliedEvent = new IncentiveAppliedEventV1({
@@ -91,14 +91,17 @@ export class ApplyIncentiveCommandHandler implements ICommandHandler<ApplyIncent
         });
     }
 
-    if (campaignDomain.fundingSource !== FundingSource.PLATFORM && campaignDomain.sponsorAccountId) {
+    if (
+      campaignDomain.fundingSource !== FundingSource.PLATFORM &&
+      campaignDomain.sponsorAccountId
+    ) {
       await this.recordSponsorshipLedgerEntries(
         campaignDomain.sponsorAccountId,
         discountAmount,
         command.currency,
         command.campaignId,
         command.invoiceId,
-        command.correlationId,
+        command.correlationId
       );
 
       const updatedCampaign = await this.incentiveEngine.getCampaign(command.campaignId);
@@ -123,7 +126,9 @@ export class ApplyIncentiveCommandHandler implements ICommandHandler<ApplyIncent
         this.eventBusService
           .publish(NatsSubjects.Incentive.SPONSORSHIP_CONSUMED_V1, sponsorshipEvent)
           .catch((error) => {
-            this.logger.error(`Failed to publish SponsorshipConsumedEvent to NATS: ${error.message}`);
+            this.logger.error(
+              `Failed to publish SponsorshipConsumedEvent to NATS: ${error.message}`
+            );
           });
       }
     }
@@ -156,7 +161,7 @@ export class ApplyIncentiveCommandHandler implements ICommandHandler<ApplyIncent
     }
 
     this.logger.log(
-      `Applied incentive from campaign ${command.campaignId} to invoice ${command.invoiceId}: -${discountAmount} ${command.currency}`,
+      `Applied incentive from campaign ${command.campaignId} to invoice ${command.invoiceId}: -${discountAmount} ${command.currency}`
     );
 
     return result;
@@ -168,7 +173,7 @@ export class ApplyIncentiveCommandHandler implements ICommandHandler<ApplyIncent
     currency: string,
     campaignId: string,
     invoiceId: string,
-    correlationId?: string,
+    correlationId?: string
   ): Promise<void> {
     await this.commandBus.execute(
       new RecordLedgerEntryCommand({
@@ -195,7 +200,7 @@ export class ApplyIncentiveCommandHandler implements ICommandHandler<ApplyIncent
           },
         ],
         correlationId,
-      }),
+      })
     );
   }
 }

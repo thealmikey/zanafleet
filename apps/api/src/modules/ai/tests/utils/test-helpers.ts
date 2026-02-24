@@ -17,7 +17,9 @@ export const testUuid = (): string => uuidv4();
 /**
  * Create a mock suggestion entity for testing
  */
-export function createMockSuggestionEntity(overrides?: Partial<AISuggestionEntity>): AISuggestionEntity {
+export function createMockSuggestionEntity(
+  overrides?: Partial<AISuggestionEntity>
+): AISuggestionEntity {
   const entity = new AISuggestionEntity();
   entity.id = overrides?.id ?? testUuid();
   entity.actorId = overrides?.actorId ?? testUuid();
@@ -30,7 +32,9 @@ export function createMockSuggestionEntity(overrides?: Partial<AISuggestionEntit
   entity.riskScore = overrides?.riskScore ?? 25;
   entity.status = overrides?.status ?? AISuggestionStatus.PENDING;
   entity.expiresAt = overrides?.expiresAt ?? new Date(Date.now() + 24 * 60 * 60 * 1000);
-  entity.deduplicationHash = overrides?.deduplicationHash ?? `${entity.actorId}:${entity.contextType}:${entity.contextId}:${entity.workflowState}:${entity.capability}`;
+  entity.deduplicationHash =
+    overrides?.deduplicationHash ??
+    `${entity.actorId}:${entity.contextType}:${entity.contextId}:${entity.workflowState}:${entity.capability}`;
   entity.metadata = overrides?.metadata ?? null;
   entity.correlationId = overrides?.correlationId ?? null;
   entity.causationId = overrides?.causationId ?? null;
@@ -65,7 +69,9 @@ export function createMockFeedbackEntity(overrides?: Partial<AIFeedbackEntity>):
 /**
  * Create a mock CreateAISuggestionDTO
  */
-export function createMockCreateSuggestionDTO(overrides?: Record<string, unknown>): Record<string, unknown> {
+export function createMockCreateSuggestionDTO(
+  overrides?: Record<string, unknown>
+): Record<string, unknown> {
   return {
     actorId: testUuid(),
     contextType: 'workflow',

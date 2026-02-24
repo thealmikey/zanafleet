@@ -23,15 +23,14 @@ export class CreateCampaignCommandHandler implements ICommandHandler<CreateCampa
     @InjectRepository(CampaignEntity)
     private readonly campaignRepository: Repository<CampaignEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: CreateCampaignCommand): Promise<string> {
     const campaignId = uuidv4();
     const now = new Date();
 
-    const initialStatus =
-      command.validFrom <= now ? CampaignStatus.ACTIVE : CampaignStatus.DRAFT;
+    const initialStatus = command.validFrom <= now ? CampaignStatus.ACTIVE : CampaignStatus.DRAFT;
 
     const entity = CampaignEntity.fromDomain({
       campaignId,
@@ -80,9 +79,7 @@ export class CreateCampaignCommandHandler implements ICommandHandler<CreateCampa
         });
     }
 
-    this.logger.log(
-      `Campaign created: ${campaignId} (${command.name}), status: ${initialStatus}`,
-    );
+    this.logger.log(`Campaign created: ${campaignId} (${command.name}), status: ${initialStatus}`);
 
     return campaignId;
   }

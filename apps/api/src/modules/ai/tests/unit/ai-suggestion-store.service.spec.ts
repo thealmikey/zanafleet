@@ -4,7 +4,12 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { AISuggestionStoreService } from '../../services/ai-suggestion-store.service';
 import { AISuggestionEntity } from '../../entities/ai-suggestion.entity';
 import { AISuggestionStatus } from '../../interfaces/ai-suggestion.interface';
-import { createMockSuggestionEntity, createMockPendingSuggestions, testUuid, createFutureDate } from '../utils/test-helpers';
+import {
+  createMockSuggestionEntity,
+  createMockPendingSuggestions,
+  testUuid,
+  createFutureDate,
+} from '../utils/test-helpers';
 import { createMockRepository, MockRepository } from '../utils/mocks/repository.mock';
 
 describe('AISuggestionStoreService', () => {
@@ -104,7 +109,9 @@ describe('AISuggestionStoreService', () => {
         const result = await service.createSuggestion(dto);
 
         expect(result.expiresAt.getTime()).toBeGreaterThan(beforeTime.getTime());
-        expect(result.expiresAt.getTime()).toBeLessThanOrEqual(new Date(Date.now() + 25 * 60 * 60 * 1000).getTime());
+        expect(result.expiresAt.getTime()).toBeLessThanOrEqual(
+          new Date(Date.now() + 25 * 60 * 60 * 1000).getTime()
+        );
       });
 
       it('should set PENDING status on creation', async () => {
@@ -311,7 +318,9 @@ describe('AISuggestionStoreService', () => {
       const result = await service.findByFilters({ actorId });
 
       expect(result).toEqual(suggestions);
-      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('suggestion.actorId = :actorId', { actorId });
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('suggestion.actorId = :actorId', {
+        actorId,
+      });
     });
 
     it('should query by contextType and contextId', async () => {
@@ -380,7 +389,7 @@ describe('AISuggestionStoreService', () => {
   describe('findPendingByActor', () => {
     it('should find pending suggestions for an actor', async () => {
       const actorId = testUuid();
-      const suggestions = createMockPendingSuggestions(3).map(s => ({ ...s, actorId }));
+      const suggestions = createMockPendingSuggestions(3).map((s) => ({ ...s, actorId }));
       (repository.find as jest.Mock).mockResolvedValue(suggestions);
 
       const result = await service.findPendingByActor(actorId);
@@ -423,7 +432,10 @@ describe('AISuggestionStoreService', () => {
     it('should update suggestion status', async () => {
       const suggestion = createMockSuggestionEntity({ status: AISuggestionStatus.PENDING });
       (repository.findOne as jest.Mock).mockResolvedValue(suggestion);
-      (repository.save as jest.Mock).mockResolvedValue({ ...suggestion, status: AISuggestionStatus.ACCEPTED });
+      (repository.save as jest.Mock).mockResolvedValue({
+        ...suggestion,
+        status: AISuggestionStatus.ACCEPTED,
+      });
 
       const result = await service.updateStatus(suggestion.id, AISuggestionStatus.ACCEPTED);
 
@@ -441,7 +453,10 @@ describe('AISuggestionStoreService', () => {
     it('should update to REJECTED status', async () => {
       const suggestion = createMockSuggestionEntity({ status: AISuggestionStatus.PENDING });
       (repository.findOne as jest.Mock).mockResolvedValue(suggestion);
-      (repository.save as jest.Mock).mockResolvedValue({ ...suggestion, status: AISuggestionStatus.REJECTED });
+      (repository.save as jest.Mock).mockResolvedValue({
+        ...suggestion,
+        status: AISuggestionStatus.REJECTED,
+      });
 
       const result = await service.updateStatus(suggestion.id, AISuggestionStatus.REJECTED);
 
@@ -451,7 +466,10 @@ describe('AISuggestionStoreService', () => {
     it('should update to EXPIRED status', async () => {
       const suggestion = createMockSuggestionEntity({ status: AISuggestionStatus.PENDING });
       (repository.findOne as jest.Mock).mockResolvedValue(suggestion);
-      (repository.save as jest.Mock).mockResolvedValue({ ...suggestion, status: AISuggestionStatus.EXPIRED });
+      (repository.save as jest.Mock).mockResolvedValue({
+        ...suggestion,
+        status: AISuggestionStatus.EXPIRED,
+      });
 
       const result = await service.updateStatus(suggestion.id, AISuggestionStatus.EXPIRED);
 
@@ -581,7 +599,9 @@ describe('AISuggestionStoreService', () => {
       (repository.findOne as jest.Mock).mockResolvedValue(suggestion);
       (repository.save as jest.Mock).mockRejectedValue(new Error('Update failed'));
 
-      await expect(service.updateStatus(suggestion.id, AISuggestionStatus.ACCEPTED)).rejects.toThrow('Update failed');
+      await expect(
+        service.updateStatus(suggestion.id, AISuggestionStatus.ACCEPTED)
+      ).rejects.toThrow('Update failed');
     });
   });
 });

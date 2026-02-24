@@ -22,7 +22,7 @@ export class PreferenceService {
 
   constructor(
     @InjectRepository(NotificationPreferenceEntity)
-    private readonly preferenceRepository: Repository<NotificationPreferenceEntity>,
+    private readonly preferenceRepository: Repository<NotificationPreferenceEntity>
   ) {}
 
   /**
@@ -43,7 +43,7 @@ export class PreferenceService {
     recipientId: string,
     recipientType: RecipientType,
     channel: NotificationChannel,
-    workspaceId?: string,
+    workspaceId?: string
   ): Promise<boolean> {
     const baseQuery = this.preferenceRepository
       .createQueryBuilder('pref')
@@ -59,27 +59,25 @@ export class PreferenceService {
 
       if (workspacePreference !== null && workspacePreference !== undefined) {
         this.logger.debug(
-          `Found workspace preference for ${recipientId}/${recipientType}/${channel}/${workspaceId}: ${workspacePreference.enabled}`,
+          `Found workspace preference for ${recipientId}/${recipientType}/${channel}/${workspaceId}: ${workspacePreference.enabled}`
         );
         return workspacePreference.enabled;
       }
     }
 
     // Fall back to global preference (workspaceId IS NULL)
-    const globalPreference = await baseQuery
-      .andWhere('pref.workspaceId IS NULL')
-      .getOne();
+    const globalPreference = await baseQuery.andWhere('pref.workspaceId IS NULL').getOne();
 
     if (globalPreference !== null && globalPreference !== undefined) {
       this.logger.debug(
-        `Found global preference for ${recipientId}/${recipientType}/${channel}: ${globalPreference.enabled}`,
+        `Found global preference for ${recipientId}/${recipientType}/${channel}: ${globalPreference.enabled}`
       );
       return globalPreference.enabled;
     }
 
     // Default to enabled (opt-out model)
     this.logger.debug(
-      `No preference found for ${recipientId}/${recipientType}/${channel}, defaulting to enabled`,
+      `No preference found for ${recipientId}/${recipientType}/${channel}, defaulting to enabled`
     );
     return true;
   }
@@ -104,7 +102,7 @@ export class PreferenceService {
     options?: {
       workspaceId?: string;
       updatedBy?: string;
-    },
+    }
   ): Promise<void> {
     const workspaceId = options?.workspaceId ?? null;
     const updatedBy = options?.updatedBy ?? null;
@@ -122,13 +120,13 @@ export class PreferenceService {
       {
         conflictPaths: ['recipientId', 'recipientType', 'channel', 'workspaceId'],
         skipUpdateIfNoValuesChanged: false,
-      },
+      }
     );
 
     this.logger.debug(
       `Set preference for ${recipientId}/${recipientType}/${channel} to ${enabled}` +
         (workspaceId ? ` for workspace ${workspaceId}` : ' (global)') +
-        (updatedBy ? ` by ${updatedBy}` : ''),
+        (updatedBy ? ` by ${updatedBy}` : '')
     );
   }
 
@@ -141,7 +139,7 @@ export class PreferenceService {
    */
   async getPreferences(
     recipientId: string,
-    recipientType: RecipientType,
+    recipientType: RecipientType
   ): Promise<NotificationPreferenceEntity[]> {
     const preferences = await this.preferenceRepository
       .createQueryBuilder('pref')
@@ -152,7 +150,7 @@ export class PreferenceService {
       .getMany();
 
     this.logger.debug(
-      `Retrieved ${preferences.length} preferences for ${recipientId}/${recipientType}`,
+      `Retrieved ${preferences.length} preferences for ${recipientId}/${recipientType}`
     );
     return preferences;
   }

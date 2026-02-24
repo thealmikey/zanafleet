@@ -24,7 +24,7 @@ export class CreateInvoiceCommandHandler implements ICommandHandler<CreateInvoic
     private readonly dataSource: DataSource,
     private readonly billingCalculator: BillingCalculatorService,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: CreateInvoiceCommand): Promise<string> {
@@ -50,7 +50,7 @@ export class CreateInvoiceCommandHandler implements ICommandHandler<CreateInvoic
           unitPrice: charge.unitPrice,
           metadata: charge.metadata,
           createdAt: now,
-        }),
+        })
       );
       chargeData.push({
         chargeId,
@@ -112,7 +112,7 @@ export class CreateInvoiceCommandHandler implements ICommandHandler<CreateInvoic
     }
 
     this.logger.log(
-      `Invoice created: ${invoiceId} with ${chargeEntities.length} charges, grandTotal: ${totals.grandTotal} ${command.currency}`,
+      `Invoice created: ${invoiceId} with ${chargeEntities.length} charges, grandTotal: ${totals.grandTotal} ${command.currency}`
     );
 
     return invoiceId;

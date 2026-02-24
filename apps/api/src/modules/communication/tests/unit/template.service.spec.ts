@@ -69,7 +69,7 @@ describe('TemplateService', () => {
       };
 
       expect(() => service.render(mockTemplate, variables)).toThrow(
-        'Missing required template variables: email for template "welcome-email"',
+        'Missing required template variables: email for template "welcome-email"'
       );
     });
 
@@ -104,7 +104,7 @@ describe('TemplateService', () => {
       const variables = {};
 
       expect(() => service.render(mockTemplate, variables)).toThrow(
-        /Missing required template variables: username, email/,
+        /Missing required template variables: username, email/
       );
     });
 
@@ -203,7 +203,8 @@ describe('TemplateService', () => {
       const queryBuilder = {
         where: jest.fn().mockReturnThis(),
         andWhere: jest.fn().mockReturnThis(),
-        getOne: jest.fn()
+        getOne: jest
+          .fn()
           .mockResolvedValueOnce(null) // workspace-specific query returns null
           .mockResolvedValueOnce(mockTemplate), // global query returns template
       };
@@ -246,7 +247,9 @@ describe('TemplateService', () => {
 
       await service.findByName('welcome-email', { workspaceId: 'workspace-1' });
 
-      expect(queryBuilder.andWhere).toHaveBeenCalledWith('template.locale = :locale', { locale: 'en' });
+      expect(queryBuilder.andWhere).toHaveBeenCalledWith('template.locale = :locale', {
+        locale: 'en',
+      });
     });
 
     it('should filter only active templates', async () => {
@@ -260,10 +263,9 @@ describe('TemplateService', () => {
 
       await service.findByName('welcome-email');
 
-      expect(queryBuilder.andWhere).toHaveBeenCalledWith(
-        'template.isActive = :isActive',
-        { isActive: true },
-      );
+      expect(queryBuilder.andWhere).toHaveBeenCalledWith('template.isActive = :isActive', {
+        isActive: true,
+      });
     });
 
     it('should support custom locale', async () => {
@@ -278,7 +280,9 @@ describe('TemplateService', () => {
 
       await service.findByName('welcome-email', { locale: 'fr' });
 
-      expect(queryBuilder.andWhere).toHaveBeenCalledWith('template.locale = :locale', { locale: 'fr' });
+      expect(queryBuilder.andWhere).toHaveBeenCalledWith('template.locale = :locale', {
+        locale: 'fr',
+      });
     });
 
     it('should support channel filter', async () => {

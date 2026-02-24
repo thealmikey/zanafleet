@@ -39,9 +39,7 @@ export class ManualOverrideAssignmentStrategy extends BaseAssignmentStrategy {
     context: AssignmentContext,
     candidates: WorkerCandidate[]
   ): Promise<AssignmentResult> {
-    this.logger.log(
-      `Starting manual override assignment for job ${context.jobId}`
-    );
+    this.logger.log(`Starting manual override assignment for job ${context.jobId}`);
 
     const workerId = context.metadata?.manualWorkerId as string | undefined;
 
@@ -76,9 +74,7 @@ export class ManualOverrideAssignmentStrategy extends BaseAssignmentStrategy {
       return {
         success: false,
         assignments: [],
-        errors: [
-          `Manual assignment validation failed: ${validation.reasons.join(', ')}`,
-        ],
+        errors: [`Manual assignment validation failed: ${validation.reasons.join(', ')}`],
         warnings: validation.warnings,
       };
     }

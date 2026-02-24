@@ -168,7 +168,11 @@ describe('HangingStateDetectorService', () => {
 
       it('should detect state just past timeout', async () => {
         const fiveMinutesOneSecondAgo = new Date(Date.now() - 5 * 60 * 1000 - 1000);
-        const params = { ...baseParams, workflowState: 'pending', stateEnteredAt: fiveMinutesOneSecondAgo };
+        const params = {
+          ...baseParams,
+          workflowState: 'pending',
+          stateEnteredAt: fiveMinutesOneSecondAgo,
+        };
 
         const result = await service.checkHangingState(params);
 
@@ -183,7 +187,10 @@ describe('HangingStateDetectorService', () => {
 
         await service.checkHangingState(params);
 
-        expect(eventBus.publish).toHaveBeenCalledWith('ai.hanging-state.detected', expect.any(Object));
+        expect(eventBus.publish).toHaveBeenCalledWith(
+          'ai.hanging-state.detected',
+          expect.any(Object)
+        );
       });
 
       it('should include correlation ID in event', async () => {
@@ -193,14 +200,22 @@ describe('HangingStateDetectorService', () => {
 
         await service.checkHangingState(params);
 
-        expect(eventBus.publish).toHaveBeenCalledWith('ai.hanging-state.detected', expect.objectContaining({
-          correlationId,
-        }));
+        expect(eventBus.publish).toHaveBeenCalledWith(
+          'ai.hanging-state.detected',
+          expect.objectContaining({
+            correlationId,
+          })
+        );
       });
 
       it('should include previous state in event', async () => {
         const stateEnteredAt = createPastDate(10);
-        const params = { ...baseParams, workflowState: 'pending', stateEnteredAt, previousState: 'draft' };
+        const params = {
+          ...baseParams,
+          workflowState: 'pending',
+          stateEnteredAt,
+          previousState: 'draft',
+        };
 
         const result = await service.checkHangingState(params);
 
@@ -219,7 +234,11 @@ describe('HangingStateDetectorService', () => {
 
       it('should include suggested capability when configured', async () => {
         service.updateTimeoutConfig([
-          { state: 'pending', expectedDurationMs: 5 * 60 * 1000, suggestedCapability: 'check_status' },
+          {
+            state: 'pending',
+            expectedDurationMs: 5 * 60 * 1000,
+            suggestedCapability: 'check_status',
+          },
         ]);
         const stateEnteredAt = createPastDate(10);
         const params = { ...baseParams, workflowState: 'pending', stateEnteredAt };
@@ -259,7 +278,11 @@ describe('HangingStateDetectorService', () => {
     it('should update timeout configuration', () => {
       const newConfig = [
         { state: 'pending', expectedDurationMs: 10 * 60 * 1000 },
-        { state: 'custom_state', expectedDurationMs: 15 * 60 * 1000, suggestedCapability: 'custom_action' },
+        {
+          state: 'custom_state',
+          expectedDurationMs: 15 * 60 * 1000,
+          suggestedCapability: 'custom_action',
+        },
       ];
 
       service.updateTimeoutConfig(newConfig);
@@ -269,22 +292,18 @@ describe('HangingStateDetectorService', () => {
     });
 
     it('should merge new config with defaults', () => {
-      service.updateTimeoutConfig([
-        { state: 'pending', expectedDurationMs: 10 * 60 * 1000 },
-      ]);
+      service.updateTimeoutConfig([{ state: 'pending', expectedDurationMs: 10 * 60 * 1000 }]);
 
       const configs = service.getTimeoutConfigs();
-      const pendingConfig = configs.find(c => c.state === 'pending');
+      const pendingConfig = configs.find((c) => c.state === 'pending');
       expect(pendingConfig?.expectedDurationMs).toBe(10 * 60 * 1000);
     });
 
     it('should add new state configurations', () => {
-      service.updateTimeoutConfig([
-        { state: 'new_state', expectedDurationMs: 20 * 60 * 1000 },
-      ]);
+      service.updateTimeoutConfig([{ state: 'new_state', expectedDurationMs: 20 * 60 * 1000 }]);
 
       const configs = service.getTimeoutConfigs();
-      const newConfig = configs.find(c => c.state === 'new_state');
+      const newConfig = configs.find((c) => c.state === 'new_state');
       expect(newConfig).toBeDefined();
     });
 
@@ -340,14 +359,14 @@ describe('HangingStateDetectorService', () => {
   describe('default timeouts', () => {
     it('should have default timeout for pending state', () => {
       const configs = service.getTimeoutConfigs();
-      const pendingConfig = configs.find(c => c.state === 'pending');
+      const pendingConfig = configs.find((c) => c.state === 'pending');
 
       expect(pendingConfig?.expectedDurationMs).toBe(5 * 60 * 1000);
     });
 
     it('should have default timeout for in_progress state', () => {
       const configs = service.getTimeoutConfigs();
-      const inProgressConfig = configs.find(c => c.state === 'in_progress');
+      const inProgressConfig = configs.find((c) => c.state === 'in_progress');
 
       expect(inProgressConfig?.expectedDurationMs).toBe(30 * 60 * 1000);
     });

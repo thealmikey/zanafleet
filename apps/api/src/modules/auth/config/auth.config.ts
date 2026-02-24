@@ -14,7 +14,7 @@ export const authConfig = registerAs('auth', () => {
   if (!jwtSecret && isProduction) {
     throw new Error(
       'JWT_SECRET environment variable is required in production. ' +
-      'Please set a secure secret (32+ characters recommended).'
+        'Please set a secure secret (32+ characters recommended).'
     );
   }
 
@@ -22,7 +22,7 @@ export const authConfig = registerAs('auth', () => {
   if (!jwtSecret) {
     console.warn(
       '⚠️  JWT_SECRET not set. Using insecure development fallback. ' +
-      'Do NOT use this in production!'
+        'Do NOT use this in production!'
     );
   }
 

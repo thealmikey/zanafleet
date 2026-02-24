@@ -2,11 +2,7 @@ export { CommunicationModule } from './communication.module';
 
 export { SendNotificationCommand } from './commands/send-notification.command';
 
-export {
-  NotificationChannel,
-  NotificationStatus,
-  RecipientType,
-} from './dto/notification.enums';
+export { NotificationChannel, NotificationStatus, RecipientType } from './dto/notification.enums';
 export {
   SendNotificationDto,
   SendNotificationDtoSchema,

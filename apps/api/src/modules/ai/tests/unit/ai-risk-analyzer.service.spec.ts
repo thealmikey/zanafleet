@@ -1,7 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { AIRiskAnalyzerService } from '../../services/ai-risk-analyzer.service';
-import { AIRiskAnalysisRequest, RiskLevel, getRiskLevel } from '../../interfaces/ai-risk-analysis.interface';
+import {
+  AIRiskAnalysisRequest,
+  RiskLevel,
+  getRiskLevel,
+} from '../../interfaces/ai-risk-analysis.interface';
 import { testUuid } from '../utils/test-helpers';
 
 describe('AIRiskAnalyzerService', () => {
@@ -9,9 +13,7 @@ describe('AIRiskAnalyzerService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        AIRiskAnalyzerService,
-      ],
+      providers: [AIRiskAnalyzerService],
     }).compile();
 
     service = module.get<AIRiskAnalyzerService>(AIRiskAnalyzerService);
@@ -139,7 +141,9 @@ describe('AIRiskAnalyzerService', () => {
 
         const result = await service.analyzeRisk(request);
 
-        const confidenceFactor = result.riskFactors.find(f => f.factor === 'capability_confidence');
+        const confidenceFactor = result.riskFactors.find(
+          (f) => f.factor === 'capability_confidence'
+        );
         expect(confidenceFactor).toBeDefined();
       });
 
@@ -148,7 +152,7 @@ describe('AIRiskAnalyzerService', () => {
 
         const result = await service.analyzeRisk(request);
 
-        const stateFactor = result.riskFactors.find(f => f.factor === 'workflow_state');
+        const stateFactor = result.riskFactors.find((f) => f.factor === 'workflow_state');
         expect(stateFactor).toBeDefined();
       });
 
@@ -159,7 +163,7 @@ describe('AIRiskAnalyzerService', () => {
 
         const result = await service.analyzeRisk(request);
 
-        const complexityFactor = result.riskFactors.find(f => f.factor === 'context_complexity');
+        const complexityFactor = result.riskFactors.find((f) => f.factor === 'context_complexity');
         expect(complexityFactor).toBeDefined();
       });
 
@@ -168,7 +172,7 @@ describe('AIRiskAnalyzerService', () => {
 
         const result = await service.analyzeRisk(request);
 
-        const historyFactor = result.riskFactors.find(f => f.factor === 'actor_history');
+        const historyFactor = result.riskFactors.find((f) => f.factor === 'actor_history');
         expect(historyFactor).toBeDefined();
       });
 
@@ -179,7 +183,7 @@ describe('AIRiskAnalyzerService', () => {
 
         const result = await service.analyzeRisk(request);
 
-        const relatedFactor = result.riskFactors.find(f => f.factor === 'related_actors');
+        const relatedFactor = result.riskFactors.find((f) => f.factor === 'related_actors');
         expect(relatedFactor).toBeDefined();
       });
     });
@@ -241,22 +245,22 @@ describe('AIRiskAnalyzerService', () => {
 
       it('should handle high risk workflow states', async () => {
         const highRiskStates = ['pending_approval', 'manual_review', 'escalated'];
-        
+
         for (const state of highRiskStates) {
           const request = createRequest({ workflowState: state });
           const result = await service.analyzeRisk(request);
-          
+
           expect(result.riskFactors).toBeDefined();
         }
       });
 
       it('should handle low risk workflow states', async () => {
         const lowRiskStates = ['completed', 'cancelled', 'draft'];
-        
+
         for (const state of lowRiskStates) {
           const request = createRequest({ workflowState: state });
           const result = await service.analyzeRisk(request);
-          
+
           expect(result.riskFactors).toBeDefined();
         }
       });

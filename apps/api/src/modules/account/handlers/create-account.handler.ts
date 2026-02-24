@@ -24,7 +24,7 @@ export class CreateAccountCommandHandler implements ICommandHandler<CreateAccoun
     @InjectRepository(AccountEntity)
     private readonly accountRepository: Repository<AccountEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async execute(command: CreateAccountCommand): Promise<string> {
@@ -57,11 +57,9 @@ export class CreateAccountCommandHandler implements ICommandHandler<CreateAccoun
     this.eventBus.publish(event);
 
     if (this.eventBusService) {
-      this.eventBusService
-        .publish(NatsSubjects.Account.CREATED_V1, event)
-        .catch((error) => {
-          this.logger.error(`Failed to publish AccountCreatedEvent to NATS: ${error.message}`);
-        });
+      this.eventBusService.publish(NatsSubjects.Account.CREATED_V1, event).catch((error) => {
+        this.logger.error(`Failed to publish AccountCreatedEvent to NATS: ${error.message}`);
+      });
     }
 
     this.logger.log(`Account created: ${accountId} for external entity: ${command.externalId}`);

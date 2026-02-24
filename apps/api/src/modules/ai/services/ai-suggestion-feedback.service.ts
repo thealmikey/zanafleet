@@ -160,10 +160,7 @@ export class AISuggestionFeedbackService {
   /**
    * Get feedback by type
    */
-  async getFeedbackByType(
-    feedbackType: AIFeedbackType,
-    limit = 100
-  ): Promise<AIFeedbackEntity[]> {
+  async getFeedbackByType(feedbackType: AIFeedbackType, limit = 100): Promise<AIFeedbackEntity[]> {
     return this.feedbackRepository.find({
       where: { feedbackType },
       order: { createdAt: 'DESC' },

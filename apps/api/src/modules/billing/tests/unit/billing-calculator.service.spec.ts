@@ -242,9 +242,27 @@ describe('BillingCalculatorService', () => {
   describe('calculateTotalsFromCharges', () => {
     it('should calculate totals from charge array', () => {
       const charges = [
-        { chargeType: ChargeType.BASE_DELIVERY_FEE, amount: 5, currency: 'USD', quantity: 1, unitPrice: 5 },
-        { chargeType: ChargeType.DISTANCE_FEE, amount: 15, currency: 'USD', quantity: 10, unitPrice: 1.5 },
-        { chargeType: ChargeType.DISCOUNT, amount: -5, currency: 'USD', quantity: 1, unitPrice: -5 },
+        {
+          chargeType: ChargeType.BASE_DELIVERY_FEE,
+          amount: 5,
+          currency: 'USD',
+          quantity: 1,
+          unitPrice: 5,
+        },
+        {
+          chargeType: ChargeType.DISTANCE_FEE,
+          amount: 15,
+          currency: 'USD',
+          quantity: 10,
+          unitPrice: 1.5,
+        },
+        {
+          chargeType: ChargeType.DISCOUNT,
+          amount: -5,
+          currency: 'USD',
+          quantity: 1,
+          unitPrice: -5,
+        },
         { chargeType: ChargeType.TAX, amount: 2.4, currency: 'USD', quantity: 1, unitPrice: 2.4 },
       ];
 
@@ -258,7 +276,13 @@ describe('BillingCalculatorService', () => {
 
     it('should handle charges with no discounts', () => {
       const charges = [
-        { chargeType: ChargeType.BASE_DELIVERY_FEE, amount: 10, currency: 'USD', quantity: 1, unitPrice: 10 },
+        {
+          chargeType: ChargeType.BASE_DELIVERY_FEE,
+          amount: 10,
+          currency: 'USD',
+          quantity: 1,
+          unitPrice: 10,
+        },
         { chargeType: ChargeType.TAX, amount: 1.6, currency: 'USD', quantity: 1, unitPrice: 1.6 },
       ];
 
@@ -272,7 +296,13 @@ describe('BillingCalculatorService', () => {
 
     it('should handle SUBSIDY same as DISCOUNT', () => {
       const charges = [
-        { chargeType: ChargeType.BASE_DELIVERY_FEE, amount: 20, currency: 'USD', quantity: 1, unitPrice: 20 },
+        {
+          chargeType: ChargeType.BASE_DELIVERY_FEE,
+          amount: 20,
+          currency: 'USD',
+          quantity: 1,
+          unitPrice: 20,
+        },
         { chargeType: ChargeType.SUBSIDY, amount: -8, currency: 'USD', quantity: 1, unitPrice: -8 },
       ];
 

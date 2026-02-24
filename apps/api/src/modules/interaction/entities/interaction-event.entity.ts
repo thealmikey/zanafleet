@@ -1,17 +1,10 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-  Index,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn, Index } from 'typeorm';
 
 import { InteractionStreamEntity } from './interaction-stream.entity';
 
 /**
  * InteractionEventType Enum
- * 
+ *
  * Defines all possible event types that can occur within an interaction stream.
  * Organized by category for clarity.
  */
@@ -44,7 +37,7 @@ export enum InteractionEventType {
 
 /**
  * InteractionActorType Enum
- * 
+ *
  * Defines all possible actor types that can create interaction events.
  * Extends the ActorType with AI_AGENT and EXTERNAL_INTEGRATION.
  */
@@ -60,10 +53,10 @@ export enum InteractionActorType {
 
 /**
  * InteractionEvent Entity
- * 
+ *
  * Represents a single event within an interaction stream.
  * This is the fundamental building block of the Interaction Engine.
- * 
+ *
  * Key concepts:
  * - streamId: Links event to its parent stream
  * - actorId/actorType: Identifies who/what created the event

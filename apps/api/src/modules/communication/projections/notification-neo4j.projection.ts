@@ -30,19 +30,19 @@ export class NotificationNeo4jProjection
   constructor(private readonly neo4j: Neo4jService) {}
 
   private isSentEvent(
-    event: NotificationSentEventV1 | NotificationFailedEventV1 | NotificationSkippedEventV1,
+    event: NotificationSentEventV1 | NotificationFailedEventV1 | NotificationSkippedEventV1
   ): event is NotificationSentEventV1 {
     return event.eventType === 'NotificationSentEvent-V1';
   }
 
   private isFailedEvent(
-    event: NotificationSentEventV1 | NotificationFailedEventV1 | NotificationSkippedEventV1,
+    event: NotificationSentEventV1 | NotificationFailedEventV1 | NotificationSkippedEventV1
   ): event is NotificationFailedEventV1 {
     return event.eventType === 'NotificationFailedEvent-V1';
   }
 
   private isSkippedEvent(
-    event: NotificationSentEventV1 | NotificationFailedEventV1 | NotificationSkippedEventV1,
+    event: NotificationSentEventV1 | NotificationFailedEventV1 | NotificationSkippedEventV1
   ): event is NotificationSkippedEventV1 {
     return event.eventType === 'NotificationSkippedEvent-V1';
   }
@@ -51,7 +51,7 @@ export class NotificationNeo4jProjection
    * Route events to appropriate handlers based on event type
    */
   async handle(
-    event: NotificationSentEventV1 | NotificationFailedEventV1 | NotificationSkippedEventV1,
+    event: NotificationSentEventV1 | NotificationFailedEventV1 | NotificationSkippedEventV1
   ): Promise<void> {
     if (this.isSentEvent(event)) {
       await this.handleNotificationSent(event);
@@ -113,7 +113,7 @@ export class NotificationNeo4jProjection
       }
 
       this.logger.debug(
-        `Notification sent: ${event.aggregateId} to ${event.recipientType} ${event.recipientId}`,
+        `Notification sent: ${event.aggregateId} to ${event.recipientType} ${event.recipientId}`
       );
     } catch (error) {
       this.logger.error(`Failed to project notification sent event: ${event.aggregateId}`, error);
@@ -187,7 +187,7 @@ export class NotificationNeo4jProjection
     } catch (error) {
       this.logger.error(
         `Failed to project notification skipped event: ${event.aggregateId}`,
-        error,
+        error
       );
       throw error;
     } finally {

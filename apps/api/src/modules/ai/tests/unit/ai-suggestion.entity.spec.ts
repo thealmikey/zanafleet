@@ -161,18 +161,18 @@ describe('AISuggestionEntity', () => {
     it('should allow transition from PENDING to ACCEPTED', () => {
       const entity = new AISuggestionEntity();
       entity.status = AISuggestionStatus.PENDING;
-      
+
       entity.accept();
-      
+
       expect(entity.status).toBe(AISuggestionStatus.ACCEPTED);
     });
 
     it('should allow transition from PENDING to REJECTED', () => {
       const entity = new AISuggestionEntity();
       entity.status = AISuggestionStatus.PENDING;
-      
+
       entity.reject();
-      
+
       expect(entity.status).toBe(AISuggestionStatus.REJECTED);
     });
   });

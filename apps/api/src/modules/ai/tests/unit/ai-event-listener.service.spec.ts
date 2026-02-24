@@ -73,7 +73,11 @@ describe('AIEventListenerService', () => {
       });
 
       it('should determine capability from workflow state - pending', async () => {
-        const suggestion = createMockSuggestionEntity({ ...baseParams, workflowState: 'pending', capability: 'submit_for_review' });
+        const suggestion = createMockSuggestionEntity({
+          ...baseParams,
+          workflowState: 'pending',
+          capability: 'submit_for_review',
+        });
         suggestionStore.createSuggestion.mockResolvedValue(suggestion);
 
         await service.generateSuggestion({ ...baseParams, workflowState: 'pending' });
@@ -91,7 +95,10 @@ describe('AIEventListenerService', () => {
       });
 
       it('should use custom capability when provided', async () => {
-        const suggestion = createMockSuggestionEntity({ ...baseParams, capability: 'custom_capability' });
+        const suggestion = createMockSuggestionEntity({
+          ...baseParams,
+          capability: 'custom_capability',
+        });
         suggestionStore.createSuggestion.mockResolvedValue(suggestion);
 
         await service.generateSuggestion({ ...baseParams, capability: 'custom_capability' });
@@ -163,7 +170,11 @@ describe('AIEventListenerService', () => {
 
     describe('capability determination', () => {
       it('should map pending state to submit_for_review', async () => {
-        const suggestion = createMockSuggestionEntity({ ...baseParams, workflowState: 'pending', capability: 'submit_for_review' });
+        const suggestion = createMockSuggestionEntity({
+          ...baseParams,
+          workflowState: 'pending',
+          capability: 'submit_for_review',
+        });
         suggestionStore.createSuggestion.mockResolvedValue(suggestion);
 
         await service.generateSuggestion({ ...baseParams, workflowState: 'pending' });
@@ -172,7 +183,11 @@ describe('AIEventListenerService', () => {
       });
 
       it('should map in_progress state to request_assistance', async () => {
-        const suggestion = createMockSuggestionEntity({ ...baseParams, workflowState: 'in_progress', capability: 'request_assistance' });
+        const suggestion = createMockSuggestionEntity({
+          ...baseParams,
+          workflowState: 'in_progress',
+          capability: 'request_assistance',
+        });
         suggestionStore.createSuggestion.mockResolvedValue(suggestion);
 
         await service.generateSuggestion({ ...baseParams, workflowState: 'in_progress' });
@@ -181,7 +196,11 @@ describe('AIEventListenerService', () => {
       });
 
       it('should map awaiting_review state to check_requirements', async () => {
-        const suggestion = createMockSuggestionEntity({ ...baseParams, workflowState: 'awaiting_review', capability: 'check_requirements' });
+        const suggestion = createMockSuggestionEntity({
+          ...baseParams,
+          workflowState: 'awaiting_review',
+          capability: 'check_requirements',
+        });
         suggestionStore.createSuggestion.mockResolvedValue(suggestion);
 
         await service.generateSuggestion({ ...baseParams, workflowState: 'awaiting_review' });
@@ -190,7 +209,11 @@ describe('AIEventListenerService', () => {
       });
 
       it('should map waiting state to follow_up', async () => {
-        const suggestion = createMockSuggestionEntity({ ...baseParams, workflowState: 'waiting', capability: 'follow_up' });
+        const suggestion = createMockSuggestionEntity({
+          ...baseParams,
+          workflowState: 'waiting',
+          capability: 'follow_up',
+        });
         suggestionStore.createSuggestion.mockResolvedValue(suggestion);
 
         await service.generateSuggestion({ ...baseParams, workflowState: 'waiting' });
@@ -199,7 +222,11 @@ describe('AIEventListenerService', () => {
       });
 
       it('should map pending_approval state to provide_additional_info', async () => {
-        const suggestion = createMockSuggestionEntity({ ...baseParams, workflowState: 'pending_approval', capability: 'provide_additional_info' });
+        const suggestion = createMockSuggestionEntity({
+          ...baseParams,
+          workflowState: 'pending_approval',
+          capability: 'provide_additional_info',
+        });
         suggestionStore.createSuggestion.mockResolvedValue(suggestion);
 
         await service.generateSuggestion({ ...baseParams, workflowState: 'pending_approval' });
@@ -208,7 +235,11 @@ describe('AIEventListenerService', () => {
       });
 
       it('should map draft state to submit_draft', async () => {
-        const suggestion = createMockSuggestionEntity({ ...baseParams, workflowState: 'draft', capability: 'submit_draft' });
+        const suggestion = createMockSuggestionEntity({
+          ...baseParams,
+          workflowState: 'draft',
+          capability: 'submit_draft',
+        });
         suggestionStore.createSuggestion.mockResolvedValue(suggestion);
 
         await service.generateSuggestion({ ...baseParams, workflowState: 'draft' });
@@ -217,7 +248,11 @@ describe('AIEventListenerService', () => {
       });
 
       it('should use check_status for unknown states', async () => {
-        const suggestion = createMockSuggestionEntity({ ...baseParams, workflowState: 'unknown_state', capability: 'check_status' });
+        const suggestion = createMockSuggestionEntity({
+          ...baseParams,
+          workflowState: 'unknown_state',
+          capability: 'check_status',
+        });
         suggestionStore.createSuggestion.mockResolvedValue(suggestion);
 
         await service.generateSuggestion({ ...baseParams, workflowState: 'unknown_state' });

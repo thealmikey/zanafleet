@@ -1,11 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 
 import { AISuggestionStatus } from '../interfaces/ai-suggestion.interface';
 
@@ -23,12 +16,7 @@ import { AISuggestionStatus } from '../interfaces/ai-suggestion.interface';
 @Index('ai_suggestions_capability_index', ['capability'])
 @Index('ai_suggestions_expires_at_index', ['expiresAt'])
 @Index('ai_suggestions_deduplication_hash_index', ['deduplicationHash'])
-@Index('ai_suggestions_actor_context_composite', [
-  'actorId',
-  'contextType',
-  'contextId',
-  'status',
-])
+@Index('ai_suggestions_actor_context_composite', ['actorId', 'contextType', 'contextId', 'status'])
 export class AISuggestionEntity {
   @PrimaryColumn('uuid')
   id!: string;

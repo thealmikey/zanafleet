@@ -21,7 +21,10 @@ import { AISuggestionRejectedEventV1 } from '../events/ai-suggestion-rejected.ev
 )
 @Injectable()
 export class AISuggestionNeo4jProjection
-  implements IEventHandler<AISuggestionGeneratedEventV1 | AISuggestionAcceptedEventV1 | AISuggestionRejectedEventV1>
+  implements
+    IEventHandler<
+      AISuggestionGeneratedEventV1 | AISuggestionAcceptedEventV1 | AISuggestionRejectedEventV1
+    >
 {
   private readonly logger = new Logger(AISuggestionNeo4jProjection.name);
 
@@ -34,7 +37,9 @@ export class AISuggestionNeo4jProjection
   /**
    * Handle suggestion generated event
    */
-  async handle(event: AISuggestionGeneratedEventV1 | AISuggestionAcceptedEventV1 | AISuggestionRejectedEventV1): Promise<void> {
+  async handle(
+    event: AISuggestionGeneratedEventV1 | AISuggestionAcceptedEventV1 | AISuggestionRejectedEventV1
+  ): Promise<void> {
     // Route to appropriate handler based on event type
     if (event instanceof AISuggestionGeneratedEventV1) {
       await this.handleSuggestionGenerated(event);

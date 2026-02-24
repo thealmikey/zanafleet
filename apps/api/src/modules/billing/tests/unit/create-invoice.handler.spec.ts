@@ -79,7 +79,7 @@ describe('CreateInvoiceCommandHandler', () => {
         mockDataSource,
         billingCalculator,
         mockEventBus,
-        undefined,
+        undefined
       );
     });
 
@@ -90,12 +90,12 @@ describe('CreateInvoiceCommandHandler', () => {
       expect(mockEntityManager.save).toHaveBeenCalledTimes(2);
 
       const invoiceSaveCall = mockEntityManager.save.mock.calls.find(
-        (call) => call[0] === InvoiceEntity,
+        (call) => call[0] === InvoiceEntity
       );
       expect(invoiceSaveCall).toBeDefined();
 
       const chargesSaveCall = mockEntityManager.save.mock.calls.find(
-        (call) => call[0] === ChargeEntity,
+        (call) => call[0] === ChargeEntity
       );
       expect(chargesSaveCall).toBeDefined();
     });
@@ -104,7 +104,7 @@ describe('CreateInvoiceCommandHandler', () => {
       await handler.execute(validCommand);
 
       const invoiceSaveCall = mockEntityManager.save.mock.calls.find(
-        (call) => call[0] === InvoiceEntity,
+        (call) => call[0] === InvoiceEntity
       );
       const savedInvoice = invoiceSaveCall?.[1] as InvoiceEntity;
 
@@ -115,7 +115,7 @@ describe('CreateInvoiceCommandHandler', () => {
       await handler.execute(validCommand);
 
       const invoiceSaveCall = mockEntityManager.save.mock.calls.find(
-        (call) => call[0] === InvoiceEntity,
+        (call) => call[0] === InvoiceEntity
       );
       const savedInvoice = invoiceSaveCall?.[1] as InvoiceEntity;
 
@@ -139,7 +139,7 @@ describe('CreateInvoiceCommandHandler', () => {
 
       expect(result).toBeDefined();
       expect(result).toMatch(
-        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
       );
     });
 
@@ -156,7 +156,7 @@ describe('CreateInvoiceCommandHandler', () => {
         mockDataSource,
         billingCalculator,
         mockEventBus,
-        mockEventBusService,
+        mockEventBusService
       );
     });
 
@@ -166,7 +166,7 @@ describe('CreateInvoiceCommandHandler', () => {
       expect(mockEventBusService.publish).toHaveBeenCalledTimes(1);
       expect(mockEventBusService.publish).toHaveBeenCalledWith(
         'billing.events.invoice-created-v1',
-        expect.any(InvoiceCreatedEventV1),
+        expect.any(InvoiceCreatedEventV1)
       );
     });
 
@@ -187,7 +187,7 @@ describe('CreateInvoiceCommandHandler', () => {
         mockDataSource,
         billingCalculator,
         mockEventBus,
-        undefined,
+        undefined
       );
     });
 
@@ -223,7 +223,7 @@ describe('CreateInvoiceCommandHandler', () => {
       await handler.execute(commandWithDiscount);
 
       const invoiceSaveCall = mockEntityManager.save.mock.calls.find(
-        (call) => call[0] === InvoiceEntity,
+        (call) => call[0] === InvoiceEntity
       );
       const savedInvoice = invoiceSaveCall?.[1] as InvoiceEntity;
 

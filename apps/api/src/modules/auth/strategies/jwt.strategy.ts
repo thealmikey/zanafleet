@@ -95,9 +95,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         _done: (err: Error | null, secretOrKey?: string | Buffer) => void
       ): void => {
         const isKeycloakToken =
-          payload.iss &&
-          keycloakIssuer &&
-          payload.iss.startsWith(keycloakIssuer);
+          payload.iss && keycloakIssuer && payload.iss.startsWith(keycloakIssuer);
 
         if (isKeycloakToken && useKeycloakRs256) {
           // Use Keycloak's public key for RS256 validation
@@ -165,7 +163,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         validIssuers.push(payload.iss);
       }
 
-      if (!validIssuers.some((issuer) => issuer === payload.iss || payload.iss?.startsWith(issuer))) {
+      if (
+        !validIssuers.some((issuer) => issuer === payload.iss || payload.iss?.startsWith(issuer))
+      ) {
         throw new UnauthorizedException('Invalid token issuer');
       }
     }
@@ -173,8 +173,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
     let actor: ActorEntity | null = null;
 
-    const isKeycloakToken =
-      payload.iss && keycloakIssuer && payload.iss.startsWith(keycloakIssuer);
+    const isKeycloakToken = payload.iss && keycloakIssuer && payload.iss.startsWith(keycloakIssuer);
 
     if (isKeycloakToken) {
       const syncResult: SyncResult = await this.keycloakUserSyncService.syncUser(

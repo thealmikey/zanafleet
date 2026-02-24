@@ -85,7 +85,7 @@ export class AIResponseGeneratedEvent {
     public readonly intent: IntentType | undefined,
     public readonly sentiment: SentimentType | undefined,
     public readonly confidence: number,
-    public readonly suggestedActions: string[] | undefined,
+    public readonly suggestedActions: string[] | undefined
   ) {}
 }
 
@@ -98,7 +98,7 @@ export class IntentDetectedEvent {
     public readonly eventId: string,
     public readonly intent: IntentType,
     public readonly entities: Record<string, string>,
-    public readonly confidence: number,
+    public readonly confidence: number
   ) {}
 }
 
@@ -111,7 +111,7 @@ export class EscalationRequiredEvent {
     public readonly eventId: string,
     public readonly reason: string,
     public readonly sentiment: SentimentType | undefined,
-    public readonly priority: 'high' | 'medium' | 'low',
+    public readonly priority: 'high' | 'medium' | 'low'
   ) {}
 }
 
@@ -123,13 +123,13 @@ export class WorkflowTriggeredEvent {
     public readonly streamId: string,
     public readonly eventId: string,
     public readonly workflowType: string,
-    public readonly payload: Record<string, unknown>,
+    public readonly payload: Record<string, unknown>
   ) {}
 }
 
 /**
  * InteractionEventCreatedEventHandler
- * 
+ *
  * Handles InteractionEventCreatedEventV1 and triggers AI orchestration
  */
 @EventsHandler(InteractionEventCreatedEventV1)
@@ -140,11 +140,13 @@ export class InteractionEventAIOHandler implements IEventHandler<InteractionEven
     private readonly eventBus: EventBus,
     private readonly intelligenceEngine: InteractionIntelligenceEngine,
     private readonly eventRepository: InteractionEventRepository,
-    private readonly streamRepository: InteractionStreamRepository,
+    private readonly streamRepository: InteractionStreamRepository
   ) {}
 
   async handle(event: InteractionEventCreatedEventV1): Promise<void> {
-    this.logger.debug(`Processing AI orchestration for event ${event.interactionEventId} in stream ${event.streamId}`);
+    this.logger.debug(
+      `Processing AI orchestration for event ${event.interactionEventId} in stream ${event.streamId}`
+    );
 
     try {
       // Build intelligence context
@@ -161,7 +163,6 @@ export class InteractionEventAIOHandler implements IEventHandler<InteractionEven
 
       // Process recommendation and emit new events
       await this.processRecommendation(context, recommendation);
-
     } catch (error) {
       this.logger.error(`Error in AI orchestration: ${error}`, error);
       // Don't throw - AI failures should not break the main flow
@@ -173,7 +174,7 @@ export class InteractionEventAIOHandler implements IEventHandler<InteractionEven
    */
   private async buildIntelligenceContext(
     streamId: string,
-    currentEventId: string,
+    currentEventId: string
   ): Promise<InteractionIntelligenceContext> {
     // Get stream
     const stream = await this.streamRepository.findById(streamId);
@@ -207,16 +208,13 @@ export class InteractionEventAIOHandler implements IEventHandler<InteractionEven
    */
   private shouldProcessEvent(event: InteractionEventEntity): boolean {
     // Only process human messages by default
-    const humanEventTypes = [
-      InteractionEventType.HUMAN_MESSAGE,
-      InteractionEventType.HUMAN_ACTION,
-    ];
+    const humanEventTypes = [InteractionEventType.HUMAN_MESSAGE, InteractionEventType.HUMAN_ACTION];
 
     // Also process external integration messages
     humanEventTypes.push(
       InteractionEventType.SLACK_MESSAGE,
       InteractionEventType.TICKET_RESPONSE,
-      InteractionEventType.EMAIL_RECEIVED,
+      InteractionEventType.EMAIL_RECEIVED
     );
 
     return humanEventTypes.includes(event.eventType);
@@ -227,7 +225,7 @@ export class InteractionEventAIOHandler implements IEventHandler<InteractionEven
    */
   private async processRecommendation(
     context: InteractionIntelligenceContext,
-    recommendation: AIRecommendation,
+    recommendation: AIRecommendation
   ): Promise<void> {
     const streamId = context.stream.id;
     const eventId = context.currentEvent!.id;
@@ -241,7 +239,7 @@ export class InteractionEventAIOHandler implements IEventHandler<InteractionEven
         recommendation.intentDetected?.intent,
         recommendation.sentimentAnalysis?.sentiment,
         recommendation.confidenceScore,
-        recommendation.response.suggestedActions,
+        recommendation.response.suggestedActions
       );
 
       this.eventBus.publish(responseEvent);
@@ -255,11 +253,13 @@ export class InteractionEventAIOHandler implements IEventHandler<InteractionEven
         eventId,
         recommendation.intentDetected.intent,
         recommendation.intentDetected.entities,
-        recommendation.intentDetected.confidence,
+        recommendation.intentDetected.confidence
       );
 
       this.eventBus.publish(intentEvent);
-      this.logger.debug(`Emitted intent detected: ${recommendation.intentDetected.intent} for stream ${streamId}`);
+      this.logger.debug(
+        `Emitted intent detected: ${recommendation.intentDetected.intent} for stream ${streamId}`
+      );
     }
 
     // Emit escalation required event
@@ -269,7 +269,7 @@ export class InteractionEventAIOHandler implements IEventHandler<InteractionEven
         eventId,
         `AI detected need for escalation: ${recommendation.action}`,
         recommendation.sentimentAnalysis?.sentiment,
-        recommendation.sentimentAnalysis?.sentiment === SentimentType.FRUSTRATED ? 'high' : 'medium',
+        recommendation.sentimentAnalysis?.sentiment === SentimentType.FRUSTRATED ? 'high' : 'medium'
       );
 
       this.eventBus.publish(escalationEvent);
@@ -282,18 +282,20 @@ export class InteractionEventAIOHandler implements IEventHandler<InteractionEven
         streamId,
         eventId,
         recommendation.workflowType,
-        recommendation.workflowPayload || {},
+        recommendation.workflowPayload || {}
       );
 
       this.eventBus.publish(workflowEvent);
-      this.logger.debug(`Emitted workflow triggered: ${recommendation.workflowType} for stream ${streamId}`);
+      this.logger.debug(
+        `Emitted workflow triggered: ${recommendation.workflowType} for stream ${streamId}`
+      );
     }
   }
 }
 
 /**
  * InteractionAIOrchestratorService
- * 
+ *
  * Provides utility methods for AI orchestration
  */
 @Injectable()
@@ -305,7 +307,7 @@ export class InteractionAIOrchestratorService implements OnModuleInit {
     private readonly intelligenceEngine: InteractionIntelligenceEngine,
     private readonly eventRepository: InteractionEventRepository,
     private readonly streamRepository: InteractionStreamRepository,
-    config?: Partial<InteractionIntelligenceConfig>,
+    config?: Partial<InteractionIntelligenceConfig>
   ) {
     this.config = { ...DEFAULT_INTELLIGENCE_CONFIG, ...config };
   }

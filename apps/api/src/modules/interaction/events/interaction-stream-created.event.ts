@@ -1,4 +1,7 @@
-import { InteractionStreamState, InteractionContextType } from '../entities/interaction-stream.entity';
+import {
+  InteractionStreamState,
+  InteractionContextType,
+} from '../entities/interaction-stream.entity';
 
 /**
  * InteractionStreamCreatedEventV1

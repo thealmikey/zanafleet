@@ -2,7 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 
-import { InteractionStreamEntity, InteractionContextType, InteractionStreamState } from '../entities/interaction-stream.entity';
+import {
+  InteractionStreamEntity,
+  InteractionContextType,
+  InteractionStreamState,
+} from '../entities/interaction-stream.entity';
 
 /**
  * InteractionStreamRepository
@@ -15,7 +19,7 @@ export class InteractionStreamRepository {
   constructor(
     @InjectRepository(InteractionStreamEntity)
     private readonly repository: Repository<InteractionStreamEntity>,
-    private readonly dataSource: DataSource,
+    private readonly dataSource: DataSource
   ) {}
 
   /**
@@ -34,7 +38,7 @@ export class InteractionStreamRepository {
    */
   async findByContext(
     contextType: InteractionContextType,
-    contextId: string,
+    contextId: string
   ): Promise<InteractionStreamEntity | null> {
     return this.repository.findOne({
       where: { contextType, contextId },
@@ -45,7 +49,9 @@ export class InteractionStreamRepository {
   /**
    * Find all streams for a given context type
    */
-  async findAllByContextType(contextType: InteractionContextType): Promise<InteractionStreamEntity[]> {
+  async findAllByContextType(
+    contextType: InteractionContextType
+  ): Promise<InteractionStreamEntity[]> {
     return this.repository.find({
       where: { contextType },
       order: { createdAt: 'DESC' },
@@ -117,7 +123,7 @@ export class InteractionStreamRepository {
   async findOrCreate(
     contextType: InteractionContextType,
     contextId: string,
-    initialParticipants: string[] = [],
+    initialParticipants: string[] = []
   ): Promise<InteractionStreamEntity> {
     return this.dataSource.transaction(async (manager) => {
       // Check if stream already exists

@@ -82,7 +82,9 @@ export class AIEventListenerService {
         riskScore = riskAnalysis.riskScore;
       } catch (error) {
         this.logger.warn(
-          `Risk analysis failed for ${params.contextType}:${params.contextId}: ${(error as Error).message}`
+          `Risk analysis failed for ${params.contextType}:${params.contextId}: ${
+            (error as Error).message
+          }`
         );
         // Continue with default risk score
       }
@@ -110,7 +112,9 @@ export class AIEventListenerService {
         suggestion = await this.suggestionStore.createSuggestion(suggestionDTO);
       } catch (error) {
         this.logger.error(
-          `Failed to store suggestion for ${params.contextType}:${params.contextId}: ${(error as Error).message}`,
+          `Failed to store suggestion for ${params.contextType}:${params.contextId}: ${
+            (error as Error).message
+          }`,
           (error as Error).stack
         );
         return null;

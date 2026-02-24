@@ -92,4 +92,3 @@ export class AssignmentCompletedEventV1 implements BaseEvent {
     });
   }
 }
-

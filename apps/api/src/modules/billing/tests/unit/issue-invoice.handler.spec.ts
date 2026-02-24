@@ -10,7 +10,6 @@ import { InvoiceEntity } from '../../entities/invoice.entity';
 import { InvoiceIssuedEventV1 } from '../../events/invoice-issued.event';
 import { IssueInvoiceCommandHandler } from '../../handlers/issue-invoice.handler';
 
-
 describe('IssueInvoiceCommandHandler', () => {
   let handler: IssueInvoiceCommandHandler;
   let mockInvoiceRepo: jest.Mocked<Repository<InvoiceEntity>>;
@@ -74,7 +73,7 @@ describe('IssueInvoiceCommandHandler', () => {
         mockInvoiceRepo,
         mockEventBus,
         mockCommandBus,
-        mockEventBusService,
+        mockEventBusService
       );
 
       mockInvoiceRepo.findOne.mockResolvedValue(existingInvoice());
@@ -123,7 +122,7 @@ describe('IssueInvoiceCommandHandler', () => {
 
       expect(mockEventBusService.publish).toHaveBeenCalledWith(
         'billing.events.invoice-issued-v1',
-        expect.any(InvoiceIssuedEventV1),
+        expect.any(InvoiceIssuedEventV1)
       );
     });
   });
@@ -134,7 +133,7 @@ describe('IssueInvoiceCommandHandler', () => {
         mockInvoiceRepo,
         mockEventBus,
         mockCommandBus,
-        undefined,
+        undefined
       );
     });
 
@@ -149,9 +148,7 @@ describe('IssueInvoiceCommandHandler', () => {
       issuedInvoice.status = InvoiceStatus.ISSUED;
       mockInvoiceRepo.findOne.mockResolvedValue(issuedInvoice);
 
-      await expect(handler.execute(validCommand)).rejects.toThrow(
-        'Invoice is not in DRAFT status',
-      );
+      await expect(handler.execute(validCommand)).rejects.toThrow('Invoice is not in DRAFT status');
     });
 
     it('should throw error when invoice is already PAID', async () => {
@@ -159,9 +156,7 @@ describe('IssueInvoiceCommandHandler', () => {
       paidInvoice.status = InvoiceStatus.PAID;
       mockInvoiceRepo.findOne.mockResolvedValue(paidInvoice);
 
-      await expect(handler.execute(validCommand)).rejects.toThrow(
-        'Invoice is not in DRAFT status',
-      );
+      await expect(handler.execute(validCommand)).rejects.toThrow('Invoice is not in DRAFT status');
     });
   });
 
@@ -171,7 +166,7 @@ describe('IssueInvoiceCommandHandler', () => {
         mockInvoiceRepo,
         mockEventBus,
         mockCommandBus,
-        undefined,
+        undefined
       );
 
       mockInvoiceRepo.findOne.mockResolvedValue(existingInvoice());

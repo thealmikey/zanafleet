@@ -53,24 +53,60 @@ const INTENT_PRIORITY: Record<IntentType, number> = {
  * Frustrated sentiment keywords
  */
 const NEGATIVE_KEYWORDS = [
-  'frustrated', 'angry', 'terrible', 'awful', 'horrible', 'worst', 'hate', 'disappointed',
-  'unacceptable', 'ridiculous', 'pathetic', 'useless', 'waste', 'never', 'stuck',
+  'frustrated',
+  'angry',
+  'terrible',
+  'awful',
+  'horrible',
+  'worst',
+  'hate',
+  'disappointed',
+  'unacceptable',
+  'ridiculous',
+  'pathetic',
+  'useless',
+  'waste',
+  'never',
+  'stuck',
 ];
 
 /**
  * Positive sentiment keywords
  */
 const POSITIVE_KEYWORDS = [
-  'great', 'excellent', 'amazing', 'wonderful', 'fantastic', 'love', 'perfect',
-  'awesome', 'thank', 'thanks', 'appreciate', 'happy', 'satisfied', 'best',
+  'great',
+  'excellent',
+  'amazing',
+  'wonderful',
+  'fantastic',
+  'love',
+  'perfect',
+  'awesome',
+  'thank',
+  'thanks',
+  'appreciate',
+  'happy',
+  'satisfied',
+  'best',
 ];
 
 /**
  * Escalation keywords
  */
 const ESCALATION_KEYWORDS = [
-  'manager', 'supervisor', 'escalate', 'complaint', 'legal', 'lawyer', 'sue',
-  'refund', 'compensation', 'CEO', 'director', 'immediately', 'urgent',
+  'manager',
+  'supervisor',
+  'escalate',
+  'complaint',
+  'legal',
+  'lawyer',
+  'sue',
+  'refund',
+  'compensation',
+  'CEO',
+  'director',
+  'immediately',
+  'urgent',
 ];
 
 /**
@@ -80,10 +116,10 @@ export const INTELLIGENCE_ENGINE_VERSION = '1.0.0';
 
 /**
  * InteractionIntelligenceEngine
- * 
+ *
  * Core engine for analyzing interaction events and generating AI recommendations.
  * Implements pattern similar to MoveIntelligenceEngine.
- * 
+ *
  * Three-phase operation:
  * 1. Intent Detection - understand what the user wants
  * 2. Sentiment Analysis - understand how the user feels
@@ -193,7 +229,10 @@ export class InteractionIntelligenceEngine {
 
     reasoningChain.push({
       step: 'Intent Detection',
-      reasoning: `Analyzed message "${message.substring(0, 50)}..." - detected intent: ${detectedIntent}`,
+      reasoning: `Analyzed message "${message.substring(
+        0,
+        50
+      )}..." - detected intent: ${detectedIntent}`,
       confidence,
       timestamp: new Date(),
     });
@@ -265,10 +304,10 @@ export class InteractionIntelligenceEngine {
     reasoningChain?: ReasoningStep[]
   ): AIRecommendation {
     const reasoning = reasoningChain || [];
-    
+
     // Determine if should escalate based on sentiment or keywords
     const shouldEscalate = this.determineEscalation(context, sentimentResult);
-    
+
     // Determine if should trigger workflow
     const { shouldTriggerWorkflow, workflowType, workflowPayload } = this.determineWorkflow(
       intentResult,
@@ -293,7 +332,9 @@ export class InteractionIntelligenceEngine {
 
     reasoning.push({
       step: 'Recommendation Synthesis',
-      reasoning: `Action: ${action}, Escalate: ${shouldEscalate}, Workflow: ${workflowType || 'none'}`,
+      reasoning: `Action: ${action}, Escalate: ${shouldEscalate}, Workflow: ${
+        workflowType || 'none'
+      }`,
       confidence: confidenceScore,
       timestamp: new Date(),
     });
@@ -347,7 +388,11 @@ export class InteractionIntelligenceEngine {
   private determineWorkflow(
     intentResult?: IntentDetectionResult,
     _sentimentResult?: SentimentAnalysisResult
-  ): { shouldTriggerWorkflow: boolean; workflowType?: string; workflowPayload?: Record<string, unknown> } {
+  ): {
+    shouldTriggerWorkflow: boolean;
+    workflowType?: string;
+    workflowPayload?: Record<string, unknown>;
+  } {
     if (!intentResult || intentResult.confidence < this.config.minConfidenceThreshold) {
       return { shouldTriggerWorkflow: false };
     }
@@ -447,9 +492,9 @@ export class InteractionIntelligenceEngine {
 
     // Add sentiment-aware adjustments
     if (sentimentResult?.sentiment === SentimentType.FRUSTRATED) {
-      message = "I apologize for any frustration. " + message;
+      message = 'I apologize for any frustration. ' + message;
     } else if (sentimentResult?.sentiment === SentimentType.POSITIVE) {
-      message = "Thank you! " + message;
+      message = 'Thank you! ' + message;
     }
 
     return {
@@ -500,7 +545,7 @@ export class InteractionIntelligenceEngine {
    */
   private extractEntities(message: string, _intent: IntentType): Record<string, string> {
     const entities: Record<string, string> = {};
-    
+
     // Simple extraction - in production, use NER
     const orderIdMatch = message.match(/order[:#\s]+([a-z0-9-]+)/i);
     if (orderIdMatch) {

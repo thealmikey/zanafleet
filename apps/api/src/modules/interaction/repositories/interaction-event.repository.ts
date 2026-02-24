@@ -2,7 +2,11 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, LessThan, MoreThan } from 'typeorm';
 
-import { InteractionEventEntity, InteractionEventType, InteractionActorType } from '../entities/interaction-event.entity';
+import {
+  InteractionEventEntity,
+  InteractionEventType,
+  InteractionActorType,
+} from '../entities/interaction-event.entity';
 
 /**
  * InteractionEventRepository
@@ -15,7 +19,7 @@ export class InteractionEventRepository {
   constructor(
     @InjectRepository(InteractionEventEntity)
     private readonly repository: Repository<InteractionEventEntity>,
-    private readonly dataSource: DataSource,
+    private readonly dataSource: DataSource
   ) {}
 
   /**
@@ -45,7 +49,7 @@ export class InteractionEventRepository {
   async findByStreamIdPaginated(
     streamId: string,
     limit = 50,
-    offset = 0,
+    offset = 0
   ): Promise<InteractionEventEntity[]> {
     return this.repository.find({
       where: { streamId },
@@ -158,7 +162,7 @@ export class InteractionEventRepository {
    */
   async appendToStream(
     streamId: string,
-    eventData: Partial<InteractionEventEntity>,
+    eventData: Partial<InteractionEventEntity>
   ): Promise<InteractionEventEntity> {
     return this.dataSource.transaction(async (manager) => {
       // Import here to avoid circular dependency

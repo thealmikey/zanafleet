@@ -26,14 +26,7 @@ export class EarningsNeo4jProjection implements IEventHandler<EarningsRecordedEv
   constructor(private readonly neo4jService: Neo4jService) {}
 
   async handle(event: EarningsRecordedEvent): Promise<void> {
-    const {
-      riderId,
-      workspaceId,
-      grossAmount,
-      netEarnings,
-      jobId,
-      createdAt,
-    } = event;
+    const { riderId, workspaceId, grossAmount, netEarnings, jobId, createdAt } = event;
 
     this.logger.debug(
       `Projecting earnings for rider ${riderId} in workspace ${workspaceId}: ${netEarnings}`

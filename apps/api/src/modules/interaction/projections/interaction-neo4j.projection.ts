@@ -7,10 +7,10 @@ import { InteractionStreamCreatedEventV1 } from '../events/interaction-stream-cr
 
 /**
  * InteractionNeo4jProjection
- * 
+ *
  * Handles Neo4j projections for interaction events.
  * Maintains the graph structure for streams, events, and participants.
- * 
+ *
  * Graph Structure:
  * - (:InteractionStream {id, contextType, contextId, state})
  * - (:InteractionEvent {id, eventType, actorId, createdAt})
@@ -32,7 +32,7 @@ export class InteractionNeo4jProjection
    * Routes to appropriate handler based on event type
    */
   async handle(
-    event: InteractionStreamCreatedEventV1 | InteractionEventCreatedEventV1,
+    event: InteractionStreamCreatedEventV1 | InteractionEventCreatedEventV1
   ): Promise<void> {
     if (event instanceof InteractionStreamCreatedEventV1) {
       await this.handleStreamCreated(event);
@@ -67,7 +67,7 @@ export class InteractionNeo4jProjection
           contextId: event.contextId,
           state: event.state,
           createdAt: event.createdAt.toISOString(),
-        },
+        }
       );
 
       // Create context relationships based on context type
@@ -100,7 +100,7 @@ export class InteractionNeo4jProjection
         `
         MERGE (s:InteractionStream {id: $streamId})
         `,
-        { streamId: event.streamId },
+        { streamId: event.streamId }
       );
 
       // Create Actor node if not exists
@@ -112,7 +112,7 @@ export class InteractionNeo4jProjection
         {
           actorId: event.actorId,
           actorType: event.actorType,
-        },
+        }
       );
 
       // Create PARTICIPATED_IN relationship
@@ -127,7 +127,7 @@ export class InteractionNeo4jProjection
           actorId: event.actorId,
           streamId: event.streamId,
           createdAt: event.createdAt.toISOString(),
-        },
+        }
       );
 
       // Create InteractionEvent node
@@ -150,7 +150,7 @@ export class InteractionNeo4jProjection
           actorId: event.actorId,
           createdAt: event.createdAt.toISOString(),
           payload: JSON.stringify(event.payload),
-        },
+        }
       );
 
       this.logger.debug(`Event node created in Neo4j: ${event.interactionEventId}`);
@@ -168,7 +168,7 @@ export class InteractionNeo4jProjection
    */
   private async createContextRelationship(
     session: any,
-    event: InteractionStreamCreatedEventV1,
+    event: InteractionStreamCreatedEventV1
   ): Promise<void> {
     const contextType = event.contextType;
     const contextId = event.contextId;
@@ -186,7 +186,7 @@ export class InteractionNeo4jProjection
       {
         streamId: event.streamId,
         contextId: contextId,
-      },
+      }
     );
   }
 
@@ -226,42 +226,42 @@ export class InteractionNeo4jInitializer {
       // Create unique constraint on InteractionStream.id
       await session.run(
         `CREATE CONSTRAINT interaction_stream_id_unique IF NOT EXISTS 
-         FOR (s:InteractionStream) REQUIRE s.id IS UNIQUE`,
+         FOR (s:InteractionStream) REQUIRE s.id IS UNIQUE`
       );
       this.logger.log('Unique constraint on InteractionStream.id created');
 
       // Create unique constraint on InteractionEvent.id
       await session.run(
         `CREATE CONSTRAINT interaction_event_id_unique IF NOT EXISTS 
-         FOR (e:InteractionEvent) REQUIRE e.id IS UNIQUE`,
+         FOR (e:InteractionEvent) REQUIRE e.id IS UNIQUE`
       );
       this.logger.log('Unique constraint on InteractionEvent.id created');
 
       // Create index on InteractionStream.contextType
       await session.run(
         `CREATE INDEX interaction_stream_context_type IF NOT EXISTS 
-         FOR (s:InteractionStream) ON (s.contextType)`,
+         FOR (s:InteractionStream) ON (s.contextType)`
       );
       this.logger.log('Index on InteractionStream.contextType created');
 
       // Create index on InteractionStream.contextId
       await session.run(
         `CREATE INDEX interaction_stream_context_id IF NOT EXISTS 
-         FOR (s:InteractionStream) ON (s.contextId)`,
+         FOR (s:InteractionStream) ON (s.contextId)`
       );
       this.logger.log('Index on InteractionStream.contextId created');
 
       // Create index on InteractionEvent.eventType
       await session.run(
         `CREATE INDEX interaction_event_type IF NOT EXISTS 
-         FOR (e:InteractionEvent) ON (e.eventType)`,
+         FOR (e:InteractionEvent) ON (e.eventType)`
       );
       this.logger.log('Index on InteractionEvent.eventType created');
 
       // Create index on InteractionEvent.createdAt
       await session.run(
         `CREATE INDEX interaction_event_created_at IF NOT EXISTS 
-         FOR (e:InteractionEvent) ON (e.createdAt)`,
+         FOR (e:InteractionEvent) ON (e.createdAt)`
       );
       this.logger.log('Index on InteractionEvent.createdAt created');
     } catch (error) {

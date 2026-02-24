@@ -22,7 +22,8 @@ import { JobTypeEntity } from '../entities/job-type.entity';
 import { JobTypeStatus } from '../dto/job-type.enums';
 import { JobTypeUIConfigResponse } from '../dto/job-type.response.dto';
 
-const UUID_V4_ROUTE_SEGMENT = ':id([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})';
+const UUID_V4_ROUTE_SEGMENT =
+  ':id([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12})';
 
 @ApiTags('Job Types')
 @ApiBearerAuth('JWT-auth')
@@ -44,7 +45,10 @@ export class JobTypeConfigController {
    * Returns complete UI configuration for rendering
    */
   @Get(`${UUID_V4_ROUTE_SEGMENT}/ui-config`)
-  @ApiOperation({ summary: 'Get job type UI configuration', description: 'Returns UI configuration for frontend rendering' })
+  @ApiOperation({
+    summary: 'Get job type UI configuration',
+    description: 'Returns UI configuration for frontend rendering',
+  })
   @ApiResponse({ status: 200, description: 'UI config retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -71,7 +75,10 @@ export class JobTypeConfigController {
    * Returns all active job types for the current workspace
    */
   @Get('active/ui-configs')
-  @ApiOperation({ summary: 'Get active job types UI configurations', description: 'Returns all active job types for frontend' })
+  @ApiOperation({
+    summary: 'Get active job types UI configurations',
+    description: 'Returns all active job types for frontend',
+  })
   @ApiResponse({ status: 200, description: 'UI configs retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 403, description: 'Forbidden' })

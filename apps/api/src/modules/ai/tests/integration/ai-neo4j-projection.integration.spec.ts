@@ -19,9 +19,7 @@ describe('AI Neo4j Projection Integration', () => {
         workflowState: 'pending',
         capability: 'submit_for_review',
         riskScore: 35,
-        riskFactors: [
-          new AIRiskFactor({ factor: 'test', weight: 0.25, description: 'Test' }),
-        ],
+        riskFactors: [new AIRiskFactor({ factor: 'test', weight: 0.25, description: 'Test' })],
         confidence: 0.75,
       });
 
@@ -40,8 +38,16 @@ describe('AI Neo4j Projection Integration', () => {
         capability: 'submit_for_review',
         riskScore: 50,
         riskFactors: [
-          new AIRiskFactor({ factor: 'capability_confidence', weight: 0.25, description: 'Confidence: 75%' }),
-          new AIRiskFactor({ factor: 'workflow_state', weight: 0.2, description: 'State: pending' }),
+          new AIRiskFactor({
+            factor: 'capability_confidence',
+            weight: 0.25,
+            description: 'Confidence: 75%',
+          }),
+          new AIRiskFactor({
+            factor: 'workflow_state',
+            weight: 0.2,
+            description: 'State: pending',
+          }),
         ],
         confidence: 0.75,
       });
@@ -60,9 +66,7 @@ describe('AI Neo4j Projection Integration', () => {
         workflowState: 'pending',
         capability: 'submit_for_review',
         riskScore: 45,
-        riskFactors: [
-          new AIRiskFactor({ factor: 'test', weight: 0.25, description: 'Test' }),
-        ],
+        riskFactors: [new AIRiskFactor({ factor: 'test', weight: 0.25, description: 'Test' })],
         confidence: 0.8,
       });
 

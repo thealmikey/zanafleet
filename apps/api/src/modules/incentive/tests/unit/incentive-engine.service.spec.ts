@@ -13,7 +13,9 @@ describe('IncentiveEngineService', () => {
   let mockApplicationRepo: jest.Mocked<Repository<IncentiveApplicationEntity>>;
   let mockEligibilityService: jest.Mocked<IncentiveEligibilityService>;
 
-  const createCampaign = (overrides?: Partial<ReturnType<CampaignEntity['toDomain']>>): CampaignEntity => {
+  const createCampaign = (
+    overrides?: Partial<ReturnType<CampaignEntity['toDomain']>>
+  ): CampaignEntity => {
     const entity = CampaignEntity.fromDomain({
       campaignId: '550e8400-e29b-41d4-a716-446655440000',
       name: 'Test Campaign',
@@ -53,7 +55,7 @@ describe('IncentiveEngineService', () => {
     service = new IncentiveEngineService(
       mockCampaignRepo,
       mockApplicationRepo,
-      mockEligibilityService,
+      mockEligibilityService
     );
   });
 
@@ -144,7 +146,7 @@ describe('IncentiveEngineService', () => {
         'charge-123',
         'beneficiary-123',
         20,
-        'USD',
+        'USD'
       );
 
       expect(result.applicationId).toBeDefined();
@@ -158,7 +160,14 @@ describe('IncentiveEngineService', () => {
       mockCampaignRepo.findOne.mockResolvedValue(null);
 
       await expect(
-        service.applyToInvoice('invalid-id', 'invoice-123', 'charge-123', 'beneficiary-123', 20, 'USD'),
+        service.applyToInvoice(
+          'invalid-id',
+          'invoice-123',
+          'charge-123',
+          'beneficiary-123',
+          20,
+          'USD'
+        )
       ).rejects.toThrow('Campaign not found');
     });
   });
@@ -175,7 +184,7 @@ describe('IncentiveEngineService', () => {
         expect.objectContaining({
           budgetUsed: '150.00',
           usageCount: 11,
-        }),
+        })
       );
     });
 
@@ -190,7 +199,7 @@ describe('IncentiveEngineService', () => {
         campaign.id,
         expect.objectContaining({
           status: CampaignStatus.EXHAUSTED,
-        }),
+        })
       );
     });
 
@@ -210,7 +219,7 @@ describe('IncentiveEngineService', () => {
         campaign.id,
         expect.objectContaining({
           status: CampaignStatus.EXHAUSTED,
-        }),
+        })
       );
     });
   });

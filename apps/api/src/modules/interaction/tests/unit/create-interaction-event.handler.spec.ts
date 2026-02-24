@@ -3,8 +3,16 @@ import { EventBus } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { CreateInteractionEventCommand } from '../../commands/create-interaction-event.command';
-import { InteractionEventEntity, InteractionEventType, InteractionActorType } from '../../entities/interaction-event.entity';
-import { InteractionStreamEntity, InteractionStreamState, InteractionContextType } from '../../entities/interaction-stream.entity';
+import {
+  InteractionEventEntity,
+  InteractionEventType,
+  InteractionActorType,
+} from '../../entities/interaction-event.entity';
+import {
+  InteractionStreamEntity,
+  InteractionStreamState,
+  InteractionContextType,
+} from '../../entities/interaction-stream.entity';
 import { CreateInteractionEventCommandHandler } from '../../handlers/create-interaction-event.handler';
 import { InteractionEventRepository } from '../../repositories/interaction-event.repository';
 import { InteractionStreamRepository } from '../../repositories/interaction-stream.repository';
@@ -38,7 +46,9 @@ describe('CreateInteractionEventCommandHandler', () => {
       ],
     }).compile();
 
-    handler = module.get<CreateInteractionEventCommandHandler>(CreateInteractionEventCommandHandler);
+    handler = module.get<CreateInteractionEventCommandHandler>(
+      CreateInteractionEventCommandHandler
+    );
     eventRepository = module.get(InteractionEventRepository);
     streamRepository = module.get(InteractionStreamRepository);
     eventBus = module.get(EventBus);
@@ -95,7 +105,7 @@ describe('CreateInteractionEventCommandHandler', () => {
           actorType: InteractionActorType.USER,
           eventType: InteractionEventType.HUMAN_MESSAGE,
           payload: { message: 'Hello, world!' },
-        }),
+        })
       );
       expect(eventBus.publish).toHaveBeenCalled();
     });
@@ -144,7 +154,7 @@ describe('CreateInteractionEventCommandHandler', () => {
         expect.objectContaining({
           correlationId: 'corr-123',
           causationId: 'caus-123',
-        }),
+        })
       );
     });
 
@@ -194,7 +204,7 @@ describe('CreateInteractionEventCommandHandler', () => {
         expect.objectContaining({
           actorType: InteractionActorType.AI_AGENT,
           eventType: InteractionEventType.AI_RESPONSE,
-        }),
+        })
       );
     });
 
@@ -205,7 +215,7 @@ describe('CreateInteractionEventCommandHandler', () => {
         actorId: 'slack-bot-1',
         actorType: InteractionActorType.EXTERNAL_INTEGRATION,
         eventType: InteractionEventType.SLACK_MESSAGE,
-        payload: { 
+        payload: {
           message: 'New message from Slack',
           slackChannelId: 'C12345',
           slackUserId: 'U12345',
@@ -232,7 +242,7 @@ describe('CreateInteractionEventCommandHandler', () => {
         actorId: 'slack-bot-1',
         actorType: InteractionActorType.EXTERNAL_INTEGRATION,
         eventType: InteractionEventType.SLACK_MESSAGE,
-        payload: { 
+        payload: {
           message: 'New message from Slack',
           slackChannelId: 'C12345',
           slackUserId: 'U12345',
@@ -252,7 +262,7 @@ describe('CreateInteractionEventCommandHandler', () => {
         expect.objectContaining({
           actorType: InteractionActorType.EXTERNAL_INTEGRATION,
           eventType: InteractionEventType.SLACK_MESSAGE,
-        }),
+        })
       );
     });
 
@@ -263,7 +273,7 @@ describe('CreateInteractionEventCommandHandler', () => {
         actorId: 'system',
         actorType: InteractionActorType.SYSTEM,
         eventType: InteractionEventType.SYSTEM_NOTIFICATION,
-        payload: { 
+        payload: {
           title: 'Order Delivered',
           message: 'Your order has been delivered successfully',
         },
@@ -289,7 +299,7 @@ describe('CreateInteractionEventCommandHandler', () => {
         actorId: 'system',
         actorType: InteractionActorType.SYSTEM,
         eventType: InteractionEventType.SYSTEM_NOTIFICATION,
-        payload: { 
+        payload: {
           title: 'Order Delivered',
           message: 'Your order has been delivered successfully',
         },
@@ -308,7 +318,7 @@ describe('CreateInteractionEventCommandHandler', () => {
         expect.objectContaining({
           actorType: InteractionActorType.SYSTEM,
           eventType: InteractionEventType.SYSTEM_NOTIFICATION,
-        }),
+        })
       );
     });
   });

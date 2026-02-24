@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
-import { InteractionContextType, InteractionStreamState } from '../entities/interaction-stream.entity';
+import {
+  InteractionContextType,
+  InteractionStreamState,
+} from '../entities/interaction-stream.entity';
 
 /**
  * Zod validation schema for CreateInteractionStreamCommand
@@ -18,7 +21,9 @@ export const CreateInteractionStreamCommandSchema = z.object({
   state: z.nativeEnum(InteractionStreamState).optional(),
 });
 
-export type CreateInteractionStreamCommandInput = z.infer<typeof CreateInteractionStreamCommandSchema>;
+export type CreateInteractionStreamCommandInput = z.infer<
+  typeof CreateInteractionStreamCommandSchema
+>;
 
 /**
  * CreateInteractionStreamCommand
@@ -52,7 +57,7 @@ export class CreateInteractionStreamCommand {
    * Safe validation - returns result object instead of throwing
    */
   static safeValidate(
-    input: unknown,
+    input: unknown
   ): z.SafeParseReturnType<unknown, CreateInteractionStreamCommandInput> {
     return CreateInteractionStreamCommandSchema.safeParse(input);
   }

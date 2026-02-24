@@ -28,10 +28,7 @@ export interface EligibilityResult {
 export class IncentiveEligibilityService {
   private readonly logger = new Logger(IncentiveEligibilityService.name);
 
-  evaluateEligibility(
-    campaign: CampaignEntity,
-    context: EligibilityContext,
-  ): EligibilityResult {
+  evaluateEligibility(campaign: CampaignEntity, context: EligibilityContext): EligibilityResult {
     const campaignDomain = campaign.toDomain();
 
     if (campaignDomain.status !== CampaignStatus.ACTIVE) {
@@ -83,7 +80,7 @@ export class IncentiveEligibilityService {
   private evaluateRules(
     rules: Record<string, unknown>,
     context: EligibilityContext,
-    _incentiveType: IncentiveType,
+    _incentiveType: IncentiveType
   ): EligibilityResult {
     if (rules.minOrderAmount !== undefined) {
       const minAmount = rules.minOrderAmount as number;

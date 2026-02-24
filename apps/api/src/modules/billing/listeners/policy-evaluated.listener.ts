@@ -46,10 +46,10 @@ export class PolicyEvaluatedListener implements IEventHandler<PolicyEvaluatedV1>
       return;
     }
 
-    const isPricingRelated = event.trigger === 'DELIVERY_PRICING' ||
-      event.matchedPolicies.some((p) =>
-        p.outputs?.surgeMultiplier !== undefined ||
-        p.outputs?.adjustment !== undefined,
+    const isPricingRelated =
+      event.trigger === 'DELIVERY_PRICING' ||
+      event.matchedPolicies.some(
+        (p) => p.outputs?.surgeMultiplier !== undefined || p.outputs?.adjustment !== undefined
       );
 
     if (!isPricingRelated) {
@@ -58,19 +58,21 @@ export class PolicyEvaluatedListener implements IEventHandler<PolicyEvaluatedV1>
 
     this.logger.log(
       `Pricing policy evaluated: trigger=${event.trigger}, decision=${event.decision}, ` +
-      `policies=${event.matchedPolicies.length}, processingTime=${event.processingTimeMs}ms`,
+        `policies=${event.matchedPolicies.length}, processingTime=${event.processingTimeMs}ms`
     );
 
     for (const policy of event.matchedPolicies) {
       if (policy.outputs?.surgeMultiplier !== undefined) {
         this.logger.debug(
-          `Policy ${policy.policyId} (${policy.name}) applied surge multiplier: ${policy.outputs.surgeMultiplier}`,
+          `Policy ${policy.policyId} (${policy.name}) applied surge multiplier: ${policy.outputs.surgeMultiplier}`
         );
       }
 
       if (policy.outputs?.adjustment !== undefined) {
         this.logger.debug(
-          `Policy ${policy.policyId} (${policy.name}) applied adjustment: ${JSON.stringify(policy.outputs.adjustment)}`,
+          `Policy ${policy.policyId} (${policy.name}) applied adjustment: ${JSON.stringify(
+            policy.outputs.adjustment
+          )}`
         );
       }
     }

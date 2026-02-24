@@ -67,7 +67,7 @@ describe('PricingSignalService', () => {
           type: 'DISCOUNT',
           multiplier: 0.9,
           reason: 'Off-peak discount',
-        }),
+        })
       );
     });
 
@@ -84,7 +84,7 @@ describe('PricingSignalService', () => {
           type: 'PREMIUM',
           multiplier: 1.25,
           reason: 'Holiday premium pricing',
-        }),
+        })
       );
     });
 
@@ -121,7 +121,7 @@ describe('PricingSignalService', () => {
         BindingTargetType.BUSINESS,
         context.businessId,
         context.timestamp,
-        context.timezone,
+        context.timezone
       );
     });
   });
@@ -146,7 +146,7 @@ describe('PricingSignalService', () => {
           multiplier: 1.5,
           reason: 'Policy-driven demand/supply surge',
           policyId: 'policy-1',
-        }),
+        })
       );
     });
 
@@ -183,7 +183,7 @@ describe('PricingSignalService', () => {
           fixedAmount: 5,
           reason: 'New customer subsidy',
           policyId: 'policy-1',
-        }),
+        })
       );
     });
   });

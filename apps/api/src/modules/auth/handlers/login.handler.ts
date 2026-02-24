@@ -9,8 +9,6 @@ import { verifyPassword } from '@zanafleet/utils';
 import { Repository } from 'typeorm';
 import { validate as isUuid } from 'uuid';
 
-
-
 import { LoginCommand } from '../commands/login.command';
 
 /** Result of a successful login operation */

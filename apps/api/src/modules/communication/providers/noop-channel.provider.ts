@@ -34,7 +34,7 @@ export class NoOpChannelProvider implements ChannelProvider {
 
   async send(message: RenderedMessage, recipient: Recipient): Promise<SendResult> {
     this.logger.debug(
-      `NoOp send called for channel ${this.channel}, recipient: ${recipient.recipientId}`,
+      `NoOp send called for channel ${this.channel}, recipient: ${recipient.recipientId}`
     );
 
     this.sentMessages.push({ message, recipient });

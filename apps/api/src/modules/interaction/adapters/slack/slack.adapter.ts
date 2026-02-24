@@ -1,11 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { InteractionEventType, InteractionActorType } from '../../entities/interaction-event.entity';
 import {
-  IInteractionAdapter,
-  AdapterInput,
-  NormalizedEvent,
-} from '../base/adapter.interface';
+  InteractionEventType,
+  InteractionActorType,
+} from '../../entities/interaction-event.entity';
+import { IInteractionAdapter, AdapterInput, NormalizedEvent } from '../base/adapter.interface';
 
 /**
  * Slack Message Interface
@@ -29,9 +28,9 @@ interface SlackMessage {
 
 /**
  * SlackAdapter
- * 
+ *
  * Normalizes Slack messages into InteractionEvents.
- * 
+ *
  * Supported event types:
  * - message (direct messages and channel messages)
  * - app_mention (mentions in channels)
@@ -99,10 +98,7 @@ export class SlackAdapter implements IInteractionAdapter {
    */
   validate(input: AdapterInput): boolean {
     const message = input.rawInput as SlackMessage;
-    return !!(
-      message &&
-      (message.challenge || message.event || message.type)
-    );
+    return !!(message && (message.challenge || message.event || message.type));
   }
 
   /**

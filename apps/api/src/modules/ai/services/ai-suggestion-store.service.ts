@@ -37,7 +37,8 @@ export class AISuggestionStoreService {
    */
   async createSuggestion(dto: CreateAISuggestionDTO): Promise<AISuggestionEntity> {
     const id = uuidv4();
-    const expiresAt = dto.expiresAt ?? new Date(Date.now() + this.DEFAULT_TTL_HOURS * 60 * 60 * 1000);
+    const expiresAt =
+      dto.expiresAt ?? new Date(Date.now() + this.DEFAULT_TTL_HOURS * 60 * 60 * 1000);
     const deduplicationHash = dto.deduplicationHash ?? this.generateHash(dto);
 
     // Check for duplicate
@@ -111,10 +112,7 @@ export class AISuggestionStoreService {
       query.andWhere('suggestion.createdAt <= :toDate', { toDate: filters.toDate });
     }
 
-    return query
-      .orderBy('suggestion.createdAt', 'DESC')
-      .take(100)
-      .getMany();
+    return query.orderBy('suggestion.createdAt', 'DESC').take(100).getMany();
   }
 
   /**
@@ -134,10 +132,7 @@ export class AISuggestionStoreService {
   /**
    * Update suggestion status
    */
-  async updateStatus(
-    id: string,
-    status: AISuggestionStatus
-  ): Promise<AISuggestionEntity | null> {
+  async updateStatus(id: string, status: AISuggestionStatus): Promise<AISuggestionEntity | null> {
     const suggestion = await this.findById(id);
     if (!suggestion) {
       return null;
@@ -252,5 +247,3 @@ export class AISuggestionStoreService {
     }
   }
 }
-
-

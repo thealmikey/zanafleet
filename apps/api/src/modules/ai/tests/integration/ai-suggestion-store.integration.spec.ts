@@ -53,7 +53,10 @@ describe('AISuggestionStoreService Integration', () => {
     it('should update suggestion status in database', async () => {
       const suggestion = createMockSuggestionEntity({ status: AISuggestionStatus.PENDING });
       (repository.findOne as jest.Mock).mockResolvedValue(suggestion);
-      (repository.save as jest.Mock).mockResolvedValue({ ...suggestion, status: AISuggestionStatus.ACCEPTED });
+      (repository.save as jest.Mock).mockResolvedValue({
+        ...suggestion,
+        status: AISuggestionStatus.ACCEPTED,
+      });
 
       await service.acceptSuggestion(suggestion.id);
 

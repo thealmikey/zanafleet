@@ -23,7 +23,7 @@ export class PaymentCompletedListener implements IEventHandler<PaymentCompletedE
     @InjectRepository(InvoiceEntity)
     private readonly invoiceRepository: Repository<InvoiceEntity>,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   async handle(event: PaymentCompletedEventV1): Promise<void> {
@@ -31,7 +31,7 @@ export class PaymentCompletedListener implements IEventHandler<PaymentCompletedE
 
     if (!event.invoiceId) {
       this.logger.debug(
-        `Payment ${event.paymentIntentId} is not associated with an invoice, skipping`,
+        `Payment ${event.paymentIntentId} is not associated with an invoice, skipping`
       );
       return;
     }

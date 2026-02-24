@@ -17,11 +17,7 @@ const CommandHandlers = [CreateInvoiceCommandHandler, IssueInvoiceCommandHandler
 const EventHandlers = [PaymentCompletedListener, PolicyEvaluatedListener];
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([InvoiceEntity, ChargeEntity]),
-    CqrsModule,
-    PaymentModule,
-  ],
+  imports: [TypeOrmModule.forFeature([InvoiceEntity, ChargeEntity]), CqrsModule, PaymentModule],
   providers: [BillingCalculatorService, PricingSignalService, ...CommandHandlers, ...EventHandlers],
   exports: [TypeOrmModule, BillingCalculatorService, PricingSignalService],
 })

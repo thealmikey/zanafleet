@@ -25,19 +25,17 @@ export class IssueInvoiceCommand {
   readonly correlationId?: string;
 
   constructor(input: IssueInvoiceCommandInput) {
-    this.invoiceId = input.invoiceId ;
+    this.invoiceId = input.invoiceId;
     this.paymentMethod = input.paymentMethod as PaymentMethod;
-    this.providerId = input.providerId ;
-    this.correlationId = input.correlationId ;
+    this.providerId = input.providerId;
+    this.correlationId = input.correlationId;
   }
 
   static validate(input: unknown): IssueInvoiceCommandInput {
     return IssueInvoiceCommandSchema.parse(input);
   }
 
-  static safeValidate(
-    input: unknown,
-  ): z.SafeParseReturnType<unknown, IssueInvoiceCommandInput> {
+  static safeValidate(input: unknown): z.SafeParseReturnType<unknown, IssueInvoiceCommandInput> {
     return IssueInvoiceCommandSchema.safeParse(input);
   }
 }

@@ -1,11 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { InteractionEventType, InteractionActorType } from '../../entities/interaction-event.entity';
 import {
-  IInteractionAdapter,
-  AdapterInput,
-  NormalizedEvent,
-} from '../base/adapter.interface';
+  InteractionEventType,
+  InteractionActorType,
+} from '../../entities/interaction-event.entity';
+import { IInteractionAdapter, AdapterInput, NormalizedEvent } from '../base/adapter.interface';
 
 /**
  * WebChat Message Interface
@@ -22,9 +21,9 @@ interface WebChatMessage {
 
 /**
  * WebChatAdapter
- * 
+ *
  * Normalizes web chat messages into InteractionEvents.
- * 
+ *
  * Supported message types:
  * - text (regular text messages)
  * - action (user actions like button clicks)
@@ -72,12 +71,7 @@ export class WebChatAdapter implements IInteractionAdapter {
    */
   validate(input: AdapterInput): boolean {
     const message = input.rawInput as WebChatMessage;
-    return !!(
-      message &&
-      message.userId &&
-      message.sessionId &&
-      message.message
-    );
+    return !!(message && message.userId && message.sessionId && message.message);
   }
 
   /**

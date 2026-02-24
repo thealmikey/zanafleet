@@ -51,7 +51,10 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
     if (module) {
       const entityManager = module.get('EntityManager');
       await entityManager.query('DELETE FROM notifications WHERE "workspaceId" IS NOT NULL');
-      await entityManager.query('DELETE FROM notification_preferences WHERE "recipientId" LIKE $1', ['test-%']);
+      await entityManager.query(
+        'DELETE FROM notification_preferences WHERE "recipientId" LIKE $1',
+        ['test-%']
+      );
     }
   });
 
@@ -66,7 +69,7 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         RecipientType.ACTOR,
         NotificationChannel.EMAIL,
         false, // disabled
-        { workspaceId },
+        { workspaceId }
       );
 
       const command = new SendNotificationCommand(
@@ -75,7 +78,7 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         NotificationChannel.EMAIL,
         'welcome',
         { username: 'TestUser', email: 'test@example.com' },
-        workspaceId,
+        workspaceId
       );
 
       const result = await commandBus.execute(command);
@@ -86,7 +89,7 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
       const entityManager = module.get('EntityManager');
       const notifications = await entityManager.query(
         'SELECT * FROM notifications WHERE "recipientId" = $1',
-        [recipientId],
+        [recipientId]
       );
 
       // Notification should either not exist or have SKIPPED status
@@ -103,7 +106,7 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         RecipientType.ACTOR,
         NotificationChannel.EMAIL,
         true, // enabled
-        { workspaceId },
+        { workspaceId }
       );
 
       const command = new SendNotificationCommand(
@@ -112,7 +115,7 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         NotificationChannel.EMAIL,
         'welcome',
         { username: 'TestUser', email: 'test@example.com' },
-        workspaceId,
+        workspaceId
       );
 
       const result = await commandBus.execute(command);
@@ -128,7 +131,7 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         recipientId,
         RecipientType.ACTOR,
         NotificationChannel.EMAIL,
-        workspaceId,
+        workspaceId
       );
 
       expect(isEnabled).toBe(true); // Default is enabled (opt-out model)
@@ -146,7 +149,7 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         RecipientType.ACTOR,
         NotificationChannel.EMAIL,
         true,
-        { workspaceId: undefined }, // global
+        { workspaceId: undefined } // global
       );
 
       // Set workspace-specific preference to disabled
@@ -155,14 +158,14 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         RecipientType.ACTOR,
         NotificationChannel.EMAIL,
         false,
-        { workspaceId }, // workspace-specific
+        { workspaceId } // workspace-specific
       );
 
       const isEnabled = await preferenceService.isEnabled(
         recipientId,
         RecipientType.ACTOR,
         NotificationChannel.EMAIL,
-        workspaceId,
+        workspaceId
       );
 
       expect(isEnabled).toBe(false); // Workspace-specific takes precedence
@@ -177,14 +180,14 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         recipientId,
         RecipientType.ACTOR,
         NotificationChannel.SMS,
-        false, // disabled globally
+        false // disabled globally
       );
 
       const isEnabled = await preferenceService.isEnabled(
         recipientId,
         RecipientType.ACTOR,
         NotificationChannel.SMS,
-        workspaceId,
+        workspaceId
       );
 
       expect(isEnabled).toBe(false); // Falls back to global

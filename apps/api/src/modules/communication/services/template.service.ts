@@ -44,7 +44,7 @@ export class TemplateService {
 
   constructor(
     @InjectRepository(TemplateEntity)
-    private readonly templateRepository: Repository<TemplateEntity>,
+    private readonly templateRepository: Repository<TemplateEntity>
   ) {}
 
   /**
@@ -65,7 +65,7 @@ export class TemplateService {
       workspaceId?: string;
       locale?: string;
       channel?: NotificationChannel;
-    },
+    }
   ): Promise<TemplateEntity | null> {
     const locale = options?.locale ?? 'en';
     const channel = options?.channel;
@@ -94,9 +94,7 @@ export class TemplateService {
     }
 
     // Fall back to global template (workspaceId IS NULL)
-    const globalTemplate = await baseQuery
-      .andWhere('template.workspaceId IS NULL')
-      .getOne();
+    const globalTemplate = await baseQuery.andWhere('template.workspaceId IS NULL').getOne();
 
     if (globalTemplate) {
       this.logger.debug(`Found global template: ${name}`);
@@ -146,10 +144,7 @@ export class TemplateService {
    * @param variables Variables to validate
    * @returns Validation result with missing variables list
    */
-  validateVariables(
-    template: TemplateEntity,
-    variables: Record<string, string>,
-  ): ValidationResult {
+  validateVariables(template: TemplateEntity, variables: Record<string, string>): ValidationResult {
     const missing: string[] = [];
 
     for (const variable of template.variables) {
@@ -163,7 +158,7 @@ export class TemplateService {
 
     if (!isValid) {
       this.logger.warn(
-        `Validation failed for template "${template.name}". Missing: ${missing.join(', ')}`,
+        `Validation failed for template "${template.name}". Missing: ${missing.join(', ')}`
       );
     }
 

@@ -33,7 +33,7 @@ export class CreateInteractionStreamCommandHandler
   constructor(
     private readonly streamRepository: InteractionStreamRepository,
     private readonly eventBus: EventBus,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -50,21 +50,21 @@ export class CreateInteractionStreamCommandHandler
     const eventId = uuidv4();
 
     this.logger.log(
-      `Executing CreateInteractionStreamCommand: ${command.contextType}/${command.contextId}`,
+      `Executing CreateInteractionStreamCommand: ${command.contextType}/${command.contextId}`
     );
 
     // Step 1: Check for existing stream with same context
     const existing = await this.streamRepository.findByContext(
       command.contextType,
-      command.contextId,
+      command.contextId
     );
 
     if (existing) {
       this.logger.warn(
-        `Stream already exists for ${command.contextType}/${command.contextId}: ${existing.id}`,
+        `Stream already exists for ${command.contextType}/${command.contextId}: ${existing.id}`
       );
       throw new ConflictException(
-        `Interaction stream for ${command.contextType}/${command.contextId} already exists`,
+        `Interaction stream for ${command.contextType}/${command.contextId} already exists`
       );
     }
 

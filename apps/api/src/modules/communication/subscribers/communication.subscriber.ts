@@ -3,7 +3,10 @@ import { CommandBus } from '@nestjs/cqrs';
 import { Ctx, MessagePattern, NatsContext, Payload } from '@nestjs/microservices';
 
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
-import { BaseEvent, SerializedEvent } from '../../../core/event-bus/interfaces/base-event.interface';
+import {
+  BaseEvent,
+  SerializedEvent,
+} from '../../../core/event-bus/interfaces/base-event.interface';
 import { EventLoggerService } from '../../../core/event-bus/services/event-logger.service';
 import { IdempotencyService } from '../../../core/event-bus/services/idempotency.service';
 import { ActorOnboardedEventV1 } from '../../actor/events/actor-onboarded.event';
@@ -25,7 +28,7 @@ export class CommunicationSubscriber {
     private readonly commandBus: CommandBus,
     private readonly idempotencyService: IdempotencyService,
     private readonly eventLogger: EventLoggerService,
-    private readonly messageBuilder: MessageBuilderService,
+    private readonly messageBuilder: MessageBuilderService
   ) {}
 
   /**
@@ -34,7 +37,7 @@ export class CommunicationSubscriber {
   @MessagePattern(NatsSubjects.Actor.ALL)
   async handleActorEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     const subject = context.getSubject();
     this.logger.debug(`Received event on subject: ${subject}`);
@@ -54,7 +57,7 @@ export class CommunicationSubscriber {
           ...data.payload,
         };
         const event = ActorOnboardedEventV1.fromJSON(
-          jsonData as unknown as Parameters<typeof ActorOnboardedEventV1.fromJSON>[0],
+          jsonData as unknown as Parameters<typeof ActorOnboardedEventV1.fromJSON>[0]
         );
 
         const command = new SendNotificationCommand(
@@ -65,7 +68,7 @@ export class CommunicationSubscriber {
           { username: event.username, email: event.email },
           event.workspaceId ?? '',
           event.correlationId,
-          event.eventId,
+          event.eventId
         );
 
         await this.commandBus.execute(command);
@@ -84,7 +87,7 @@ export class CommunicationSubscriber {
   @MessagePattern(NatsSubjects.SignUp.ALL)
   async handleSignUpEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     const subject = context.getSubject();
     this.logger.debug(`Received event on subject: ${subject}`);
@@ -104,7 +107,7 @@ export class CommunicationSubscriber {
           ...data.payload,
         };
         const event = SignUpFinalizedEventV1.fromJSON(
-          jsonData as unknown as Parameters<typeof SignUpFinalizedEventV1.fromJSON>[0],
+          jsonData as unknown as Parameters<typeof SignUpFinalizedEventV1.fromJSON>[0]
         );
 
         const command = new SendNotificationCommand(
@@ -115,7 +118,7 @@ export class CommunicationSubscriber {
           { sessionId: event.sessionId, workspaceId: event.workspaceId },
           event.workspaceId,
           event.correlationId,
-          event.eventId,
+          event.eventId
         );
 
         await this.commandBus.execute(command);
@@ -134,7 +137,7 @@ export class CommunicationSubscriber {
   @MessagePattern(NatsSubjects.Order.ALL)
   async handleOrderEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     const subject = context.getSubject();
     this.logger.debug(`Received event on subject: ${subject}`);
@@ -167,7 +170,7 @@ export class CommunicationSubscriber {
           delivery: { scheduledDropoffTime: payload.scheduledTime ?? null },
         });
 
-        const workspaceId = (payload.workspaceId ) ?? '';
+        const workspaceId = payload.workspaceId ?? '';
 
         const command = new SendNotificationCommand(
           businessId,
@@ -177,7 +180,7 @@ export class CommunicationSubscriber {
           { message },
           workspaceId,
           data.correlationId,
-          data.eventId,
+          data.eventId
         );
 
         await this.commandBus.execute(command);
@@ -196,7 +199,7 @@ export class CommunicationSubscriber {
   @MessagePattern(NatsSubjects.Delivery.ALL)
   async handleDeliveryEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     const subject = context.getSubject();
     this.logger.debug(`Received event on subject: ${subject}`);
@@ -236,7 +239,7 @@ export class CommunicationSubscriber {
           delivery: { scheduledDropoffTime: payload.scheduledDropoffTime ?? null },
         });
 
-        const workspaceId = (payload.workspaceId ) ?? '';
+        const workspaceId = payload.workspaceId ?? '';
 
         const command = new SendNotificationCommand(
           businessId,
@@ -246,7 +249,7 @@ export class CommunicationSubscriber {
           { message },
           workspaceId,
           data.correlationId,
-          data.eventId,
+          data.eventId
         );
 
         await this.commandBus.execute(command);

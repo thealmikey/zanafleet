@@ -142,7 +142,7 @@ export class NotificationDispatchCoordinator {
     @Optional()
     @InjectRepository(NotificationEntity)
     private readonly notificationRepository?: Repository<NotificationEntity>,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -150,7 +150,9 @@ export class NotificationDispatchCoordinator {
    */
   async dispatch(input: NotificationInput): Promise<DispatchResult> {
     const notificationId = uuidv4();
-    this.logger.log(`Dispatching notification ${notificationId} for recipient ${input.recipientId}`);
+    this.logger.log(
+      `Dispatching notification ${notificationId} for recipient ${input.recipientId}`
+    );
 
     try {
       const preferredChannel = await this.selectChannel(input);
@@ -158,21 +160,18 @@ export class NotificationDispatchCoordinator {
       if (!preferredChannel) {
         const skippedResult = this.createSkippedResult(
           notificationId,
-          'No enabled channels available for recipient',
+          'No enabled channels available for recipient'
         );
         await this.emitSkippedEvent(input, skippedResult);
         return skippedResult;
       }
 
-      const rateLimitCheck = this.checkRateLimit(
-        input.recipientId,
-        preferredChannel,
-      );
+      const rateLimitCheck = this.checkRateLimit(input.recipientId, preferredChannel);
 
       if (!rateLimitCheck.allowed) {
         const skippedResult = this.createSkippedResult(
           notificationId,
-          `Rate limit exceeded: ${rateLimitCheck.reason}`,
+          `Rate limit exceeded: ${rateLimitCheck.reason}`
         );
         await this.emitSkippedEvent(input, skippedResult);
         return skippedResult;
@@ -185,17 +184,14 @@ export class NotificationDispatchCoordinator {
       });
 
       if (!template) {
-        return this.createFailedResult(
-          notificationId,
-          `Template not found: ${input.templateName}`,
-        );
+        return this.createFailedResult(notificationId, `Template not found: ${input.templateName}`);
       }
 
       const validation = this.templateService.validateVariables(template, input.variables);
       if (!validation.isValid) {
         return this.createFailedResult(
           notificationId,
-          'Template validation failed: missing or invalid variables',
+          'Template validation failed: missing or invalid variables'
         );
       }
 
@@ -206,7 +202,7 @@ export class NotificationDispatchCoordinator {
         input,
         rendered,
         preferredChannel,
-        template,
+        template
       );
 
       this.incrementRateLimit(input.recipientId, result.channel ?? preferredChannel);
@@ -217,7 +213,7 @@ export class NotificationDispatchCoordinator {
 
       const failedResult = this.createFailedResult(
         notificationId,
-        error instanceof Error ? error.message : 'Unexpected error during dispatch',
+        error instanceof Error ? error.message : 'Unexpected error during dispatch'
       );
 
       await this.emitFailedEvent(input, failedResult);
@@ -255,14 +251,14 @@ export class NotificationDispatchCoordinator {
         results.push(
           this.createFailedResult(
             uuidv4(),
-            error instanceof Error ? error.message : 'Batch processing error',
-          ),
+            error instanceof Error ? error.message : 'Batch processing error'
+          )
         );
       }
     }
 
     this.logger.log(
-      `Batch dispatch completed: ${successCount} success, ${failedCount} failed, ${skippedCount} skipped`,
+      `Batch dispatch completed: ${successCount} success, ${failedCount} failed, ${skippedCount} skipped`
     );
 
     return {
@@ -353,13 +349,11 @@ export class NotificationDispatchCoordinator {
         input.recipientId,
         input.recipientType,
         channel,
-        input.workspaceId,
+        input.workspaceId
       );
 
       if (!isEnabled) {
-        this.logger.debug(
-          `Channel ${channel} disabled by preference for ${input.recipientId}`,
-        );
+        this.logger.debug(`Channel ${channel} disabled by preference for ${input.recipientId}`);
         continue;
       }
 
@@ -407,7 +401,7 @@ export class NotificationDispatchCoordinator {
     input: NotificationInput,
     rendered: RenderedMessage,
     primaryChannel: NotificationChannel,
-    template: TemplateEntity,
+    template: TemplateEntity
   ): Promise<DispatchResult> {
     const recipient = this.buildRecipient(input);
 
@@ -417,7 +411,7 @@ export class NotificationDispatchCoordinator {
       rendered,
       recipient,
       input,
-      template,
+      template
     );
 
     if (primaryResult.success) {
@@ -437,7 +431,7 @@ export class NotificationDispatchCoordinator {
         input.recipientId,
         input.recipientType,
         fallbackChannel,
-        input.workspaceId,
+        input.workspaceId
       );
 
       if (!isEnabled) {
@@ -467,7 +461,7 @@ export class NotificationDispatchCoordinator {
         fallbackRendered,
         recipient,
         input,
-        fallbackTemplate,
+        fallbackTemplate
       );
 
       if (fallbackResult.success) {
@@ -491,7 +485,7 @@ export class NotificationDispatchCoordinator {
     rendered: RenderedMessage,
     recipient: Recipient,
     input: NotificationInput,
-    template: TemplateEntity,
+    template: TemplateEntity
   ): Promise<DispatchResult> {
     const provider = this.providerRegistry.getPrimary(channel);
 
@@ -499,7 +493,7 @@ export class NotificationDispatchCoordinator {
       return this.createFailedResult(
         notificationId,
         `No provider available for channel ${channel}`,
-        channel,
+        channel
       );
     }
 
@@ -507,7 +501,7 @@ export class NotificationDispatchCoordinator {
       return this.createFailedResult(
         notificationId,
         `Provider cannot deliver to recipient via ${channel}`,
-        channel,
+        channel
       );
     }
 
@@ -526,7 +520,7 @@ export class NotificationDispatchCoordinator {
             rendered,
             channel,
             NotificationStatus.SENT,
-            sendResult,
+            sendResult
           );
 
           await this.emitSentEvent(input, notificationId, channel, sendResult);
@@ -542,12 +536,12 @@ export class NotificationDispatchCoordinator {
 
         lastError = new Error(sendResult.errorMessage ?? 'Send failed');
         this.logger.warn(
-          `Send attempt ${attempt}/${this.config.maxRetries} failed: ${sendResult.errorMessage}`,
+          `Send attempt ${attempt}/${this.config.maxRetries} failed: ${sendResult.errorMessage}`
         );
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
         this.logger.warn(
-          `Send attempt ${attempt}/${this.config.maxRetries} threw error: ${lastError.message}`,
+          `Send attempt ${attempt}/${this.config.maxRetries} threw error: ${lastError.message}`
         );
       }
 
@@ -566,7 +560,7 @@ export class NotificationDispatchCoordinator {
       channel,
       NotificationStatus.FAILED,
       undefined,
-      errorMessage,
+      errorMessage
     );
 
     await this.emitFailedEvent(input, {
@@ -581,7 +575,7 @@ export class NotificationDispatchCoordinator {
 
   private checkRateLimit(
     recipientId: string,
-    channel: NotificationChannel,
+    channel: NotificationChannel
   ): { allowed: boolean; reason?: string } {
     const key = `${recipientId}:${channel}`;
     const now = new Date();
@@ -656,7 +650,7 @@ export class NotificationDispatchCoordinator {
     channel: NotificationChannel,
     status: NotificationStatus,
     sendResult?: SendResult,
-    error?: string,
+    error?: string
   ): Promise<void> {
     if (!this.notificationRepository) {
       return;
@@ -690,7 +684,7 @@ export class NotificationDispatchCoordinator {
     input: NotificationInput,
     notificationId: string,
     channel: NotificationChannel,
-    sendResult: SendResult,
+    sendResult: SendResult
   ): Promise<void> {
     if (!this.eventBusService) {
       return;
@@ -718,17 +712,12 @@ export class NotificationDispatchCoordinator {
       causationId: input.causationId,
     };
 
-    await this.eventBusService
-      .publish(NatsSubjects.Notification.SENT_V1, event)
-      .catch((error) => {
-        this.logger.error(`Failed to publish NotificationSentEvent: ${error.message}`);
-      });
+    await this.eventBusService.publish(NatsSubjects.Notification.SENT_V1, event).catch((error) => {
+      this.logger.error(`Failed to publish NotificationSentEvent: ${error.message}`);
+    });
   }
 
-  private async emitFailedEvent(
-    input: NotificationInput,
-    result: DispatchResult,
-  ): Promise<void> {
+  private async emitFailedEvent(input: NotificationInput, result: DispatchResult): Promise<void> {
     if (!this.eventBusService) {
       return;
     }
@@ -761,10 +750,7 @@ export class NotificationDispatchCoordinator {
       });
   }
 
-  private async emitSkippedEvent(
-    input: NotificationInput,
-    result: DispatchResult,
-  ): Promise<void> {
+  private async emitSkippedEvent(input: NotificationInput, result: DispatchResult): Promise<void> {
     if (!this.eventBusService) {
       return;
     }
@@ -800,7 +786,7 @@ export class NotificationDispatchCoordinator {
   private createFailedResult(
     notificationId: string,
     error: string,
-    channel?: NotificationChannel,
+    channel?: NotificationChannel
   ): DispatchResult {
     return {
       success: false,
@@ -810,10 +796,7 @@ export class NotificationDispatchCoordinator {
     };
   }
 
-  private createSkippedResult(
-    notificationId: string,
-    skippedReason: string,
-  ): DispatchResult {
+  private createSkippedResult(notificationId: string, skippedReason: string): DispatchResult {
     return {
       success: false,
       notificationId,

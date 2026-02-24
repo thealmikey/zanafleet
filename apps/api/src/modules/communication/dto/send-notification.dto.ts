@@ -10,9 +10,7 @@ export const SendNotificationDtoSchema = z.object({
   recipientType: z
     .nativeEnum(RecipientType)
     .describe('The type of recipient (actor, rider, or business)'),
-  channel: z
-    .nativeEnum(NotificationChannel)
-    .describe('The communication channel to use'),
+  channel: z.nativeEnum(NotificationChannel).describe('The communication channel to use'),
   templateId: z.string().min(1).describe('The ID of the notification template to render'),
   variables: z
     .record(z.string(), z.any())

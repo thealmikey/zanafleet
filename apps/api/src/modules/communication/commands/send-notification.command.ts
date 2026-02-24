@@ -13,6 +13,6 @@ export class SendNotificationCommand {
     public readonly variables: Record<string, unknown> = {},
     public readonly workspaceId: string,
     public readonly correlationId?: string,
-    public readonly causationId?: string,
+    public readonly causationId?: string
   ) {}
 }

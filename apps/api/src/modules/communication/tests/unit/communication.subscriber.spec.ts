@@ -36,7 +36,7 @@ describe('CommunicationSubscriber - Order/Delivery reactions', () => {
       commandBus as any,
       idempotencyService as any,
       eventLogger as any,
-      messageBuilder as any,
+      messageBuilder as any
     );
   });
 

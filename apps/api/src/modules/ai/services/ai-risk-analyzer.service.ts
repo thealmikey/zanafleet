@@ -22,7 +22,7 @@ export class AIRiskAnalyzerService {
    */
   async analyzeRisk(request: AIRiskAnalysisRequest): Promise<AIRiskAnalysis> {
     const startTime = Date.now();
-    
+
     this.logger.debug(
       `Analyzing risk for actor=${request.actorId}, context=${request.contextType}:${request.contextId}`
     );
@@ -180,7 +180,7 @@ export class AIRiskAnalyzerService {
     const actorCount = relatedActors?.length ?? 0;
 
     // More related actors = more complexity = slightly higher risk
-    const riskWeight = Math.min(0.15, 0.05 + (actorCount * 0.02));
+    const riskWeight = Math.min(0.15, 0.05 + actorCount * 0.02);
 
     return {
       factor: 'related_actors',

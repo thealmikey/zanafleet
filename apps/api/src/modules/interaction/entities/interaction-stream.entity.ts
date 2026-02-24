@@ -27,10 +27,10 @@ export enum InteractionContextType {
 
 /**
  * InteractionStream Entity
- * 
+ *
  * Represents a contextual thread of interactions within the platform.
  * This is the aggregate root for all interaction events.
- * 
+ *
  * Key concepts:
  * - contextType/contextId: Links stream to domain entities (Order, Delivery, etc.)
  * - participantIds: Tracks all actors who have participated in this stream
@@ -62,7 +62,7 @@ export class InteractionStreamEntity {
 
   @Column('text', {
     array: true,
-    default: () => "ARRAY[]::text[]",
+    default: () => 'ARRAY[]::text[]',
   })
   participantIds!: string[];
 

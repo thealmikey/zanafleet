@@ -1,4 +1,13 @@
-import { BadRequestException, Body, Controller, HttpCode, HttpStatus, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
@@ -18,10 +27,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @Throttle({ auth: { limit: 10, ttl: 60000 } }) // 10 requests per minute for login
-  async login(
-    @Body() body: LoginDto,
-    @Res() res: Response
-  ): Promise<LoginResponseDto> {
+  async login(@Body() body: LoginDto, @Res() res: Response): Promise<LoginResponseDto> {
     try {
       const input = LoginCommand.validate(body);
       const command = new LoginCommand(input);

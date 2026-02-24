@@ -6,7 +6,11 @@ import request from 'supertest';
 
 import { NotificationsController } from '../../controllers/notifications.controller';
 import { NotificationDispatchCoordinator } from '../../coordinators/notification-dispatch.coordinator';
-import { NotificationChannel, RecipientType, NotificationStatus } from '../../dto/notification.enums';
+import {
+  NotificationChannel,
+  RecipientType,
+  NotificationStatus,
+} from '../../dto/notification.enums';
 
 describe('NotificationsController (e2e)', () => {
   let app: INestApplication;
@@ -404,10 +408,7 @@ describe('NotificationsController (e2e)', () => {
         workspaceId: 'workspace-123',
       };
 
-      await request(app.getHttpServer())
-        .post('/notifications/dispatch')
-        .send(dto)
-        .expect(403);
+      await request(app.getHttpServer()).post('/notifications/dispatch').send(dto).expect(403);
     });
 
     it('should return 403 for batch dispatch when lacking capability', async () => {
@@ -422,9 +423,7 @@ describe('NotificationsController (e2e)', () => {
     it('should return 403 for status check when lacking capability', async () => {
       mockCapabilityAccessController.hasCapability.mockResolvedValue(false);
 
-      await request(app.getHttpServer())
-        .get('/notifications/notif-123/status')
-        .expect(403);
+      await request(app.getHttpServer()).get('/notifications/notif-123/status').expect(403);
     });
   });
 });

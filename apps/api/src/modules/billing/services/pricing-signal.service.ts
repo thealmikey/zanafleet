@@ -3,7 +3,6 @@ import { SchedulingConstraintService } from '@api/modules/calendar/services/sche
 import { PolicyEvaluationEngineService } from '@api/modules/policy/services/policy-evaluation-engine.service';
 import { Injectable, Logger, Optional } from '@nestjs/common';
 
-
 /**
  * Context for retrieving pricing signals
  */
@@ -59,13 +58,17 @@ export class PricingSignalService {
 
   constructor(
     @Optional() private readonly policyEngine?: PolicyEvaluationEngineService,
-    @Optional() private readonly schedulingConstraint?: SchedulingConstraintService,
+    @Optional() private readonly schedulingConstraint?: SchedulingConstraintService
   ) {
     if (!this.policyEngine) {
-      this.logger.warn('PolicyEvaluationEngineService not available - policy-based pricing disabled');
+      this.logger.warn(
+        'PolicyEvaluationEngineService not available - policy-based pricing disabled'
+      );
     }
     if (!this.schedulingConstraint) {
-      this.logger.warn('SchedulingConstraintService not available - calendar-based pricing disabled');
+      this.logger.warn(
+        'SchedulingConstraintService not available - calendar-based pricing disabled'
+      );
     }
   }
 
@@ -116,7 +119,7 @@ export class PricingSignalService {
     dynamicAdjustments.push(...policySignals.additionalAdjustments);
 
     this.logger.debug(
-      `Pricing signals for workspace ${context.workspaceId}: surge=${surgeMultiplier}, offPeak=${isOffPeak}, holiday=${isHoliday}`,
+      `Pricing signals for workspace ${context.workspaceId}: surge=${surgeMultiplier}, offPeak=${isOffPeak}, holiday=${isHoliday}`
     );
 
     return {
@@ -133,7 +136,7 @@ export class PricingSignalService {
   }
 
   private async getCalendarSignals(
-    context: PricingContext,
+    context: PricingContext
   ): Promise<{ isOffPeak: boolean; isHoliday: boolean }> {
     if (!this.schedulingConstraint) {
       return { isOffPeak: false, isHoliday: false };
@@ -145,7 +148,7 @@ export class PricingSignalService {
           BindingTargetType.BUSINESS,
           context.businessId ?? context.workspaceId,
           context.timestamp,
-          context.timezone,
+          context.timezone
         ),
         this.schedulingConstraint.isHoliday(context.timestamp),
       ]);
@@ -155,15 +158,15 @@ export class PricingSignalService {
       return { isOffPeak, isHoliday };
     } catch (error) {
       this.logger.error(
-        `Failed to get calendar signals: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to get calendar signals: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`
       );
       return { isOffPeak: false, isHoliday: false };
     }
   }
 
-  private async getPolicySignals(
-    context: PricingContext,
-  ): Promise<{
+  private async getPolicySignals(context: PricingContext): Promise<{
     surgeMultiplier: number;
     policyId?: string;
     additionalAdjustments: DynamicAdjustment[];
@@ -202,7 +205,9 @@ export class PricingSignalService {
       };
     } catch (error) {
       this.logger.error(
-        `Failed to evaluate pricing policy: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `Failed to evaluate pricing policy: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`
       );
       return {
         surgeMultiplier: this.DEFAULT_SURGE_MULTIPLIER,
@@ -258,7 +263,7 @@ export class PricingSignalService {
         const adj = policy.outputs.adjustment as Partial<DynamicAdjustment>;
         if (adj.type && (adj.multiplier || adj.fixedAmount)) {
           adjustments.push({
-            type: adj.type ,
+            type: adj.type,
             multiplier: adj.multiplier,
             fixedAmount: adj.fixedAmount,
             reason: adj.reason ?? 'Policy adjustment',

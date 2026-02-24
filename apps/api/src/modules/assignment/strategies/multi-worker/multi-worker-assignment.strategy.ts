@@ -75,7 +75,7 @@ export class MultiWorkerAssignmentStrategy extends BaseAssignmentStrategy {
     );
 
     assignments.push(...primaryAssignments.assignments);
-    primaryAssignments.assignedWorkerIds.forEach(id => assignedWorkerIds.add(id));
+    primaryAssignments.assignedWorkerIds.forEach((id) => assignedWorkerIds.add(id));
     errors.push(...primaryAssignments.errors);
     warnings.push(...primaryAssignments.warnings);
 
@@ -123,21 +123,18 @@ export class MultiWorkerAssignmentStrategy extends BaseAssignmentStrategy {
 
     // Check if all requirements were met
     const totalAssigned = assignments.length;
-    const totalRequired = context.requiredWorkerTypes.reduce(
-      (sum, req) => sum + req.minWorkers,
-      0
-    );
+    const totalRequired = context.requiredWorkerTypes.reduce((sum, req) => sum + req.minWorkers, 0);
 
     if (totalAssigned < totalRequired) {
-      warnings.push(
-        `Only assigned ${totalAssigned} of ${totalRequired} required workers`
-      );
+      warnings.push(`Only assigned ${totalAssigned} of ${totalRequired} required workers`);
     }
 
     const success = assignments.length > 0;
 
     this.logger.log(
-      `Multi worker assignment completed: ${success ? 'success' : 'failed'} for job ${context.jobId}`
+      `Multi worker assignment completed: ${success ? 'success' : 'failed'} for job ${
+        context.jobId
+      }`
     );
 
     return {
@@ -229,10 +226,7 @@ export class MultiWorkerAssignmentStrategy extends BaseAssignmentStrategy {
   /**
    * Filter candidates by worker type.
    */
-  private filterByWorkerType(
-    candidates: WorkerCandidate[],
-    workerType: string
-  ): WorkerCandidate[] {
+  private filterByWorkerType(candidates: WorkerCandidate[], workerType: string): WorkerCandidate[] {
     if (!workerType || workerType === 'default') {
       return candidates;
     }
@@ -264,9 +258,7 @@ export class MultiWorkerAssignmentStrategy extends BaseAssignmentStrategy {
     const validCandidates = await this.filterValidCandidates(candidates, context);
 
     // Filter out already assigned workers
-    const availableCandidates = validCandidates.filter(
-      (c) => !alreadyAssigned.has(c.workerId)
-    );
+    const availableCandidates = validCandidates.filter((c) => !alreadyAssigned.has(c.workerId));
 
     // Assign workers up to the minimum required
     let assigned = 0;
@@ -291,9 +283,7 @@ export class MultiWorkerAssignmentStrategy extends BaseAssignmentStrategy {
     }
 
     if (assigned < minWorkers) {
-      errors.push(
-        `Could not assign enough ${role} workers: needed ${minWorkers}, got ${assigned}`
-      );
+      errors.push(`Could not assign enough ${role} workers: needed ${minWorkers}, got ${assigned}`);
     }
 
     return { assignments, assignedWorkerIds, errors, warnings };

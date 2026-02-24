@@ -18,10 +18,7 @@ import {
 export abstract class BaseAssignmentStrategy implements AssignmentStrategy {
   protected readonly logger: Logger;
 
-  constructor(
-    public readonly type: AssignmentStrategyType,
-    public readonly name: string
-  ) {
+  constructor(public readonly type: AssignmentStrategyType, public readonly name: string) {
     this.logger = new Logger(`${BaseAssignmentStrategy.name}[${this.name}]`);
   }
 
@@ -54,7 +51,10 @@ export abstract class BaseAssignmentStrategy implements AssignmentStrategy {
     let score = 100;
 
     // Check if worker is available
-    if (candidate.availabilityStatus !== 'available' && candidate.availabilityStatus !== 'on_duty') {
+    if (
+      candidate.availabilityStatus !== 'available' &&
+      candidate.availabilityStatus !== 'on_duty'
+    ) {
       reasons.push(`Worker is not available (status: ${candidate.availabilityStatus})`);
       score -= 50;
     }
@@ -72,14 +72,20 @@ export abstract class BaseAssignmentStrategy implements AssignmentStrategy {
     }
 
     if (context.constraints.minRating && candidate.rating < context.constraints.minRating) {
-      reasons.push(`Worker rating ${candidate.rating} is below minimum required ${context.constraints.minRating}`);
+      reasons.push(
+        `Worker rating ${candidate.rating} is below minimum required ${context.constraints.minRating}`
+      );
       score -= 20;
     }
 
     // Check worker type requirements
     const requiredTypes = context.requiredWorkerTypes.map((r) => r.workerType);
     if (requiredTypes.length > 0 && !requiredTypes.includes(candidate.workerType)) {
-      reasons.push(`Worker type ${candidate.workerType} does not match required types: ${requiredTypes.join(', ')}`);
+      reasons.push(
+        `Worker type ${candidate.workerType} does not match required types: ${requiredTypes.join(
+          ', '
+        )}`
+      );
       score -= 40;
     }
 

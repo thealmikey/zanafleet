@@ -5,7 +5,6 @@ import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-
 import { CommunicationModule } from '../../communication.module';
 import { NotificationChannel } from '../../dto/notification.enums';
 import { TemplateEntity } from '../../entities/template.entity';
@@ -51,7 +50,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
   afterEach(async () => {
     if (module) {
       const entityManager = module.get('EntityManager');
-      await entityManager.query('DELETE FROM notification_templates WHERE "name" LIKE $1', ['test-%']);
+      await entityManager.query('DELETE FROM notification_templates WHERE "name" LIKE $1', [
+        'test-%',
+      ]);
     }
   });
 
@@ -90,8 +91,8 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
         isActive: true,
       });
 
-      expect(() =>
-        templateService.render(template, { username: 'JohnDoe' }), // missing email
+      expect(
+        () => templateService.render(template, { username: 'JohnDoe' }) // missing email
       ).toThrow(/Missing required template variables.*email/);
     });
 
