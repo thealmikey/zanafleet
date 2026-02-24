@@ -3,6 +3,6 @@ export class AcceptDeliveryAssignmentCommand {
     public readonly deliveryId: string,
     public readonly riderId: string,
     public readonly correlationId?: string,
-    public readonly causationId?: string,
+    public readonly causationId?: string
   ) {}
 }

@@ -3,7 +3,8 @@ import { AssignmentRulesService } from '../../services/assignment-rules.service'
 describe('AssignmentRulesService', () => {
   const service = new AssignmentRulesService();
 
-  const minutesFrom = (base: Date, minutes: number): Date => new Date(base.getTime() + minutes * 60 * 1000);
+  const minutesFrom = (base: Date, minutes: number): Date =>
+    new Date(base.getTime() + minutes * 60 * 1000);
 
   it('should MATCH_NOW when not scheduled', () => {
     const now = new Date('2024-01-01T12:00:00.000Z');
@@ -17,7 +18,11 @@ describe('AssignmentRulesService', () => {
     const now = new Date('2024-01-01T12:00:00.000Z');
     const past = new Date('2024-01-01T10:00:00.000Z');
 
-    const result = service.evaluateForMatching({ isScheduled: true, scheduledPickupTime: past, now });
+    const result = service.evaluateForMatching({
+      isScheduled: true,
+      scheduledPickupTime: past,
+      now,
+    });
 
     expect(result.decision).toBe('MATCH_NOW');
     expect(result.reason).toBe('PAST_SCHEDULE');
@@ -29,7 +34,7 @@ describe('AssignmentRulesService', () => {
 
     const result = service.evaluateForMatching(
       { isScheduled: true, scheduledDropoffTime: scheduled, now },
-      { preMatchWindowMinutes: 30 },
+      { preMatchWindowMinutes: 30 }
     );
 
     expect(result.decision).toBe('SCHEDULE_FOR_LATER');
@@ -43,7 +48,7 @@ describe('AssignmentRulesService', () => {
 
     const result = service.evaluateForMatching(
       { isScheduled: true, scheduledPickupTime: scheduled, now },
-      { preMatchWindowMinutes: 30 },
+      { preMatchWindowMinutes: 30 }
     );
 
     expect(result.decision).toBe('MATCH_NOW');

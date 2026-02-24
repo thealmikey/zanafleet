@@ -26,7 +26,7 @@ export class CalendarSyncService {
 
   constructor(
     @InjectRepository(CalendarEventEntity)
-    private readonly calendarEventRepo: Repository<CalendarEventEntity>,
+    private readonly calendarEventRepo: Repository<CalendarEventEntity>
   ) {}
 
   /**
@@ -76,17 +76,14 @@ export class CalendarSyncService {
    * @param options Fetch options for the provider
    * @returns Sync result with created/updated/skipped counts
    */
-  async syncFromProvider(
-    providerName: string,
-    options: FetchEventsOptions,
-  ): Promise<SyncResult> {
+  async syncFromProvider(providerName: string, options: FetchEventsOptions): Promise<SyncResult> {
     const provider = this.providers.get(providerName);
     if (!provider) {
       throw new NotFoundException(`Calendar provider not found: ${providerName}`);
     }
 
     this.logger.log(
-      `Starting sync from provider ${providerName} for ${options.startDate.toISOString()} to ${options.endDate.toISOString()}`,
+      `Starting sync from provider ${providerName} for ${options.startDate.toISOString()} to ${options.endDate.toISOString()}`
     );
 
     const externalEvents = await provider.fetchEvents(options);
@@ -112,7 +109,7 @@ export class CalendarSyncService {
     }
 
     this.logger.log(
-      `Sync complete from ${providerName}: created=${created}, updated=${updated}, skipped=${skipped}`,
+      `Sync complete from ${providerName}: created=${created}, updated=${updated}, skipped=${skipped}`
     );
 
     return { created, updated, skipped };
@@ -126,7 +123,7 @@ export class CalendarSyncService {
    * @returns 'created', 'updated', or 'skipped'
    */
   private async mergeExternalEvent(
-    externalEvent: ExternalCalendarEvent,
+    externalEvent: ExternalCalendarEvent
   ): Promise<'created' | 'updated' | 'skipped'> {
     const existing = await this.calendarEventRepo.findOne({
       where: {
@@ -167,9 +164,7 @@ export class CalendarSyncService {
       recurrencePattern: externalEvent.recurrenceRule
         ? RecurrencePattern.CUSTOM
         : RecurrencePattern.NONE,
-      recurrenceRule: externalEvent.recurrenceRule
-        ? { rule: externalEvent.recurrenceRule }
-        : null,
+      recurrenceRule: externalEvent.recurrenceRule ? { rule: externalEvent.recurrenceRule } : null,
       priority: this.getPriorityForEventType(externalEvent.eventType),
       isActive: true,
       externalId: externalEvent.externalId,
@@ -187,7 +182,7 @@ export class CalendarSyncService {
    */
   private eventNeedsUpdate(
     existing: CalendarEventEntity,
-    incoming: ExternalCalendarEvent,
+    incoming: ExternalCalendarEvent
   ): boolean {
     if (existing.title !== incoming.title) return true;
     if (existing.eventType !== incoming.eventType) return true;

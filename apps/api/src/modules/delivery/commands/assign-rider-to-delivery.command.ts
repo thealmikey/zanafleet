@@ -4,6 +4,6 @@ export class AssignRiderToDeliveryCommand {
     public readonly riderId: string,
     public readonly notifyAssignment: boolean = false,
     public readonly correlationId?: string,
-    public readonly causationId?: string,
+    public readonly causationId?: string
   ) {}
 }

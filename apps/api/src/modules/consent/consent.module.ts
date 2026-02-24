@@ -11,17 +11,17 @@ import { ConsentConfirmationService } from './services/consent-confirmation.serv
 
 /**
  * ConsentModule
- * 
+ *
  * Provides the consent-driven navigation architecture for ZanaFleet.
  * This module ensures that AI never auto-executes capabilities and
  * users always confirm before any action is taken.
- * 
+ *
  * Core functionality:
  * - CapabilityProposal: Tracks AI-suggested capabilities
  * - ConsentConfirmationService: Handles confirmation workflow
  * - CapabilityOrchestrator: Executes capabilities ONLY after confirmation
  * - ConfidenceThresholdService: Manages confidence thresholds
- * 
+ *
  * Key principles:
  * - NEVER auto-execute: CapabilityOrchestrator checks confirmation
  * - Append-only: Proposals are immutable once created
@@ -34,11 +34,7 @@ import { ConsentConfirmationService } from './services/consent-confirmation.serv
     EventBusModule.forFeature(),
     TypeOrmModule.forFeature([CapabilityProposalEntity]),
   ],
-  providers: [
-    ConsentConfirmationService,
-    CapabilityOrchestrator,
-    ConfidenceThresholdService,
-  ],
+  providers: [ConsentConfirmationService, CapabilityOrchestrator, ConfidenceThresholdService],
   exports: [
     ConsentConfirmationService,
     CapabilityOrchestrator,

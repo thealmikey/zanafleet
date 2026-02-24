@@ -3,13 +3,7 @@
 // Triggers: Event-driven (escalation requests) + Scheduled (stale escalations)
 // =============================================================================
 
-import {
-  Agent,
-  AgentType,
-  AgentTriggerType,
-  RetryPolicy,
-  ObservabilityConfig,
-} from '../types';
+import { Agent, AgentType, AgentTriggerType, RetryPolicy, ObservabilityConfig } from '../types';
 
 /**
  * Default retry policy for escalation agent

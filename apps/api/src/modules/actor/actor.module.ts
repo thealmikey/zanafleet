@@ -60,7 +60,7 @@ export class ActorModule implements OnModuleInit {
 
   constructor(
     private readonly neo4jInitializer: ActorNeo4jInitializer,
-    private readonly testAccountSeeder: TestAccountSeederService,
+    private readonly testAccountSeeder: TestAccountSeederService
   ) {}
 
   /**

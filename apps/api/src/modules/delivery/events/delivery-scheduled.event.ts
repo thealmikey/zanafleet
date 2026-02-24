@@ -75,9 +75,7 @@ export class DeliveryScheduledEventV1 {
 
       deliveryId: this.deliveryId,
       businessId: this.businessId,
-      scheduledPickupTime: this.scheduledPickupTime
-        ? this.scheduledPickupTime.toISOString()
-        : null,
+      scheduledPickupTime: this.scheduledPickupTime ? this.scheduledPickupTime.toISOString() : null,
       scheduledDropoffTime: this.scheduledDropoffTime
         ? this.scheduledDropoffTime.toISOString()
         : null,

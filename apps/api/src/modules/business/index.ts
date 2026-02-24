@@ -14,6 +14,9 @@ export {
 } from './commands/create-business.command';
 export { BusinessOnboardedEventV1 } from './events/business-onboarded.event';
 export { CreateBusinessCommandHandler } from './handlers/create-business.handler';
-export { BusinessNeo4jProjection, BusinessNeo4jInitializer } from './projections/business-neo4j.projection';
+export {
+  BusinessNeo4jProjection,
+  BusinessNeo4jInitializer,
+} from './projections/business-neo4j.projection';
 export { BusinessController } from './controllers/business.controller';
 export { BusinessModule } from './business.module';

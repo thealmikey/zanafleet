@@ -19,31 +19,29 @@ import { MatchingService } from './services/matching.service';
 import { TripService } from './services/trip.service';
 import { BundleService } from './services/bundle.service';
 
-
-
 @Module({
-    imports: [
-        CqrsModule,
-        TypeOrmModule.forFeature([AssetEntity, TripEntity, BundleEntity]),
-        PolicyModule,
-        SearchModule,
-    ],
-    controllers: [AssetController, TripController, BundleController, IntegrationController],
-    providers: [
-        MatchingService,
-        TripService,
-        AssetService,
-        BundleService,
-        AssetImageService,
-        AssetNeo4jProjection,
-        AssetNeo4jInitializer,
-    ],
-    exports: [TypeOrmModule, MatchingService, TripService, AssetNeo4jInitializer],
+  imports: [
+    CqrsModule,
+    TypeOrmModule.forFeature([AssetEntity, TripEntity, BundleEntity]),
+    PolicyModule,
+    SearchModule,
+  ],
+  controllers: [AssetController, TripController, BundleController, IntegrationController],
+  providers: [
+    MatchingService,
+    TripService,
+    AssetService,
+    BundleService,
+    AssetImageService,
+    AssetNeo4jProjection,
+    AssetNeo4jInitializer,
+  ],
+  exports: [TypeOrmModule, MatchingService, TripService, AssetNeo4jInitializer],
 })
 export class AssetModule implements OnModuleInit {
-    constructor(private readonly assetNeo4jInitializer: AssetNeo4jInitializer) { }
+  constructor(private readonly assetNeo4jInitializer: AssetNeo4jInitializer) {}
 
-    async onModuleInit(): Promise<void> {
-        await this.assetNeo4jInitializer.initialize();
-    }
+  async onModuleInit(): Promise<void> {
+    await this.assetNeo4jInitializer.initialize();
+  }
 }

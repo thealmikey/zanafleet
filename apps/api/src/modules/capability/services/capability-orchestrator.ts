@@ -5,10 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CapabilityAccessController } from './capability-access.controller';
 import { CapabilityRepository } from '../repositories/capability.repository';
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
-import {
-  CapabilityUsedEventV1,
-  CapabilityExecutionResult,
-} from '../events/capability-used.event';
+import { CapabilityUsedEventV1, CapabilityExecutionResult } from '../events/capability-used.event';
 
 /**
  * Orchestration context - passed through the orchestration flow
@@ -267,7 +264,7 @@ export class CapabilityOrchestrator implements ICapabilityOrchestrator {
       if (request.command) {
         try {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          commandResult = await this.commandBus.execute<any>(request.command) as T;
+          commandResult = (await this.commandBus.execute<any>(request.command)) as T;
           this.logger.debug(
             `CapabilityOrchestrator: Command executed successfully for ${request.capabilityName}`
           );
@@ -377,10 +374,7 @@ export class CapabilityOrchestrator implements ICapabilityOrchestrator {
    * Check if actor can execute capability (without executing)
    */
   async canExecute(request: OrchestrationRequest): Promise<boolean> {
-    return this.capabilityAccessController.hasCapability(
-      request.actorId,
-      request.capabilityName
-    );
+    return this.capabilityAccessController.hasCapability(request.actorId, request.capabilityName);
   }
 
   /**

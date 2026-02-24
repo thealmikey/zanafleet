@@ -23,7 +23,7 @@ export interface RegionFilter {
 export class CalendarEventRepository {
   constructor(
     @InjectRepository(CalendarEventEntity)
-    private readonly repo: Repository<CalendarEventEntity>,
+    private readonly repo: Repository<CalendarEventEntity>
   ) {}
 
   /**
@@ -35,7 +35,7 @@ export class CalendarEventRepository {
   async findActiveEventsForDateRange(
     startDate: Date,
     endDate: Date,
-    regionFilter?: RegionFilter,
+    regionFilter?: RegionFilter
   ): Promise<CalendarEventEntity[]> {
     const qb = this.repo
       .createQueryBuilder('event')
@@ -47,10 +47,7 @@ export class CalendarEventRepository {
       this.applyRegionFilter(qb, regionFilter);
     }
 
-    return qb
-      .orderBy('event.priority', 'DESC')
-      .addOrderBy('event.startTime', 'ASC')
-      .getMany();
+    return qb.orderBy('event.priority', 'DESC').addOrderBy('event.startTime', 'ASC').getMany();
   }
 
   /**
@@ -60,7 +57,7 @@ export class CalendarEventRepository {
    */
   async findHolidaysForDate(
     date: Date,
-    regionFilter?: RegionFilter,
+    regionFilter?: RegionFilter
   ): Promise<CalendarEventEntity[]> {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
@@ -140,7 +137,7 @@ export class CalendarEventRepository {
    */
   private applyRegionFilter(
     qb: ReturnType<Repository<CalendarEventEntity>['createQueryBuilder']>,
-    region: RegionFilter,
+    region: RegionFilter
   ): void {
     if (region.country) {
       qb.andWhere(
@@ -150,7 +147,7 @@ export class CalendarEventRepository {
               country: region.country,
             })
             .orWhere(`event.region_scope->>'country' IS NULL`);
-        }),
+        })
       );
     }
 
@@ -159,11 +156,10 @@ export class CalendarEventRepository {
         new Brackets((subQb) => {
           subQb
             .where(`event.region_scope->>'administrativeArea' IS NULL`)
-            .orWhere(
-              `event.region_scope->>'administrativeArea' = :adminArea`,
-              { adminArea: region.administrativeArea },
-            );
-        }),
+            .orWhere(`event.region_scope->>'administrativeArea' = :adminArea`, {
+              adminArea: region.administrativeArea,
+            });
+        })
       );
     }
 
@@ -175,7 +171,7 @@ export class CalendarEventRepository {
             .orWhere(`event.region_scope->>'locality' = :locality`, {
               locality: region.locality,
             });
-        }),
+        })
       );
     }
   }

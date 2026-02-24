@@ -1,11 +1,7 @@
 import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import {
-  CalendarScope,
-  CalendarRuleType,
-  CreateCalendarInput,
-} from '@zanafleet/contracts';
+import { CalendarScope, CalendarRuleType, CreateCalendarInput } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 
 import { EventBusService } from '../../../../core/event-bus/event-bus.service';
@@ -162,11 +158,9 @@ describe('CalendarService', () => {
     it('should throw NotFoundException when calendar not found', async () => {
       calendarRepository.findById.mockResolvedValue(null);
 
+      await expect(service.getCalendar('non-existent')).rejects.toThrow(NotFoundException);
       await expect(service.getCalendar('non-existent')).rejects.toThrow(
-        NotFoundException,
-      );
-      await expect(service.getCalendar('non-existent')).rejects.toThrow(
-        'Calendar not found: non-existent',
+        'Calendar not found: non-existent'
       );
     });
   });
@@ -222,9 +216,9 @@ describe('CalendarService', () => {
     it('should throw NotFoundException when calendar not found', async () => {
       calendarRepository.findById.mockResolvedValue(null);
 
-      await expect(
-        service.updateCalendar('non-existent', { name: 'Test' }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.updateCalendar('non-existent', { name: 'Test' })).rejects.toThrow(
+        NotFoundException
+      );
     });
   });
 
@@ -245,16 +239,14 @@ describe('CalendarService', () => {
       await service.deleteCalendar('test-uuid');
 
       expect(calendarRepository.save).toHaveBeenCalledWith(
-        expect.objectContaining({ isActive: false }),
+        expect.objectContaining({ isActive: false })
       );
     });
 
     it('should throw NotFoundException when calendar not found', async () => {
       calendarRepository.findById.mockResolvedValue(null);
 
-      await expect(service.deleteCalendar('non-existent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.deleteCalendar('non-existent')).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -312,7 +304,7 @@ describe('CalendarService', () => {
         service.addTimeWindow('non-existent', {
           startTime: '08:00:00',
           endTime: '17:00:00',
-        }),
+        })
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -352,7 +344,7 @@ describe('CalendarService', () => {
           ruleType: CalendarRuleType.HOLIDAY,
           scope: CalendarScope.NATIONAL,
           conditions: {},
-        }),
+        })
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -527,25 +519,28 @@ describe('CalendarService', () => {
       const monday = new Date(2024, 0, 15); // January 15, 2024 in local time
       const mondayResult = await service.getEffectiveTimeWindows('calendar-uuid', monday);
       expect(mondayResult).toHaveLength(2); // Monday window + all-days window
-      expect(mondayResult.map(w => w.timeWindowId).sort()).toEqual(['window-all', 'window-mon']);
+      expect(mondayResult.map((w) => w.timeWindowId).sort()).toEqual(['window-all', 'window-mon']);
 
       // Test Wednesday (2024-01-17 is a Wednesday)
       const wednesday = new Date(2024, 0, 17); // January 17, 2024 in local time
       const wednesdayResult = await service.getEffectiveTimeWindows('calendar-uuid', wednesday);
       expect(wednesdayResult).toHaveLength(2); // Wednesday window + all-days window
-      expect(wednesdayResult.map(w => w.timeWindowId).sort()).toEqual(['window-all', 'window-wed']);
+      expect(wednesdayResult.map((w) => w.timeWindowId).sort()).toEqual([
+        'window-all',
+        'window-wed',
+      ]);
 
       // Test Friday (2024-01-19 is a Friday)
       const friday = new Date(2024, 0, 19); // January 19, 2024 in local time
       const fridayResult = await service.getEffectiveTimeWindows('calendar-uuid', friday);
       expect(fridayResult).toHaveLength(2); // Friday window + all-days window
-      expect(fridayResult.map(w => w.timeWindowId).sort()).toEqual(['window-all', 'window-fri']);
+      expect(fridayResult.map((w) => w.timeWindowId).sort()).toEqual(['window-all', 'window-fri']);
 
       // Test Sunday (2024-01-21 is a Sunday)
       const sunday = new Date(2024, 0, 21); // January 21, 2024 in local time
       const sundayResult = await service.getEffectiveTimeWindows('calendar-uuid', sunday);
       expect(sundayResult).toHaveLength(2); // Sunday window + all-days window
-      expect(sundayResult.map(w => w.timeWindowId).sort()).toEqual(['window-all', 'window-sun']);
+      expect(sundayResult.map((w) => w.timeWindowId).sort()).toEqual(['window-all', 'window-sun']);
 
       // Test Tuesday (2024-01-16 is a Tuesday) - should only get all-days window
       const tuesday = new Date(2024, 0, 16); // January 16, 2024 in local time
@@ -563,9 +558,9 @@ describe('CalendarService', () => {
     it('should throw NotFoundException when calendar not found', async () => {
       calendarRepository.findById.mockResolvedValue(null);
 
-      await expect(
-        service.getEffectiveTimeWindows('non-existent', new Date()),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.getEffectiveTimeWindows('non-existent', new Date())).rejects.toThrow(
+        NotFoundException
+      );
     });
 
     it('should return midnight-crossing time window (22:00 to 06:00) for matching days', async () => {

@@ -62,8 +62,8 @@ export class DeliveryRequestCoordinator {
     private readonly deliveryLifecycleCoordinator: DeliveryLifecycleCoordinator,
     private readonly deliveryMatchingCoordinator: DeliveryMatchingCoordinator,
     private readonly deliveryService: DeliveryService,
-    private readonly eventBus: EventBusService,
-  ) { }
+    private readonly eventBus: EventBusService
+  ) {}
 
   async requestDelivery(input: RequestDeliveryInput): Promise<RequestDeliveryResult> {
     const itemSummary = this.buildItemSummary(input.itemId, input.itemDescription);
@@ -90,7 +90,7 @@ export class DeliveryRequestCoordinator {
     });
 
     const orderId = await this.commandBus.execute<CreateOrderCommand, string>(
-      new CreateOrderCommand(orderInput),
+      new CreateOrderCommand(orderInput)
     );
 
     const lifecycleResult = await this.deliveryLifecycleCoordinator.createDelivery({
@@ -136,12 +136,14 @@ export class DeliveryRequestCoordinator {
       matchingTriggered = true;
       try {
         const matchingResult = await this.deliveryMatchingCoordinator.findAndAssignRider(
-          lifecycleResult.deliveryId,
+          lifecycleResult.deliveryId
         );
         assignedRiderId = matchingResult.success ? matchingResult.assignedRiderId ?? null : null;
       } catch (error) {
         this.logger.warn(
-          `Auto-matching failed for delivery ${lifecycleResult.deliveryId}: ${(error as Error).message}`,
+          `Auto-matching failed for delivery ${lifecycleResult.deliveryId}: ${
+            (error as Error).message
+          }`
         );
       }
     }
@@ -192,7 +194,7 @@ export class DeliveryRequestCoordinator {
 
     if (input.latitude === undefined || input.longitude === undefined) {
       throw new BadRequestException(
-        'A location requires either locationId or both latitude and longitude',
+        'A location requires either locationId or both latitude and longitude'
       );
     }
 
@@ -229,7 +231,7 @@ export class DeliveryRequestCoordinator {
 
   private estimateDistanceKm(
     pickup: { latitude: number; longitude: number } | null,
-    dropoff: { latitude: number; longitude: number } | null,
+    dropoff: { latitude: number; longitude: number } | null
   ): number | undefined {
     if (!pickup || !dropoff) {
       return undefined;

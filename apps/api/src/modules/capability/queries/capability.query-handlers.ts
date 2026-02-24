@@ -14,9 +14,7 @@ import {
  * Query to retrieve all capabilities with optional filtering
  */
 export class GetAllCapabilitiesQuery {
-  constructor(
-    public readonly options: CapabilityListQueryDto = {}
-  ) {}
+  constructor(public readonly options: CapabilityListQueryDto = {}) {}
 }
 
 /**
@@ -48,10 +46,7 @@ export class GetActorCapabilitiesQuery {
  * Query to check if an actor has a specific capability
  */
 export class CheckActorCapabilityQuery {
-  constructor(
-    public readonly actorId: string,
-    public readonly capabilityName: string
-  ) {}
+  constructor(public readonly actorId: string, public readonly capabilityName: string) {}
 }
 
 /**
@@ -85,7 +80,9 @@ export class GetAllCapabilitiesQueryHandler implements IQueryHandler<GetAllCapab
     const limit = Math.min(options.limit ?? 50, 100);
     const skip = (page - 1) * limit;
 
-    this.logger.debug(`Getting capabilities: page=${page}, limit=${limit}, category=${options.category}`);
+    this.logger.debug(
+      `Getting capabilities: page=${page}, limit=${limit}, category=${options.category}`
+    );
 
     let capabilities;
     let total;
@@ -96,7 +93,7 @@ export class GetAllCapabilitiesQueryHandler implements IQueryHandler<GetAllCapab
       capabilities = capabilities.slice(skip, skip + limit);
     } else if (options.requiresConsent !== undefined) {
       const all = await this.capabilityRepository.findAll();
-      capabilities = all.filter(c => c.requiresConsent === options.requiresConsent);
+      capabilities = all.filter((c) => c.requiresConsent === options.requiresConsent);
       total = capabilities.length;
       capabilities = capabilities.slice(skip, skip + limit);
     } else {
@@ -107,8 +104,9 @@ export class GetAllCapabilitiesQueryHandler implements IQueryHandler<GetAllCapab
       if (options.search) {
         const searchLower = options.search.toLowerCase();
         capabilities = capabilities.filter(
-          c => c.name.toLowerCase().includes(searchLower) ||
-               (c.description?.toLowerCase().includes(searchLower) ?? false)
+          (c) =>
+            c.name.toLowerCase().includes(searchLower) ||
+            (c.description?.toLowerCase().includes(searchLower) ?? false)
         );
         total = capabilities.length;
       }
@@ -116,17 +114,19 @@ export class GetAllCapabilitiesQueryHandler implements IQueryHandler<GetAllCapab
       capabilities = capabilities.slice(skip, skip + limit);
     }
 
-    const dtos = capabilities.map(c => CapabilityResponseDto.fromEntity({
-      id: c.id,
-      name: c.name,
-      description: c.description,
-      category: c.category,
-      requiresConsent: c.requiresConsent,
-      version: c.version,
-      metadata: c.metadata,
-      createdAt: c.createdAt,
-      updatedAt: c.updatedAt,
-    }));
+    const dtos = capabilities.map((c) =>
+      CapabilityResponseDto.fromEntity({
+        id: c.id,
+        name: c.name,
+        description: c.description,
+        category: c.category,
+        requiresConsent: c.requiresConsent,
+        version: c.version,
+        metadata: c.metadata,
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt,
+      })
+    );
 
     return new CapabilityListResponseDto({
       capabilities: dtos,
@@ -255,17 +255,19 @@ export class GetCapabilitiesByCategoryQueryHandler
   async execute(query: GetCapabilitiesByCategoryQuery): Promise<CapabilityResponseDto[]> {
     const capabilities = await this.capabilityRepository.findByCategory(query.category);
 
-    return capabilities.map(c => CapabilityResponseDto.fromEntity({
-      id: c.id,
-      name: c.name,
-      description: c.description,
-      category: c.category,
-      requiresConsent: c.requiresConsent,
-      version: c.version,
-      metadata: c.metadata,
-      createdAt: c.createdAt,
-      updatedAt: c.updatedAt,
-    }));
+    return capabilities.map((c) =>
+      CapabilityResponseDto.fromEntity({
+        id: c.id,
+        name: c.name,
+        description: c.description,
+        category: c.category,
+        requiresConsent: c.requiresConsent,
+        version: c.version,
+        metadata: c.metadata,
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt,
+      })
+    );
   }
 }
 
@@ -284,17 +286,19 @@ export class GetCapabilitiesRequiringConsentQueryHandler
   async execute(): Promise<CapabilityResponseDto[]> {
     const capabilities = await this.capabilityRepository.findRequiringConsent();
 
-    return capabilities.map(c => CapabilityResponseDto.fromEntity({
-      id: c.id,
-      name: c.name,
-      description: c.description,
-      category: c.category,
-      requiresConsent: c.requiresConsent,
-      version: c.version,
-      metadata: c.metadata,
-      createdAt: c.createdAt,
-      updatedAt: c.updatedAt,
-    }));
+    return capabilities.map((c) =>
+      CapabilityResponseDto.fromEntity({
+        id: c.id,
+        name: c.name,
+        description: c.description,
+        category: c.category,
+        requiresConsent: c.requiresConsent,
+        version: c.version,
+        metadata: c.metadata,
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt,
+      })
+    );
   }
 }
 

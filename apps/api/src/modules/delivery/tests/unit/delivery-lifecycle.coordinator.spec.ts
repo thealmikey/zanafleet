@@ -68,61 +68,61 @@ describe('DeliveryLifecycleCoordinator', () => {
     describe('isValidTransition', () => {
       it('should allow Requested -> Assigned', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Requested, DeliveryStatus.Assigned),
+          coordinator.isValidTransition(DeliveryStatus.Requested, DeliveryStatus.Assigned)
         ).toBe(true);
       });
 
       it('should allow Requested -> Cancelled', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Requested, DeliveryStatus.Cancelled),
+          coordinator.isValidTransition(DeliveryStatus.Requested, DeliveryStatus.Cancelled)
         ).toBe(true);
       });
 
       it('should allow Assigned -> PickedUp', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Assigned, DeliveryStatus.PickedUp),
+          coordinator.isValidTransition(DeliveryStatus.Assigned, DeliveryStatus.PickedUp)
         ).toBe(true);
       });
 
       it('should allow PickedUp -> InTransit', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.PickedUp, DeliveryStatus.InTransit),
+          coordinator.isValidTransition(DeliveryStatus.PickedUp, DeliveryStatus.InTransit)
         ).toBe(true);
       });
 
       it('should allow InTransit -> Delivered', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.InTransit, DeliveryStatus.Delivered),
+          coordinator.isValidTransition(DeliveryStatus.InTransit, DeliveryStatus.Delivered)
         ).toBe(true);
       });
 
       it('should NOT allow Requested -> Delivered (skip states)', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Requested, DeliveryStatus.Delivered),
+          coordinator.isValidTransition(DeliveryStatus.Requested, DeliveryStatus.Delivered)
         ).toBe(false);
       });
 
       it('should NOT allow Delivered -> any state (terminal)', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Delivered, DeliveryStatus.Requested),
+          coordinator.isValidTransition(DeliveryStatus.Delivered, DeliveryStatus.Requested)
         ).toBe(false);
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Delivered, DeliveryStatus.Cancelled),
+          coordinator.isValidTransition(DeliveryStatus.Delivered, DeliveryStatus.Cancelled)
         ).toBe(false);
       });
 
       it('should NOT allow Cancelled -> any state (terminal)', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Cancelled, DeliveryStatus.Requested),
+          coordinator.isValidTransition(DeliveryStatus.Cancelled, DeliveryStatus.Requested)
         ).toBe(false);
       });
 
       it('should NOT allow backward transitions', () => {
         expect(
-          coordinator.isValidTransition(DeliveryStatus.Assigned, DeliveryStatus.Requested),
+          coordinator.isValidTransition(DeliveryStatus.Assigned, DeliveryStatus.Requested)
         ).toBe(false);
         expect(
-          coordinator.isValidTransition(DeliveryStatus.InTransit, DeliveryStatus.PickedUp),
+          coordinator.isValidTransition(DeliveryStatus.InTransit, DeliveryStatus.PickedUp)
         ).toBe(false);
       });
     });
@@ -272,7 +272,7 @@ describe('DeliveryLifecycleCoordinator', () => {
           deliveryId: 'delivery-123',
           businessId: validInput.businessId,
           workspaceId: validInput.workspaceId,
-        }),
+        })
       );
     });
   });
@@ -287,7 +287,7 @@ describe('DeliveryLifecycleCoordinator', () => {
       const result = await coordinator.transitionState(
         'delivery-123',
         DeliveryStatus.Assigned,
-        'actor-123',
+        'actor-123'
       );
 
       expect(result.success).toBe(true);
@@ -298,7 +298,7 @@ describe('DeliveryLifecycleCoordinator', () => {
           eventType: 'DeliveryStateTransitionedEvent-V1',
           deliveryId: 'delivery-123',
           newState: DeliveryStatus.Assigned,
-        }),
+        })
       );
     });
   });
@@ -313,7 +313,7 @@ describe('DeliveryLifecycleCoordinator', () => {
       const result = await coordinator.cancelDelivery(
         'delivery-123',
         'Customer request',
-        'actor-123',
+        'actor-123'
       );
 
       expect(result.success).toBe(true);
@@ -325,7 +325,7 @@ describe('DeliveryLifecycleCoordinator', () => {
           eventType: 'DeliveryCancelledEvent-V1',
           deliveryId: 'delivery-123',
           reason: 'Customer request',
-        }),
+        })
       );
     });
   });
@@ -358,7 +358,7 @@ describe('DeliveryLifecycleCoordinator', () => {
           deliveryId: 'delivery-123',
           totalCharges: 25.52,
           surgeMultiplier: 1.2,
-        }),
+        })
       );
     });
 

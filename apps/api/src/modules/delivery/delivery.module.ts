@@ -47,7 +47,7 @@ function createMockRepository<T = unknown>(): Record<string, unknown> {
     findOneBy: async (): Promise<T | null> => null,
     create: (data: Partial<T>): T => data as T,
     merge: (entity: T, ...updates: Record<string, unknown>[]): T =>
-      ({ ...entity, ...Object.assign({}, ...updates) }) as T,
+      ({ ...entity, ...Object.assign({}, ...updates) } as T),
     delete: async (): Promise<{ affected: number }> => ({ affected: 1 }),
     createQueryBuilder: () => null,
     manager: { save: async (entity: T): Promise<T> => entity },
@@ -73,7 +73,7 @@ function createMockDataSource(): Record<string, unknown> {
  */
 function createTypeOrmFallbackProviders(...entities: (new () => unknown)[]): Provider[] {
   if (!isSandBoxMode) return [];
-  return entities.map(entity => ({
+  return entities.map((entity) => ({
     provide: getRepositoryToken(entity),
     useValue: createMockRepository(),
   }));

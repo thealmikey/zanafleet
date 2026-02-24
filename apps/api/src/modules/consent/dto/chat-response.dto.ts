@@ -52,7 +52,7 @@ export class CapabilityProposalDto {
 
 /**
  * ChatResponse DTO
- * 
+ *
  * The updated ChatResponse structure that supports consent-driven interactions.
  */
 export class ChatResponseDto {

@@ -10,128 +10,130 @@ import { AssetEntity } from '../entities/asset.entity';
  */
 @Injectable()
 export class AssetImageService {
-    constructor(
-        @InjectRepository(AssetEntity)
-        private readonly assetRepository: Repository<AssetEntity>,
-    ) { }
+  constructor(
+    @InjectRepository(AssetEntity)
+    private readonly assetRepository: Repository<AssetEntity>
+  ) {}
 
-    /**
-     * Add image to asset
-     */
-    async addImage(
-        assetId: string,
-        imageData: {
-            mediaId: string;
-            purpose?: 'exterior' | 'interior' | 'cargo' | 'dashboard' | 'custom';
-            isPrimary?: boolean;
-        }
-    ): Promise<void> {
-        const asset = await this.assetRepository.findOne({ where: { id: assetId } });
+  /**
+   * Add image to asset
+   */
+  async addImage(
+    assetId: string,
+    imageData: {
+      mediaId: string;
+      purpose?: 'exterior' | 'interior' | 'cargo' | 'dashboard' | 'custom';
+      isPrimary?: boolean;
+    }
+  ): Promise<void> {
+    const asset = await this.assetRepository.findOne({ where: { id: assetId } });
 
-        if (!asset) {
-            throw new NotFoundException(`Asset with ID "${assetId}" not found`);
-        }
-
-        const imageIds = asset.imageIds || [];
-
-        // If setting as primary, unmark other images
-        if (imageData.isPrimary) {
-            imageIds.forEach(img => img.isPrimary = false);
-        }
-
-        // Add new image
-        imageIds.push({
-            mediaId: imageData.mediaId,
-            purpose: imageData.purpose || 'custom',
-            isPrimary: imageData.isPrimary || false,
-            uploadedAt: new Date(),
-        });
-
-        asset.imageIds = imageIds;
-        await this.assetRepository.save(asset);
+    if (!asset) {
+      throw new NotFoundException(`Asset with ID "${assetId}" not found`);
     }
 
-    /**
-     * Remove image from asset
-     */
-    async removeImage(assetId: string, mediaId: string): Promise<void> {
-        const asset = await this.assetRepository.findOne({ where: { id: assetId } });
+    const imageIds = asset.imageIds || [];
 
-        if (!asset) {
-            throw new NotFoundException(`Asset with ID "${assetId}" not found`);
-        }
-
-        const imageIds = asset.imageIds || [];
-        asset.imageIds = imageIds.filter(img => img.mediaId !== mediaId);
-
-        await this.assetRepository.save(asset);
+    // If setting as primary, unmark other images
+    if (imageData.isPrimary) {
+      imageIds.forEach((img) => (img.isPrimary = false));
     }
 
-    /**
-     * Update image metadata
-     */
-    async updateImageMetadata(
-        assetId: string,
-        mediaId: string,
-        updates: {
-            purpose?: 'exterior' | 'interior' | 'cargo' | 'dashboard' | 'custom';
-            isPrimary?: boolean;
-        }
-    ): Promise<void> {
-        const asset = await this.assetRepository.findOne({ where: { id: assetId } });
+    // Add new image
+    imageIds.push({
+      mediaId: imageData.mediaId,
+      purpose: imageData.purpose || 'custom',
+      isPrimary: imageData.isPrimary || false,
+      uploadedAt: new Date(),
+    });
 
-        if (!asset) {
-            throw new NotFoundException(`Asset with ID "${assetId}" not found`);
-        }
+    asset.imageIds = imageIds;
+    await this.assetRepository.save(asset);
+  }
 
-        const imageIds = asset.imageIds || [];
-        const imageIndex = imageIds.findIndex(img => img.mediaId === mediaId);
+  /**
+   * Remove image from asset
+   */
+  async removeImage(assetId: string, mediaId: string): Promise<void> {
+    const asset = await this.assetRepository.findOne({ where: { id: assetId } });
 
-        if (imageIndex === -1) {
-            throw new NotFoundException(`Image with ID "${mediaId}" not found on asset`);
-        }
-
-        // If setting as primary, unmark other images
-        if (updates.isPrimary) {
-            imageIds.forEach(img => img.isPrimary = false);
-        }
-
-        // Update image metadata
-        if (updates.purpose !== undefined) {
-            imageIds[imageIndex].purpose = updates.purpose;
-        }
-        if (updates.isPrimary !== undefined) {
-            imageIds[imageIndex].isPrimary = updates.isPrimary;
-        }
-
-        asset.imageIds = imageIds;
-        await this.assetRepository.save(asset);
+    if (!asset) {
+      throw new NotFoundException(`Asset with ID "${assetId}" not found`);
     }
 
-    /**
-     * Get all images for an asset
-     */
-    async getAssetImages(assetId: string): Promise<Array<{
-        mediaId: string;
-        purpose?: string;
-        isPrimary?: boolean;
-        uploadedAt?: Date;
-    }>> {
-        const asset = await this.assetRepository.findOne({ where: { id: assetId } });
+    const imageIds = asset.imageIds || [];
+    asset.imageIds = imageIds.filter((img) => img.mediaId !== mediaId);
 
-        if (!asset) {
-            throw new NotFoundException(`Asset with ID "${assetId}" not found`);
-        }
+    await this.assetRepository.save(asset);
+  }
 
-        return asset.imageIds || [];
+  /**
+   * Update image metadata
+   */
+  async updateImageMetadata(
+    assetId: string,
+    mediaId: string,
+    updates: {
+      purpose?: 'exterior' | 'interior' | 'cargo' | 'dashboard' | 'custom';
+      isPrimary?: boolean;
+    }
+  ): Promise<void> {
+    const asset = await this.assetRepository.findOne({ where: { id: assetId } });
+
+    if (!asset) {
+      throw new NotFoundException(`Asset with ID "${assetId}" not found`);
     }
 
-    /**
-     * Get primary image for an asset
-     */
-    async getPrimaryImage(assetId: string): Promise<string | null> {
-        const images = await this.getAssetImages(assetId);
-        const primary = images.find(img => img.isPrimary);
-        return primary ? primary.mediaId : (images[0]?.mediaId || null);
+    const imageIds = asset.imageIds || [];
+    const imageIndex = imageIds.findIndex((img) => img.mediaId === mediaId);
+
+    if (imageIndex === -1) {
+      throw new NotFoundException(`Image with ID "${mediaId}" not found on asset`);
     }
+
+    // If setting as primary, unmark other images
+    if (updates.isPrimary) {
+      imageIds.forEach((img) => (img.isPrimary = false));
+    }
+
+    // Update image metadata
+    if (updates.purpose !== undefined) {
+      imageIds[imageIndex].purpose = updates.purpose;
+    }
+    if (updates.isPrimary !== undefined) {
+      imageIds[imageIndex].isPrimary = updates.isPrimary;
+    }
+
+    asset.imageIds = imageIds;
+    await this.assetRepository.save(asset);
+  }
+
+  /**
+   * Get all images for an asset
+   */
+  async getAssetImages(assetId: string): Promise<
+    Array<{
+      mediaId: string;
+      purpose?: string;
+      isPrimary?: boolean;
+      uploadedAt?: Date;
+    }>
+  > {
+    const asset = await this.assetRepository.findOne({ where: { id: assetId } });
+
+    if (!asset) {
+      throw new NotFoundException(`Asset with ID "${assetId}" not found`);
+    }
+
+    return asset.imageIds || [];
+  }
+
+  /**
+   * Get primary image for an asset
+   */
+  async getPrimaryImage(assetId: string): Promise<string | null> {
+    const images = await this.getAssetImages(assetId);
+    const primary = images.find((img) => img.isPrimary);
+    return primary ? primary.mediaId : images[0]?.mediaId || null;
+  }
 }

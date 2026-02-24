@@ -1,22 +1,10 @@
 import { RequireCapability } from '@api/core/api/decorators';
 import { CapabilityGuard } from '@api/core/api/guards';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
-import {
-  Controller,
-  Get,
-  Query,
-  Param,
-  UseGuards,
-  Header,
-} from '@nestjs/common';
+import { parseQueryParams, createPaginationMeta, RawQueryParams } from '@api/core/api/utils';
+import { Controller, Get, Query, Param, UseGuards, Header } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeliveryStatus, OrderStatus } from '@zanafleet/contracts';
 import { Repository, MoreThanOrEqual } from 'typeorm';
-
 
 import { InvoiceEntity } from '../../billing/entities/invoice.entity';
 import { DeliveryEntity } from '../../delivery/entities/delivery.entity';
@@ -96,8 +84,8 @@ export class BusinessDashboardController {
       },
     });
 
-    const pendingOrders = orders.filter(o => o.status === OrderStatus.Pending).length;
-    const fulfilledOrders = orders.filter(o => o.status === OrderStatus.Fulfilled).length;
+    const pendingOrders = orders.filter((o) => o.status === OrderStatus.Pending).length;
+    const fulfilledOrders = orders.filter((o) => o.status === OrderStatus.Fulfilled).length;
 
     const [deliveries, totalDeliveries] = await this.deliveryRepository.findAndCount({
       where: {
@@ -106,7 +94,9 @@ export class BusinessDashboardController {
       },
     });
 
-    const completedDeliveries = deliveries.filter(d => d.status === DeliveryStatus.Delivered).length;
+    const completedDeliveries = deliveries.filter(
+      (d) => d.status === DeliveryStatus.Delivered
+    ).length;
 
     const invoices = await this.invoiceRepository.find({
       where: {
@@ -239,7 +229,7 @@ export class BusinessDashboardController {
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
     const [entities, total] = await this.invoiceRepository.findAndCount({
-      where: filter ,
+      where: filter,
       order,
       skip: pagination.offset,
       take: pagination.limit,

@@ -1,15 +1,15 @@
-import { Test } from '@nestjs/testing'
-import { getRepositoryToken, getDataSourceToken } from '@nestjs/typeorm'
-import { DeliveryStatus } from '@zanafleet/contracts'
-import { Repository, EntityManager } from 'typeorm'
+import { Test } from '@nestjs/testing';
+import { getRepositoryToken, getDataSourceToken } from '@nestjs/typeorm';
+import { DeliveryStatus } from '@zanafleet/contracts';
+import { Repository, EntityManager } from 'typeorm';
 
-import { DeliveryEntity } from '../../entities/delivery.entity'
-import { DeliveryService } from '../../services/delivery.service'
+import { DeliveryEntity } from '../../entities/delivery.entity';
+import { DeliveryService } from '../../services/delivery.service';
 
 describe('DeliveryService', () => {
-  let service: DeliveryService
-  let repo: jest.Mocked<Repository<DeliveryEntity>>
-  let dataSource: { transaction: jest.Mock }
+  let service: DeliveryService;
+  let repo: jest.Mocked<Repository<DeliveryEntity>>;
+  let dataSource: { transaction: jest.Mock };
 
   beforeEach(async () => {
     repo = {
@@ -20,11 +20,11 @@ describe('DeliveryService', () => {
       findOne: jest.fn(),
       update: jest.fn(),
       manager: {} as any,
-    } as unknown as jest.Mocked<Repository<DeliveryEntity>>
+    } as unknown as jest.Mocked<Repository<DeliveryEntity>>;
 
     dataSource = {
       transaction: jest.fn(),
-    }
+    };
 
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -32,13 +32,13 @@ describe('DeliveryService', () => {
         { provide: getRepositoryToken(DeliveryEntity), useValue: repo },
         { provide: getDataSourceToken(), useValue: dataSource },
       ],
-    }).compile()
+    }).compile();
 
-    service = moduleRef.get(DeliveryService)
-  })
+    service = moduleRef.get(DeliveryService);
+  });
 
   it('persists a scheduled delivery', async () => {
-    const now = new Date('2025-01-01T00:00:00.000Z')
+    const now = new Date('2025-01-01T00:00:00.000Z');
     const saved: DeliveryEntity = Object.assign(new DeliveryEntity(), {
       id: 'd-1',
       businessId: 'b-1',
@@ -65,9 +65,9 @@ describe('DeliveryService', () => {
       trackingUrl: null,
       createdAt: now,
       updatedAt: now,
-    })
+    });
 
-    repo.save.mockResolvedValue(saved)
+    repo.save.mockResolvedValue(saved);
 
     await service.createScheduled({
       businessId: 'b-1',
@@ -76,37 +76,37 @@ describe('DeliveryService', () => {
       scheduledPickupTime: now,
       scheduledDropoffTime: new Date('2025-01-01T01:00:00.000Z'),
       visibilityToken: 'tok',
-    })
+    });
 
-    expect(repo.save).toHaveBeenCalledTimes(1)
-    const arg = repo.save.mock.calls[0][0] as DeliveryEntity
-    expect(arg.isScheduled).toBe(true)
-    expect(arg.scheduledPickupTime).toEqual(now)
-    expect(arg.status).toBe(DeliveryStatus.Requested)
-  })
+    expect(repo.save).toHaveBeenCalledTimes(1);
+    const arg = repo.save.mock.calls[0][0] as DeliveryEntity;
+    expect(arg.isScheduled).toBe(true);
+    expect(arg.scheduledPickupTime).toEqual(now);
+    expect(arg.status).toBe(DeliveryStatus.Requested);
+  });
 
   it('links orderIds into delivery_orders', async () => {
     const qrm: Partial<EntityManager> = {
       query: jest.fn().mockResolvedValue(undefined),
-    }
+    };
     dataSource.transaction.mockImplementation(async (cb: (em: EntityManager) => Promise<void>) => {
-      await cb(qrm as EntityManager)
-    })
+      await cb(qrm as EntityManager);
+    });
 
-    await service.linkOrders('d-1', ['o-1', 'o-2', 'o-3'])
+    await service.linkOrders('d-1', ['o-1', 'o-2', 'o-3']);
 
-    expect(dataSource.transaction).toHaveBeenCalledTimes(1)
-    expect((qrm.query as jest.Mock).mock.calls.length).toBe(3)
+    expect(dataSource.transaction).toHaveBeenCalledTimes(1);
+    expect((qrm.query as jest.Mock).mock.calls.length).toBe(3);
     for (const call of (qrm.query as jest.Mock).mock.calls) {
-      expect(call[0]).toContain('"delivery_orders"')
-      expect(call[0]).toContain('ON CONFLICT ("deliveryId","orderId") DO NOTHING')
+      expect(call[0]).toContain('"delivery_orders"');
+      expect(call[0]).toContain('ON CONFLICT ("deliveryId","orderId") DO NOTHING');
     }
-  })
+  });
 
   describe('getPublicViewByToken', () => {
-    it.todo('returns null when token does not exist in database')
+    it.todo('returns null when token does not exist in database');
 
-    it.todo('returns null when token format is invalid')
+    it.todo('returns null when token format is invalid');
 
     /**
      * @todo Implement token validation
@@ -135,9 +135,9 @@ describe('DeliveryService', () => {
       //   - 'expired-token' -> null
       //   - '' (empty string) -> null
       //   - 'valid-token' -> DeliveryResponse
-      expect(true).toBe(true) // Placeholder assertion
-    })
-  })
+      expect(true).toBe(true); // Placeholder assertion
+    });
+  });
 
   it('updates assignment and status timestamps', async () => {
     const existing: DeliveryEntity = Object.assign(new DeliveryEntity(), {
@@ -152,35 +152,35 @@ describe('DeliveryService', () => {
       isScheduled: false,
       createdAt: new Date('2025-01-01T00:00:00.000Z'),
       updatedAt: new Date('2025-01-01T00:00:00.000Z'),
-    })
+    });
 
-    repo.findOneByOrFail.mockResolvedValue(existing)
+    repo.findOneByOrFail.mockResolvedValue(existing);
 
-    await service.assignRider('d-1', 'r-1')
+    await service.assignRider('d-1', 'r-1');
 
     expect(repo.update).toHaveBeenCalledWith(
       { id: 'd-1' },
       expect.objectContaining({
         assignedRiderId: 'r-1',
         assignedAt: expect.any(Date),
-      }),
-    )
+      })
+    );
 
-    const pickedUpAt = new Date('2025-01-01T00:30:00.000Z')
+    const pickedUpAt = new Date('2025-01-01T00:30:00.000Z');
     repo.findOneByOrFail.mockResolvedValue({
       ...existing,
       status: DeliveryStatus.InTransit,
       pickedUpAt,
-    } as DeliveryEntity)
+    } as DeliveryEntity);
 
-    await service.updateStatus('d-1', DeliveryStatus.InTransit, { pickedUpAt })
+    await service.updateStatus('d-1', DeliveryStatus.InTransit, { pickedUpAt });
 
     expect(repo.update).toHaveBeenCalledWith(
       { id: 'd-1' },
       expect.objectContaining({
         status: DeliveryStatus.InTransit,
         pickedUpAt,
-      }),
-    )
-  })
-})
+      })
+    );
+  });
+});

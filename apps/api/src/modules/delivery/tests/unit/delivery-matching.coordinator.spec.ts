@@ -38,9 +38,27 @@ describe('DeliveryMatchingCoordinator', () => {
   };
 
   const mockCandidates: MatchingCandidate[] = [
-    { riderId: 'rider-1', saccoId: 'sacco-1', distanceMeters: 500, score: 90, vehicleType: VehicleType.Bike },
-    { riderId: 'rider-2', saccoId: 'sacco-2', distanceMeters: 800, score: 85, vehicleType: VehicleType.Bike },
-    { riderId: 'rider-3', saccoId: 'sacco-1', distanceMeters: 1200, score: 80, vehicleType: VehicleType.TukTuk },
+    {
+      riderId: 'rider-1',
+      saccoId: 'sacco-1',
+      distanceMeters: 500,
+      score: 90,
+      vehicleType: VehicleType.Bike,
+    },
+    {
+      riderId: 'rider-2',
+      saccoId: 'sacco-2',
+      distanceMeters: 800,
+      score: 85,
+      vehicleType: VehicleType.Bike,
+    },
+    {
+      riderId: 'rider-3',
+      saccoId: 'sacco-1',
+      distanceMeters: 1200,
+      score: 80,
+      vehicleType: VehicleType.TukTuk,
+    },
   ];
 
   beforeEach(async () => {
@@ -86,7 +104,9 @@ describe('DeliveryMatchingCoordinator', () => {
   describe('findAndAssignRider', () => {
     beforeEach(() => {
       mockDeliveryRepository.findOneBy.mockResolvedValue(mockDelivery as DeliveryEntity);
-      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(mockCandidates as never);
+      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(
+        mockCandidates as never
+      );
       mockAssignmentRulesService.evaluateForMatching.mockReturnValue({
         decision: 'MATCH_NOW',
         reason: 'NOT_SCHEDULED',
@@ -124,7 +144,7 @@ describe('DeliveryMatchingCoordinator', () => {
           riderId: 'rider-1',
           score: 90,
           distanceMeters: 500,
-        }),
+        })
       );
     });
 
@@ -132,7 +152,7 @@ describe('DeliveryMatchingCoordinator', () => {
       mockDeliveryRepository.findOneBy.mockResolvedValue(null);
 
       await expect(coordinator.findAndAssignRider('nonexistent')).rejects.toThrow(
-        DeliveryNotFoundError,
+        DeliveryNotFoundError
       );
     });
 
@@ -204,7 +224,9 @@ describe('DeliveryMatchingCoordinator', () => {
         { riderId: 'rider-1', saccoId: 'sacco-1', distanceMeters: 500, score: 90 },
         { riderId: 'rider-2', saccoId: 'sacco-2', distanceMeters: 500, score: 89 },
       ];
-      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(sameSaccoCandidates as never);
+      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(
+        sameSaccoCandidates as never
+      );
 
       const result1 = await coordinator.findAndAssignRider('delivery-123');
       expect(result1.assignedRiderId).toBe('rider-1');
@@ -234,7 +256,9 @@ describe('DeliveryMatchingCoordinator', () => {
         { riderId: 'rider-1', saccoId: 'sacco-1', distanceMeters: 500, score: 90 },
         { riderId: 'rider-2', saccoId: 'sacco-2', distanceMeters: 500, score: 85 },
       ];
-      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(fairnessCandidates as never);
+      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(
+        fairnessCandidates as never
+      );
 
       await coordinator.findAndAssignRider('delivery-123', config);
 
@@ -254,7 +278,9 @@ describe('DeliveryMatchingCoordinator', () => {
         { riderId: 'rider-2', saccoId: null, distanceMeters: 480, score: 90 },
         { riderId: 'rider-3', saccoId: null, distanceMeters: 420, score: 90 },
       ];
-      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(sameTierCandidates as never);
+      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(
+        sameTierCandidates as never
+      );
 
       const result = await coordinator.findAndAssignRider('delivery-123');
 
@@ -266,7 +292,9 @@ describe('DeliveryMatchingCoordinator', () => {
   describe('handleAssignmentTimeout', () => {
     beforeEach(() => {
       mockDeliveryRepository.findOneBy.mockResolvedValue(mockDelivery as DeliveryEntity);
-      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(mockCandidates as never);
+      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(
+        mockCandidates as never
+      );
       mockAssignmentRulesService.evaluateForMatching.mockReturnValue({
         decision: 'MATCH_NOW',
         reason: 'NOT_SCHEDULED',
@@ -307,7 +335,7 @@ describe('DeliveryMatchingCoordinator', () => {
         expect.objectContaining({
           eventType: 'MatchingTimeoutEvent-V1',
           deliveryId: 'delivery-123',
-        }),
+        })
       );
     });
 
@@ -327,7 +355,7 @@ describe('DeliveryMatchingCoordinator', () => {
         'delivery.events.matching-timeout-v1',
         expect.objectContaining({
           expandedRadiusMeters: 10000,
-        }),
+        })
       );
     });
   });
@@ -335,7 +363,9 @@ describe('DeliveryMatchingCoordinator', () => {
   describe('handleRiderRejection', () => {
     beforeEach(() => {
       mockDeliveryRepository.findOneBy.mockResolvedValue(mockDelivery as DeliveryEntity);
-      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(mockCandidates as never);
+      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(
+        mockCandidates as never
+      );
       mockAssignmentRulesService.evaluateForMatching.mockReturnValue({
         decision: 'MATCH_NOW',
         reason: 'NOT_SCHEDULED',
@@ -356,7 +386,7 @@ describe('DeliveryMatchingCoordinator', () => {
       const result = await coordinator.handleRiderRejection(
         'delivery-123',
         'rider-1',
-        'Rider declined',
+        'Rider declined'
       );
 
       expect(result.success).toBe(true);
@@ -373,7 +403,7 @@ describe('DeliveryMatchingCoordinator', () => {
           deliveryId: 'delivery-123',
           riderId: 'rider-1',
           reason: 'Rider busy',
-        }),
+        })
       );
     });
 
@@ -397,7 +427,9 @@ describe('DeliveryMatchingCoordinator', () => {
         status: DeliveryStatus.Assigned,
       };
       mockDeliveryRepository.findOneBy.mockResolvedValue(assignedDelivery as DeliveryEntity);
-      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(mockCandidates as never);
+      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(
+        mockCandidates as never
+      );
       mockAssignmentRulesService.evaluateForMatching.mockReturnValue({
         decision: 'MATCH_NOW',
         reason: 'NOT_SCHEDULED',
@@ -426,7 +458,9 @@ describe('DeliveryMatchingCoordinator', () => {
         status: DeliveryStatus.Assigned,
       };
       mockDeliveryRepository.findOneBy.mockResolvedValue(assignedDelivery as DeliveryEntity);
-      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(mockCandidates as never);
+      mockCandidateSelectionService.findAndRankCandidates.mockResolvedValue(
+        mockCandidates as never
+      );
       mockAssignmentRulesService.evaluateForMatching.mockReturnValue({
         decision: 'MATCH_NOW',
         reason: 'NOT_SCHEDULED',
@@ -449,7 +483,7 @@ describe('DeliveryMatchingCoordinator', () => {
         expect.objectContaining({
           riderId: 'rider-1',
           reason: 'Reassignment: Customer complaint',
-        }),
+        })
       );
     });
   });

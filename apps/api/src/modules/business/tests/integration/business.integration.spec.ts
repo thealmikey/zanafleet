@@ -7,7 +7,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BusinessType } from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
 
-
 import { BusinessModule } from '../../business.module';
 import { CreateBusinessCommand } from '../../commands/create-business.command';
 
@@ -57,14 +56,18 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
     // Clean up test data from Postgres
     if (module) {
       const entityManager = module.get('EntityManager');
-      await entityManager.query('DELETE FROM businesses WHERE business_name LIKE $1', ['Test Business%']);
+      await entityManager.query('DELETE FROM businesses WHERE business_name LIKE $1', [
+        'Test Business%',
+      ]);
     }
 
     // Clean up test data from Neo4j
     if (neo4jService) {
       const session = neo4jService.getWriteSession();
       try {
-        await session.run("MATCH (b:Business) WHERE b.businessName STARTS WITH 'Test Business' DETACH DELETE b");
+        await session.run(
+          "MATCH (b:Business) WHERE b.businessName STARTS WITH 'Test Business' DETACH DELETE b"
+        );
       } finally {
         await session.close();
       }
@@ -73,7 +76,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
 
   describe('Create Business', () => {
     it('should create a Business with valid data and return businessId', async () => {
-      const phone = `+2547${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
+      const phone = `+2547${Math.floor(Math.random() * 100000000)
+        .toString()
+        .padStart(8, '0')}`;
       const command = new CreateBusinessCommand({
         businessName: `Test Business ${uuidv4().slice(0, 8)}`,
         phone,
@@ -96,7 +101,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
     });
 
     it('should throw ConflictException when creating Business with duplicate phone', async () => {
-      const phone = `+2547${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
+      const phone = `+2547${Math.floor(Math.random() * 100000000)
+        .toString()
+        .padStart(8, '0')}`;
       const command1 = new CreateBusinessCommand({
         businessName: `Test Business ${uuidv4().slice(0, 8)}`,
         phone,
@@ -131,7 +138,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
 
     it('should create :Business node in Neo4j after creation with location properties', async () => {
       const businessName = `Test Business ${uuidv4().slice(0, 8)}`;
-      const phone = `+2547${Math.floor(Math.random() * 100000000).toString().padStart(8, '0')}`;
+      const phone = `+2547${Math.floor(Math.random() * 100000000)
+        .toString()
+        .padStart(8, '0')}`;
       const command = new CreateBusinessCommand({
         businessName,
         phone,
@@ -154,10 +163,9 @@ const shouldRunIntegration = process.env.RUN_INTEGRATION_TESTS === 'true';
       // Verify Neo4j node exists with separate location properties
       const session = neo4jService.getReadSession();
       try {
-        const result = await session.run(
-          'MATCH (b:Business {id: $businessId}) RETURN b',
-          { businessId }
-        );
+        const result = await session.run('MATCH (b:Business {id: $businessId}) RETURN b', {
+          businessId,
+        });
         expect(result.records.length).toBe(1);
         const node = result.records[0].get('b').properties;
         expect(node.businessName).toBe(businessName);

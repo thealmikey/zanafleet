@@ -54,7 +54,9 @@ export class CreateActorCommandHandler implements ICommandHandler<CreateActorCom
     const now = new Date();
     const eventId = uuidv4();
 
-    this.logger.log(`Executing CreateActorCommand for actor: ${command.email} (type: ${command.type})`);
+    this.logger.log(
+      `Executing CreateActorCommand for actor: ${command.email} (type: ${command.type})`
+    );
 
     // Step 1: Validate workspace existence if provided
     if (command.workspaceId) {

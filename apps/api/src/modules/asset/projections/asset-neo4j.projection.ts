@@ -12,19 +12,19 @@ import { AssetCreatedEventV1 } from '../events/asset-created.event';
 @EventsHandler(AssetCreatedEventV1)
 @Injectable()
 export class AssetNeo4jProjection implements IEventHandler<AssetCreatedEventV1> {
-    private readonly logger = new Logger(AssetNeo4jProjection.name);
+  private readonly logger = new Logger(AssetNeo4jProjection.name);
 
-    constructor(private readonly neo4j: Neo4jService) { }
+  constructor(private readonly neo4j: Neo4jService) {}
 
-    async handle(event: AssetCreatedEventV1): Promise<void> {
-        this.logger.log(`Handling AssetCreatedEventV1 for asset: ${event.assetId}`);
+  async handle(event: AssetCreatedEventV1): Promise<void> {
+    this.logger.log(`Handling AssetCreatedEventV1 for asset: ${event.assetId}`);
 
-        const session = this.neo4j.getWriteSession();
+    const session = this.neo4j.getWriteSession();
 
-        try {
-            // Create/update Asset node
-            await session.run(
-                `
+    try {
+      // Create/update Asset node
+      await session.run(
+        `
         MERGE (a:Asset {id: $assetId})
         SET a.name = $name,
             a.type = $type,
@@ -37,43 +37,45 @@ export class AssetNeo4jProjection implements IEventHandler<AssetCreatedEventV1> 
             a.updatedAt = datetime($createdAt)
         RETURN a.id as assetId
         `,
-                {
-                    assetId: event.assetId,
-                    name: event.name,
-                    type: event.type,
-                    status: event.status,
-                    ownerId: event.ownerId,
-                    ownerType: event.ownerType,
-                    latitude: event.homeBase?.latitude ?? null,
-                    longitude: event.homeBase?.longitude ?? null,
-                    createdAt: event.createdAt.toISOString(),
-                }
-            );
+        {
+          assetId: event.assetId,
+          name: event.name,
+          type: event.type,
+          status: event.status,
+          ownerId: event.ownerId,
+          ownerType: event.ownerType,
+          latitude: event.homeBase?.latitude ?? null,
+          longitude: event.homeBase?.longitude ?? null,
+          createdAt: event.createdAt.toISOString(),
+        }
+      );
 
-            // Establish relationship to Owner (Individual or Organization)
-            const ownerLabel = event.ownerType === 'Organization' ? 'Organization' : 'Actor';
-            await session.run(
-                `
+      // Establish relationship to Owner (Individual or Organization)
+      const ownerLabel = event.ownerType === 'Organization' ? 'Organization' : 'Actor';
+      await session.run(
+        `
         MATCH (a:Asset {id: $assetId})
         MERGE (o:${ownerLabel} {id: $ownerId})
         MERGE (o)-[rel:OWNS]->(a)
         SET rel.updatedAt = datetime($createdAt)
         `,
-                {
-                    assetId: event.assetId,
-                    ownerId: event.ownerId,
-                    createdAt: event.createdAt.toISOString(),
-                }
-            );
-
-            this.logger.debug(`Asset node and ownership relationship created/updated in Neo4j: ${event.assetId}`);
-        } catch (error) {
-            const err = error as Error;
-            this.logger.error(`Failed to project asset to Neo4j: ${err.message}`, err.stack);
-        } finally {
-            await session.close();
+        {
+          assetId: event.assetId,
+          ownerId: event.ownerId,
+          createdAt: event.createdAt.toISOString(),
         }
+      );
+
+      this.logger.debug(
+        `Asset node and ownership relationship created/updated in Neo4j: ${event.assetId}`
+      );
+    } catch (error) {
+      const err = error as Error;
+      this.logger.error(`Failed to project asset to Neo4j: ${err.message}`, err.stack);
+    } finally {
+      await session.close();
     }
+  }
 }
 
 /**
@@ -81,21 +83,29 @@ export class AssetNeo4jProjection implements IEventHandler<AssetCreatedEventV1> 
  */
 @Injectable()
 export class AssetNeo4jInitializer {
-    private readonly logger = new Logger(AssetNeo4jInitializer.name);
+  private readonly logger = new Logger(AssetNeo4jInitializer.name);
 
-    constructor(private readonly neo4j: Neo4jService) { }
+  constructor(private readonly neo4j: Neo4jService) {}
 
-    async initialize(): Promise<void> {
-        const session = this.neo4j.getWriteSession();
-        try {
-            await session.run('CREATE CONSTRAINT asset_id_unique IF NOT EXISTS FOR (a:Asset) REQUIRE a.id IS UNIQUE');
-            await session.run('CREATE INDEX asset_type_index IF NOT EXISTS FOR (a:Asset) ON (a.type)');
-            await session.run('CREATE INDEX asset_owner_id_index IF NOT EXISTS FOR (a:Asset) ON (a.ownerId)');
-            this.logger.log('Neo4j constraints/indexes for Asset initialized');
-        } catch (error) {
-            this.logger.error(`Failed to initialize Neo4j for Asset: ${error instanceof Error ? error.message : String(error)}`);
-        } finally {
-            await session.close();
-        }
+  async initialize(): Promise<void> {
+    const session = this.neo4j.getWriteSession();
+    try {
+      await session.run(
+        'CREATE CONSTRAINT asset_id_unique IF NOT EXISTS FOR (a:Asset) REQUIRE a.id IS UNIQUE'
+      );
+      await session.run('CREATE INDEX asset_type_index IF NOT EXISTS FOR (a:Asset) ON (a.type)');
+      await session.run(
+        'CREATE INDEX asset_owner_id_index IF NOT EXISTS FOR (a:Asset) ON (a.ownerId)'
+      );
+      this.logger.log('Neo4j constraints/indexes for Asset initialized');
+    } catch (error) {
+      this.logger.error(
+        `Failed to initialize Neo4j for Asset: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+    } finally {
+      await session.close();
     }
+  }
 }

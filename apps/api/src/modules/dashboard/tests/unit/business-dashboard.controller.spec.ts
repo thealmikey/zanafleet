@@ -6,7 +6,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { DeliveryStatus, OrderStatus } from '@zanafleet/contracts';
 import request from 'supertest';
 
-
 import { InvoiceEntity } from '../../../billing/entities/invoice.entity';
 import { DeliveryEntity } from '../../../delivery/entities/delivery.entity';
 import { OrderEntity } from '../../../order/entities/order.entity';
@@ -38,7 +37,9 @@ describe('BusinessDashboardController (e2e)', () => {
     createdAt: overrides.createdAt ?? new Date('2024-01-01'),
   });
 
-  const createMockDelivery = (overrides: Partial<DeliveryEntity> = {}): Partial<DeliveryEntity> => ({
+  const createMockDelivery = (
+    overrides: Partial<DeliveryEntity> = {}
+  ): Partial<DeliveryEntity> => ({
     id: overrides.id ?? 'delivery-123',
     businessId: overrides.businessId ?? 'business-123',
     status: overrides.status ?? DeliveryStatus.Delivered,
@@ -48,7 +49,9 @@ describe('BusinessDashboardController (e2e)', () => {
     createdAt: overrides.createdAt ?? new Date('2024-01-01'),
   });
 
-  const createMockInvoice = (overrides: Record<string, unknown> = {}): {
+  const createMockInvoice = (
+    overrides: Record<string, unknown> = {}
+  ): {
     id: string;
     status: string;
     subtotal: string;

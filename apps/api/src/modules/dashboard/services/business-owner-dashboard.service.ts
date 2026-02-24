@@ -65,13 +65,18 @@ export class BusinessOwnerDashboardService {
     private readonly deliveryLifecycleCoordinator: DeliveryLifecycleCoordinator,
     private readonly deliveryMatchingCoordinator: DeliveryMatchingCoordinator,
     private readonly deliveryService: DeliveryService,
-    private readonly eventBus: EventBusService,
-  ) { }
+    private readonly eventBus: EventBusService
+  ) {}
 
-  async listMyBusinesses(actorId: string | null, workspaceId: string | null): Promise<{
-    businessId: string;
-    businessName: string;
-  }[]> {
+  async listMyBusinesses(
+    actorId: string | null,
+    workspaceId: string | null
+  ): Promise<
+    {
+      businessId: string;
+      businessName: string;
+    }[]
+  > {
     const businessIds = await this.adminScopeService.getScopedBusinessIds(actorId, workspaceId);
     if (businessIds.length === 0) {
       return [];
@@ -110,15 +115,10 @@ export class BusinessOwnerDashboardService {
       monthStart,
       monthEnd: now,
       totalDeliveries: deliveries.length,
-      activeDeliveries: deliveries.filter((d) =>
-        ACTIVE_DELIVERY_STATUSES.includes(d.status )
-      ).length,
-      successfulDeliveries: deliveries.filter(
-        (d) => d.status === DeliveryStatus.Delivered
-      ).length,
-      cancelledDeliveries: deliveries.filter(
-        (d) => d.status === DeliveryStatus.Cancelled
-      ).length,
+      activeDeliveries: deliveries.filter((d) => ACTIVE_DELIVERY_STATUSES.includes(d.status))
+        .length,
+      successfulDeliveries: deliveries.filter((d) => d.status === DeliveryStatus.Delivered).length,
+      cancelledDeliveries: deliveries.filter((d) => d.status === DeliveryStatus.Cancelled).length,
       spendThisMonth: spendData.totalSpend,
       currency: spendData.currency,
     };
@@ -208,7 +208,9 @@ export class BusinessOwnerDashboardService {
         assignedRiderId = matchingResult.success ? matchingResult.assignedRiderId ?? null : null;
       } catch (error) {
         this.logger.warn(
-          `Auto-matching failed for delivery ${lifecycleResult.deliveryId}: ${(error as Error).message}`
+          `Auto-matching failed for delivery ${lifecycleResult.deliveryId}: ${
+            (error as Error).message
+          }`
         );
       }
     }
@@ -241,9 +243,7 @@ export class BusinessOwnerDashboardService {
       order: { createdAt: 'DESC' },
     });
 
-    const paymentStateMap = await this.buildPaymentStateByDelivery(
-      candidates.map((d) => d.id)
-    );
+    const paymentStateMap = await this.buildPaymentStateByDelivery(candidates.map((d) => d.id));
 
     const from = parseDate(query.from);
     const to = parseDate(query.to);
@@ -252,10 +252,7 @@ export class BusinessOwnerDashboardService {
     );
 
     const [ordered, total] = sortDeliveries(filtered, sort);
-    const pageData = ordered.slice(
-      pagination.offset,
-      pagination.offset + pagination.limit
-    );
+    const pageData = ordered.slice(pagination.offset, pagination.offset + pagination.limit);
 
     const data = await this.enrichDeliveryRows(pageData, paymentStateMap);
 
@@ -284,7 +281,8 @@ export class BusinessOwnerDashboardService {
     const rider = delivery.assignedRiderId
       ? await this.riderRepository.findOne({ where: { id: delivery.assignedRiderId } })
       : null;
-    const paymentStatus = (await this.buildPaymentStateByDelivery([deliveryId]))[deliveryId] ?? null;
+    const paymentStatus =
+      (await this.buildPaymentStateByDelivery([deliveryId]))[deliveryId] ?? null;
 
     return {
       deliveryId: delivery.id,
@@ -371,7 +369,9 @@ export class BusinessOwnerDashboardService {
     };
   }
 
-  private async getDeliveryTimelineInternal(deliveryId: string): Promise<DeliveryTimelineItemDto[]> {
+  private async getDeliveryTimelineInternal(
+    deliveryId: string
+  ): Promise<DeliveryTimelineItemDto[]> {
     const delivery = await this.deliveryRepository.findOne({ where: { id: deliveryId } });
     if (!delivery) {
       return [];
@@ -456,9 +456,7 @@ export class BusinessOwnerDashboardService {
       return [];
     }
 
-    const riderIds = deliveries
-      .map((d) => d.assignedRiderId)
-      .filter((id): id is string => !!id);
+    const riderIds = deliveries.map((d) => d.assignedRiderId).filter((id): id is string => !!id);
 
     const [orders, invoices, riders] = await Promise.all([
       this.orderRepository.find({ where: { deliveryId: In(deliveryIds) } }),
@@ -496,7 +494,9 @@ export class BusinessOwnerDashboardService {
     });
   }
 
-  private async getSpendForDeliveryIds(deliveryIds: string[]): Promise<{ totalSpend: number; currency: string }> {
+  private async getSpendForDeliveryIds(
+    deliveryIds: string[]
+  ): Promise<{ totalSpend: number; currency: string }> {
     if (deliveryIds.length === 0) {
       return { totalSpend: 0, currency: 'KES' };
     }
@@ -528,9 +528,9 @@ export class BusinessOwnerDashboardService {
 
     const intents = invoiceIds.length
       ? await this.paymentIntentRepository.find({
-        where: { invoiceId: In(invoiceIds) },
-        order: { createdAt: 'DESC' },
-      })
+          where: { invoiceId: In(invoiceIds) },
+          order: { createdAt: 'DESC' },
+        })
       : [];
 
     const invoiceToIntent = new Map<string, PaymentIntentEntity>();
@@ -636,11 +636,7 @@ export class BusinessOwnerDashboardService {
     actorId: string | null,
     workspaceId: string | null
   ): Promise<void> {
-    const scoped = await this.adminScopeService.isBusinessInScope(
-      businessId,
-      actorId,
-      workspaceId
-    );
+    const scoped = await this.adminScopeService.isBusinessInScope(businessId, actorId, workspaceId);
     if (!scoped) {
       throw new ForbiddenException(`Business "${businessId}" is not within your scope`);
     }

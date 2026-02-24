@@ -2,7 +2,6 @@ import { LocationSchema, LocationInput } from '@api/core/location';
 import { BusinessType } from '@zanafleet/contracts';
 import { z } from 'zod';
 
-
 /**
  * Zod validation schema for CreateBusinessCommand
  * Ensures type safety and input validation at command level

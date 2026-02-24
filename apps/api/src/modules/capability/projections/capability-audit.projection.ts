@@ -56,10 +56,7 @@ export class CapabilityAuditProjection implements IEventHandler<CapabilityUsedEv
       this.logger.debug(`Capability usage audit persisted: ${event.eventId}`);
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(
-        `Failed to persist capability usage audit: ${err.message}`,
-        err.stack
-      );
+      this.logger.error(`Failed to persist capability usage audit: ${err.message}`, err.stack);
       // Don't re-throw - audit failures shouldn't break the main flow
     }
   }

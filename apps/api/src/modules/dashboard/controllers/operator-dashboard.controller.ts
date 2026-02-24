@@ -1,10 +1,6 @@
 import { RequireCapability } from '@api/core/api/decorators';
 import { CapabilityGuard } from '@api/core/api/guards';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
+import { parseQueryParams, createPaginationMeta, RawQueryParams } from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -17,7 +13,6 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeliveryStatus, GeoPoint } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
-
 
 import { DeliveryEntity } from '../../delivery/entities/delivery.entity';
 import { GeoQueryCoordinator } from '../../location-intelligence/coordinators/geo-query.coordinator';
@@ -85,9 +80,8 @@ export class OperatorDashboardController {
       const waitMs = now.getTime() - d.createdAt.getTime();
       totalWaitMinutes += waitMs / (1000 * 60);
     }
-    const avgWaitTimeMinutes = pendingAssignments > 0
-      ? Math.round(totalWaitMinutes / pendingAssignments)
-      : 0;
+    const avgWaitTimeMinutes =
+      pendingAssignments > 0 ? Math.round(totalWaitMinutes / pendingAssignments) : 0;
 
     return {
       pendingAssignments,

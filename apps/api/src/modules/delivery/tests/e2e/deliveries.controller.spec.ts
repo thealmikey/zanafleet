@@ -8,7 +8,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { DeliveryStatus, PolicyEffect } from '@zanafleet/contracts';
 import request from 'supertest';
 
-
 import { DeliveriesController } from '../../controllers/deliveries.controller';
 import { DeliveryExecutionCoordinator } from '../../coordinators/delivery-execution.coordinator';
 import { DeliveryLifecycleCoordinator } from '../../coordinators/delivery-lifecycle.coordinator';

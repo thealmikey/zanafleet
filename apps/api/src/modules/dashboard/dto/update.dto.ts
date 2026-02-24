@@ -1,9 +1,4 @@
-import {
-  LocationData,
-  VehicleType,
-  BusinessType,
-  DeliveryStatus,
-} from '@zanafleet/contracts';
+import { LocationData, VehicleType, BusinessType, DeliveryStatus } from '@zanafleet/contracts';
 
 /**
  * Update DTOs for admin hierarchy endpoints.

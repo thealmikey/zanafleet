@@ -3,11 +3,7 @@
 // =============================================================================
 
 import { BaseEvent } from '../../../core/event-bus/interfaces/base-event.interface';
-import {
-  AgentExecutionStatus,
-  AgentTriggerType,
-  PolicyDecision,
-} from '../types';
+import { AgentExecutionStatus, AgentTriggerType, PolicyDecision } from '../types';
 
 /**
  * AgentTriggeredEventV1 - emitted when an agent is triggered

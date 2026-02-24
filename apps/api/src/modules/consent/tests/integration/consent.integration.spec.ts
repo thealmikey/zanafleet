@@ -4,7 +4,10 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { InteractionEventRepository } from '../../../interaction/repositories/interaction-event.repository';
 import { CapabilityProposalEntity } from '../../entities/capability-proposal.entity';
 import { ProposalStatus, InvocationMode, ConfirmationAction } from '../../enums/consent.enums';
-import { CapabilityOrchestrator, CapabilityHandler } from '../../services/capability-orchestrator.service';
+import {
+  CapabilityOrchestrator,
+  CapabilityHandler,
+} from '../../services/capability-orchestrator.service';
 import { ConfidenceThresholdService } from '../../services/confidence-threshold.service';
 import { ConsentConfirmationService } from '../../services/consent-confirmation.service';
 
@@ -30,7 +33,12 @@ describe('Consent Integration Tests', () => {
 
   const createMockProposalRepository = () => ({
     create: jest.fn().mockImplementation((data: any) => data),
-    save: jest.fn().mockImplementation(async (data: any) => ({ ...data, proposalId: data.proposalId || 'proposal-1' })),
+    save: jest
+      .fn()
+      .mockImplementation(async (data: any) => ({
+        ...data,
+        proposalId: data.proposalId || 'proposal-1',
+      })),
     findOne: jest.fn(),
     find: jest.fn(),
   });
@@ -73,7 +81,7 @@ describe('Consent Integration Tests', () => {
     it('should create proposal, confirm, and execute successfully', async () => {
       // Step 1: Check if we should propose based on confidence
       // Order capabilities require 0.90 threshold
-      const shouldPropose = thresholdService.shouldPropose(0.90, 'CreateOrder');
+      const shouldPropose = thresholdService.shouldPropose(0.9, 'CreateOrder');
       expect(shouldPropose).toBe(true);
 
       // Step 2: Create proposal
@@ -84,28 +92,37 @@ describe('Consent Integration Tests', () => {
         'event-1',
         'CreateOrder',
         { amount: 100 },
-        0.90,
+        0.9,
         [],
-        'Create order for 100',
+        'Create order for 100'
       );
       expect(proposal.status).toBe(ProposalStatus.PROPOSED);
       expect(proposal.proposalId).toBeDefined();
 
       // Step 3: Confirm proposal - mock findOne to return proposal with PROPOSED status
-      mockProposalRepository.findOne.mockResolvedValue({ ...proposal, status: ProposalStatus.PROPOSED });
-      mockProposalRepository.save.mockImplementation(async (data: any) => ({ ...proposal, ...data }));
+      mockProposalRepository.findOne.mockResolvedValue({
+        ...proposal,
+        status: ProposalStatus.PROPOSED,
+      });
+      mockProposalRepository.save.mockImplementation(async (data: any) => ({
+        ...proposal,
+        ...data,
+      }));
 
       const confirmResult = await consentService.processConfirmation(
         proposal.proposalId,
         ConfirmationAction.CONFIRM,
-        'user-1',
+        'user-1'
       );
       expect(confirmResult.success).toBe(true);
       expect(confirmResult.proposal.status).toBe(ProposalStatus.CONFIRMED);
 
       // Step 4: Execute capability - mock findOne to return proposal with CONFIRMED status
-      mockProposalRepository.findOne.mockResolvedValue({ ...proposal, status: ProposalStatus.CONFIRMED });
-      
+      mockProposalRepository.findOne.mockResolvedValue({
+        ...proposal,
+        status: ProposalStatus.CONFIRMED,
+      });
+
       const executeResult = await orchestrator.execute(proposal.proposalId);
       expect(executeResult.success).toBe(true);
       expect(executeResult.result).toEqual({ orderId: 'order-123', amount: 100 });
@@ -121,12 +138,18 @@ describe('Consent Integration Tests', () => {
         { amount: 100 },
         0.85,
         [],
-        'Create order for 100',
+        'Create order for 100'
       );
 
       // Confirm proposal exists with PROPOSED status
-      mockProposalRepository.findOne.mockResolvedValue({ ...proposal, status: ProposalStatus.PROPOSED });
-      mockProposalRepository.save.mockImplementation(async (data: any) => ({ ...proposal, ...data }));
+      mockProposalRepository.findOne.mockResolvedValue({
+        ...proposal,
+        status: ProposalStatus.PROPOSED,
+      });
+      mockProposalRepository.save.mockImplementation(async (data: any) => ({
+        ...proposal,
+        ...data,
+      }));
 
       // Reject proposal
       const rejectResult = await consentService.processConfirmation(
@@ -134,22 +157,25 @@ describe('Consent Integration Tests', () => {
         ConfirmationAction.REJECT,
         'user-1',
         undefined,
-        'Not needed',
+        'Not needed'
       );
       expect(rejectResult.success).toBe(true);
       expect(rejectResult.proposal.status).toBe(ProposalStatus.REJECTED);
 
       // Try to execute - should fail because status is REJECTED
-      mockProposalRepository.findOne.mockResolvedValue({ ...proposal, status: ProposalStatus.REJECTED });
+      mockProposalRepository.findOne.mockResolvedValue({
+        ...proposal,
+        status: ProposalStatus.REJECTED,
+      });
       await expect(orchestrator.execute(proposal.proposalId)).rejects.toThrow();
     });
 
     it('should require higher confidence for payments', () => {
       // Payment requires 0.95 threshold
-      const paymentShouldPropose = thresholdService.shouldPropose(0.90, 'ProcessPayment');
+      const paymentShouldPropose = thresholdService.shouldPropose(0.9, 'ProcessPayment');
       expect(paymentShouldPropose).toBe(false);
 
-      const paymentShouldClarify = thresholdService.shouldClarify(0.90, 'ProcessPayment');
+      const paymentShouldClarify = thresholdService.shouldClarify(0.9, 'ProcessPayment');
       expect(paymentShouldClarify).toBe(true);
 
       // High enough confidence should propose
@@ -173,19 +199,25 @@ describe('Consent Integration Tests', () => {
         { amount: 100 },
         0.85,
         [],
-        'Create order for 100',
+        'Create order for 100'
       );
 
       // Confirm proposal exists with PROPOSED status
-      mockProposalRepository.findOne.mockResolvedValue({ ...proposal, status: ProposalStatus.PROPOSED });
-      mockProposalRepository.save.mockImplementation(async (data: any) => ({ ...proposal, ...data }));
+      mockProposalRepository.findOne.mockResolvedValue({
+        ...proposal,
+        status: ProposalStatus.PROPOSED,
+      });
+      mockProposalRepository.save.mockImplementation(async (data: any) => ({
+        ...proposal,
+        ...data,
+      }));
 
       // Modify inputs
       const modifyResult = await consentService.processConfirmation(
         proposal.proposalId,
         ConfirmationAction.MODIFY,
         'user-1',
-        { amount: 200 },
+        { amount: 200 }
       );
       expect(modifyResult.success).toBe(true);
       expect(modifyResult.proposal.extractedInputs).toEqual({ amount: 200 });
@@ -201,19 +233,25 @@ describe('Consent Integration Tests', () => {
         { query: 'test' },
         0.85,
         [],
-        'Search for test',
+        'Search for test'
       );
 
       // Confirm proposal exists with PROPOSED status
-      mockProposalRepository.findOne.mockResolvedValue({ ...proposal, status: ProposalStatus.PROPOSED });
-      mockProposalRepository.save.mockImplementation(async (data: any) => ({ ...proposal, ...data }));
+      mockProposalRepository.findOne.mockResolvedValue({
+        ...proposal,
+        status: ProposalStatus.PROPOSED,
+      });
+      mockProposalRepository.save.mockImplementation(async (data: any) => ({
+        ...proposal,
+        ...data,
+      }));
 
       // Switch to Search capability - pass new capability name in modifiedInputs
       const switchResult = await consentService.processConfirmation(
         proposal.proposalId,
         ConfirmationAction.SWITCH_CAPABILITY,
         'user-1',
-        { capabilityName: 'Search', query: 'test' },
+        { capabilityName: 'Search', query: 'test' }
       );
       expect(switchResult.success).toBe(true);
     });
@@ -230,22 +268,38 @@ describe('Consent Integration Tests', () => {
         { amount: 100 },
         0.85,
         [],
-        'Create order',
+        'Create order'
       );
 
       // Confirm proposal - mock with PROPOSED status
-      mockProposalRepository.findOne.mockResolvedValue({ ...proposal, status: ProposalStatus.PROPOSED });
-      mockProposalRepository.save.mockImplementation(async (data: any) => ({ ...proposal, ...data }));
+      mockProposalRepository.findOne.mockResolvedValue({
+        ...proposal,
+        status: ProposalStatus.PROPOSED,
+      });
+      mockProposalRepository.save.mockImplementation(async (data: any) => ({
+        ...proposal,
+        ...data,
+      }));
 
-      await consentService.processConfirmation(proposal.proposalId, ConfirmationAction.CONFIRM, 'user-1');
+      await consentService.processConfirmation(
+        proposal.proposalId,
+        ConfirmationAction.CONFIRM,
+        'user-1'
+      );
 
       // Execute - mock with CONFIRMED status
-      mockProposalRepository.findOne.mockResolvedValue({ ...proposal, status: ProposalStatus.CONFIRMED });
-      mockProposalRepository.save.mockImplementation(async (data: any) => ({ ...proposal, ...data }));
+      mockProposalRepository.findOne.mockResolvedValue({
+        ...proposal,
+        status: ProposalStatus.CONFIRMED,
+      });
+      mockProposalRepository.save.mockImplementation(async (data: any) => ({
+        ...proposal,
+        ...data,
+      }));
       mockInteractionEventRepository.appendToStream.mockResolvedValue({});
 
       const result = await orchestrator.execute(proposal.proposalId);
-      
+
       expect(result.navigationIntent).toBeDefined();
       expect(result.navigationIntent?.targetRoute).toBe('/orders');
       expect(result.navigationIntent?.invocationMode).toBe(InvocationMode.CONVERSATIONAL);
@@ -255,17 +309,17 @@ describe('Consent Integration Tests', () => {
   describe('Confidence-based Decision Making', () => {
     it('should determine correct action based on confidence levels', () => {
       // Very low confidence - should reject
-      expect(thresholdService.getRecommendedAction(0.30, 'CreateOrder')).toBe('reject');
+      expect(thresholdService.getRecommendedAction(0.3, 'CreateOrder')).toBe('reject');
 
       // Low confidence (below minimum bar) - should reject
-      expect(thresholdService.getRecommendedAction(0.50, 'CreateOrder')).toBe('reject');
+      expect(thresholdService.getRecommendedAction(0.5, 'CreateOrder')).toBe('reject');
 
       // Medium confidence - between minimum bar and threshold - should clarify
       // For Order capabilities: minimum bar = 0.60, threshold = 0.90
-      expect(thresholdService.getRecommendedAction(0.70, 'CreateOrder')).toBe('clarify');
+      expect(thresholdService.getRecommendedAction(0.7, 'CreateOrder')).toBe('clarify');
 
       // High confidence - meets threshold - should propose
-      expect(thresholdService.getRecommendedAction(0.90, 'CreateOrder')).toBe('propose');
+      expect(thresholdService.getRecommendedAction(0.9, 'CreateOrder')).toBe('propose');
     });
   });
 
@@ -285,18 +339,34 @@ describe('Consent Integration Tests', () => {
         {},
         0.85,
         [],
-        'Test',
+        'Test'
       );
 
       // Confirm proposal - mock with PROPOSED status
-      mockProposalRepository.findOne.mockResolvedValue({ ...proposal, status: ProposalStatus.PROPOSED });
-      mockProposalRepository.save.mockImplementation(async (data: any) => ({ ...proposal, ...data }));
+      mockProposalRepository.findOne.mockResolvedValue({
+        ...proposal,
+        status: ProposalStatus.PROPOSED,
+      });
+      mockProposalRepository.save.mockImplementation(async (data: any) => ({
+        ...proposal,
+        ...data,
+      }));
 
-      await consentService.processConfirmation(proposal.proposalId, ConfirmationAction.CONFIRM, 'user-1');
+      await consentService.processConfirmation(
+        proposal.proposalId,
+        ConfirmationAction.CONFIRM,
+        'user-1'
+      );
 
       // Execute - mock with CONFIRMED status
-      mockProposalRepository.findOne.mockResolvedValue({ ...proposal, status: ProposalStatus.CONFIRMED });
-      mockProposalRepository.save.mockImplementation(async (data: any) => ({ ...proposal, ...data }));
+      mockProposalRepository.findOne.mockResolvedValue({
+        ...proposal,
+        status: ProposalStatus.CONFIRMED,
+      });
+      mockProposalRepository.save.mockImplementation(async (data: any) => ({
+        ...proposal,
+        ...data,
+      }));
       mockInteractionEventRepository.appendToStream.mockResolvedValue({});
 
       const result = await orchestrator.execute(proposal.proposalId);

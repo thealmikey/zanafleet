@@ -10,7 +10,7 @@ import { ActorEntity } from '../entities/actor.entity';
 /**
  * Seeds test accounts on application startup in dev/test mode.
  * This service is idempotent - it will not create duplicate accounts.
- * 
+ *
  * WARNING: Only runs when NODE_ENV !== 'production'
  */
 @Injectable()
@@ -19,7 +19,7 @@ export class TestAccountSeederService implements OnModuleInit {
 
   constructor(
     @InjectRepository(ActorEntity)
-    private readonly actorRepository: Repository<ActorEntity>,
+    private readonly actorRepository: Repository<ActorEntity>
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -41,7 +41,7 @@ export class TestAccountSeederService implements OnModuleInit {
 
     for (const account of TEST_ACCOUNTS) {
       const exists = await this.accountExists(account.email);
-      
+
       if (exists) {
         this.logger.debug(`Skipped existing account: ${account.email}`);
         skipped++;

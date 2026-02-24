@@ -1,10 +1,6 @@
 import { RequireCapability } from '@api/core/api/decorators';
 import { CapabilityGuard, PolicyGuard } from '@api/core/api/guards';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  getStringFilterValue,
-} from '@api/core/api/utils';
+import { parseQueryParams, createPaginationMeta, getStringFilterValue } from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -20,12 +16,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  PolicyTrigger,
-  ValidatedUser,
-} from '@zanafleet/contracts';
+import { PolicyTrigger, ValidatedUser } from '@zanafleet/contracts';
 import { Repository, In } from 'typeorm';
-
 
 import { BusinessEntity } from '../../business/entities/business.entity';
 import { DeliveryEntity } from '../../delivery/entities/delivery.entity';
@@ -102,7 +94,7 @@ export class AdminHierarchyController {
 
     const [entities, total] = await this.businessRepository.findAndCount({
       where: {
-        ...(filter ),
+        ...filter,
         id: In(businessIds),
       },
       order,
@@ -139,7 +131,7 @@ export class AdminHierarchyController {
 
     const [entities, total] = await this.saccoRepository.findAndCount({
       where: {
-        ...(filter ),
+        ...filter,
         id: In(saccoIds),
       },
       order,
@@ -169,7 +161,11 @@ export class AdminHierarchyController {
     if (riderId) {
       riderIds = [riderId];
     } else {
-      riderIds = await this.adminScopeService.getScopedRiderIds(actorId, workspaceId, saccoId ?? null);
+      riderIds = await this.adminScopeService.getScopedRiderIds(
+        actorId,
+        workspaceId,
+        saccoId ?? null
+      );
     }
 
     if (riderIds.length === 0) {
@@ -182,7 +178,7 @@ export class AdminHierarchyController {
     const order = sort ? { [sort.field]: sort.order } : undefined;
 
     const whereClause: Record<string, unknown> = {
-      ...(filter ),
+      ...filter,
       id: In(riderIds),
     };
 

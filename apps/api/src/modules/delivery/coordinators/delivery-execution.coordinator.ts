@@ -67,10 +67,10 @@ export class RiderMismatchError extends Error {
   constructor(
     public readonly deliveryId: string,
     public readonly expectedRiderId: string | null,
-    public readonly actualRiderId: string,
+    public readonly actualRiderId: string
   ) {
     super(
-      `Rider ${actualRiderId} is not assigned to delivery ${deliveryId}. Expected: ${expectedRiderId}`,
+      `Rider ${actualRiderId} is not assigned to delivery ${deliveryId}. Expected: ${expectedRiderId}`
     );
     this.name = 'RiderMismatchError';
   }
@@ -80,10 +80,12 @@ export class InvalidStatusError extends Error {
   constructor(
     public readonly deliveryId: string,
     public readonly currentStatus: string,
-    public readonly expectedStatuses: string[],
+    public readonly expectedStatuses: string[]
   ) {
     super(
-      `Delivery ${deliveryId} has status ${currentStatus}, expected one of: ${expectedStatuses.join(', ')}`,
+      `Delivery ${deliveryId} has status ${currentStatus}, expected one of: ${expectedStatuses.join(
+        ', '
+      )}`
     );
     this.name = 'InvalidStatusError';
   }
@@ -111,7 +113,7 @@ export class DeliveryExecutionCoordinator {
     private readonly locationIntelligenceService: LocationIntelligenceService,
     private readonly eventBus: EventBusService,
     @Optional()
-    _policyEngine?: PolicyEvaluationEngineService,
+    _policyEngine?: PolicyEvaluationEngineService
   ) {}
 
   /**
@@ -128,7 +130,7 @@ export class DeliveryExecutionCoordinator {
   async confirmPickup(
     deliveryId: string,
     riderId: string,
-    proofData?: PickupProofInput,
+    proofData?: PickupProofInput
   ): Promise<ConfirmPickupResult> {
     this.logger.log(`Confirming pickup for delivery ${deliveryId} by rider ${riderId}`);
 
@@ -149,16 +151,12 @@ export class DeliveryExecutionCoordinator {
         throw new InvalidStatusError(deliveryId, delivery.status, [DeliveryStatus.Assigned]);
       }
 
-      await this.lifecycleCoordinator.transitionState(
-        deliveryId,
-        DeliveryStatus.PickedUp,
-        riderId,
-      );
+      await this.lifecycleCoordinator.transitionState(deliveryId, DeliveryStatus.PickedUp, riderId);
 
       await this.lifecycleCoordinator.transitionState(
         deliveryId,
         DeliveryStatus.InTransit,
-        riderId,
+        riderId
       );
 
       const event = new PickupConfirmedEventV1({
@@ -203,7 +201,7 @@ export class DeliveryExecutionCoordinator {
   async confirmDropoff(
     deliveryId: string,
     riderId: string,
-    proofData?: DropoffProofInput,
+    proofData?: DropoffProofInput
   ): Promise<ConfirmDropoffResult> {
     this.logger.log(`Confirming dropoff for delivery ${deliveryId} by rider ${riderId}`);
 
@@ -227,7 +225,7 @@ export class DeliveryExecutionCoordinator {
       await this.lifecycleCoordinator.transitionState(
         deliveryId,
         DeliveryStatus.Delivered,
-        riderId,
+        riderId
       );
 
       const event = new DropoffConfirmedEventV1({
@@ -269,7 +267,7 @@ export class DeliveryExecutionCoordinator {
    */
   async updateProgress(
     deliveryId: string,
-    telemetryData: TelemetryInput,
+    telemetryData: TelemetryInput
   ): Promise<UpdateProgressResult> {
     this.logger.log(`Updating progress for delivery ${deliveryId}`);
 
@@ -295,7 +293,7 @@ export class DeliveryExecutionCoordinator {
         const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
         const riderPath = await this.locationIntelligenceService.getRiderPath(
           delivery.assignedRiderId,
-          { start: oneHourAgo, end: now },
+          { start: oneHourAgo, end: now }
         );
 
         if (riderPath.length > 0) {
@@ -381,7 +379,7 @@ export class DeliveryExecutionCoordinator {
       await this.eventBus.publish(NatsSubjects.Delivery.DELAY_DETECTED_V1, event);
 
       this.logger.warn(
-        `Delay detected for delivery ${deliveryId}: ${delayMinutes} minutes past SLA`,
+        `Delay detected for delivery ${deliveryId}: ${delayMinutes} minutes past SLA`
       );
     }
 

@@ -133,19 +133,19 @@ describe('DeliveryExecutionCoordinator', () => {
       expect(lifecycleCoordinator.transitionState).toHaveBeenCalledWith(
         mockDeliveryId,
         DeliveryStatus.PickedUp,
-        mockRiderId,
+        mockRiderId
       );
       expect(lifecycleCoordinator.transitionState).toHaveBeenCalledWith(
         mockDeliveryId,
         DeliveryStatus.InTransit,
-        mockRiderId,
+        mockRiderId
       );
       expect(eventBus.publish).toHaveBeenCalledWith(
         'delivery.events.pickup-confirmed-v1',
         expect.objectContaining({
           deliveryId: mockDeliveryId,
           riderId: mockRiderId,
-        }),
+        })
       );
     });
 
@@ -195,7 +195,7 @@ describe('DeliveryExecutionCoordinator', () => {
         'delivery.events.pickup-confirmed-v1',
         expect.objectContaining({
           proofData: null,
-        }),
+        })
       );
     });
   });
@@ -216,14 +216,14 @@ describe('DeliveryExecutionCoordinator', () => {
       expect(lifecycleCoordinator.transitionState).toHaveBeenCalledWith(
         mockDeliveryId,
         DeliveryStatus.Delivered,
-        mockRiderId,
+        mockRiderId
       );
       expect(eventBus.publish).toHaveBeenCalledWith(
         'delivery.events.dropoff-confirmed-v1',
         expect.objectContaining({
           deliveryId: mockDeliveryId,
           riderId: mockRiderId,
-        }),
+        })
       );
     });
 
@@ -283,7 +283,7 @@ describe('DeliveryExecutionCoordinator', () => {
             latitude: telemetryData.latitude,
             longitude: telemetryData.longitude,
           },
-        }),
+        })
       );
     });
 
@@ -311,7 +311,7 @@ describe('DeliveryExecutionCoordinator', () => {
           latitude: -1.2921,
           longitude: 36.8219,
           timestamp: new Date(),
-        }),
+        })
       ).rejects.toThrow(DeliveryNotFoundError);
     });
 
@@ -324,7 +324,7 @@ describe('DeliveryExecutionCoordinator', () => {
           latitude: -1.2921,
           longitude: 36.8219,
           timestamp: new Date(),
-        }),
+        })
       ).rejects.toThrow(InvalidStatusError);
     });
 
@@ -355,7 +355,7 @@ describe('DeliveryExecutionCoordinator', () => {
       deliveryRepository.findOne.mockResolvedValue(mockDelivery);
       locationIntelligenceService.getRiderPath.mockResolvedValue([
         { latitude: -1.29, longitude: 36.82 },
-        { latitude: -1.30, longitude: 36.83 },
+        { latitude: -1.3, longitude: 36.83 },
       ]);
 
       const telemetryData = {
@@ -372,7 +372,7 @@ describe('DeliveryExecutionCoordinator', () => {
         expect.objectContaining({
           start: expect.any(Date),
           end: expect.any(Date),
-        }),
+        })
       );
     });
   });
@@ -420,7 +420,7 @@ describe('DeliveryExecutionCoordinator', () => {
           deliveryId: mockDeliveryId,
           delayMinutes: expect.any(Number),
           reason: 'SLA dropoff time exceeded',
-        }),
+        })
       );
     });
 
@@ -443,7 +443,7 @@ describe('DeliveryExecutionCoordinator', () => {
       deliveryRepository.findOne.mockResolvedValue(null);
 
       await expect(coordinator.detectAbnormalDelay(mockDeliveryId)).rejects.toThrow(
-        DeliveryNotFoundError,
+        DeliveryNotFoundError
       );
     });
   });

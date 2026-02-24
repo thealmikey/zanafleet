@@ -135,10 +135,7 @@ export class CapabilityAccessController implements ICapabilityAccessController {
    * @param capabilityNames - The names of the capabilities required
    * @returns Map of capability name to boolean result
    */
-  async hasCapabilities(
-    actorId: string,
-    capabilityNames: string[]
-  ): Promise<Map<string, boolean>> {
+  async hasCapabilities(actorId: string, capabilityNames: string[]): Promise<Map<string, boolean>> {
     const results = new Map<string, boolean>();
 
     // Parallel execution for better performance

@@ -1,20 +1,9 @@
 import { RequireCapability } from '@api/core/api/decorators';
 import { CapabilityGuard } from '@api/core/api/guards';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
-import {
-  Controller,
-  Get,
-  Query,
-  UseGuards,
-  Header,
-} from '@nestjs/common';
+import { parseQueryParams, createPaginationMeta, RawQueryParams } from '@api/core/api/utils';
+import { Controller, Get, Query, UseGuards, Header } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThanOrEqual } from 'typeorm';
-
 
 import { PolicyEntity } from '../../policy/entities/policy.entity';
 import { SettlementBatchEntity } from '../../settlement/entities/settlement-batch.entity';
@@ -53,9 +42,7 @@ export class AdminDashboardController {
 
   @Get('metrics')
   @Header('Cache-Control', 'private, max-age=60')
-  async getSystemMetrics(
-    @Query('periodDays') periodDaysStr?: string
-  ): Promise<SystemMetrics> {
+  async getSystemMetrics(@Query('periodDays') periodDaysStr?: string): Promise<SystemMetrics> {
     const periodDays = periodDaysStr ? parseInt(periodDaysStr, 10) : 30;
     const periodStart = new Date();
     periodStart.setDate(periodStart.getDate() - periodDays);
@@ -67,9 +54,9 @@ export class AdminDashboardController {
       },
     });
 
-    const pendingSettlements = settlements.filter(s => s.status === 'PENDING').length;
-    const completedSettlements = settlements.filter(s => s.status === 'COMPLETED').length;
-    const failedSettlements = settlements.filter(s => s.status === 'FAILED').length;
+    const pendingSettlements = settlements.filter((s) => s.status === 'PENDING').length;
+    const completedSettlements = settlements.filter((s) => s.status === 'COMPLETED').length;
+    const failedSettlements = settlements.filter((s) => s.status === 'FAILED').length;
 
     const [, totalPolicies] = await this.policyRepository.findAndCount();
     const [, activePolicies] = await this.policyRepository.findAndCount({
@@ -99,7 +86,7 @@ export class AdminDashboardController {
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
     const [entities, total] = await this.settlementRepository.findAndCount({
-      where: filter ,
+      where: filter,
       order,
       skip: pagination.offset,
       take: pagination.limit,
@@ -140,7 +127,7 @@ export class AdminDashboardController {
     const order = sort ? { [sort.field]: sort.order } : { priority: 'DESC' as const };
 
     const [entities, total] = await this.policyRepository.findAndCount({
-      where: filter ,
+      where: filter,
       order,
       skip: pagination.offset,
       take: pagination.limit,

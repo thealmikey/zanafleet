@@ -3,10 +3,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { InteractionEventType, InteractionActorType } from '../../interaction/entities/interaction-event.entity';
+import {
+  InteractionEventType,
+  InteractionActorType,
+} from '../../interaction/entities/interaction-event.entity';
 import { InteractionEventRepository } from '../../interaction/repositories/interaction-event.repository';
 import { NavigationIntentDto } from '../dto/navigation-intent.dto';
-import { CapabilityProposalEntity, ReasoningStep, ProposalAlternative } from '../entities/capability-proposal.entity';
+import {
+  CapabilityProposalEntity,
+  ReasoningStep,
+  ProposalAlternative,
+} from '../entities/capability-proposal.entity';
 import { ProposalStatus, InvocationMode, ConfirmationAction } from '../enums/consent.enums';
 
 /**
@@ -22,7 +29,7 @@ export interface ConfirmationResult {
 
 /**
  * UserConfirmation Event
- * 
+ *
  * Captured when user responds to a proposal
  */
 export interface UserConfirmation {
@@ -70,7 +77,7 @@ export class UnknownConfirmationActionError extends Error {
 
 /**
  * ConsentConfirmationService
- * 
+ *
  * Handles the confirmation workflow for capability proposals.
  * This service ensures user sovereignty by requiring explicit confirmation
  * before any capability execution.
@@ -83,12 +90,12 @@ export class ConsentConfirmationService {
   constructor(
     @InjectRepository(CapabilityProposalEntity)
     private readonly proposalRepository: Repository<CapabilityProposalEntity>,
-    private readonly interactionEventRepository: InteractionEventRepository,
+    private readonly interactionEventRepository: InteractionEventRepository
   ) {}
 
   /**
    * Create a new proposal from AI analysis
-   * 
+   *
    * IMPORTANT: This does NOT execute the capability
    * It only creates a proposal and appends to InteractionStream
    */
@@ -103,7 +110,7 @@ export class ConsentConfirmationService {
     summary: string,
     reasoning?: ReasoningStep[],
     alternatives?: ProposalAlternative[],
-    invocationMode?: InvocationMode,
+    invocationMode?: InvocationMode
   ): Promise<CapabilityProposalEntity> {
     const proposalId = uuidv4();
     const now = new Date();
@@ -151,7 +158,9 @@ export class ConsentConfirmationService {
         createdAt: now,
       });
     } catch (error) {
-      this.logger.warn(`Failed to append proposal event to interaction stream: ${(error as Error).message}`);
+      this.logger.warn(
+        `Failed to append proposal event to interaction stream: ${(error as Error).message}`
+      );
       // Don't fail the proposal creation if event append fails
     }
 
@@ -160,7 +169,7 @@ export class ConsentConfirmationService {
 
   /**
    * Process user confirmation
-   * 
+   *
    * This is the ONLY path to capability execution
    * User must explicitly confirm before execute() is called
    */
@@ -169,7 +178,7 @@ export class ConsentConfirmationService {
     action: ConfirmationAction,
     actorId: string,
     modifiedInputs?: Record<string, unknown>,
-    reason?: string,
+    reason?: string
   ): Promise<ConfirmationResult> {
     const proposal = await this.proposalRepository.findOne({
       where: { proposalId },
@@ -181,7 +190,7 @@ export class ConsentConfirmationService {
 
     if (proposal.status !== ProposalStatus.PROPOSED) {
       throw new InvalidProposalStateError(
-        `Proposal ${proposalId} is not in PROPOSED state: ${proposal.status}`,
+        `Proposal ${proposalId} is not in PROPOSED state: ${proposal.status}`
       );
     }
 
@@ -248,7 +257,7 @@ export class ConsentConfirmationService {
    */
   private async confirmProposal(
     proposal: CapabilityProposalEntity,
-    _confirmation: UserConfirmation,
+    _confirmation: UserConfirmation
   ): Promise<ConfirmationResult> {
     const now = new Date();
 
@@ -272,7 +281,7 @@ export class ConsentConfirmationService {
    */
   private async rejectProposal(
     proposal: CapabilityProposalEntity,
-    _confirmation: UserConfirmation,
+    _confirmation: UserConfirmation
   ): Promise<ConfirmationResult> {
     const now = new Date();
 
@@ -294,7 +303,7 @@ export class ConsentConfirmationService {
   private async modifyProposal(
     proposal: CapabilityProposalEntity,
     _confirmation: UserConfirmation,
-    modifiedInputs: Record<string, unknown>,
+    modifiedInputs: Record<string, unknown>
   ): Promise<ConfirmationResult> {
     const now = new Date();
 
@@ -319,7 +328,7 @@ export class ConsentConfirmationService {
    */
   private async cancelProposal(
     proposal: CapabilityProposalEntity,
-    _confirmation: UserConfirmation,
+    _confirmation: UserConfirmation
   ): Promise<ConfirmationResult> {
     const now = new Date();
 
@@ -340,7 +349,7 @@ export class ConsentConfirmationService {
    */
   private async requestClarification(
     proposal: CapabilityProposalEntity,
-    _confirmation: UserConfirmation,
+    _confirmation: UserConfirmation
   ): Promise<ConfirmationResult> {
     this.logger.log(`Clarification requested for proposal ${proposal.proposalId}`);
 
@@ -357,7 +366,7 @@ export class ConsentConfirmationService {
   private async switchCapability(
     proposal: CapabilityProposalEntity,
     _confirmation: UserConfirmation,
-    _modifiedInputs?: Record<string, unknown>,
+    _modifiedInputs?: Record<string, unknown>
   ): Promise<ConfirmationResult> {
     // Mark current as cancelled
     const now = new Date();

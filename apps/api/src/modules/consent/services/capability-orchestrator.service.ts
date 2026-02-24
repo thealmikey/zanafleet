@@ -3,14 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { InteractionEventType, InteractionActorType } from '../../interaction/entities/interaction-event.entity';
+import {
+  InteractionEventType,
+  InteractionActorType,
+} from '../../interaction/entities/interaction-event.entity';
 import { InteractionEventRepository } from '../../interaction/repositories/interaction-event.repository';
 import { NavigationIntentDto } from '../dto/navigation-intent.dto';
 import { CapabilityProposalEntity } from '../entities/capability-proposal.entity';
 import { ProposalStatus, InvocationMode } from '../enums/consent.enums';
 
 import { ProposalNotFoundError, InvalidProposalStateError } from './consent-confirmation.service';
-
 
 /**
  * Execution result from capability orchestrator
@@ -24,23 +26,23 @@ export interface ExecutionResult {
 
 /**
  * CapabilityOrchestrator
- * 
+ *
  * Orchestrates capability execution AFTER user confirmation.
  * This is the ONLY path to capability execution - it NEVER auto-invokes.
- * 
+ *
  * CRITICAL: execute() MUST check that proposal is CONFIRMED before proceeding.
  */
 @Injectable()
 export class CapabilityOrchestrator {
   private readonly logger = new Logger(CapabilityOrchestrator.name);
-  
+
   // Registry of capability handlers
   private readonly capabilityHandlers: Map<string, CapabilityHandler> = new Map();
 
   constructor(
     @InjectRepository(CapabilityProposalEntity)
     private readonly proposalRepository: Repository<CapabilityProposalEntity>,
-    private readonly interactionEventRepository: InteractionEventRepository,
+    private readonly interactionEventRepository: InteractionEventRepository
   ) {}
 
   /**
@@ -53,10 +55,10 @@ export class CapabilityOrchestrator {
 
   /**
    * Execute a capability
-   * 
+   *
    * CRITICAL: This ONLY executes after confirmation check.
    * The proposal MUST be in CONFIRMED status before execution.
-   * 
+   *
    * @param proposalId - The ID of the confirmed proposal
    * @returns ExecutionResult with navigation intent
    */
@@ -76,20 +78,20 @@ export class CapabilityOrchestrator {
     if (proposal.status !== ProposalStatus.CONFIRMED) {
       throw new InvalidProposalStateError(
         `Cannot execute proposal ${proposalId}: status is ${proposal.status}. ` +
-        'Proposal must be CONFIRMED before execution.',
+          'Proposal must be CONFIRMED before execution.'
       );
     }
 
     // Get the appropriate handler
     const handler = this.capabilityHandlers.get(proposal.capabilityName);
-    
+
     if (!handler) {
       const error = `No handler registered for capability: ${proposal.capabilityName}`;
       this.logger.error(error);
-      
+
       // Mark as failed
       await this.markAsFailed(proposal, error);
-      
+
       return {
         success: false,
         error,
@@ -99,17 +101,19 @@ export class CapabilityOrchestrator {
     try {
       // Execute the capability
       const result = await handler.execute(proposal.extractedInputs);
-      
+
       // Mark as executed
       await this.markAsExecuted(proposal, result);
-      
+
       // Append execution event to stream
       await this.appendExecutionEvent(proposal, result);
 
       // Generate navigation intent based on result
       const navigationIntent = this.generateNavigationIntent(proposal, result);
 
-      this.logger.log(`Successfully executed capability ${proposal.capabilityName} for proposal ${proposalId}`);
+      this.logger.log(
+        `Successfully executed capability ${proposal.capabilityName} for proposal ${proposalId}`
+      );
 
       return {
         success: true,
@@ -119,10 +123,10 @@ export class CapabilityOrchestrator {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       this.logger.error(`Execution failed for proposal ${proposalId}: ${errorMessage}`);
-      
+
       // Mark as failed
       await this.markAsFailed(proposal, errorMessage);
-      
+
       // Append failure event
       await this.appendFailureEvent(proposal, errorMessage);
 
@@ -140,16 +144,16 @@ export class CapabilityOrchestrator {
   async executeDirect(
     capabilityName: string,
     inputs: Record<string, unknown>,
-    invocationMode: InvocationMode = InvocationMode.CONVERSATIONAL,
+    invocationMode: InvocationMode = InvocationMode.CONVERSATIONAL
   ): Promise<ExecutionResult> {
     this.logger.log(`Direct executing capability: ${capabilityName}`);
 
     const handler = this.capabilityHandlers.get(capabilityName);
-    
+
     if (!handler) {
       const error = `No handler registered for capability: ${capabilityName}`;
       this.logger.error(error);
-      
+
       return {
         success: false,
         error,
@@ -158,7 +162,11 @@ export class CapabilityOrchestrator {
 
     try {
       const result = await handler.execute(inputs);
-      const navigationIntent = this.generateNavigationIntentFromCapability(capabilityName, result, invocationMode);
+      const navigationIntent = this.generateNavigationIntentFromCapability(
+        capabilityName,
+        result,
+        invocationMode
+      );
 
       return {
         success: true,
@@ -179,7 +187,10 @@ export class CapabilityOrchestrator {
   /**
    * Mark proposal as executed
    */
-  private async markAsExecuted(proposal: CapabilityProposalEntity, _result: unknown): Promise<void> {
+  private async markAsExecuted(
+    proposal: CapabilityProposalEntity,
+    _result: unknown
+  ): Promise<void> {
     proposal.status = ProposalStatus.EXECUTED;
     proposal.updatedAt = new Date();
     await this.proposalRepository.save(proposal);
@@ -199,7 +210,7 @@ export class CapabilityOrchestrator {
    */
   private async appendExecutionEvent(
     proposal: CapabilityProposalEntity,
-    result: unknown,
+    result: unknown
   ): Promise<void> {
     try {
       await this.interactionEventRepository.appendToStream(proposal.streamId, {
@@ -225,7 +236,7 @@ export class CapabilityOrchestrator {
    */
   private async appendFailureEvent(
     proposal: CapabilityProposalEntity,
-    error: string,
+    error: string
   ): Promise<void> {
     try {
       await this.interactionEventRepository.appendToStream(proposal.streamId, {
@@ -251,15 +262,15 @@ export class CapabilityOrchestrator {
    */
   private generateNavigationIntent(
     proposal: CapabilityProposalEntity,
-    result: unknown,
+    result: unknown
   ): NavigationIntentDto | undefined {
     // Default navigation based on capability name
     const routeMap: Record<string, string> = {
-      'CreateOrder': '/orders',
-      'RequestMoveEstimate': '/estimates',
-      'ProcessPayment': '/payments',
-      'ScheduleDelivery': '/deliveries',
-      'CreateRider': '/riders',
+      CreateOrder: '/orders',
+      RequestMoveEstimate: '/estimates',
+      ProcessPayment: '/payments',
+      ScheduleDelivery: '/deliveries',
+      CreateRider: '/riders',
     };
 
     const targetRoute = routeMap[proposal.capabilityName] || '/dashboard';
@@ -282,14 +293,14 @@ export class CapabilityOrchestrator {
   private generateNavigationIntentFromCapability(
     capabilityName: string,
     result: unknown,
-    invocationMode: InvocationMode,
+    invocationMode: InvocationMode
   ): NavigationIntentDto | undefined {
     const routeMap: Record<string, string> = {
-      'CreateOrder': '/orders',
-      'RequestMoveEstimate': '/estimates',
-      'ProcessPayment': '/payments',
-      'ScheduleDelivery': '/deliveries',
-      'CreateRider': '/riders',
+      CreateOrder: '/orders',
+      RequestMoveEstimate: '/estimates',
+      ProcessPayment: '/payments',
+      ScheduleDelivery: '/deliveries',
+      CreateRider: '/riders',
     };
 
     const targetRoute = routeMap[capabilityName] || '/dashboard';

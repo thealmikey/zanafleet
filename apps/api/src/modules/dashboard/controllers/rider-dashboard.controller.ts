@@ -1,22 +1,10 @@
 import { RequireCapability } from '@api/core/api/decorators';
 import { CapabilityGuard } from '@api/core/api/guards';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
-import {
-  Controller,
-  Get,
-  Query,
-  Param,
-  UseGuards,
-  Header,
-} from '@nestjs/common';
+import { parseQueryParams, createPaginationMeta, RawQueryParams } from '@api/core/api/utils';
+import { Controller, Get, Query, Param, UseGuards, Header } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeliveryStatus } from '@zanafleet/contracts';
 import { Repository, In, MoreThanOrEqual } from 'typeorm';
-
 
 import { DeliveryEntity } from '../../delivery/entities/delivery.entity';
 import { SettlementBatchEntity } from '../../settlement/entities/settlement-batch.entity';

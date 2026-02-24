@@ -49,7 +49,7 @@ export class CalendarBindingService {
     @InjectRepository(CalendarBindingEntity)
     private readonly bindingRepo: Repository<CalendarBindingEntity>,
     @InjectRepository(CalendarOverrideEntity)
-    private readonly overrideRepo: Repository<CalendarOverrideEntity>,
+    private readonly overrideRepo: Repository<CalendarOverrideEntity>
   ) {}
 
   /**
@@ -74,9 +74,7 @@ export class CalendarBindingService {
     });
 
     const saved = await this.bindingRepo.save(entity);
-    this.logger.log(
-      `Bound calendar ${input.calendarId} to ${input.targetType}:${input.targetId}`,
-    );
+    this.logger.log(`Bound calendar ${input.calendarId} to ${input.targetType}:${input.targetId}`);
     return this.toBindingResponse(saved);
   }
 
@@ -101,7 +99,7 @@ export class CalendarBindingService {
    */
   async getBindingsForTarget(
     targetType: BindingTargetType,
-    targetId: string,
+    targetId: string
   ): Promise<CalendarBindingResponse[]> {
     const bindings = await this.bindingRepo.find({
       where: { targetType, targetId, isActive: true },
@@ -123,7 +121,7 @@ export class CalendarBindingService {
   async resolveEffectiveCalendars(
     targetType: BindingTargetType,
     targetId: string,
-    context: InheritanceContext = {},
+    context: InheritanceContext = {}
   ): Promise<ResolvedBinding[]> {
     const resolvedBindings: ResolvedBinding[] = [];
     const inheritanceChain = this.buildInheritanceChain(targetType, targetId, context);
@@ -142,10 +140,7 @@ export class CalendarBindingService {
       });
 
       for (const binding of bindings) {
-        const effectivePriority = this.calculateEffectivePriority(
-          binding.priority,
-          level,
-        );
+        const effectivePriority = this.calculateEffectivePriority(binding.priority, level);
 
         resolvedBindings.push({
           binding: this.toBindingResponse(binding),
@@ -171,7 +166,7 @@ export class CalendarBindingService {
   async getActiveOverrides(
     targetScope: CalendarScope,
     targetScopeId: string | null,
-    atTime: Date = new Date(),
+    atTime: Date = new Date()
   ): Promise<CalendarOverrideResponse[]> {
     const qb = this.overrideRepo
       .createQueryBuilder('override')
@@ -199,7 +194,7 @@ export class CalendarBindingService {
    */
   async getActiveOverridesWithInheritance(
     context: InheritanceContext,
-    atTime: Date = new Date(),
+    atTime: Date = new Date()
   ): Promise<CalendarOverrideResponse[]> {
     const allOverrides: CalendarOverrideResponse[] = [];
 
@@ -210,7 +205,7 @@ export class CalendarBindingService {
       const workspaceOverrides = await this.getActiveOverrides(
         CalendarScope.NATIONAL,
         context.workspaceId,
-        atTime,
+        atTime
       );
       allOverrides.push(...workspaceOverrides);
     }
@@ -219,7 +214,7 @@ export class CalendarBindingService {
       const saccoOverrides = await this.getActiveOverrides(
         CalendarScope.SACCO,
         context.saccoId,
-        atTime,
+        atTime
       );
       allOverrides.push(...saccoOverrides);
     }
@@ -228,7 +223,7 @@ export class CalendarBindingService {
       const businessOverrides = await this.getActiveOverrides(
         CalendarScope.BUSINESS,
         context.businessId,
-        atTime,
+        atTime
       );
       allOverrides.push(...businessOverrides);
     }
@@ -237,7 +232,7 @@ export class CalendarBindingService {
       const riderOverrides = await this.getActiveOverrides(
         CalendarScope.RIDER,
         context.riderId,
-        atTime,
+        atTime
       );
       allOverrides.push(...riderOverrides);
     }
@@ -269,7 +264,9 @@ export class CalendarBindingService {
 
     const saved = await this.overrideRepo.save(entity);
     this.logger.log(
-      `Applied override ${saved.id} (${input.exceptionType}) to ${input.targetScope}:${input.targetScopeId ?? 'GLOBAL'}`,
+      `Applied override ${saved.id} (${input.exceptionType}) to ${input.targetScope}:${
+        input.targetScopeId ?? 'GLOBAL'
+      }`
     );
     return this.toOverrideResponse(saved);
   }
@@ -296,7 +293,7 @@ export class CalendarBindingService {
   private buildInheritanceChain(
     targetType: BindingTargetType,
     targetId: string,
-    context: InheritanceContext,
+    context: InheritanceContext
   ): Array<{ type: BindingTargetType; id: string }> {
     const chain: Array<{ type: BindingTargetType; id: string }> = [];
 

@@ -17,7 +17,7 @@ describe('TestAccountSeederService', () => {
   beforeEach(async () => {
     // Reset mocks
     jest.clearAllMocks();
-    
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         TestAccountSeederService,
@@ -35,7 +35,7 @@ describe('TestAccountSeederService', () => {
     it('should skip existing accounts and not create duplicates', async () => {
       // Arrange: First account exists, second doesn't
       const existingAccount = TEST_ACCOUNTS[0];
-      
+
       mockRepository.findOne.mockImplementation(async ({ where }) => {
         if (where.email === existingAccount.email) {
           return { id: existingAccount.id, email: existingAccount.email } as ActorEntity;
@@ -49,13 +49,13 @@ describe('TestAccountSeederService', () => {
 
       // Assert: findOne called for all accounts
       expect(mockRepository.findOne).toHaveBeenCalledTimes(TEST_ACCOUNTS.length);
-      
+
       // Assert: save NOT called for existing account
       const saveCallEmails = mockRepository.save.mock.calls.map(
         (call) => (call[0] as ActorEntity).email
       );
       expect(saveCallEmails).not.toContain(existingAccount.email);
-      
+
       // Assert: save called for new accounts (all except first)
       expect(mockRepository.save).toHaveBeenCalledTimes(TEST_ACCOUNTS.length - 1);
     });
@@ -95,7 +95,7 @@ describe('TestAccountSeederService', () => {
       await service.seedTestAccounts();
 
       // Assert: All saved entities should have a password hash (not plain text)
-      const savedEntities = mockRepository.save.mock.calls.map(call => call[0] as ActorEntity);
+      const savedEntities = mockRepository.save.mock.calls.map((call) => call[0] as ActorEntity);
       for (const entity of savedEntities) {
         expect(entity.passwordHash).toBeDefined();
         expect(entity.passwordHash).not.toBe(TEST_PASSWORD);

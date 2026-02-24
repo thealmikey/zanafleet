@@ -5,30 +5,30 @@ import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Inde
 @Index(['workspaceId'])
 @Index(['phoneNumber'])
 export class CustomerEntity {
-    @PrimaryColumn('uuid')
-    id!: string;
+  @PrimaryColumn('uuid')
+  id!: string;
 
-    @Column('uuid')
-    businessId!: string;
+  @Column('uuid')
+  businessId!: string;
 
-    @Column('uuid')
-    workspaceId!: string;
+  @Column('uuid')
+  workspaceId!: string;
 
-    @Column('varchar', { length: 255 })
-    name!: string;
+  @Column('varchar', { length: 255 })
+  name!: string;
 
-    @Column('varchar', { length: 20 })
-    phoneNumber!: string;
+  @Column('varchar', { length: 20 })
+  phoneNumber!: string;
 
-    @Column('varchar', { length: 255, nullable: true })
-    email: string | null = null;
+  @Column('varchar', { length: 255, nullable: true })
+  email: string | null = null;
 
-    @Column('jsonb', { nullable: true })
-    metadata: Record<string, unknown> | null = null;
+  @Column('jsonb', { nullable: true })
+  metadata: Record<string, unknown> | null = null;
 
-    @CreateDateColumn({ type: 'timestamp with time zone' })
-    createdAt!: Date;
+  @CreateDateColumn({ type: 'timestamp with time zone' })
+  createdAt!: Date;
 
-    @UpdateDateColumn({ type: 'timestamp with time zone' })
-    updatedAt!: Date;
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
+  updatedAt!: Date;
 }

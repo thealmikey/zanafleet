@@ -4,8 +4,15 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { InteractionEventRepository } from '../../../interaction/repositories/interaction-event.repository';
 import { CapabilityProposalEntity } from '../../entities/capability-proposal.entity';
 import { ProposalStatus, InvocationMode } from '../../enums/consent.enums';
-import { CapabilityOrchestrator, CapabilityHandler } from '../../services/capability-orchestrator.service';
-import { ConsentConfirmationService, ProposalNotFoundError, InvalidProposalStateError } from '../../services/consent-confirmation.service';
+import {
+  CapabilityOrchestrator,
+  CapabilityHandler,
+} from '../../services/capability-orchestrator.service';
+import {
+  ConsentConfirmationService,
+  ProposalNotFoundError,
+  InvalidProposalStateError,
+} from '../../services/consent-confirmation.service';
 
 describe('CapabilityOrchestrator', () => {
   let orchestrator: CapabilityOrchestrator;
@@ -47,14 +54,15 @@ describe('CapabilityOrchestrator', () => {
 
   describe('execute', () => {
     // Create a fresh confirmed proposal for each test to avoid state mutation
-    const createConfirmedProposal = () => ({
-      proposalId: 'proposal-1',
-      streamId: 'stream-1',
-      capabilityName: 'CreateOrder',
-      extractedInputs: { amount: 100 },
-      status: ProposalStatus.CONFIRMED,
-      invocationMode: InvocationMode.CONVERSATIONAL,
-    } as unknown as CapabilityProposalEntity);
+    const createConfirmedProposal = () =>
+      ({
+        proposalId: 'proposal-1',
+        streamId: 'stream-1',
+        capabilityName: 'CreateOrder',
+        extractedInputs: { amount: 100 },
+        status: ProposalStatus.CONFIRMED,
+        invocationMode: InvocationMode.CONVERSATIONAL,
+      } as unknown as CapabilityProposalEntity);
 
     beforeEach(() => {
       // Reset all mocks before each test - including mock implementations
@@ -69,7 +77,10 @@ describe('CapabilityOrchestrator', () => {
       orchestrator.registerHandler('CreateOrder', handler);
 
       mockProposalRepository.findOne.mockResolvedValue(mockConfirmedProposal);
-      mockProposalRepository.save.mockResolvedValue({ ...mockConfirmedProposal, status: ProposalStatus.EXECUTED });
+      mockProposalRepository.save.mockResolvedValue({
+        ...mockConfirmedProposal,
+        status: ProposalStatus.EXECUTED,
+      });
       mockInteractionEventRepository.appendToStream.mockResolvedValue({} as any);
 
       const result = await orchestrator.execute('proposal-1');
@@ -117,7 +128,10 @@ describe('CapabilityOrchestrator', () => {
     it('should return error when no handler is registered', async () => {
       const mockConfirmedProposal = createConfirmedProposal();
       mockProposalRepository.findOne.mockResolvedValue(mockConfirmedProposal);
-      mockProposalRepository.save.mockResolvedValue({ ...mockConfirmedProposal, status: ProposalStatus.FAILED });
+      mockProposalRepository.save.mockResolvedValue({
+        ...mockConfirmedProposal,
+        status: ProposalStatus.FAILED,
+      });
       mockInteractionEventRepository.appendToStream.mockResolvedValue({} as any);
 
       const result = await orchestrator.execute('proposal-1');
@@ -134,7 +148,10 @@ describe('CapabilityOrchestrator', () => {
       orchestrator.registerHandler('CreateOrder', handler);
 
       mockProposalRepository.findOne.mockResolvedValue(mockConfirmedProposal);
-      mockProposalRepository.save.mockResolvedValue({ ...mockConfirmedProposal, status: ProposalStatus.FAILED });
+      mockProposalRepository.save.mockResolvedValue({
+        ...mockConfirmedProposal,
+        status: ProposalStatus.FAILED,
+      });
       mockInteractionEventRepository.appendToStream.mockResolvedValue({} as any);
 
       const result = await orchestrator.execute('proposal-1');
@@ -151,7 +168,10 @@ describe('CapabilityOrchestrator', () => {
       orchestrator.registerHandler('CreateOrder', handler);
 
       mockProposalRepository.findOne.mockResolvedValue(mockConfirmedProposal);
-      mockProposalRepository.save.mockResolvedValue({ ...mockConfirmedProposal, status: ProposalStatus.EXECUTED });
+      mockProposalRepository.save.mockResolvedValue({
+        ...mockConfirmedProposal,
+        status: ProposalStatus.EXECUTED,
+      });
       mockInteractionEventRepository.appendToStream.mockResolvedValue({} as any);
 
       const result = await orchestrator.execute('proposal-1');
@@ -168,13 +188,15 @@ describe('CapabilityOrchestrator', () => {
       orchestrator.registerHandler('CreateOrder', handler);
 
       mockProposalRepository.findOne.mockResolvedValue(mockConfirmedProposal);
-      mockProposalRepository.save.mockImplementation((proposal) => Promise.resolve(proposal as CapabilityProposalEntity));
+      mockProposalRepository.save.mockImplementation((proposal) =>
+        Promise.resolve(proposal as CapabilityProposalEntity)
+      );
       mockInteractionEventRepository.appendToStream.mockResolvedValue({} as any);
 
       await orchestrator.execute('proposal-1');
 
       expect(mockProposalRepository.save).toHaveBeenCalledWith(
-        expect.objectContaining({ status: ProposalStatus.EXECUTED }),
+        expect.objectContaining({ status: ProposalStatus.EXECUTED })
       );
     });
 
@@ -186,13 +208,15 @@ describe('CapabilityOrchestrator', () => {
       orchestrator.registerHandler('CreateOrder', handler);
 
       mockProposalRepository.findOne.mockResolvedValue(mockConfirmedProposal);
-      mockProposalRepository.save.mockImplementation((proposal) => Promise.resolve(proposal as CapabilityProposalEntity));
+      mockProposalRepository.save.mockImplementation((proposal) =>
+        Promise.resolve(proposal as CapabilityProposalEntity)
+      );
       mockInteractionEventRepository.appendToStream.mockResolvedValue({} as any);
 
       await orchestrator.execute('proposal-1');
 
       expect(mockProposalRepository.save).toHaveBeenCalledWith(
-        expect.objectContaining({ status: ProposalStatus.FAILED }),
+        expect.objectContaining({ status: ProposalStatus.FAILED })
       );
     });
   });
@@ -207,7 +231,7 @@ describe('CapabilityOrchestrator', () => {
       const result = await orchestrator.executeDirect(
         'Search',
         { query: 'test' },
-        InvocationMode.INLINE_PREVIEW,
+        InvocationMode.INLINE_PREVIEW
       );
 
       expect(result.success).toBe(true);

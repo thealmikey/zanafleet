@@ -24,7 +24,11 @@ import { CapabilityController } from './controllers/capability.controller';
 
 // Re-export for external use
 export { CapabilityOrchestrator } from './services/capability-orchestrator';
-export { ICapabilityOrchestrator, OrchestrationRequest, OrchestrationResult } from './services/capability-orchestrator';
+export {
+  ICapabilityOrchestrator,
+  OrchestrationRequest,
+  OrchestrationResult,
+} from './services/capability-orchestrator';
 export { CapabilityAccessController } from './services/capability-access.controller';
 export { CapabilityRepository } from './repositories/capability.repository';
 export { CapabilityAuditService } from './services/capability-audit.service';
@@ -46,9 +50,7 @@ export const CommandHandlers = [
       CapabilityAuditEntity,
     ]),
   ],
-  controllers: [
-    CapabilityController,
-  ],
+  controllers: [CapabilityController],
   providers: [
     // Repositories
     CapabilityRepository,

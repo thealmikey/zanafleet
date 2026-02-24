@@ -3,10 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 
 import { CapabilityAuditEntity } from '../entities/capability-audit.entity';
-import {
-  CapabilityUsedEventV1,
-  CapabilityExecutionResult,
-} from '../events/capability-used.event';
+import { CapabilityUsedEventV1, CapabilityExecutionResult } from '../events/capability-used.event';
 
 /**
  * Simple UUID generator
@@ -42,7 +39,7 @@ export class CapabilityAuditService {
 
   constructor(
     @InjectRepository(CapabilityAuditEntity)
-    private readonly auditRepository: Repository<CapabilityAuditEntity>,
+    private readonly auditRepository: Repository<CapabilityAuditEntity>
   ) {}
 
   /**
@@ -91,7 +88,7 @@ export class CapabilityAuditService {
     const saved = await this.auditRepository.save(auditRecord);
 
     this.logger.log(
-      `Capability usage recorded: ${event.actorId} executed ${event.capabilityName} - ${event.result}`,
+      `Capability usage recorded: ${event.actorId} executed ${event.capabilityName} - ${event.result}`
     );
 
     return saved;
@@ -115,7 +112,7 @@ export class CapabilityAuditService {
   async findByCapabilityName(
     capabilityName: string,
     limit = 100,
-    offset = 0,
+    offset = 0
   ): Promise<CapabilityAuditEntity[]> {
     return this.auditRepository.find({
       where: { capabilityName },
@@ -131,7 +128,7 @@ export class CapabilityAuditService {
   async findByContextId(
     contextId: string,
     limit = 100,
-    offset = 0,
+    offset = 0
   ): Promise<CapabilityAuditEntity[]> {
     return this.auditRepository.find({
       where: { contextId },
@@ -157,7 +154,7 @@ export class CapabilityAuditService {
     capabilityName?: string,
     startDate?: string,
     endDate?: string,
-    result?: CapabilityExecutionResult,
+    result?: CapabilityExecutionResult
   ): Promise<UsageStats> {
     // Get total count
     const queryBuilder = this.auditRepository.createQueryBuilder('audit');

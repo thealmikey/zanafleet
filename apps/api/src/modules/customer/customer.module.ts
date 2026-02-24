@@ -26,8 +26,6 @@ export const CUSTOMER_REPOSITORY_TOKEN = getRepositoryToken(CustomerEntity);
 // Re-export for external use
 export { CustomerRepositoryInMemory } from './repositories/customer.repository.in-memory';
 
-
-
 /**
  * Creates a mock repository for sandbox mode
  */
@@ -38,7 +36,8 @@ function createMockRepository<T = unknown>(): Record<string, unknown> {
     findOne: async (): Promise<T | null> => null,
     findOneBy: async (): Promise<T | null> => null,
     create: (data: Partial<T>): T => data as T,
-    merge: (entity: T, ...updates: Record<string, unknown>[]): T => ({ ...entity, ...Object.assign({}, ...updates) }) as T,
+    merge: (entity: T, ...updates: Record<string, unknown>[]): T =>
+      ({ ...entity, ...Object.assign({}, ...updates) } as T),
     delete: async (): Promise<{ affected: number }> => ({ affected: 1 }),
     createQueryBuilder: () => null,
     manager: { save: async (entity: T): Promise<T> => entity },
@@ -50,7 +49,7 @@ function createMockRepository<T = unknown>(): Record<string, unknown> {
  */
 function createTypeOrmFallbackProviders(...entities: (new () => unknown)[]): Provider[] {
   if (!isSandBoxMode) return [];
-  return entities.map(entity => ({
+  return entities.map((entity) => ({
     provide: getRepositoryToken(entity),
     useValue: createMockRepository(),
   }));
@@ -88,12 +87,12 @@ function getExports(): Array<Type<unknown> | string | symbol> {
     CommerceContextEngine,
     CustomerProjectionService,
   ];
-  
+
   // Only export TypeOrmModule when not in sandbox mode
   if (!isSandBoxMode) {
     moduleExports.push(TypeOrmModule);
   }
-  
+
   // Filter out any undefined values that might cause issues
   return moduleExports.filter((exp): exp is Type<unknown> | string | symbol => exp !== undefined);
 }
@@ -102,22 +101,18 @@ const repositoryProviders = getCustomerRepositoryProvider();
 console.log('[DEBUG] CustomerModule repository providers:', repositoryProviders);
 
 @Module({
-    imports: [
-        ...getTypeOrmImports(),
-        CalendarModule,
-        PolicyModule,
-    ],
-    controllers: [CustomerController],
-    providers: [
-        CommerceContextEngine,
-        CustomerProjectionService,
-        ...repositoryProviders,
-        ...createTypeOrmFallbackProviders(
-          BusinessAvailabilityProjection,
-          CustomerActivityProjection,
-          MarketDensityProjection,
-        ),
-    ],
-    exports: getExports(),
+  imports: [...getTypeOrmImports(), CalendarModule, PolicyModule],
+  controllers: [CustomerController],
+  providers: [
+    CommerceContextEngine,
+    CustomerProjectionService,
+    ...repositoryProviders,
+    ...createTypeOrmFallbackProviders(
+      BusinessAvailabilityProjection,
+      CustomerActivityProjection,
+      MarketDensityProjection
+    ),
+  ],
+  exports: getExports(),
 })
-export class CustomerModule { }
+export class CustomerModule {}

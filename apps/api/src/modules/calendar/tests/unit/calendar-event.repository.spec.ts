@@ -4,7 +4,10 @@ import { CalendarEventType, RecurrencePattern } from '@zanafleet/contracts';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 
 import { CalendarEventEntity } from '../../entities/calendar-event.entity';
-import { CalendarEventRepository, RegionFilter } from '../../repositories/calendar-event.repository';
+import {
+  CalendarEventRepository,
+  RegionFilter,
+} from '../../repositories/calendar-event.repository';
 
 describe('CalendarEventRepository', () => {
   let repository: CalendarEventRepository;
@@ -52,9 +55,15 @@ describe('CalendarEventRepository', () => {
       const result = await repository.findActiveEventsForDateRange(startDate, endDate);
 
       expect(mockRepo.createQueryBuilder).toHaveBeenCalledWith('event');
-      expect(mockQueryBuilder.where).toHaveBeenCalledWith('event.isActive = :isActive', { isActive: true });
-      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('event.startTime <= :endDate', { endDate });
-      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('event.endTime >= :startDate', { startDate });
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith('event.isActive = :isActive', {
+        isActive: true,
+      });
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('event.startTime <= :endDate', {
+        endDate,
+      });
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('event.endTime >= :startDate', {
+        startDate,
+      });
       expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith('event.priority', 'DESC');
       expect(mockQueryBuilder.addOrderBy).toHaveBeenCalledWith('event.startTime', 'ASC');
       expect(result).toBe(mockEvents);
@@ -83,7 +92,9 @@ describe('CalendarEventRepository', () => {
       const result = await repository.findHolidaysForDate(date);
 
       expect(mockRepo.createQueryBuilder).toHaveBeenCalledWith('event');
-      expect(mockQueryBuilder.where).toHaveBeenCalledWith('event.isActive = :isActive', { isActive: true });
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith('event.isActive = :isActive', {
+        isActive: true,
+      });
       expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('event.eventType = :eventType', {
         eventType: CalendarEventType.PUBLIC_HOLIDAY,
       });
@@ -112,7 +123,9 @@ describe('CalendarEventRepository', () => {
       const result = await repository.findByRegion(region);
 
       expect(mockRepo.createQueryBuilder).toHaveBeenCalledWith('event');
-      expect(mockQueryBuilder.where).toHaveBeenCalledWith('event.isActive = :isActive', { isActive: true });
+      expect(mockQueryBuilder.where).toHaveBeenCalledWith('event.isActive = :isActive', {
+        isActive: true,
+      });
       expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith('event.startTime', 'ASC');
       expect(result).toBe(mockEvents);
     });

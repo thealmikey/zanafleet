@@ -2,14 +2,8 @@ export { CalendarModule } from './calendar.module';
 export { CalendarService } from './services/calendar.service';
 export { CalendarBindingService } from './services/calendar-binding.service';
 export { SchedulingConstraintService } from './services/scheduling-constraint.service';
-export type {
-  CreateCalendarRuleInput,
-  UpdateCalendarInput,
-} from './services/calendar.service';
-export type {
-  ResolvedBinding,
-  InheritanceContext,
-} from './services/calendar-binding.service';
+export type { CreateCalendarRuleInput, UpdateCalendarInput } from './services/calendar.service';
+export type { ResolvedBinding, InheritanceContext } from './services/calendar-binding.service';
 export type {
   ConstraintContext,
   ConstraintResult,

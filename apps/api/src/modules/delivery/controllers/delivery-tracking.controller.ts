@@ -1,4 +1,4 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common'
+import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import {
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -7,29 +7,29 @@ import {
   ApiProperty,
   ApiPropertyOptional,
   ApiTags,
-} from '@nestjs/swagger'
-import { InjectDataSource } from '@nestjs/typeorm'
-import { DeliveryStatus } from '@zanafleet/contracts'
-import { DataSource } from 'typeorm'
+} from '@nestjs/swagger';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DeliveryStatus } from '@zanafleet/contracts';
+import { DataSource } from 'typeorm';
 
-import { DeliveryService } from '../services/delivery.service'
+import { DeliveryService } from '../services/delivery.service';
 
 class DeliveryTrackingStopDto {
   @ApiProperty({ description: 'Stop sequence number starting from 0', example: 0 })
-  sequence!: number
+  sequence!: number;
 
   @ApiProperty({
     description: 'Type of stop',
     example: 'pickup',
     enum: ['pickup', 'dropoff', 'waypoint'],
   })
-  type!: 'pickup' | 'dropoff' | 'waypoint'
+  type!: 'pickup' | 'dropoff' | 'waypoint';
 
   @ApiProperty({
     description: 'Location identifier of the stop',
     example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
   })
-  locationId!: string
+  locationId!: string;
 
   @ApiPropertyOptional({
     description: 'Scheduled time of the stop (if any)',
@@ -38,7 +38,7 @@ class DeliveryTrackingStopDto {
     format: 'date-time',
     nullable: true,
   })
-  scheduledTime!: Date | null
+  scheduledTime!: Date | null;
 
   @ApiPropertyOptional({
     description: 'Actual time of the stop (if any)',
@@ -47,22 +47,22 @@ class DeliveryTrackingStopDto {
     format: 'date-time',
     nullable: true,
   })
-  actualTime!: Date | null
+  actualTime!: Date | null;
 
   @ApiPropertyOptional({
     description: 'Additional notes for the stop',
     example: 'Leave with security at gate',
     nullable: true,
   })
-  notes!: string | null
+  notes!: string | null;
 }
 
 class RiderLastKnownLocationDto {
   @ApiProperty({ description: 'Latitude', example: -1.29 })
-  latitude!: number
+  latitude!: number;
 
   @ApiProperty({ description: 'Longitude', example: 36.82 })
-  longitude!: number
+  longitude!: number;
 
   @ApiPropertyOptional({
     description: 'When the rider was last seen at this location',
@@ -71,7 +71,7 @@ class RiderLastKnownLocationDto {
     format: 'date-time',
     nullable: true,
   })
-  lastSeenAt?: Date | null
+  lastSeenAt?: Date | null;
 }
 
 class PublicRiderSummaryDto {
@@ -80,14 +80,14 @@ class PublicRiderSummaryDto {
     example: 'rider-123',
     nullable: true,
   })
-  riderId!: string | null
+  riderId!: string | null;
 
   @ApiPropertyOptional({
     description: 'Last known rider location (if resolvable)',
     type: RiderLastKnownLocationDto,
     nullable: true,
   })
-  lastKnownLocation?: RiderLastKnownLocationDto | null
+  lastKnownLocation?: RiderLastKnownLocationDto | null;
 }
 
 export class DeliveryTrackingResponseDto {
@@ -95,14 +95,14 @@ export class DeliveryTrackingResponseDto {
     description: 'Delivery identifier',
     example: 'd-123',
   })
-  deliveryId!: string
+  deliveryId!: string;
 
   @ApiProperty({
     description: 'Current delivery status',
     enum: DeliveryStatus,
     example: DeliveryStatus.InTransit,
   })
-  status!: DeliveryStatus
+  status!: DeliveryStatus;
 
   @ApiPropertyOptional({
     description: 'Scheduled pickup time (if any)',
@@ -111,7 +111,7 @@ export class DeliveryTrackingResponseDto {
     example: '2025-01-01T10:00:00.000Z',
     nullable: true,
   })
-  scheduledPickupTime!: Date | null
+  scheduledPickupTime!: Date | null;
 
   @ApiPropertyOptional({
     description: 'Scheduled dropoff time (if any)',
@@ -120,20 +120,20 @@ export class DeliveryTrackingResponseDto {
     example: '2025-01-01T11:00:00.000Z',
     nullable: true,
   })
-  scheduledDropoffTime!: Date | null
+  scheduledDropoffTime!: Date | null;
 
   @ApiProperty({
     description: 'Stops associated with this delivery (empty if none)',
     type: [DeliveryTrackingStopDto],
   })
-  stops!: DeliveryTrackingStopDto[]
+  stops!: DeliveryTrackingStopDto[];
 
   @ApiPropertyOptional({
     description: 'Public rider summary (if a rider is assigned)',
     type: PublicRiderSummaryDto,
     nullable: true,
   })
-  rider?: PublicRiderSummaryDto | null
+  rider?: PublicRiderSummaryDto | null;
 }
 
 @ApiTags('Deliveries')
@@ -142,7 +142,7 @@ export class DeliveryTrackingController {
   constructor(
     private readonly deliveryService: DeliveryService,
     @InjectDataSource()
-    private readonly dataSource: DataSource,
+    private readonly dataSource: DataSource
   ) {}
 
   @Get(':token')
@@ -162,12 +162,12 @@ export class DeliveryTrackingController {
   })
   @ApiNotFoundResponse({ description: 'Delivery not found for token' })
   async getByToken(@Param('token') token: string): Promise<DeliveryTrackingResponseDto> {
-    const base = await this.deliveryService.getPublicViewByToken(token)
+    const base = await this.deliveryService.getPublicViewByToken(token);
     if (!base) {
-      throw new NotFoundException('Delivery not found')
+      throw new NotFoundException('Delivery not found');
     }
 
-    const rows = (await this.dataSource.query(
+    const rows = await this.dataSource.query(
       `
       SELECT
         "sequence",
@@ -180,8 +180,8 @@ export class DeliveryTrackingController {
       WHERE "deliveryId" = $1
       ORDER BY "sequence" ASC
     `,
-      [base.deliveryId],
-    ))
+      [base.deliveryId]
+    );
 
     const stops: DeliveryTrackingStopDto[] = rows.map((r) => ({
       sequence: Number(r.sequence),
@@ -190,7 +190,7 @@ export class DeliveryTrackingController {
       scheduledTime: r.scheduledTime ? new Date(r.scheduledTime) : null,
       actualTime: r.actualTime ? new Date(r.actualTime) : null,
       notes: r.notes ?? null,
-    }))
+    }));
 
     const riderSummary: PublicRiderSummaryDto | null =
       base.assignedRiderId != null
@@ -200,7 +200,7 @@ export class DeliveryTrackingController {
             // Kept null here to avoid leaking PII and cross-module DB access.
             lastKnownLocation: null,
           }
-        : null
+        : null;
 
     return {
       deliveryId: base.deliveryId,
@@ -209,6 +209,6 @@ export class DeliveryTrackingController {
       scheduledDropoffTime: base.scheduledDropoffTime ?? null,
       stops,
       rider: riderSummary,
-    }
+    };
   }
 }

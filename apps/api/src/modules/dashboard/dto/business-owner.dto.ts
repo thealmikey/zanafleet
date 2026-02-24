@@ -1,7 +1,6 @@
 import type { RawQueryParams } from '@api/core/api/utils';
 import type { DeliveryStatus } from '@zanafleet/contracts';
 
-
 export type PaymentStateFilter = 'UNPAID' | 'PENDING' | 'PAID' | 'FAILED';
 
 export interface BusinessOverviewDto {

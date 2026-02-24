@@ -1,4 +1,10 @@
-import { CalendarScope, CalendarRuleType, CalendarEventType, RecurrencePattern, BindingTargetType } from '@zanafleet/contracts';
+import {
+  CalendarScope,
+  CalendarRuleType,
+  CalendarEventType,
+  RecurrencePattern,
+  BindingTargetType,
+} from '@zanafleet/contracts';
 
 import { CalendarBindingEntity } from '../../entities/calendar-binding.entity';
 import { CalendarEventEntity } from '../../entities/calendar-event.entity';
@@ -361,7 +367,11 @@ describe('Calendar Entities', () => {
         expect(domain.allDay).toBe(true);
         expect(domain.regionScope).toEqual({ country: 'Kenya' });
         expect(domain.recurrencePattern).toBe(RecurrencePattern.YEARLY);
-        expect(domain.recurrenceRule).toEqual({ frequency: 'YEARLY', byMonth: [12], byMonthDay: [25] });
+        expect(domain.recurrenceRule).toEqual({
+          frequency: 'YEARLY',
+          byMonth: [12],
+          byMonthDay: [25],
+        });
         expect(domain.priority).toBe(100);
         expect(domain.isActive).toBe(true);
         expect(domain.createdAt).toBe(now);
@@ -377,7 +387,11 @@ describe('Calendar Entities', () => {
         entity.startTime = startTime;
         entity.endTime = endTime;
         entity.allDay = false;
-        entity.regionScope = { country: 'Kenya', administrativeArea: 'Nairobi', locality: 'Westlands' };
+        entity.regionScope = {
+          country: 'Kenya',
+          administrativeArea: 'Nairobi',
+          locality: 'Westlands',
+        };
         entity.recurrencePattern = RecurrencePattern.NONE;
         entity.recurrenceRule = null;
         entity.priority = 0;

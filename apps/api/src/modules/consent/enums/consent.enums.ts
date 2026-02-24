@@ -1,13 +1,13 @@
 /**
  * Consent Module Enums
- * 
+ *
  * Defines all enum types used in the consent-driven navigation architecture.
  * These enums control the proposal lifecycle, invocation modes, and confirmation actions.
  */
 
 /**
  * CapabilityProposal Status Enum
- * 
+ *
  * Lifecycle: proposed → confirmed | rejected | expired → executed (if confirmed)
  */
 export enum ProposalStatus {
@@ -22,7 +22,7 @@ export enum ProposalStatus {
 
 /**
  * InvocationMode Enum
- * 
+ *
  * Defines how a capability should be invoked after user confirmation.
  */
 export enum InvocationMode {
@@ -34,7 +34,7 @@ export enum InvocationMode {
 
 /**
  * ConfirmationAction Enum
- * 
+ *
  * All possible user responses to a capability proposal.
  */
 export enum ConfirmationAction {

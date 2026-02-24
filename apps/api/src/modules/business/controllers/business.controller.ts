@@ -30,11 +30,7 @@ import { Repository } from 'typeorm';
 
 import { RequireCapability } from '@api/core/api/decorators';
 import { CapabilityGuard } from '@api/core/api/guards';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
+import { parseQueryParams, createPaginationMeta, RawQueryParams } from '@api/core/api/utils';
 
 import { CreateBusinessCommand } from '../commands/create-business.command';
 import { BusinessEntity } from '../entities/business.entity';
@@ -95,10 +91,20 @@ export class BusinessController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new business', description: 'Create a new business entity within the workspace' })
-  @ApiResponse({ status: 201, description: 'Business created successfully', schema: { example: { id: 'uuid' } } })
+  @ApiOperation({
+    summary: 'Create a new business',
+    description: 'Create a new business entity within the workspace',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Business created successfully',
+    schema: { example: { id: 'uuid' } },
+  })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   async create(@Body() dto: CreateBusinessDto): Promise<{ id: string }> {
     const validated = CreateBusinessCommand.validate(dto);
@@ -107,9 +113,15 @@ export class BusinessController {
   }
 
   @Get(UUID_V4_ROUTE_SEGMENT)
-  @ApiOperation({ summary: 'Get business by ID', description: 'Retrieve a specific business by its unique identifier' })
+  @ApiOperation({
+    summary: 'Get business by ID',
+    description: 'Retrieve a specific business by its unique identifier',
+  })
   @ApiResponse({ status: 200, description: 'Business retrieved successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Business not found' })
   @ApiParam({ name: 'id', description: 'Business unique identifier (UUID)', type: String })
@@ -122,13 +134,23 @@ export class BusinessController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List all businesses', description: 'Retrieve all businesses with pagination, sorting, and filtering' })
+  @ApiOperation({
+    summary: 'List all businesses',
+    description: 'Retrieve all businesses with pagination, sorting, and filtering',
+  })
   @ApiResponse({ status: 200, description: 'Businesses retrieved successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number (1-based)', type: Number })
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
-  @ApiQuery({ name: 'sort', required: false, description: 'Sort field and order (e.g., createdAt:desc)' })
+  @ApiQuery({
+    name: 'sort',
+    required: false,
+    description: 'Sort field and order (e.g., createdAt:desc)',
+  })
   @ApiQuery({ name: 'filter', required: false, description: 'Filter criteria as JSON' })
   async findAll(@Query() query: RawQueryParams): Promise<{
     data: ReturnType<BusinessEntity['toDomain']>[];
@@ -139,7 +161,7 @@ export class BusinessController {
     const order = sort ? { [sort.field]: sort.order } : undefined;
 
     const [entities, total] = await this.businessRepository.findAndCount({
-      where: filter ,
+      where: filter,
       order,
       skip: pagination.offset,
       take: pagination.limit,
@@ -154,7 +176,10 @@ export class BusinessController {
   @Patch(UUID_V4_ROUTE_SEGMENT)
   @ApiOperation({ summary: 'Update a business', description: 'Update an existing business entity' })
   @ApiResponse({ status: 200, description: 'Business updated successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Business not found' })
   @ApiParam({ name: 'id', description: 'Business unique identifier (UUID)', type: String })
@@ -176,8 +201,15 @@ export class BusinessController {
   @Delete(UUID_V4_ROUTE_SEGMENT)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete a business', description: 'Delete an existing business entity' })
-  @ApiResponse({ status: 200, description: 'Business deleted successfully', schema: { example: { deleted: true } } })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Business deleted successfully',
+    schema: { example: { deleted: true } },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Business not found' })
   @ApiParam({ name: 'id', description: 'Business unique identifier (UUID)', type: String })

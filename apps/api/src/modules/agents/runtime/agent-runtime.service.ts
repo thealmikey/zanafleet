@@ -37,7 +37,7 @@ export class AgentRuntime implements OnModuleInit {
     private readonly eventBus: EventBusService,
     private readonly policyEngine: PolicyEngine,
     private readonly telemetry: AgentTelemetry,
-    private readonly jobQueue: JobQueue,
+    private readonly jobQueue: JobQueue
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -124,7 +124,7 @@ export class AgentRuntime implements OnModuleInit {
       triggerType: AgentTriggerType;
       triggerEventId?: string;
       payload: Record<string, unknown>;
-    },
+    }
   ): Promise<void> {
     const executionId = uuidv4();
     const correlationId = uuidv4();
@@ -159,7 +159,9 @@ export class AgentRuntime implements OnModuleInit {
         if (attempt < retryPolicy.maxRetries) {
           const backoff = this.calculateBackoff(retryPolicy, attempt);
           this.logger.warn(
-            `Agent ${agent.name} failed (attempt ${attempt + 1}/${retryPolicy.maxRetries + 1}), retrying in ${backoff}ms`,
+            `Agent ${agent.name} failed (attempt ${attempt + 1}/${
+              retryPolicy.maxRetries + 1
+            }), retrying in ${backoff}ms`
           );
           await this.delay(backoff);
         }
@@ -173,10 +175,7 @@ export class AgentRuntime implements OnModuleInit {
   /**
    * Execute the agent through the full pipeline
    */
-  private async executeAgent(
-    agent: Agent,
-    context: AgentContext,
-  ): Promise<AgentExecutionResult> {
+  private async executeAgent(agent: Agent, context: AgentContext): Promise<AgentExecutionResult> {
     const startTime = Date.now();
     let decision: AgentDecision;
     let result: unknown;
@@ -239,7 +238,7 @@ export class AgentRuntime implements OnModuleInit {
             decision,
             undefined,
             `Blocked: ${decision.reason}`,
-            startTime,
+            startTime
           );
 
         case PolicyDecision.REQUIRE_CONSENT:
@@ -260,7 +259,7 @@ export class AgentRuntime implements OnModuleInit {
             decision,
             undefined,
             'Consent required',
-            startTime,
+            startTime
           );
 
         case PolicyDecision.ESCALATE:
@@ -272,7 +271,7 @@ export class AgentRuntime implements OnModuleInit {
             decision,
             undefined,
             'Escalated',
-            startTime,
+            startTime
           );
 
         case PolicyDecision.SUGGEST:
@@ -311,7 +310,7 @@ export class AgentRuntime implements OnModuleInit {
         decision,
         result,
         undefined,
-        startTime,
+        startTime
       );
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -334,7 +333,10 @@ export class AgentRuntime implements OnModuleInit {
   /**
    * Run optional AI analysis (safe fallback on failure)
    */
-  private async runAIAnalysis(_agent: Agent, _context: AgentContext): Promise<AIResult | undefined> {
+  private async runAIAnalysis(
+    _agent: Agent,
+    _context: AgentContext
+  ): Promise<AIResult | undefined> {
     // Placeholder - would integrate with AI module
     // Returns undefined to fall back to policy defaults
     return undefined;
@@ -343,11 +345,7 @@ export class AgentRuntime implements OnModuleInit {
   /**
    * Handle dead letter - failed executions after all retries
    */
-  private async handleDeadLetter(
-    agent: Agent,
-    context: AgentContext,
-    error: Error,
-  ): Promise<void> {
+  private async handleDeadLetter(agent: Agent, context: AgentContext, error: Error): Promise<void> {
     const deadLetter: DeadLetterMessage = {
       id: uuidv4(),
       originalJobId: context.executionId,
@@ -362,7 +360,7 @@ export class AgentRuntime implements OnModuleInit {
 
     this.logger.error(
       `Dead letter: Agent ${agent.name} failed after ${agent.retryPolicy.maxRetries} retries`,
-      error,
+      error
     );
 
     this.telemetry.emit({
@@ -383,9 +381,8 @@ export class AgentRuntime implements OnModuleInit {
     return Array.from(this.agents.values()).filter((agent) =>
       agent.triggers.some(
         (trigger) =>
-          trigger.type === AgentTriggerType.EVENT &&
-          trigger.eventTypes?.includes(eventType),
-      ),
+          trigger.type === AgentTriggerType.EVENT && trigger.eventTypes?.includes(eventType)
+      )
     );
   }
 
@@ -394,7 +391,7 @@ export class AgentRuntime implements OnModuleInit {
    */
   private findScheduledAgents(): Agent[] {
     return Array.from(this.agents.values()).filter((agent) =>
-      agent.triggers.some((trigger) => trigger.type === AgentTriggerType.SCHEDULED),
+      agent.triggers.some((trigger) => trigger.type === AgentTriggerType.SCHEDULED)
     );
   }
 
@@ -426,7 +423,7 @@ export class AgentRuntime implements OnModuleInit {
   private calculateBackoff(retryPolicy: RetryPolicy, attempt: number): number {
     return Math.min(
       retryPolicy.initialBackoffMs * Math.pow(retryPolicy.backoffMultiplier, attempt),
-      retryPolicy.maxBackoffMs,
+      retryPolicy.maxBackoffMs
     );
   }
 
@@ -447,7 +444,7 @@ export class AgentRuntime implements OnModuleInit {
     decision: AgentDecision,
     result: unknown,
     error: string | undefined,
-    startTime: number,
+    startTime: number
   ): AgentExecutionResult {
     return {
       executionId: context.executionId,

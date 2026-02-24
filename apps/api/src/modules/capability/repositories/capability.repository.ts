@@ -190,7 +190,7 @@ export class CapabilityRepository {
   async findByCategory(category: string): Promise<CapabilityEntity[]> {
     return this.capabilityRepository
       .createQueryBuilder('capability')
-      .where('capability.metadata ->> \'category\' = :category', { category })
+      .where("capability.metadata ->> 'category' = :category", { category })
       .orderBy('capability.name', 'ASC')
       .getMany();
   }
@@ -201,7 +201,7 @@ export class CapabilityRepository {
   async findRequiringConsent(): Promise<CapabilityEntity[]> {
     return this.capabilityRepository
       .createQueryBuilder('capability')
-      .where('capability.metadata ->> \'requiresConsent\' = \'true\'')
+      .where("capability.metadata ->> 'requiresConsent' = 'true'")
       .orderBy('capability.name', 'ASC')
       .getMany();
   }

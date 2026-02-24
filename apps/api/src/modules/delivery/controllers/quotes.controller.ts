@@ -34,28 +34,24 @@ export class CreateQuoteRequestDto {
 
 /**
  * Quotes Controller for WooCommerce Integration
- * 
+ *
  * Provides endpoints at /api/v1/quotes for the WooCommerce plugin
  * to create delivery quotes without requiring full delivery creation.
  */
 @Controller('quotes')
 export class QuotesController {
-  constructor(
-    private readonly billingCalculator: BillingCalculatorService,
-  ) {}
+  constructor(private readonly billingCalculator: BillingCalculatorService) {}
 
   /**
    * POST /api/v1/quotes
    * Create a delivery quote (WooCommerce compatible API)
-   * 
+   *
    * This endpoint matches the WooCommerce plugin's expected interface:
    * - POST /api/v1/quotes
    */
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async createQuote(
-    @Body() dto: CreateQuoteRequestDto,
-  ): Promise<{
+  async createQuote(@Body() dto: CreateQuoteRequestDto): Promise<{
     quoteId: string;
     basePrice: number;
     distancePrice: number;
@@ -79,8 +75,11 @@ export class QuotesController {
     // Return quote in WooCommerce-compatible format
     return {
       quoteId: `quote_${Date.now()}`,
-      basePrice: charges.charges.find(c => c.chargeType === ChargeType.BASE_DELIVERY_FEE)?.amount ?? 200,
-      distancePrice: charges.charges.find(c => c.chargeType === ChargeType.DISTANCE_FEE)?.amount ?? (distanceKm * 50),
+      basePrice:
+        charges.charges.find((c) => c.chargeType === ChargeType.BASE_DELIVERY_FEE)?.amount ?? 200,
+      distancePrice:
+        charges.charges.find((c) => c.chargeType === ChargeType.DISTANCE_FEE)?.amount ??
+        distanceKm * 50,
       totalPrice: charges.grandTotal,
       currency: 'KES',
       distanceKm,

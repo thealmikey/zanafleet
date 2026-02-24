@@ -1,33 +1,33 @@
-import { Test } from '@nestjs/testing'
-import { DeliveryStatus } from '@zanafleet/contracts'
+import { Test } from '@nestjs/testing';
+import { DeliveryStatus } from '@zanafleet/contracts';
 
-import { EventBusService } from '../../../../core/event-bus'
-import { NatsSubjects } from '../../../../core/event-bus/event-bus.constants'
-import { DeliveryScheduledEventV1 } from '../../events/delivery-scheduled.event'
-import { DeliveryService } from '../../services/delivery.service'
-import { OrderCreatedSubscriber } from '../../subscribers/order-created.subscriber'
+import { EventBusService } from '../../../../core/event-bus';
+import { NatsSubjects } from '../../../../core/event-bus/event-bus.constants';
+import { DeliveryScheduledEventV1 } from '../../events/delivery-scheduled.event';
+import { DeliveryService } from '../../services/delivery.service';
+import { OrderCreatedSubscriber } from '../../subscribers/order-created.subscriber';
 
 describe('OrderCreatedSubscriber', () => {
-  let subscriber: OrderCreatedSubscriber
+  let subscriber: OrderCreatedSubscriber;
   let deliveryService: {
-    createScheduled: jest.Mock
-    createOnDemand: jest.Mock
-    linkOrders: jest.Mock
-  }
-  let eventBus: { publish: jest.Mock; publishEvent: jest.Mock; isReady: jest.Mock }
+    createScheduled: jest.Mock;
+    createOnDemand: jest.Mock;
+    linkOrders: jest.Mock;
+  };
+  let eventBus: { publish: jest.Mock; publishEvent: jest.Mock; isReady: jest.Mock };
 
   beforeEach(async () => {
     deliveryService = {
       createScheduled: jest.fn(),
       createOnDemand: jest.fn(),
       linkOrders: jest.fn(),
-    }
+    };
 
     eventBus = {
       publish: jest.fn(),
       publishEvent: jest.fn(),
       isReady: jest.fn().mockReturnValue(true),
-    }
+    };
 
     const moduleRef = await Test.createTestingModule({
       providers: [
@@ -35,13 +35,13 @@ describe('OrderCreatedSubscriber', () => {
         { provide: DeliveryService, useValue: deliveryService },
         { provide: EventBusService, useValue: eventBus },
       ],
-    }).compile()
+    }).compile();
 
-    subscriber = moduleRef.get(OrderCreatedSubscriber)
-  })
+    subscriber = moduleRef.get(OrderCreatedSubscriber);
+  });
 
   it('creates a Delivery and publishes DeliveryScheduledEventV1 when scheduledTime is present', async () => {
-    const scheduledAt = new Date('2025-02-01T10:00:00.000Z')
+    const scheduledAt = new Date('2025-02-01T10:00:00.000Z');
     deliveryService.createScheduled.mockResolvedValue({
       deliveryId: 'd-1',
       businessId: 'b-1',
@@ -54,7 +54,7 @@ describe('OrderCreatedSubscriber', () => {
       isScheduled: true,
       createdAt: new Date('2025-02-01T09:00:00.000Z'),
       updatedAt: new Date('2025-02-01T09:00:00.000Z'),
-    })
+    });
 
     const eventPayload = {
       eventId: 'e-1',
@@ -73,9 +73,9 @@ describe('OrderCreatedSubscriber', () => {
       correlationId: 'corr-1',
       causationId: 'caus-1',
       dropoffLocationId: 'loc-d',
-    }
+    };
 
-    await subscriber.handleOrderCreated(eventPayload as any, {} as any)
+    await subscriber.handleOrderCreated(eventPayload as any, {} as any);
 
     // ensure a scheduled delivery was created with the scheduled pickup time
     expect(deliveryService.createScheduled).toHaveBeenCalledWith(
@@ -83,25 +83,25 @@ describe('OrderCreatedSubscriber', () => {
         businessId: 'b-1',
         scheduledPickupTime: expect.any(Date),
         dropoffLocationId: 'loc-d',
-      }),
-    )
+      })
+    );
 
     // ensure the order -> delivery link is created
-    expect(deliveryService.linkOrders).toHaveBeenCalledWith('d-1', ['o-1'])
+    expect(deliveryService.linkOrders).toHaveBeenCalledWith('d-1', ['o-1']);
 
     // ensure the delivery scheduled event was published on the bus
-    expect(eventBus.publish).toHaveBeenCalledTimes(1)
-    const [subject, evt] = eventBus.publish.mock.calls[0]
-    expect(subject).toBe(NatsSubjects.Delivery.SCHEDULED_V1)
-    expect(evt).toBeInstanceOf(DeliveryScheduledEventV1)
-    const json = (evt as DeliveryScheduledEventV1).toJSON()
-    expect(json.deliveryId).toBe('d-1')
-    expect(json.businessId).toBe('b-1')
-    expect(json.scheduledPickupTime).toBe(scheduledAt.toISOString())
-  })
+    expect(eventBus.publish).toHaveBeenCalledTimes(1);
+    const [subject, evt] = eventBus.publish.mock.calls[0];
+    expect(subject).toBe(NatsSubjects.Delivery.SCHEDULED_V1);
+    expect(evt).toBeInstanceOf(DeliveryScheduledEventV1);
+    const json = (evt as DeliveryScheduledEventV1).toJSON();
+    expect(json.deliveryId).toBe('d-1');
+    expect(json.businessId).toBe('b-1');
+    expect(json.scheduledPickupTime).toBe(scheduledAt.toISOString());
+  });
 
   it('preserves Date objects directly without re-parsing', async () => {
-    const scheduledAt = new Date('2025-02-01T10:00:00.000Z')
+    const scheduledAt = new Date('2025-02-01T10:00:00.000Z');
     deliveryService.createScheduled.mockResolvedValue({
       deliveryId: 'd-2',
       businessId: 'b-2',
@@ -114,7 +114,7 @@ describe('OrderCreatedSubscriber', () => {
       isScheduled: true,
       createdAt: new Date('2025-02-01T09:00:00.000Z'),
       updatedAt: new Date('2025-02-01T09:00:00.000Z'),
-    })
+    });
 
     const eventPayload = {
       eventId: 'e-2',
@@ -130,16 +130,16 @@ describe('OrderCreatedSubscriber', () => {
       scheduledTime: scheduledAt, // Pass Date object directly
       status: 'Pending',
       createdAt: new Date('2025-02-01T09:00:00.000Z').toISOString(),
-    }
+    };
 
-    await subscriber.handleOrderCreated(eventPayload as any, {} as any)
+    await subscriber.handleOrderCreated(eventPayload as any, {} as any);
 
     // Verify the exact Date object is preserved (not re-parsed from string)
     expect(deliveryService.createScheduled).toHaveBeenCalledWith(
       expect.objectContaining({
         businessId: 'b-2',
         scheduledPickupTime: scheduledAt,
-      }),
-    )
-  })
-})
+      })
+    );
+  });
+});

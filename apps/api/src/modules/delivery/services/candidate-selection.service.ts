@@ -103,7 +103,7 @@ export function isAvailableDuringWindow(candidate: RiderCandidate, window: TimeW
  */
 export function rankCandidates(
   candidates: readonly RiderCandidate[],
-  options: RankingOptions,
+  options: RankingOptions
 ): RankedCandidate[] {
   const maxDistanceMeters = options.maxDistanceMeters ?? DEFAULT_RADIUS_METERS;
   const availabilityWindow = computeAvailabilityWindow({

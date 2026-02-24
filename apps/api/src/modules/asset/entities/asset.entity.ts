@@ -1,12 +1,5 @@
 import { AssetType, AssetStatus, LocationData, OwnerType } from '@zanafleet/contracts';
-import {
-    Entity,
-    PrimaryColumn,
-    Column,
-    CreateDateColumn,
-    UpdateDateColumn,
-    Index,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
 /**
  * Asset Entity
@@ -17,68 +10,68 @@ import {
 @Index(['type'])
 @Index(['status'])
 export class AssetEntity {
-    @PrimaryColumn('uuid')
-    id!: string;
+  @PrimaryColumn('uuid')
+  id!: string;
 
-    @Column('varchar', { length: 255 })
-    name!: string;
+  @Column('varchar', { length: 255 })
+  name!: string;
 
-    @Column('enum', { enum: AssetType })
-    type!: AssetType;
+  @Column('enum', { enum: AssetType })
+  type!: AssetType;
 
-    @Column('enum', { enum: AssetStatus, default: AssetStatus.ACTIVE })
-    status!: AssetStatus;
+  @Column('enum', { enum: AssetStatus, default: AssetStatus.ACTIVE })
+  status!: AssetStatus;
 
-    @Column('uuid')
-    ownerId!: string;
+  @Column('uuid')
+  ownerId!: string;
 
-    @Column('enum', { enum: OwnerType })
-    ownerType!: OwnerType;
+  @Column('enum', { enum: OwnerType })
+  ownerType!: OwnerType;
 
-    @Column('jsonb', { nullable: true })
-    capacity?: Record<string, unknown>;
+  @Column('jsonb', { nullable: true })
+  capacity?: Record<string, unknown>;
 
-    @Column('jsonb', { nullable: true })
-    metadata?: Record<string, unknown>;
+  @Column('jsonb', { nullable: true })
+  metadata?: Record<string, unknown>;
 
-    @Column('jsonb', { nullable: true })
-    homeBase?: LocationData;
+  @Column('jsonb', { nullable: true })
+  homeBase?: LocationData;
 
-    /**
-     * Array of Media IDs for asset images
-     * Each image stores metadata: { mediaId, purpose, isPrimary, uploadedAt }
-     */
-    @Column('jsonb', { nullable: true, default: '[]' })
-    imageIds?: Array<{
-        mediaId: string;
-        purpose?: 'exterior' | 'interior' | 'cargo' | 'dashboard' | 'custom';
-        isPrimary?: boolean;
-        uploadedAt?: Date;
-    }>;
+  /**
+   * Array of Media IDs for asset images
+   * Each image stores metadata: { mediaId, purpose, isPrimary, uploadedAt }
+   */
+  @Column('jsonb', { nullable: true, default: '[]' })
+  imageIds?: Array<{
+    mediaId: string;
+    purpose?: 'exterior' | 'interior' | 'cargo' | 'dashboard' | 'custom';
+    isPrimary?: boolean;
+    uploadedAt?: Date;
+  }>;
 
-    @CreateDateColumn({ type: 'timestamp with time zone' })
-    createdAt!: Date;
+  @CreateDateColumn({ type: 'timestamp with time zone' })
+  createdAt!: Date;
 
-    @UpdateDateColumn({ type: 'timestamp with time zone' })
-    updatedAt!: Date;
+  @UpdateDateColumn({ type: 'timestamp with time zone' })
+  updatedAt!: Date;
 
-    /**
-     * Convert entity to domain-compatible object
-     */
-    toDomain() {
-        return {
-            assetId: this.id,
-            name: this.name,
-            type: this.type,
-            status: this.status,
-            ownerId: this.ownerId,
-            ownerType: this.ownerType,
-            capacity: this.capacity,
-            metadata: this.metadata,
-            homeBase: this.homeBase,
-            imageIds: this.imageIds || [],
-            createdAt: this.createdAt,
-            updatedAt: this.updatedAt,
-        };
-    }
+  /**
+   * Convert entity to domain-compatible object
+   */
+  toDomain() {
+    return {
+      assetId: this.id,
+      name: this.name,
+      type: this.type,
+      status: this.status,
+      ownerId: this.ownerId,
+      ownerType: this.ownerType,
+      capacity: this.capacity,
+      metadata: this.metadata,
+      homeBase: this.homeBase,
+      imageIds: this.imageIds || [],
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+    };
+  }
 }

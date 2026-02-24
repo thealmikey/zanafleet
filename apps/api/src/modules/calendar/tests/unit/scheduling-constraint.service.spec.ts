@@ -149,7 +149,7 @@ describe('SchedulingConstraintService', () => {
 
     it('should block operation on public holiday', async () => {
       calendarBindingService.getActiveOverrides.mockResolvedValue([]);
-      
+
       const christmasEvent = new CalendarEventEntity();
       christmasEvent.id = 'christmas-uuid';
       christmasEvent.eventType = CalendarEventType.PUBLIC_HOLIDAY;
@@ -283,10 +283,11 @@ describe('SchedulingConstraintService', () => {
 
       await service.evaluate(contextWithRegion);
 
-      expect(calendarEventRepository.findHolidaysForDate).toHaveBeenCalledWith(
-        now,
-        { country: 'Kenya', administrativeArea: 'Nairobi', locality: undefined },
-      );
+      expect(calendarEventRepository.findHolidaysForDate).toHaveBeenCalledWith(now, {
+        country: 'Kenya',
+        administrativeArea: 'Nairobi',
+        locality: undefined,
+      });
     });
   });
 
@@ -323,7 +324,7 @@ describe('SchedulingConstraintService', () => {
         BindingTargetType.BUSINESS,
         'business-uuid',
         workingHoursTime,
-        'UTC',
+        'UTC'
       );
 
       expect(result).toBe(true);
@@ -362,7 +363,7 @@ describe('SchedulingConstraintService', () => {
         BindingTargetType.BUSINESS,
         'business-uuid',
         afterHoursTime,
-        'UTC',
+        'UTC'
       );
 
       expect(result).toBe(false);
@@ -375,7 +376,7 @@ describe('SchedulingConstraintService', () => {
         BindingTargetType.BUSINESS,
         'business-uuid',
         now,
-        'UTC',
+        'UTC'
       );
 
       expect(result).toBe(true);
@@ -415,7 +416,7 @@ describe('SchedulingConstraintService', () => {
         BindingTargetType.BUSINESS,
         'business-uuid',
         testTimestamp,
-        'UTC',
+        'UTC'
       );
 
       expect(result).toBe(true);
@@ -453,7 +454,7 @@ describe('SchedulingConstraintService', () => {
         BindingTargetType.BUSINESS,
         'business-uuid',
         testTimestamp,
-        'UTC',
+        'UTC'
       );
 
       expect(result).toBe(true);
@@ -491,7 +492,7 @@ describe('SchedulingConstraintService', () => {
         BindingTargetType.BUSINESS,
         'business-uuid',
         testTimestamp,
-        'UTC',
+        'UTC'
       );
 
       expect(result).toBe(false);
@@ -529,7 +530,7 @@ describe('SchedulingConstraintService', () => {
         BindingTargetType.BUSINESS,
         'business-uuid',
         testTimestamp,
-        'UTC',
+        'UTC'
       );
 
       expect(result).toBe(true);
@@ -567,7 +568,7 @@ describe('SchedulingConstraintService', () => {
         BindingTargetType.BUSINESS,
         'business-uuid',
         testTimestamp,
-        'UTC',
+        'UTC'
       );
 
       expect(result).toBe(true);
@@ -601,10 +602,10 @@ describe('SchedulingConstraintService', () => {
 
       await service.isHoliday(now, { country: 'Kenya', administrativeArea: 'Nairobi' });
 
-      expect(calendarEventRepository.findHolidaysForDate).toHaveBeenCalledWith(
-        now,
-        { country: 'Kenya', administrativeArea: 'Nairobi' },
-      );
+      expect(calendarEventRepository.findHolidaysForDate).toHaveBeenCalledWith(now, {
+        country: 'Kenya',
+        administrativeArea: 'Nairobi',
+      });
     });
   });
 
@@ -642,11 +643,7 @@ describe('SchedulingConstraintService', () => {
       calendarRuleRepo.find.mockResolvedValueOnce([blackoutRule]);
       calendarRuleRepo.find.mockResolvedValueOnce([]);
 
-      const result = await service.isBlackoutPeriod(
-        BindingTargetType.RIDER,
-        'rider-uuid',
-        now,
-      );
+      const result = await service.isBlackoutPeriod(BindingTargetType.RIDER, 'rider-uuid', now);
 
       expect(result).toBe(true);
     });
@@ -669,11 +666,7 @@ describe('SchedulingConstraintService', () => {
 
       calendarRuleRepo.find.mockResolvedValue([]);
 
-      const result = await service.isBlackoutPeriod(
-        BindingTargetType.RIDER,
-        'rider-uuid',
-        now,
-      );
+      const result = await service.isBlackoutPeriod(BindingTargetType.RIDER, 'rider-uuid', now);
 
       expect(result).toBe(false);
     });
@@ -699,7 +692,7 @@ describe('SchedulingConstraintService', () => {
         CalendarScope.BUSINESS,
         'business-uuid',
         now,
-        'ALLOW',
+        'ALLOW'
       );
 
       expect(result).toBe(true);
@@ -720,12 +713,7 @@ describe('SchedulingConstraintService', () => {
         },
       ]);
 
-      const result = await service.hasActiveOverride(
-        CalendarScope.GLOBAL,
-        'any-id',
-        now,
-        'ALLOW',
-      );
+      const result = await service.hasActiveOverride(CalendarScope.GLOBAL, 'any-id', now, 'ALLOW');
 
       expect(result).toBe(true);
     });
@@ -737,7 +725,7 @@ describe('SchedulingConstraintService', () => {
         CalendarScope.BUSINESS,
         'business-uuid',
         now,
-        'ALLOW',
+        'ALLOW'
       );
 
       expect(result).toBe(false);
@@ -762,7 +750,7 @@ describe('SchedulingConstraintService', () => {
         CalendarScope.BUSINESS,
         'business-uuid',
         now,
-        'CUSTOM_OVERRIDE',
+        'CUSTOM_OVERRIDE'
       );
 
       expect(result).toBe(true);
@@ -778,7 +766,7 @@ describe('SchedulingConstraintService', () => {
         BindingTargetType.BUSINESS,
         'business-uuid',
         now,
-        'UTC',
+        'UTC'
       );
 
       expect(result).toBeInstanceOf(Date);
@@ -799,7 +787,7 @@ describe('SchedulingConstraintService', () => {
         BindingTargetType.BUSINESS,
         'business-uuid',
         now,
-        'UTC',
+        'UTC'
       );
 
       expect(result).toBeInstanceOf(Date);
@@ -840,7 +828,7 @@ describe('SchedulingConstraintService', () => {
         BindingTargetType.BUSINESS,
         'business-uuid',
         earlyMorning,
-        'UTC',
+        'UTC'
       );
 
       expect(result).toBeInstanceOf(Date);
@@ -861,7 +849,7 @@ describe('SchedulingConstraintService', () => {
         BindingTargetType.BUSINESS,
         'business-uuid',
         now,
-        'UTC',
+        'UTC'
       );
 
       expect(result).toBeNull();
@@ -1000,7 +988,7 @@ describe('SchedulingConstraintService', () => {
         expect(calendarBindingService.getActiveOverrides).toHaveBeenCalledWith(
           expectedScope,
           'test-id',
-          now,
+          now
         );
       }
     });

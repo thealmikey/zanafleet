@@ -76,7 +76,14 @@ describe('CalendarPolicyBridgeService', () => {
       schedulingConstraintService.isBlackoutPeriod.mockResolvedValue(false);
       schedulingConstraintService.hasActiveOverride.mockResolvedValue(false);
       calendarBindingService.getBindingsForTarget.mockResolvedValue([
-        { bindingId: 'binding-1', calendarId: 'cal-1', targetType, targetId, priority: 1, inheritParent: true },
+        {
+          bindingId: 'binding-1',
+          calendarId: 'cal-1',
+          targetType,
+          targetId,
+          priority: 1,
+          inheritParent: true,
+        },
       ]);
     });
 
@@ -137,7 +144,7 @@ describe('CalendarPolicyBridgeService', () => {
         targetType,
         targetId,
         timestamp,
-        customTz,
+        customTz
       );
     });
   });
@@ -176,7 +183,7 @@ describe('CalendarPolicyBridgeService', () => {
               effect: template.effect,
             }),
           }),
-        }),
+        })
       );
     });
 
@@ -194,7 +201,7 @@ describe('CalendarPolicyBridgeService', () => {
               }),
             }),
           }),
-        }),
+        })
       );
     });
 
@@ -356,10 +363,9 @@ describe('CalendarPolicyBridgeService', () => {
 
       await service.getSurgeMultiplier(timestamp, regionId);
 
-      expect(schedulingConstraintService.isHoliday).toHaveBeenCalledWith(
-        timestamp,
-        { country: regionId },
-      );
+      expect(schedulingConstraintService.isHoliday).toHaveBeenCalledWith(timestamp, {
+        country: regionId,
+      });
     });
   });
 
@@ -379,7 +385,7 @@ describe('CalendarPolicyBridgeService', () => {
         targetType,
         targetId,
         fromTime,
-        'Africa/Nairobi',
+        'Africa/Nairobi'
       );
     });
 
@@ -401,7 +407,7 @@ describe('CalendarPolicyBridgeService', () => {
         targetType,
         targetId,
         fromTime,
-        customTz,
+        customTz
       );
     });
   });
@@ -468,7 +474,7 @@ describe('CalendarPolicyBridgeService', () => {
             policyId,
             sourceRuleId: ruleId,
           }),
-        }),
+        })
       );
     });
   });
@@ -558,15 +564,15 @@ describe('CalendarPolicyBridgeService', () => {
       const peakContext = await service.getCalendarPolicyContext(
         peakTime,
         BindingTargetType.BUSINESS,
-        'business-123',
+        'business-123'
       );
-      
+
       service.clearCache();
-      
+
       const nonPeakContext = await service.getCalendarPolicyContext(
         nonPeakTime,
         BindingTargetType.BUSINESS,
-        'business-123',
+        'business-123'
       );
 
       expect(peakContext.isPeakHour).toBe(true);

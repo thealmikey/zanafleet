@@ -1,49 +1,49 @@
-import { randomUUID } from 'node:crypto'
+import { randomUUID } from 'node:crypto';
 
 export class DeliveryPickedUpEventV1 {
-  readonly eventId: string
-  readonly eventType = 'Delivery.Delivery.PickedUpV1' as const
-  readonly eventVersion = '1.0.0' as const
-  readonly occurredAt: Date
-  readonly aggregateId: string
-  readonly aggregateType = 'Delivery' as const
-  readonly deliveryId: string
-  readonly businessId: string
-  readonly pickedUpAt: Date
-  readonly correlationId?: string
-  readonly causationId?: string
+  readonly eventId: string;
+  readonly eventType = 'Delivery.Delivery.PickedUpV1' as const;
+  readonly eventVersion = '1.0.0' as const;
+  readonly occurredAt: Date;
+  readonly aggregateId: string;
+  readonly aggregateType = 'Delivery' as const;
+  readonly deliveryId: string;
+  readonly businessId: string;
+  readonly pickedUpAt: Date;
+  readonly correlationId?: string;
+  readonly causationId?: string;
 
   constructor(data: {
-    eventId?: string
-    deliveryId: string
-    businessId: string
-    pickedUpAt: Date
-    occurredAt?: Date
-    correlationId?: string
-    causationId?: string
+    eventId?: string;
+    deliveryId: string;
+    businessId: string;
+    pickedUpAt: Date;
+    occurredAt?: Date;
+    correlationId?: string;
+    causationId?: string;
   }) {
-    this.eventId = data.eventId ?? randomUUID()
-    this.deliveryId = data.deliveryId
-    this.businessId = data.businessId
-    this.pickedUpAt = data.pickedUpAt
-    this.occurredAt = data.occurredAt ?? new Date()
-    this.aggregateId = data.deliveryId
-    this.correlationId = data.correlationId
-    this.causationId = data.causationId
+    this.eventId = data.eventId ?? randomUUID();
+    this.deliveryId = data.deliveryId;
+    this.businessId = data.businessId;
+    this.pickedUpAt = data.pickedUpAt;
+    this.occurredAt = data.occurredAt ?? new Date();
+    this.aggregateId = data.deliveryId;
+    this.correlationId = data.correlationId;
+    this.causationId = data.causationId;
   }
 
   toJSON(): {
-    eventId: string
-    eventType: 'Delivery.Delivery.PickedUpV1'
-    eventVersion: '1.0.0'
-    occurredAt: string
-    aggregateId: string
-    aggregateType: 'Delivery'
-    deliveryId: string
-    businessId: string
-    pickedUpAt: string
-    correlationId?: string
-    causationId?: string
+    eventId: string;
+    eventType: 'Delivery.Delivery.PickedUpV1';
+    eventVersion: '1.0.0';
+    occurredAt: string;
+    aggregateId: string;
+    aggregateType: 'Delivery';
+    deliveryId: string;
+    businessId: string;
+    pickedUpAt: string;
+    correlationId?: string;
+    causationId?: string;
   } {
     return {
       eventId: this.eventId,
@@ -57,21 +57,21 @@ export class DeliveryPickedUpEventV1 {
       pickedUpAt: this.pickedUpAt.toISOString(),
       correlationId: this.correlationId,
       causationId: this.causationId,
-    }
+    };
   }
 
   static fromJSON(data: {
-    eventId: string
-    eventType: 'Delivery.Delivery.PickedUpV1'
-    eventVersion: '1.0.0'
-    occurredAt: string
-    aggregateId: string
-    aggregateType: 'Delivery'
-    deliveryId: string
-    businessId: string
-    pickedUpAt: string
-    correlationId?: string
-    causationId?: string
+    eventId: string;
+    eventType: 'Delivery.Delivery.PickedUpV1';
+    eventVersion: '1.0.0';
+    occurredAt: string;
+    aggregateId: string;
+    aggregateType: 'Delivery';
+    deliveryId: string;
+    businessId: string;
+    pickedUpAt: string;
+    correlationId?: string;
+    causationId?: string;
   }): DeliveryPickedUpEventV1 {
     return new DeliveryPickedUpEventV1({
       eventId: data.eventId,
@@ -81,6 +81,6 @@ export class DeliveryPickedUpEventV1 {
       occurredAt: new Date(data.occurredAt),
       correlationId: data.correlationId,
       causationId: data.causationId,
-    })
+    });
   }
 }

@@ -6,7 +6,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { DeliveryStatus } from '@zanafleet/contracts';
 import request from 'supertest';
 
-
 import { DeliveryEntity } from '../../../delivery/entities/delivery.entity';
 import { SettlementBatchEntity } from '../../../settlement/entities/settlement-batch.entity';
 import { RiderDashboardController } from '../../controllers/rider-dashboard.controller';
@@ -22,7 +21,9 @@ describe('RiderDashboardController (e2e)', () => {
   };
   let mockCapabilityAccessController: { hasCapability: jest.Mock };
 
-  const createMockDelivery = (overrides: Partial<DeliveryEntity> = {}): Partial<DeliveryEntity> => ({
+  const createMockDelivery = (
+    overrides: Partial<DeliveryEntity> = {}
+  ): Partial<DeliveryEntity> => ({
     id: overrides.id ?? 'delivery-123',
     businessId: overrides.businessId ?? 'business-123',
     assignedRiderId: overrides.assignedRiderId ?? 'rider-123',

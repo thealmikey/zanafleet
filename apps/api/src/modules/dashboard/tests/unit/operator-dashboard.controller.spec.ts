@@ -6,7 +6,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { DeliveryStatus } from '@zanafleet/contracts';
 import request from 'supertest';
 
-
 import { DeliveryEntity } from '../../../delivery/entities/delivery.entity';
 import { GeoQueryCoordinator } from '../../../location-intelligence/coordinators/geo-query.coordinator';
 import { OperatorDashboardController } from '../../controllers/operator-dashboard.controller';
@@ -23,7 +22,9 @@ describe('OperatorDashboardController (e2e)', () => {
   };
   let mockCapabilityAccessController: { hasCapability: jest.Mock };
 
-  const createMockDelivery = (overrides: Partial<DeliveryEntity> = {}): Partial<DeliveryEntity> => ({
+  const createMockDelivery = (
+    overrides: Partial<DeliveryEntity> = {}
+  ): Partial<DeliveryEntity> => ({
     id: overrides.id ?? 'delivery-123',
     businessId: overrides.businessId ?? 'business-123',
     status: overrides.status ?? DeliveryStatus.Requested,
@@ -99,10 +100,7 @@ describe('OperatorDashboardController (e2e)', () => {
 
   describe('GET /dashboards/operator/assignment-queue', () => {
     it('should return 200 with paginated assignment queue', async () => {
-      const mockDeliveries = [
-        createMockDelivery({ id: 'd1' }),
-        createMockDelivery({ id: 'd2' }),
-      ];
+      const mockDeliveries = [createMockDelivery({ id: 'd1' }), createMockDelivery({ id: 'd2' })];
       mockDeliveryRepository.findAndCount.mockResolvedValue([mockDeliveries, 2]);
 
       const response = await request(app.getHttpServer())
@@ -162,12 +160,14 @@ describe('OperatorDashboardController (e2e)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .get('/dashboards/operator/route-hint?originLat=-1.2921&originLng=36.8219&destLat=-1.3000&destLng=36.8300')
+        .get(
+          '/dashboards/operator/route-hint?originLat=-1.2921&originLng=36.8219&destLat=-1.3000&destLng=36.8300'
+        )
         .expect(200);
 
       expect(response.body).toMatchObject({
         origin: { latitude: -1.2921, longitude: 36.8219 },
-        destination: { latitude: -1.3000, longitude: 36.8300 },
+        destination: { latitude: -1.3, longitude: 36.83 },
         estimatedDurationSeconds: 600,
         estimatedDistanceMeters: 2500,
         confidence: 'HIGH',
@@ -208,9 +208,7 @@ describe('OperatorDashboardController (e2e)', () => {
     it('should return 403 when user lacks dashboard.operator.read capability', async () => {
       mockCapabilityAccessController.hasCapability.mockResolvedValue(false);
 
-      await request(app.getHttpServer())
-        .get('/dashboards/operator/metrics')
-        .expect(403);
+      await request(app.getHttpServer()).get('/dashboards/operator/metrics').expect(403);
     });
   });
 });

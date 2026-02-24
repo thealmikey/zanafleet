@@ -121,7 +121,7 @@ const DEFAULT_CONFIG: CalendarPolicyBridgeConfig = {
   cacheTtlMs: 5 * 60 * 1000, // 5 minutes
   defaultTimezone: 'Africa/Nairobi',
   peakHours: [
-    { start: 7, end: 9 },   // Morning rush
+    { start: 7, end: 9 }, // Morning rush
     { start: 12, end: 14 }, // Lunch rush
     { start: 17, end: 20 }, // Evening rush
   ],
@@ -153,7 +153,7 @@ export class CalendarPolicyBridgeService {
   constructor(
     private readonly schedulingConstraintService: SchedulingConstraintService,
     private readonly calendarBindingService: CalendarBindingService,
-    @Optional() private readonly eventBusService?: EventBusService,
+    @Optional() private readonly eventBusService?: EventBusService
   ) {}
 
   /**
@@ -164,7 +164,7 @@ export class CalendarPolicyBridgeService {
     timestamp: Date,
     targetType: BindingTargetType,
     targetId: string,
-    timezone?: string,
+    timezone?: string
   ): Promise<CalendarPolicyContext> {
     const tz = timezone ?? this.config.defaultTimezone;
     const cacheKey = this.buildCacheKey('context', { timestamp, targetType, targetId, tz });
@@ -185,7 +185,11 @@ export class CalendarPolicyBridgeService {
       ]);
 
     const isPeakHour = this.isPeakHour(timestamp, tz);
-    const surgeMultiplier = this.calculateSurgeMultiplier(isHoliday, isPeakHour, isWithinWorkingHours);
+    const surgeMultiplier = this.calculateSurgeMultiplier(
+      isHoliday,
+      isPeakHour,
+      isWithinWorkingHours
+    );
 
     const context: CalendarPolicyContext = {
       isHoliday,
@@ -211,7 +215,7 @@ export class CalendarPolicyBridgeService {
    */
   async createPolicyFromCalendarRule(
     ruleId: string,
-    template: PolicyTemplate,
+    template: PolicyTemplate
   ): Promise<PolicyCreationResult> {
     const policyId = uuidv4();
 
@@ -259,13 +263,18 @@ export class CalendarPolicyBridgeService {
     timestamp: Date,
     targetType: BindingTargetType,
     targetId: string,
-    timezone?: string,
+    timezone?: string
   ): Promise<AllowedResult> {
     const tz = timezone ?? this.config.defaultTimezone;
     const context = await this.getCalendarPolicyContext(timestamp, targetType, targetId, tz);
 
     if (context.isBlackoutPeriod && !context.hasActiveOverride) {
-      const suggestedNextSlot = await this.getNextAvailableSlot(timestamp, targetType, targetId, tz);
+      const suggestedNextSlot = await this.getNextAvailableSlot(
+        timestamp,
+        targetType,
+        targetId,
+        tz
+      );
       return {
         allowed: false,
         reason: 'Delivery blocked during blackout period',
@@ -277,7 +286,12 @@ export class CalendarPolicyBridgeService {
     }
 
     if (context.isHoliday && !context.hasActiveOverride) {
-      const suggestedNextSlot = await this.getNextAvailableSlot(timestamp, targetType, targetId, tz);
+      const suggestedNextSlot = await this.getNextAvailableSlot(
+        timestamp,
+        targetType,
+        targetId,
+        tz
+      );
       return {
         allowed: false,
         reason: 'Delivery blocked on holiday',
@@ -289,7 +303,12 @@ export class CalendarPolicyBridgeService {
     }
 
     if (!context.isWithinWorkingHours && !context.hasActiveOverride) {
-      const suggestedNextSlot = await this.getNextAvailableSlot(timestamp, targetType, targetId, tz);
+      const suggestedNextSlot = await this.getNextAvailableSlot(
+        timestamp,
+        targetType,
+        targetId,
+        tz
+      );
       return {
         allowed: false,
         reason: 'Delivery blocked outside working hours',
@@ -311,11 +330,7 @@ export class CalendarPolicyBridgeService {
    * Get surge multiplier for a specific timestamp.
    * Considers holidays, peak hours, and regional factors.
    */
-  async getSurgeMultiplier(
-    timestamp: Date,
-    regionId?: string,
-    timezone?: string,
-  ): Promise<number> {
+  async getSurgeMultiplier(timestamp: Date, regionId?: string, timezone?: string): Promise<number> {
     const tz = timezone ?? this.config.defaultTimezone;
     const cacheKey = this.buildCacheKey('surge', { timestamp, regionId, tz });
     const cached = this.getFromCache<number>(cacheKey);
@@ -326,7 +341,7 @@ export class CalendarPolicyBridgeService {
 
     const isHoliday = await this.schedulingConstraintService.isHoliday(
       timestamp,
-      regionId ? { country: regionId } : undefined,
+      regionId ? { country: regionId } : undefined
     );
 
     const isPeakHour = this.isPeakHour(timestamp, tz);
@@ -345,7 +360,7 @@ export class CalendarPolicyBridgeService {
     fromTime: Date,
     targetType: BindingTargetType,
     targetId: string,
-    timezone?: string,
+    timezone?: string
   ): Promise<Date | null> {
     const tz = timezone ?? this.config.defaultTimezone;
 
@@ -353,7 +368,7 @@ export class CalendarPolicyBridgeService {
       targetType,
       targetId,
       fromTime,
-      tz,
+      tz
     );
   }
 
@@ -376,7 +391,9 @@ export class CalendarPolicyBridgeService {
       this.cache.delete(key);
     }
 
-    this.logger.debug(`Invalidated ${keysToDelete.length} cache entries for ${targetType}:${targetId}`);
+    this.logger.debug(
+      `Invalidated ${keysToDelete.length} cache entries for ${targetType}:${targetId}`
+    );
   }
 
   /**
@@ -445,15 +462,13 @@ export class CalendarPolicyBridgeService {
   private isPeakHour(timestamp: Date, _timezone: string): boolean {
     const hour = timestamp.getUTCHours();
 
-    return this.config.peakHours.some(
-      (peak) => hour >= peak.start && hour < peak.end,
-    );
+    return this.config.peakHours.some((peak) => hour >= peak.start && hour < peak.end);
   }
 
   private calculateSurgeMultiplier(
     isHoliday: boolean,
     isPeakHour: boolean,
-    isWithinWorkingHours: boolean,
+    isWithinWorkingHours: boolean
   ): number {
     let multiplier = 1.0;
 
@@ -475,7 +490,7 @@ export class CalendarPolicyBridgeService {
   private async checkActiveOverride(
     targetType: BindingTargetType,
     targetId: string,
-    timestamp: Date,
+    timestamp: Date
   ): Promise<boolean> {
     const scope = this.mapTargetTypeToScope(targetType);
 
@@ -483,7 +498,7 @@ export class CalendarPolicyBridgeService {
       scope,
       targetId,
       timestamp,
-      'ALLOW',
+      'ALLOW'
     );
 
     return hasAllowOverride;
@@ -531,7 +546,7 @@ export class CalendarPolicyBridgeService {
   private async emitPolicyBindingCreatedEvent(
     policyId: string,
     ruleId: string,
-    policyDefinition: Record<string, unknown>,
+    policyDefinition: Record<string, unknown>
   ): Promise<void> {
     if (!this.eventBusService) {
       return;
@@ -559,10 +574,7 @@ export class CalendarPolicyBridgeService {
       });
   }
 
-  private async emitPolicyBindingActivatedEvent(
-    policyId: string,
-    ruleId: string,
-  ): Promise<void> {
+  private async emitPolicyBindingActivatedEvent(policyId: string, ruleId: string): Promise<void> {
     if (!this.eventBusService) {
       return;
     }

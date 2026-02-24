@@ -60,7 +60,10 @@ describe('ActorController (e2e)', () => {
       .overrideGuard(CapabilityGuard)
       .useValue({
         canActivate: async (): Promise<boolean> => {
-          const result = await mockCapabilityAccessController.hasCapability('test-actor', 'actor.manage');
+          const result = await mockCapabilityAccessController.hasCapability(
+            'test-actor',
+            'actor.manage'
+          );
           if (!result) {
             throw new ForbiddenException('Missing required capability: actor.manage');
           }
@@ -100,9 +103,7 @@ describe('ActorController (e2e)', () => {
       const mockEntity = createMockActorEntity();
       mockRepository.findOne.mockResolvedValue(mockEntity);
 
-      const response = await request(app.getHttpServer())
-        .get('/actors/actor-123')
-        .expect(200);
+      const response = await request(app.getHttpServer()).get('/actors/actor-123').expect(200);
 
       expect(response.body).toMatchObject({
         actorId: 'actor-123',
@@ -115,15 +116,16 @@ describe('ActorController (e2e)', () => {
     it('should return 404 when actor not found', async () => {
       mockRepository.findOne.mockResolvedValue(null);
 
-      await request(app.getHttpServer())
-        .get('/actors/non-existent')
-        .expect(404);
+      await request(app.getHttpServer()).get('/actors/non-existent').expect(404);
     });
   });
 
   describe('GET /actors', () => {
     it('should return 200 with data and meta respecting pagination', async () => {
-      const mockEntities = [createMockActorEntity({ id: 'actor-1' }), createMockActorEntity({ id: 'actor-2' })];
+      const mockEntities = [
+        createMockActorEntity({ id: 'actor-1' }),
+        createMockActorEntity({ id: 'actor-2' }),
+      ];
       mockRepository.findAndCount.mockResolvedValue([mockEntities, 2]);
 
       const response = await request(app.getHttpServer())

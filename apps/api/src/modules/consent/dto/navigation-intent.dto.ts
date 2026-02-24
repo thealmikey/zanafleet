@@ -2,7 +2,7 @@ import { InvocationMode } from '../enums/consent.enums';
 
 /**
  * NavigationIntent DTO
- * 
+ *
  * Represents the navigation intent after capability execution.
  * This guides the UI on where to navigate or what to display.
  */

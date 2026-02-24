@@ -47,7 +47,9 @@ describe('SupportDashboardController (e2e)', () => {
     createdAt: overrides.createdAt ?? new Date('2024-01-01'),
   });
 
-  const createMockPaymentIntent = (overrides: Record<string, unknown> = {}): Record<string, unknown> => {
+  const createMockPaymentIntent = (
+    overrides: Record<string, unknown> = {}
+  ): Record<string, unknown> => {
     const id = (overrides.id as string) ?? 'intent-123';
     const payerAccountId = (overrides.payerAccountId as string) ?? 'payer-123';
     const payeeAccountId = (overrides.payeeAccountId as string) ?? 'payee-123';
@@ -176,9 +178,7 @@ describe('SupportDashboardController (e2e)', () => {
 
   describe('GET /dashboards/support/disputes/escalated', () => {
     it('should return 200 with escalated disputes only', async () => {
-      const mockDisputes = [
-        createMockDispute({ id: 'd1', status: 'ESCALATED' as any }),
-      ];
+      const mockDisputes = [createMockDispute({ id: 'd1', status: 'ESCALATED' as any })];
       mockDisputeRepository.findAndCount.mockResolvedValue([mockDisputes, 1]);
 
       const response = await request(app.getHttpServer())
@@ -233,9 +233,7 @@ describe('SupportDashboardController (e2e)', () => {
     it('should return 403 when user lacks dashboard.support.read capability', async () => {
       mockCapabilityAccessController.hasCapability.mockResolvedValue(false);
 
-      await request(app.getHttpServer())
-        .get('/dashboards/support/metrics')
-        .expect(403);
+      await request(app.getHttpServer()).get('/dashboards/support/metrics').expect(403);
     });
   });
 });

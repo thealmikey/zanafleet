@@ -48,10 +48,10 @@ export class ActorEntity {
   @Column('varchar', { nullable: true })
   location?: string | null;
 
-  @Column('text', { array: true, default: () => "ARRAY[]::text[]" })
+  @Column('text', { array: true, default: () => 'ARRAY[]::text[]' })
   roles!: string[];
 
-  @Column('text', { array: true, default: () => "ARRAY[]::text[]" })
+  @Column('text', { array: true, default: () => 'ARRAY[]::text[]' })
   linkedWallets!: string[];
 
   @CreateDateColumn({ type: 'timestamp with time zone' })

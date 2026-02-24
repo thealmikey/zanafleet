@@ -8,7 +8,12 @@ export type AssignmentDecisionType = 'MATCH_NOW' | 'SCHEDULE_FOR_LATER';
 
 export interface AssignmentDecision {
   decision: AssignmentDecisionType;
-  reason: 'NOT_SCHEDULED' | 'PAST_SCHEDULE' | 'WITHIN_WINDOW' | 'FUTURE_OUTSIDE_WINDOW' | 'IMMEDIATE';
+  reason:
+    | 'NOT_SCHEDULED'
+    | 'PAST_SCHEDULE'
+    | 'WITHIN_WINDOW'
+    | 'FUTURE_OUTSIDE_WINDOW'
+    | 'IMMEDIATE';
   scheduleAt?: Date;
 }
 
@@ -32,9 +37,13 @@ export class AssignmentRulesService {
    * Decide whether to match a delivery now or delay until N minutes before scheduled time.
    * Pure decision function: no I/O, no side effects.
    */
-  evaluateForMatching(input: EvaluateInput, config?: Partial<AssignmentRulesConfig>): AssignmentDecision {
+  evaluateForMatching(
+    input: EvaluateInput,
+    config?: Partial<AssignmentRulesConfig>
+  ): AssignmentDecision {
     const now = input.now ?? new Date();
-    const preMatchWindowMinutes = config?.preMatchWindowMinutes ?? this.defaultConfig.preMatchWindowMinutes;
+    const preMatchWindowMinutes =
+      config?.preMatchWindowMinutes ?? this.defaultConfig.preMatchWindowMinutes;
     const scheduledAt = this.resolveScheduledTime({
       scheduledPickupTime: input.scheduledPickupTime,
       scheduledDropoffTime: input.scheduledDropoffTime,
@@ -57,7 +66,11 @@ export class AssignmentRulesService {
     const threshold = new Date(scheduledAt.getTime() - windowMs);
 
     if (now.getTime() < threshold.getTime()) {
-      return { decision: 'SCHEDULE_FOR_LATER', reason: 'FUTURE_OUTSIDE_WINDOW', scheduleAt: threshold };
+      return {
+        decision: 'SCHEDULE_FOR_LATER',
+        reason: 'FUTURE_OUTSIDE_WINDOW',
+        scheduleAt: threshold,
+      };
     }
 
     return { decision: 'MATCH_NOW', reason: 'WITHIN_WINDOW' };
@@ -83,7 +96,8 @@ export class AssignmentRulesService {
     if (!scheduledAt) return false;
 
     const assignedAt = params.assignedAt ?? new Date();
-    const preMatchWindowMinutes = params.config?.preMatchWindowMinutes ?? this.defaultConfig.preMatchWindowMinutes;
+    const preMatchWindowMinutes =
+      params.config?.preMatchWindowMinutes ?? this.defaultConfig.preMatchWindowMinutes;
     const windowMs = preMatchWindowMinutes * 60 * 1000;
     const earlyThreshold = new Date(scheduledAt.getTime() - windowMs);
 

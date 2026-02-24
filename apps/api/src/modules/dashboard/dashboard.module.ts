@@ -3,7 +3,6 @@ import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-
 import { ChargeEntity } from '../billing/entities/charge.entity';
 import { InvoiceEntity } from '../billing/entities/invoice.entity';
 import { BusinessEntity } from '../business/entities/business.entity';

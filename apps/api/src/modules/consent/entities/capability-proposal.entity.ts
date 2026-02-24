@@ -1,11 +1,4 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Index,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
 import { ProposalStatus, InvocationMode } from '../enums/consent.enums';
 
@@ -30,11 +23,11 @@ export interface ProposalAlternative {
 
 /**
  * CapabilityProposal Entity
- * 
+ *
  * Tracks a single AI-suggested capability with full audit trail.
  * This is the core domain model that tracks AI-suggested capabilities
  * before user confirmation.
- * 
+ *
  * Key concepts:
  * - proposalId: Unique identifier for this proposal
  * - capabilityName: The capability being proposed
@@ -129,9 +122,6 @@ export class CapabilityProposalEntity {
    * Check if the proposal can be confirmed
    */
   canBeConfirmed(): boolean {
-    return (
-      this.status === ProposalStatus.PROPOSED &&
-      !this.isExpired()
-    );
+    return this.status === ProposalStatus.PROPOSED && !this.isExpired();
   }
 }

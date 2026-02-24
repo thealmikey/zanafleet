@@ -116,9 +116,7 @@ describe('CalendarBindingService', () => {
       };
 
       await expect(service.bindCalendar(input)).rejects.toThrow(NotFoundException);
-      await expect(service.bindCalendar(input)).rejects.toThrow(
-        'Calendar not found: non-existent',
-      );
+      await expect(service.bindCalendar(input)).rejects.toThrow('Calendar not found: non-existent');
     });
 
     it('should use default values for optional fields', async () => {
@@ -167,9 +165,7 @@ describe('CalendarBindingService', () => {
     it('should throw NotFoundException when binding not found', async () => {
       bindingRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.unbindCalendar('non-existent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.unbindCalendar('non-existent')).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -198,14 +194,18 @@ describe('CalendarBindingService', () => {
 
       const result = await service.getBindingsForTarget(
         BindingTargetType.BUSINESS,
-        'business-uuid',
+        'business-uuid'
       );
 
       expect(result).toHaveLength(2);
       expect(result[0].bindingId).toBe('binding-1');
       expect(result[1].bindingId).toBe('binding-2');
       expect(bindingRepo.find).toHaveBeenCalledWith({
-        where: { targetType: BindingTargetType.BUSINESS, targetId: 'business-uuid', isActive: true },
+        where: {
+          targetType: BindingTargetType.BUSINESS,
+          targetId: 'business-uuid',
+          isActive: true,
+        },
         order: { priority: 'DESC' },
       });
     });
@@ -213,10 +213,7 @@ describe('CalendarBindingService', () => {
     it('should return empty array when no bindings exist', async () => {
       bindingRepo.find.mockResolvedValue([]);
 
-      const result = await service.getBindingsForTarget(
-        BindingTargetType.RIDER,
-        'rider-uuid',
-      );
+      const result = await service.getBindingsForTarget(BindingTargetType.RIDER, 'rider-uuid');
 
       expect(result).toHaveLength(0);
     });
@@ -253,7 +250,7 @@ describe('CalendarBindingService', () => {
       const result = await service.resolveEffectiveCalendars(
         BindingTargetType.RIDER,
         'rider-uuid',
-        { saccoId: 'sacco-uuid', businessId: 'business-uuid', workspaceId: 'workspace-uuid' },
+        { saccoId: 'sacco-uuid', businessId: 'business-uuid', workspaceId: 'workspace-uuid' }
       );
 
       expect(result).toHaveLength(2);
@@ -284,14 +281,12 @@ describe('CalendarBindingService', () => {
         createdAt: now,
       });
 
-      bindingRepo.find
-        .mockResolvedValueOnce([riderBinding])
-        .mockResolvedValueOnce([saccoBinding]);
+      bindingRepo.find.mockResolvedValueOnce([riderBinding]).mockResolvedValueOnce([saccoBinding]);
 
       const result = await service.resolveEffectiveCalendars(
         BindingTargetType.RIDER,
         'rider-uuid',
-        { saccoId: 'sacco-uuid' },
+        { saccoId: 'sacco-uuid' }
       );
 
       expect(result).toHaveLength(1);
@@ -326,7 +321,7 @@ describe('CalendarBindingService', () => {
       const result = await service.resolveEffectiveCalendars(
         BindingTargetType.BUSINESS,
         'business-uuid',
-        { workspaceId: 'workspace-uuid' },
+        { workspaceId: 'workspace-uuid' }
       );
 
       expect(result).toHaveLength(2);
@@ -357,11 +352,7 @@ describe('CalendarBindingService', () => {
 
       overrideRepo.createQueryBuilder.mockReturnValue(mockQueryBuilder as any);
 
-      const result = await service.getActiveOverrides(
-        CalendarScope.BUSINESS,
-        'business-uuid',
-        now,
-      );
+      const result = await service.getActiveOverrides(CalendarScope.BUSINESS, 'business-uuid', now);
 
       expect(result).toHaveLength(1);
       expect(result[0].exceptionType).toBe('ALLOW_ON_HOLIDAY');
@@ -382,9 +373,7 @@ describe('CalendarBindingService', () => {
 
       await service.getActiveOverrides(CalendarScope.GLOBAL, null, now);
 
-      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
-        'override.targetScopeId IS NULL',
-      );
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith('override.targetScopeId IS NULL');
     });
   });
 
@@ -448,17 +437,13 @@ describe('CalendarBindingService', () => {
 
       await service.deactivateOverride('override-uuid');
 
-      expect(overrideRepo.save).toHaveBeenCalledWith(
-        expect.objectContaining({ isActive: false }),
-      );
+      expect(overrideRepo.save).toHaveBeenCalledWith(expect.objectContaining({ isActive: false }));
     });
 
     it('should throw NotFoundException when override not found', async () => {
       overrideRepo.findOne.mockResolvedValue(null);
 
-      await expect(service.deactivateOverride('non-existent')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(service.deactivateOverride('non-existent')).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -480,7 +465,7 @@ describe('CalendarBindingService', () => {
           businessId: 'business-uuid',
           riderId: 'rider-uuid',
         },
-        now,
+        now
       );
 
       expect(overrides).toHaveLength(0);

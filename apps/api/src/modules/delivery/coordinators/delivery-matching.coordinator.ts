@@ -68,10 +68,7 @@ const DEFAULT_MATCHING_CONFIG: MatchingConfig = {
 };
 
 export class NoEligibleRidersError extends Error {
-  constructor(
-    public readonly deliveryId: string,
-    public readonly attemptCount: number,
-  ) {
+  constructor(public readonly deliveryId: string, public readonly attemptCount: number) {
     super(`No eligible riders found for delivery ${deliveryId} after ${attemptCount} attempts`);
     this.name = 'NoEligibleRidersError';
   }
@@ -109,7 +106,7 @@ export class DeliveryMatchingCoordinator {
     private readonly assignmentRulesService: AssignmentRulesService,
     private readonly policyEngine: PolicyEvaluationEngineService,
     private readonly deliveryService: DeliveryService,
-    private readonly eventBus: EventBusService,
+    private readonly eventBus: EventBusService
   ) {}
 
   /**
@@ -125,7 +122,7 @@ export class DeliveryMatchingCoordinator {
    */
   async findAndAssignRider(
     deliveryId: string,
-    config: Partial<MatchingConfig> = {},
+    config: Partial<MatchingConfig> = {}
   ): Promise<MatchingResult> {
     const matchingConfig = { ...DEFAULT_MATCHING_CONFIG, ...config };
     this.logger.log(`Starting rider matching for delivery ${deliveryId}`);
@@ -151,7 +148,7 @@ export class DeliveryMatchingCoordinator {
     const evaluatedCandidates = await this.evaluateCandidates(
       eligibleCandidates,
       delivery,
-      matchingConfig,
+      matchingConfig
     );
 
     if (evaluatedCandidates.length === 0) {
@@ -171,7 +168,7 @@ export class DeliveryMatchingCoordinator {
 
     if (policyResult.finalDecision.effect === PolicyEffect.BLOCK) {
       this.logger.warn(
-        `Policy blocked rider ${selectedCandidate.riderId} for delivery ${deliveryId}`,
+        `Policy blocked rider ${selectedCandidate.riderId} for delivery ${deliveryId}`
       );
       state.excludedRiderIds.add(selectedCandidate.riderId);
       return this.findAndAssignRider(deliveryId, config);
@@ -197,7 +194,7 @@ export class DeliveryMatchingCoordinator {
 
     this.logger.log(
       `Assigned rider ${selectedCandidate.riderId} to delivery ${deliveryId} ` +
-        `(score: ${selectedCandidate.score}, distance: ${selectedCandidate.distanceMeters}m)`,
+        `(score: ${selectedCandidate.score}, distance: ${selectedCandidate.distanceMeters}m)`
     );
 
     return {
@@ -214,7 +211,7 @@ export class DeliveryMatchingCoordinator {
    */
   async handleAssignmentTimeout(
     deliveryId: string,
-    config: Partial<MatchingConfig> = {},
+    config: Partial<MatchingConfig> = {}
   ): Promise<MatchingResult> {
     const matchingConfig = { ...DEFAULT_MATCHING_CONFIG, ...config };
     this.logger.log(`Handling assignment timeout for delivery ${deliveryId}`);
@@ -224,7 +221,7 @@ export class DeliveryMatchingCoordinator {
 
     state.currentRadiusMeters = Math.min(
       state.currentRadiusMeters * matchingConfig.radiusExpansionFactor,
-      matchingConfig.maxRadiusMeters,
+      matchingConfig.maxRadiusMeters
     );
 
     const event = new MatchingTimeoutEventV1({
@@ -252,7 +249,7 @@ export class DeliveryMatchingCoordinator {
     deliveryId: string,
     riderId: string,
     reason: string,
-    config: Partial<MatchingConfig> = {},
+    config: Partial<MatchingConfig> = {}
   ): Promise<MatchingResult> {
     const matchingConfig = { ...DEFAULT_MATCHING_CONFIG, ...config };
     this.logger.log(`Handling rider ${riderId} rejection for delivery ${deliveryId}: ${reason}`);
@@ -279,7 +276,7 @@ export class DeliveryMatchingCoordinator {
   async reassignDelivery(
     deliveryId: string,
     reason: string,
-    config: Partial<MatchingConfig> = {},
+    config: Partial<MatchingConfig> = {}
   ): Promise<MatchingResult> {
     this.logger.log(`Reassigning delivery ${deliveryId}: ${reason}`);
 
@@ -324,10 +321,7 @@ export class DeliveryMatchingCoordinator {
     return this.recentSaccoAssignments.get(saccoId) ?? 0;
   }
 
-  private getOrCreateMatchingState(
-    deliveryId: string,
-    config: MatchingConfig,
-  ): MatchingState {
+  private getOrCreateMatchingState(deliveryId: string, config: MatchingConfig): MatchingState {
     let state = this.matchingStates.get(deliveryId);
     if (!state) {
       state = {
@@ -356,7 +350,7 @@ export class DeliveryMatchingCoordinator {
 
   private async findCandidates(
     delivery: DeliveryEntity,
-    radiusMeters: number,
+    radiusMeters: number
   ): Promise<MatchingCandidate[]> {
     // Use a default pickup location - in production this would be resolved from pickupLocationId
     const pickup: GeoPoint = { latitude: -1.2921, longitude: 36.8219 }; // Default Nairobi coordinates
@@ -381,7 +375,7 @@ export class DeliveryMatchingCoordinator {
 
   private filterExcludedRiders(
     candidates: MatchingCandidate[],
-    excludedIds: Set<string>,
+    excludedIds: Set<string>
   ): MatchingCandidate[] {
     return candidates.filter((c) => !excludedIds.has(c.riderId));
   }
@@ -389,7 +383,7 @@ export class DeliveryMatchingCoordinator {
   private async evaluateCandidates(
     candidates: MatchingCandidate[],
     delivery: DeliveryEntity,
-    _config: MatchingConfig,
+    _config: MatchingConfig
   ): Promise<MatchingCandidate[]> {
     // Check if we should match now or schedule for later
     const timingDecision = this.assignmentRulesService.evaluateForMatching({
@@ -400,7 +394,7 @@ export class DeliveryMatchingCoordinator {
 
     if (timingDecision.decision === 'SCHEDULE_FOR_LATER') {
       this.logger.debug(
-        `Delivery ${delivery.id} scheduled for later matching: ${timingDecision.reason}`,
+        `Delivery ${delivery.id} scheduled for later matching: ${timingDecision.reason}`
       );
       // Return empty array to indicate we shouldn't match now
       return [];
@@ -417,9 +411,12 @@ export class DeliveryMatchingCoordinator {
    */
   private applyFairnessRules(
     candidates: MatchingCandidate[],
-    config: MatchingConfig,
+    config: MatchingConfig
   ): MatchingCandidate[] {
-    const tieredCandidates = this.groupByDistanceTier(candidates, config.distanceTierThresholdMeters);
+    const tieredCandidates = this.groupByDistanceTier(
+      candidates,
+      config.distanceTierThresholdMeters
+    );
 
     const fairnessScoredCandidates = candidates.map((candidate) => {
       let fairnessScore = candidate.score;
@@ -433,7 +430,10 @@ export class DeliveryMatchingCoordinator {
         }
       }
 
-      const tier = this.getDistanceTier(candidate.distanceMeters, config.distanceTierThresholdMeters);
+      const tier = this.getDistanceTier(
+        candidate.distanceMeters,
+        config.distanceTierThresholdMeters
+      );
       const tierCandidates = tieredCandidates.get(tier) ?? [];
       const tierIndex = tierCandidates.findIndex((c) => c.riderId === candidate.riderId);
       fairnessScore -= tierIndex * 0.1;
@@ -449,7 +449,7 @@ export class DeliveryMatchingCoordinator {
 
   private groupByDistanceTier(
     candidates: MatchingCandidate[],
-    tierThreshold: number,
+    tierThreshold: number
   ): Map<number, MatchingCandidate[]> {
     const tiers = new Map<number, MatchingCandidate[]>();
 
@@ -469,7 +469,7 @@ export class DeliveryMatchingCoordinator {
 
   private async evaluatePolicyRules(
     delivery: DeliveryEntity,
-    candidate: MatchingCandidate,
+    candidate: MatchingCandidate
   ): Promise<{ finalDecision: { effect: PolicyEffect } }> {
     return this.policyEngine.evaluate({
       trigger: PolicyTrigger.RIDER_ASSIGNMENT,

@@ -1,13 +1,5 @@
 import { CalendarEventType, RecurrencePattern } from '@zanafleet/contracts';
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Index,
-} from 'typeorm';
-
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
 /**
  * Region Scope Interface

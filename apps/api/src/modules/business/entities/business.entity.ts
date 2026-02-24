@@ -9,7 +9,6 @@ import {
   Unique,
 } from 'typeorm';
 
-
 /**
  * Business Entity
  * Represents the Postgres persistence model for businesses

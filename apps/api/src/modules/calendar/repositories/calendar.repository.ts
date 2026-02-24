@@ -13,7 +13,7 @@ import { CalendarEntity } from '../entities/calendar.entity';
 export class CalendarRepository {
   constructor(
     @InjectRepository(CalendarEntity)
-    private readonly repo: Repository<CalendarEntity>,
+    private readonly repo: Repository<CalendarEntity>
   ) {}
 
   /**
@@ -37,10 +37,7 @@ export class CalendarRepository {
    * @param scope The owner scope level
    * @param scopeId Optional scope target ID (e.g., businessId, saccoId)
    */
-  async findByOwnerScope(
-    scope: CalendarScope,
-    scopeId?: string,
-  ): Promise<CalendarEntity[]> {
+  async findByOwnerScope(scope: CalendarScope, scopeId?: string): Promise<CalendarEntity[]> {
     if (scopeId !== undefined) {
       return this.repo.find({
         where: { ownerScope: scope, ownerScopeId: scopeId },

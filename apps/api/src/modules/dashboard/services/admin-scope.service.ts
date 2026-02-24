@@ -1,4 +1,3 @@
-
 import { Neo4jService } from '@api/core/neo4j';
 import {
   ADMIN_SCOPED_BUSINESS_IDS,
@@ -73,10 +72,7 @@ export class AdminScopeService {
    * @param workspaceId - The workspace ID (optional, for workspace-scoped fallback)
    * @returns Array of sacco IDs within scope
    */
-  async getScopedSaccoIds(
-    actorId?: string | null,
-    workspaceId?: string | null
-  ): Promise<string[]> {
+  async getScopedSaccoIds(actorId?: string | null, workspaceId?: string | null): Promise<string[]> {
     const session = this.neo4jService.getReadSession();
     try {
       if (actorId) {

@@ -3,13 +3,7 @@
 // Triggers: Event-driven (delivery, transaction events) + Scheduled
 // =============================================================================
 
-import {
-  Agent,
-  AgentType,
-  AgentTriggerType,
-  RetryPolicy,
-  ObservabilityConfig,
-} from '../types';
+import { Agent, AgentType, AgentTriggerType, RetryPolicy, ObservabilityConfig } from '../types';
 
 /**
  * Default retry policy for risk monitoring

@@ -7,7 +7,6 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { BusinessType } from '@zanafleet/contracts';
 import request from 'supertest';
 
-
 import { BusinessController } from '../../controllers/business.controller';
 import { BusinessEntity } from '../../entities/business.entity';
 
@@ -64,7 +63,10 @@ describe('BusinessController (e2e)', () => {
       .overrideGuard(CapabilityGuard)
       .useValue({
         canActivate: async (): Promise<boolean> => {
-          const result = await mockCapabilityAccessController.hasCapability('test-actor', 'business.manage');
+          const result = await mockCapabilityAccessController.hasCapability(
+            'test-actor',
+            'business.manage'
+          );
           if (!result) {
             throw new ForbiddenException('Missing required capability: business.manage');
           }

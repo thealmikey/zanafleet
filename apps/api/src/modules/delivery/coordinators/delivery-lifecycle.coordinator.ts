@@ -76,30 +76,24 @@ export class InvalidStateTransitionError extends Error {
   constructor(
     public readonly deliveryId: string,
     public readonly currentState: string,
-    public readonly targetState: string,
+    public readonly targetState: string
   ) {
     super(
-      `Invalid state transition from ${currentState} to ${targetState} for delivery ${deliveryId}`,
+      `Invalid state transition from ${currentState} to ${targetState} for delivery ${deliveryId}`
     );
     this.name = 'InvalidStateTransitionError';
   }
 }
 
 export class PolicyBlockedError extends Error {
-  constructor(
-    public readonly reason: string,
-    public readonly policyId?: string,
-  ) {
+  constructor(public readonly reason: string, public readonly policyId?: string) {
     super(`Delivery creation blocked by policy: ${reason}`);
     this.name = 'PolicyBlockedError';
   }
 }
 
 export class CalendarConstraintError extends Error {
-  constructor(
-    public readonly reason: string,
-    public readonly suggestedTime?: Date,
-  ) {
+  constructor(public readonly reason: string, public readonly suggestedTime?: Date) {
     super(`Calendar constraint violation: ${reason}`);
     this.name = 'CalendarConstraintError';
   }
@@ -126,8 +120,8 @@ export class DeliveryLifecycleCoordinator {
     private readonly billingCalculator: BillingCalculatorService,
     private readonly schedulingConstraint: SchedulingConstraintService,
     private readonly eventBus: EventBusService,
-    _ledgerService: LedgerService,
-  ) { }
+    _ledgerService: LedgerService
+  ) {}
 
   /**
    * Validates if a state transition is allowed by the state machine.
@@ -162,7 +156,7 @@ export class DeliveryLifecycleCoordinator {
    * 5. Emit DeliveryCreatedEventV1
    */
   async createDelivery(
-    input: CreateDeliveryInput,
+    input: CreateDeliveryInput
   ): Promise<{ deliveryId: string; estimatedCharges: number }> {
     this.logger.log(`Creating delivery for business ${input.businessId}`);
 
@@ -177,7 +171,7 @@ export class DeliveryLifecycleCoordinator {
     if (policyResult.finalDecision.effect === PolicyEffect.BLOCK) {
       throw new PolicyBlockedError(
         'Delivery creation denied by policy',
-        policyResult.evaluatedPolicies.find((p) => p.matched)?.policyId,
+        policyResult.evaluatedPolicies.find((p) => p.matched)?.policyId
       );
     }
 
@@ -190,9 +184,7 @@ export class DeliveryLifecycleCoordinator {
     });
 
     if (!constraintResult.allowed) {
-      throw new CalendarConstraintError(
-        constraintResult.reason || 'Schedule not available',
-      );
+      throw new CalendarConstraintError(constraintResult.reason || 'Schedule not available');
     }
 
     const pricingResult = await this.billingCalculator.calculateDeliveryChargesWithSignals({
@@ -202,21 +194,21 @@ export class DeliveryLifecycleCoordinator {
 
     const deliveryResult = input.isScheduled
       ? await this.deliveryService.createScheduled({
-        businessId: input.businessId,
-        pickupLocationId: input.pickupLocationId,
-        dropoffLocationId: input.dropoffLocationId,
-        scheduledPickupTime: input.scheduledPickupTime!,
-        scheduledDropoffTime: input.scheduledDropoffTime,
-        recipientName: input.recipientName,
-        recipientPhone: input.recipientPhone,
-      })
+          businessId: input.businessId,
+          pickupLocationId: input.pickupLocationId,
+          dropoffLocationId: input.dropoffLocationId,
+          scheduledPickupTime: input.scheduledPickupTime!,
+          scheduledDropoffTime: input.scheduledDropoffTime,
+          recipientName: input.recipientName,
+          recipientPhone: input.recipientPhone,
+        })
       : await this.deliveryService.createOnDemand({
-        businessId: input.businessId,
-        pickupLocationId: input.pickupLocationId,
-        dropoffLocationId: input.dropoffLocationId,
-        recipientName: input.recipientName,
-        recipientPhone: input.recipientPhone,
-      });
+          businessId: input.businessId,
+          pickupLocationId: input.pickupLocationId,
+          dropoffLocationId: input.dropoffLocationId,
+          recipientName: input.recipientName,
+          recipientPhone: input.recipientPhone,
+        });
 
     const event = new DeliveryCreatedEventV1({
       eventId: uuidv4(),
@@ -247,7 +239,7 @@ export class DeliveryLifecycleCoordinator {
   async transitionState(
     deliveryId: string,
     targetState: DeliveryStatus,
-    triggeredBy?: string,
+    triggeredBy?: string
   ): Promise<TransitionStateResult> {
     this.logger.log(`Transitioning delivery ${deliveryId} to ${targetState}`);
 
@@ -277,7 +269,7 @@ export class DeliveryLifecycleCoordinator {
    */
   async applyPricing(
     deliveryId: string,
-    distanceKm = 5,
+    distanceKm = 5
   ): Promise<{ totalCharges: number; surgeMultiplier: number }> {
     this.logger.log(`Applying pricing to delivery ${deliveryId}`);
 
@@ -317,7 +309,7 @@ export class DeliveryLifecycleCoordinator {
   async cancelDelivery(
     deliveryId: string,
     reason: string,
-    cancelledBy?: string,
+    cancelledBy?: string
   ): Promise<CancelDeliveryResult> {
     this.logger.log(`Cancelling delivery ${deliveryId}: ${reason}`);
 

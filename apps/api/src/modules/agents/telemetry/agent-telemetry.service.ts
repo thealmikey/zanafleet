@@ -46,38 +46,36 @@ export class AgentTelemetry {
     // Log based on event type
     switch (event.eventType) {
       case AgentTelemetryEventType.TRIGGERED:
-        this.logger.debug(
-          `[TELEMETRY] Agent triggered: ${event.agentName} (${event.executionId})`,
-        );
+        this.logger.debug(`[TELEMETRY] Agent triggered: ${event.agentName} (${event.executionId})`);
         break;
       case AgentTelemetryEventType.DECISION_MADE:
         this.logger.debug(
-          `[TELEMETRY] Decision made: ${event.payload['decision']} for ${event.agentName}`,
+          `[TELEMETRY] Decision made: ${event.payload['decision']} for ${event.agentName}`
         );
         break;
       case AgentTelemetryEventType.EXECUTION_STARTED:
         this.logger.debug(
-          `[TELEMETRY] Execution started: ${event.agentName} (${event.executionId})`,
+          `[TELEMETRY] Execution started: ${event.agentName} (${event.executionId})`
         );
         break;
       case AgentTelemetryEventType.EXECUTION_SUCCEEDED:
         this.logger.log(
-          `[TELEMETRY] Execution succeeded: ${event.agentName} (${event.executionId})`,
+          `[TELEMETRY] Execution succeeded: ${event.agentName} (${event.executionId})`
         );
         break;
       case AgentTelemetryEventType.EXECUTION_FAILED:
         this.logger.error(
-          `[TELEMETRY] Execution failed: ${event.agentName} (${event.executionId}) - ${event.payload['error']}`,
+          `[TELEMETRY] Execution failed: ${event.agentName} (${event.executionId}) - ${event.payload['error']}`
         );
         break;
       case AgentTelemetryEventType.BLOCKED:
         this.logger.warn(
-          `[TELEMETRY] Execution blocked: ${event.agentName} (${event.executionId}) - ${event.payload['reason']}`,
+          `[TELEMETRY] Execution blocked: ${event.agentName} (${event.executionId}) - ${event.payload['reason']}`
         );
         break;
       case AgentTelemetryEventType.CONSENT_REQUESTED:
         this.logger.debug(
-          `[TELEMETRY] Consent requested: ${event.agentName} (${event.executionId})`,
+          `[TELEMETRY] Consent requested: ${event.agentName} (${event.executionId})`
         );
         break;
     }

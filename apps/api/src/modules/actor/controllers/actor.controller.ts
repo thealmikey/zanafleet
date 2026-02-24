@@ -1,10 +1,6 @@
 import { RequireCapability } from '@api/core/api/decorators';
 import { CapabilityGuard } from '@api/core/api/guards';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
+import { parseQueryParams, createPaginationMeta, RawQueryParams } from '@api/core/api/utils';
 import {
   Controller,
   Get,
@@ -109,10 +105,20 @@ export class ActorController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  @ApiOperation({ summary: 'Create a new actor', description: 'Create a new actor/user in the system' })
-  @ApiResponse({ status: 201, description: 'Actor created successfully', schema: { example: { id: 'uuid' } } })
+  @ApiOperation({
+    summary: 'Create a new actor',
+    description: 'Create a new actor/user in the system',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Actor created successfully',
+    schema: { example: { id: 'uuid' } },
+  })
   @ApiResponse({ status: 400, description: 'Invalid request body' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   async create(@Body() dto: CreateActorDto): Promise<{ id: string }> {
     const validated = CreateActorCommand.validate(dto);
@@ -121,9 +127,15 @@ export class ActorController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get actor by ID', description: 'Retrieve a specific actor by their unique identifier' })
+  @ApiOperation({
+    summary: 'Get actor by ID',
+    description: 'Retrieve a specific actor by their unique identifier',
+  })
   @ApiResponse({ status: 200, description: 'Actor retrieved successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Actor not found' })
   @ApiParam({ name: 'id', description: 'Actor unique identifier (UUID)', type: String })
@@ -136,13 +148,23 @@ export class ActorController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List all actors', description: 'Retrieve all actors with pagination, sorting, and filtering' })
+  @ApiOperation({
+    summary: 'List all actors',
+    description: 'Retrieve all actors with pagination, sorting, and filtering',
+  })
   @ApiResponse({ status: 200, description: 'Actors retrieved successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiQuery({ name: 'page', required: false, description: 'Page number (1-based)', type: Number })
   @ApiQuery({ name: 'limit', required: false, description: 'Items per page', type: Number })
-  @ApiQuery({ name: 'sort', required: false, description: 'Sort field and order (e.g., createdAt:desc)' })
+  @ApiQuery({
+    name: 'sort',
+    required: false,
+    description: 'Sort field and order (e.g., createdAt:desc)',
+  })
   @ApiQuery({ name: 'filter', required: false, description: 'Filter criteria as JSON' })
   async findAll(@Query() query: RawQueryParams): Promise<{
     data: ReturnType<ActorEntity['toDomain']>[];
@@ -153,7 +175,7 @@ export class ActorController {
     const order = sort ? { [sort.field]: sort.order } : undefined;
 
     const [entities, total] = await this.actorRepository.findAndCount({
-      where: filter ,
+      where: filter,
       order,
       skip: pagination.offset,
       take: pagination.limit,
@@ -168,7 +190,10 @@ export class ActorController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update an actor', description: 'Update an existing actor information' })
   @ApiResponse({ status: 200, description: 'Actor updated successfully' })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Actor not found' })
   @ApiParam({ name: 'id', description: 'Actor unique identifier (UUID)', type: String })
@@ -190,8 +215,15 @@ export class ActorController {
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Delete an actor', description: 'Remove an actor from the system' })
-  @ApiResponse({ status: 200, description: 'Actor deleted successfully', schema: { example: { deleted: true } } })
-  @ApiResponse({ status: 401, description: 'Unauthorized - Invalid or missing authentication token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Actor deleted successfully',
+    schema: { example: { deleted: true } },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Invalid or missing authentication token',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden - Missing required capability' })
   @ApiResponse({ status: 404, description: 'Actor not found' })
   @ApiParam({ name: 'id', description: 'Actor unique identifier (UUID)', type: String })

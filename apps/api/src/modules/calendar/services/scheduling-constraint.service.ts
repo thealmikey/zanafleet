@@ -1,27 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  BindingTargetType,
-  CalendarScope,
-  CalendarRuleType,
-} from '@zanafleet/contracts';
+import { BindingTargetType, CalendarScope, CalendarRuleType } from '@zanafleet/contracts';
 import { DateTime } from 'luxon';
 import { Repository } from 'typeorm';
 
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
-import {
-  ConstraintContext,
-  ConstraintResult,
-  BlockedByType,
-} from '../dto/constraint.types';
+import { ConstraintContext, ConstraintResult, BlockedByType } from '../dto/constraint.types';
 import { CalendarRuleEntity } from '../entities/calendar-rule.entity';
 import { ConstraintBlockedActionEventV1 } from '../events/calendar.events';
 import { CalendarEventRepository, RegionFilter } from '../repositories/calendar-event.repository';
 
 import { CalendarBindingService, InheritanceContext } from './calendar-binding.service';
 import { CalendarService } from './calendar.service';
-
 
 const MAX_SEARCH_DAYS = 7;
 
@@ -47,7 +38,7 @@ export class SchedulingConstraintService {
     private readonly calendarService: CalendarService,
     @InjectRepository(CalendarRuleEntity)
     private readonly calendarRuleRepo: Repository<CalendarRuleEntity>,
-    private readonly eventBusService: EventBusService,
+    private readonly eventBusService: EventBusService
   ) {}
 
   /**
@@ -72,7 +63,7 @@ export class SchedulingConstraintService {
       targetScope,
       targetId,
       timestamp,
-      'ALLOW',
+      'ALLOW'
     );
 
     if (hasAllowOverride) {
@@ -92,7 +83,7 @@ export class SchedulingConstraintService {
         timestamp,
         timezone,
         regionFilter,
-        context,
+        context
       );
       const result = {
         ...holidayResult,
@@ -111,7 +102,7 @@ export class SchedulingConstraintService {
         timestamp,
         timezone,
         regionFilter,
-        context,
+        context
       );
       const result = {
         ...blackoutResult,
@@ -127,7 +118,7 @@ export class SchedulingConstraintService {
       targetId,
       timestamp,
       timezone,
-      context,
+      context
     );
     if (!workingHoursResult.allowed) {
       const suggestedReschedule = await this.suggestNextAvailableTime(
@@ -136,7 +127,7 @@ export class SchedulingConstraintService {
         timestamp,
         timezone,
         regionFilter,
-        context,
+        context
       );
       const result = {
         ...workingHoursResult,
@@ -163,7 +154,7 @@ export class SchedulingConstraintService {
     targetType: BindingTargetType,
     targetId: string,
     timestamp: Date,
-    timezone: string,
+    timezone: string
   ): Promise<boolean> {
     const result = await this.checkWorkingHours(targetType, targetId, timestamp, timezone);
     return result.allowed;
@@ -175,10 +166,7 @@ export class SchedulingConstraintService {
    * @param regionScope Optional region filter for geographic scoping
    */
   async isHoliday(timestamp: Date, regionScope?: RegionFilter): Promise<boolean> {
-    const holidays = await this.calendarEventRepository.findHolidaysForDate(
-      timestamp,
-      regionScope,
-    );
+    const holidays = await this.calendarEventRepository.findHolidaysForDate(timestamp, regionScope);
     return holidays.length > 0;
   }
 
@@ -191,7 +179,7 @@ export class SchedulingConstraintService {
   async isBlackoutPeriod(
     targetType: BindingTargetType,
     targetId: string,
-    timestamp: Date,
+    timestamp: Date
   ): Promise<boolean> {
     const result = await this.checkBlackoutPeriod(targetType, targetId, timestamp);
     return !result.allowed;
@@ -208,12 +196,12 @@ export class SchedulingConstraintService {
     targetScope: CalendarScope,
     targetScopeId: string,
     timestamp: Date,
-    overrideType: 'ALLOW' | 'BLOCK' | string,
+    overrideType: 'ALLOW' | 'BLOCK' | string
   ): Promise<boolean> {
     const overrides = await this.calendarBindingService.getActiveOverrides(
       targetScope,
       targetScopeId,
-      timestamp,
+      timestamp
     );
 
     if (overrideType === 'ALLOW') {
@@ -221,7 +209,7 @@ export class SchedulingConstraintService {
         (o) =>
           o.exceptionType === 'ALLOW_ON_HOLIDAY' ||
           o.exceptionType === 'EMERGENCY_OPEN' ||
-          o.exceptionType === 'EXTENDED_HOURS',
+          o.exceptionType === 'EXTENDED_HOURS'
       );
     }
 
@@ -245,7 +233,7 @@ export class SchedulingConstraintService {
     fromTimestamp: Date,
     timezone: string,
     regionFilter?: RegionFilter,
-    context?: ConstraintContext,
+    context?: ConstraintContext
   ): Promise<Date | null> {
     let currentTime = DateTime.fromJSDate(fromTimestamp, { zone: timezone });
     const maxSearchDate = currentTime.plus({ days: MAX_SEARCH_DAYS });
@@ -273,7 +261,7 @@ export class SchedulingConstraintService {
         targetId,
         currentTime,
         timezone,
-        context,
+        context
       );
 
       if (nextWorkingTime) {
@@ -289,11 +277,11 @@ export class SchedulingConstraintService {
 
   private async checkHoliday(
     timestamp: Date,
-    regionFilter?: RegionFilter,
+    regionFilter?: RegionFilter
   ): Promise<ConstraintResult> {
     const holidays = await this.calendarEventRepository.findHolidaysForDate(
       timestamp,
-      regionFilter,
+      regionFilter
     );
 
     if (holidays.length > 0) {
@@ -316,13 +304,13 @@ export class SchedulingConstraintService {
     targetType: BindingTargetType,
     targetId: string,
     timestamp: Date,
-    context?: ConstraintContext,
+    context?: ConstraintContext
   ): Promise<ConstraintResult> {
     const inheritanceContext = this.buildInheritanceContext(targetType, targetId, context);
     const resolvedBindings = await this.calendarBindingService.resolveEffectiveCalendars(
       targetType,
       targetId,
-      inheritanceContext,
+      inheritanceContext
     );
 
     for (const resolved of resolvedBindings) {
@@ -381,13 +369,13 @@ export class SchedulingConstraintService {
     targetId: string,
     timestamp: Date,
     timezone: string,
-    context?: ConstraintContext,
+    context?: ConstraintContext
   ): Promise<ConstraintResult> {
     const inheritanceContext = this.buildInheritanceContext(targetType, targetId, context);
     const resolvedBindings = await this.calendarBindingService.resolveEffectiveCalendars(
       targetType,
       targetId,
-      inheritanceContext,
+      inheritanceContext
     );
 
     if (resolvedBindings.length === 0) {
@@ -399,7 +387,7 @@ export class SchedulingConstraintService {
       try {
         const timeWindows = await this.calendarService.getEffectiveTimeWindows(
           resolved.binding.calendarId,
-          timestamp,
+          timestamp
         );
 
         if (timeWindows.length === 0) {
@@ -437,13 +425,13 @@ export class SchedulingConstraintService {
     targetId: string,
     currentTime: DateTime,
     _timezone: string,
-    context?: ConstraintContext,
+    context?: ConstraintContext
   ): Promise<Date | null> {
     const inheritanceContext = this.buildInheritanceContext(targetType, targetId, context);
     const resolvedBindings = await this.calendarBindingService.resolveEffectiveCalendars(
       targetType,
       targetId,
-      inheritanceContext,
+      inheritanceContext
     );
 
     if (resolvedBindings.length === 0) {
@@ -454,7 +442,7 @@ export class SchedulingConstraintService {
       try {
         const timeWindows = await this.calendarService.getEffectiveTimeWindows(
           resolved.binding.calendarId,
-          currentTime.toJSDate(),
+          currentTime.toJSDate()
         );
 
         if (timeWindows.length === 0) {
@@ -464,12 +452,12 @@ export class SchedulingConstraintService {
         const timeStr = this.formatTimeString(
           currentTime.hour,
           currentTime.minute,
-          currentTime.second,
+          currentTime.second
         );
 
         // Sort windows by start time
         const sortedWindows = [...timeWindows].sort((a, b) =>
-          a.startTime.localeCompare(b.startTime),
+          a.startTime.localeCompare(b.startTime)
         );
 
         for (const window of sortedWindows) {
@@ -498,7 +486,9 @@ export class SchedulingConstraintService {
   }
 
   private formatTimeString(hour: number, minute: number, second: number): string {
-    return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
+    return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(
+      second
+    ).padStart(2, '0')}`;
   }
 
   private isTimeInWindow(time: string, start: string, end: string): boolean {
@@ -510,10 +500,7 @@ export class SchedulingConstraintService {
     return time >= start && time <= end;
   }
 
-  private isTimestampInRuleRange(
-    timestamp: Date,
-    conditions: Record<string, unknown>,
-  ): boolean {
+  private isTimestampInRuleRange(timestamp: Date, conditions: Record<string, unknown>): boolean {
     const startDate = conditions.startDate as string | undefined;
     const endDate = conditions.endDate as string | undefined;
 
@@ -556,7 +543,7 @@ export class SchedulingConstraintService {
   private buildInheritanceContext(
     targetType: BindingTargetType,
     targetId: string,
-    context?: ConstraintContext,
+    context?: ConstraintContext
   ): InheritanceContext {
     const result: InheritanceContext = {};
 
@@ -600,10 +587,7 @@ export class SchedulingConstraintService {
     }
   }
 
-  private emitBlockedEvent(
-    context: ConstraintContext,
-    result: ConstraintResult,
-  ): void {
+  private emitBlockedEvent(context: ConstraintContext, result: ConstraintResult): void {
     if (!result.blockedBy) return;
 
     const event = new ConstraintBlockedActionEventV1({
@@ -618,9 +602,11 @@ export class SchedulingConstraintService {
       suggestedReschedule: result.suggestedReschedule ?? null,
     });
 
-    this.eventBusService.publish(NatsSubjects.Calendar.CONSTRAINT_BLOCKED_V1, event).catch((publishError: unknown) => {
-      const err = publishError instanceof Error ? publishError : new Error(String(publishError));
-      this.logger.warn(`Failed to publish ConstraintBlockedActionEventV1: ${err.message}`);
-    });
+    this.eventBusService
+      .publish(NatsSubjects.Calendar.CONSTRAINT_BLOCKED_V1, event)
+      .catch((publishError: unknown) => {
+        const err = publishError instanceof Error ? publishError : new Error(String(publishError));
+        this.logger.warn(`Failed to publish ConstraintBlockedActionEventV1: ${err.message}`);
+      });
   }
 }

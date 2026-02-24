@@ -1,4 +1,9 @@
-import { BaseEvent, CalendarEventType, CalendarScope, BindingTargetType } from '@zanafleet/contracts';
+import {
+  BaseEvent,
+  CalendarEventType,
+  CalendarScope,
+  BindingTargetType,
+} from '@zanafleet/contracts';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
@@ -418,7 +423,9 @@ export class ConstraintBlockedActionEventV1 implements BaseEvent {
       blockedById: data.blockedById as string,
       reason: data.reason as string,
       timestamp: new Date(data.timestamp as string),
-      suggestedReschedule: data.suggestedReschedule ? new Date(data.suggestedReschedule as string) : null,
+      suggestedReschedule: data.suggestedReschedule
+        ? new Date(data.suggestedReschedule as string)
+        : null,
       occurredAt: new Date(data.occurredAt as string),
       correlationId: data.correlationId as string | undefined,
       causationId: data.causationId as string | undefined,

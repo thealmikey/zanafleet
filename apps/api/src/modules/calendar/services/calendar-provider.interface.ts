@@ -47,8 +47,5 @@ export interface CalendarProviderInterface {
 
   fetchEvents(options: FetchEventsOptions): Promise<ExternalCalendarEvent[]>;
 
-  syncToCalendar(
-    events: ExternalCalendarEvent[],
-    targetCalendarId: string,
-  ): Promise<SyncResult>;
+  syncToCalendar(events: ExternalCalendarEvent[], targetCalendarId: string): Promise<SyncResult>;
 }

@@ -5,7 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { BusinessController } from './controllers/business.controller';
 import { BusinessEntity } from './entities/business.entity';
 import { CreateBusinessCommandHandler } from './handlers/create-business.handler';
-import { BusinessNeo4jInitializer, BusinessNeo4jProjection } from './projections/business-neo4j.projection';
+import {
+  BusinessNeo4jInitializer,
+  BusinessNeo4jProjection,
+} from './projections/business-neo4j.projection';
 
 /**
  * BusinessModule

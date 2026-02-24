@@ -1,144 +1,136 @@
-import { DeliveryStatus } from '@zanafleet/contracts'
-import {
-  Entity,
-  PrimaryColumn,
-  Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  Index,
-} from 'typeorm'
-
+import { DeliveryStatus } from '@zanafleet/contracts';
+import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, Index } from 'typeorm';
 
 @Entity({ name: 'deliveries' })
 export class DeliveryEntity {
   @PrimaryColumn('uuid')
-  id!: string
+  id!: string;
 
   @Index('IDX_deliveries_business_id')
   @Column('uuid')
-  businessId!: string
+  businessId!: string;
 
   @Index('IDX_deliveries_workspace_id')
   @Column('uuid')
-  workspaceId!: string
+  workspaceId!: string;
 
   @Index('IDX_deliveries_external_order_id')
   @Column('uuid', { nullable: true })
-  externalOrderId!: string | null
+  externalOrderId!: string | null;
 
   @Column('uuid', { nullable: true })
-  pickupLocationId!: string | null
+  pickupLocationId!: string | null;
 
   @Column('uuid', { nullable: true })
-  dropoffLocationId!: string | null
+  dropoffLocationId!: string | null;
 
   @Index('IDX_deliveries_assigned_rider_id')
   @Column('uuid', { nullable: true })
-  assignedRiderId!: string | null
+  assignedRiderId!: string | null;
 
   // Keep DB column flexible; ensure TS type aligns with DeliveryStatus contract
   @Index('IDX_deliveries_status')
   @Column('varchar', { length: 20 })
-  status!: DeliveryStatus
+  status!: DeliveryStatus;
 
   @Index('IDX_deliveries_scheduled_pickup_time')
   @Column({ type: 'timestamp with time zone', nullable: true })
-  scheduledPickupTime!: Date | null
+  scheduledPickupTime!: Date | null;
 
   @Index('IDX_deliveries_scheduled_dropoff_time')
   @Column({ type: 'timestamp with time zone', nullable: true })
-  scheduledDropoffTime!: Date | null
+  scheduledDropoffTime!: Date | null;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  recipientName!: string | null
+  recipientName!: string | null;
 
   @Column({ type: 'varchar', length: 20, nullable: true })
-  recipientPhone!: string | null
+  recipientPhone!: string | null;
 
   @Column({ type: 'boolean', default: false })
-  isScheduled!: boolean
+  isScheduled!: boolean;
 
   // Assignment & lifecycle timestamps
   @Column({ type: 'timestamp with time zone', nullable: true })
-  assignedAt!: Date | null
+  assignedAt!: Date | null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  assignmentNotifiedAt!: Date | null
+  assignmentNotifiedAt!: Date | null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  pickedUpAt!: Date | null
+  pickedUpAt!: Date | null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  deliveredAt!: Date | null
+  deliveredAt!: Date | null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  cancelledAt!: Date | null
+  cancelledAt!: Date | null;
 
   // Attempts
   @Column({ type: 'timestamp with time zone', nullable: true })
-  firstAttemptAt!: Date | null
+  firstAttemptAt!: Date | null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  lastAttemptAt!: Date | null
+  lastAttemptAt!: Date | null;
 
   @Column({ type: 'int', default: 0 })
-  attemptCount!: number
+  attemptCount!: number;
 
   // SLAs
   @Column({ type: 'timestamp with time zone', nullable: true })
-  slaPickupBy!: Date | null
+  slaPickupBy!: Date | null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  slaDropoffBy!: Date | null
+  slaDropoffBy!: Date | null;
 
   @Column({ type: 'timestamp with time zone', nullable: true })
-  slaBreachedAt!: Date | null
+  slaBreachedAt!: Date | null;
 
   // Tracking & visibility
   @Column({ type: 'varchar', length: 64, nullable: true })
-  visibilityToken!: string | null
+  visibilityToken!: string | null;
 
   @Column({ type: 'varchar', length: 64, nullable: true })
-  trackingCode!: string | null
+  trackingCode!: string | null;
 
   @Column({ type: 'varchar', length: 512, nullable: true })
-  trackingUrl!: string | null
+  trackingUrl!: string | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
-  createdAt!: Date
+  createdAt!: Date;
 
   @UpdateDateColumn({ type: 'timestamp with time zone' })
-  updatedAt!: Date
+  updatedAt!: Date;
 
   toDomain(): {
-    deliveryId: string
-    businessId: string
-    externalOrderId: string | null
-    pickupLocationId: string | null
-    dropoffLocationId: string | null
-    assignedRiderId: string | null
-    status: DeliveryStatus
-    scheduledPickupTime: Date | null
-    scheduledDropoffTime: Date | null
-    recipientName: string | null
-    recipientPhone: string | null
-    isScheduled: boolean
-    assignedAt: Date | null
-    assignmentNotifiedAt: Date | null
-    pickedUpAt: Date | null
-    deliveredAt: Date | null
-    cancelledAt: Date | null
-    firstAttemptAt: Date | null
-    lastAttemptAt: Date | null
-    attemptCount: number
-    slaPickupBy: Date | null
-    slaDropoffBy: Date | null
-    slaBreachedAt: Date | null
-    visibilityToken: string | null
-    trackingCode: string | null
-    trackingUrl: string | null
-    createdAt: Date
-    updatedAt: Date
+    deliveryId: string;
+    businessId: string;
+    externalOrderId: string | null;
+    pickupLocationId: string | null;
+    dropoffLocationId: string | null;
+    assignedRiderId: string | null;
+    status: DeliveryStatus;
+    scheduledPickupTime: Date | null;
+    scheduledDropoffTime: Date | null;
+    recipientName: string | null;
+    recipientPhone: string | null;
+    isScheduled: boolean;
+    assignedAt: Date | null;
+    assignmentNotifiedAt: Date | null;
+    pickedUpAt: Date | null;
+    deliveredAt: Date | null;
+    cancelledAt: Date | null;
+    firstAttemptAt: Date | null;
+    lastAttemptAt: Date | null;
+    attemptCount: number;
+    slaPickupBy: Date | null;
+    slaDropoffBy: Date | null;
+    slaBreachedAt: Date | null;
+    visibilityToken: string | null;
+    trackingCode: string | null;
+    trackingUrl: string | null;
+    createdAt: Date;
+    updatedAt: Date;
   } {
     return {
       deliveryId: this.id,
@@ -169,67 +161,67 @@ export class DeliveryEntity {
       trackingUrl: this.trackingUrl,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt,
-    }
+    };
   }
 
   static fromDomain(data: {
-    deliveryId: string
-    businessId: string
-    externalOrderId?: string | null
-    pickupLocationId?: string | null
-    dropoffLocationId?: string | null
-    assignedRiderId?: string | null
-    status: DeliveryStatus
-    scheduledPickupTime?: Date | null
-    scheduledDropoffTime?: Date | null
-    recipientName?: string | null
-    recipientPhone?: string | null
-    isScheduled?: boolean
-    assignedAt?: Date | null
-    assignmentNotifiedAt?: Date | null
-    pickedUpAt?: Date | null
-    deliveredAt?: Date | null
-    cancelledAt?: Date | null
-    firstAttemptAt?: Date | null
-    lastAttemptAt?: Date | null
-    attemptCount?: number
-    slaPickupBy?: Date | null
-    slaDropoffBy?: Date | null
-    slaBreachedAt?: Date | null
-    visibilityToken?: string | null
-    trackingCode?: string | null
-    trackingUrl?: string | null
-    createdAt: Date
+    deliveryId: string;
+    businessId: string;
+    externalOrderId?: string | null;
+    pickupLocationId?: string | null;
+    dropoffLocationId?: string | null;
+    assignedRiderId?: string | null;
+    status: DeliveryStatus;
+    scheduledPickupTime?: Date | null;
+    scheduledDropoffTime?: Date | null;
+    recipientName?: string | null;
+    recipientPhone?: string | null;
+    isScheduled?: boolean;
+    assignedAt?: Date | null;
+    assignmentNotifiedAt?: Date | null;
+    pickedUpAt?: Date | null;
+    deliveredAt?: Date | null;
+    cancelledAt?: Date | null;
+    firstAttemptAt?: Date | null;
+    lastAttemptAt?: Date | null;
+    attemptCount?: number;
+    slaPickupBy?: Date | null;
+    slaDropoffBy?: Date | null;
+    slaBreachedAt?: Date | null;
+    visibilityToken?: string | null;
+    trackingCode?: string | null;
+    trackingUrl?: string | null;
+    createdAt: Date;
   }): DeliveryEntity {
-    const e = new DeliveryEntity()
-    e.id = data.deliveryId
-    e.businessId = data.businessId
-    e.externalOrderId = data.externalOrderId ?? null
-    e.pickupLocationId = data.pickupLocationId ?? null
-    e.dropoffLocationId = data.dropoffLocationId ?? null
-    e.assignedRiderId = data.assignedRiderId ?? null
-    e.status = data.status
-    e.scheduledPickupTime = data.scheduledPickupTime ?? null
-    e.scheduledDropoffTime = data.scheduledDropoffTime ?? null
-    e.recipientName = data.recipientName ?? null
-    e.recipientPhone = data.recipientPhone ?? null
-    e.isScheduled = data.isScheduled ?? false
-    e.assignedAt = data.assignedAt ?? null
-    e.assignmentNotifiedAt = data.assignmentNotifiedAt ?? null
-    e.pickedUpAt = data.pickedUpAt ?? null
-    e.deliveredAt = data.deliveredAt ?? null
-    e.cancelledAt = data.cancelledAt ?? null
-    e.firstAttemptAt = data.firstAttemptAt ?? null
-    e.lastAttemptAt = data.lastAttemptAt ?? null
-    e.attemptCount = data.attemptCount ?? 0
-    e.slaPickupBy = data.slaPickupBy ?? null
-    e.slaDropoffBy = data.slaDropoffBy ?? null
-    e.slaBreachedAt = data.slaBreachedAt ?? null
-    e.visibilityToken = data.visibilityToken ?? null
-    e.trackingCode = data.trackingCode ?? null
-    e.trackingUrl = data.trackingUrl ?? null
-    e.createdAt = data.createdAt
+    const e = new DeliveryEntity();
+    e.id = data.deliveryId;
+    e.businessId = data.businessId;
+    e.externalOrderId = data.externalOrderId ?? null;
+    e.pickupLocationId = data.pickupLocationId ?? null;
+    e.dropoffLocationId = data.dropoffLocationId ?? null;
+    e.assignedRiderId = data.assignedRiderId ?? null;
+    e.status = data.status;
+    e.scheduledPickupTime = data.scheduledPickupTime ?? null;
+    e.scheduledDropoffTime = data.scheduledDropoffTime ?? null;
+    e.recipientName = data.recipientName ?? null;
+    e.recipientPhone = data.recipientPhone ?? null;
+    e.isScheduled = data.isScheduled ?? false;
+    e.assignedAt = data.assignedAt ?? null;
+    e.assignmentNotifiedAt = data.assignmentNotifiedAt ?? null;
+    e.pickedUpAt = data.pickedUpAt ?? null;
+    e.deliveredAt = data.deliveredAt ?? null;
+    e.cancelledAt = data.cancelledAt ?? null;
+    e.firstAttemptAt = data.firstAttemptAt ?? null;
+    e.lastAttemptAt = data.lastAttemptAt ?? null;
+    e.attemptCount = data.attemptCount ?? 0;
+    e.slaPickupBy = data.slaPickupBy ?? null;
+    e.slaDropoffBy = data.slaDropoffBy ?? null;
+    e.slaBreachedAt = data.slaBreachedAt ?? null;
+    e.visibilityToken = data.visibilityToken ?? null;
+    e.trackingCode = data.trackingCode ?? null;
+    e.trackingUrl = data.trackingUrl ?? null;
+    e.createdAt = data.createdAt;
     // updatedAt is managed by DB
-    return e
+    return e;
   }
 }

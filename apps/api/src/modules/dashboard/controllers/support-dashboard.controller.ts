@@ -1,20 +1,9 @@
 import { RequireCapability } from '@api/core/api/decorators';
 import { CapabilityGuard } from '@api/core/api/guards';
-import {
-  parseQueryParams,
-  createPaginationMeta,
-  RawQueryParams,
-} from '@api/core/api/utils';
-import {
-  Controller,
-  Get,
-  Query,
-  UseGuards,
-  Header,
-} from '@nestjs/common';
+import { parseQueryParams, createPaginationMeta, RawQueryParams } from '@api/core/api/utils';
+import { Controller, Get, Query, UseGuards, Header } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThanOrEqual } from 'typeorm';
-
 
 import { DisputeEntity } from '../../payment/entities/dispute.entity';
 import { PaymentIntentEntity } from '../../payment/entities/payment-intent.entity';
@@ -82,9 +71,7 @@ export class SupportDashboardController {
 
   @Get('metrics')
   @Header('Cache-Control', 'private, max-age=60')
-  async getSupportMetrics(
-    @Query('periodDays') periodDaysStr?: string
-  ): Promise<SupportMetrics> {
+  async getSupportMetrics(@Query('periodDays') periodDaysStr?: string): Promise<SupportMetrics> {
     const periodDays = periodDaysStr ? parseInt(periodDaysStr, 10) : 30;
     const periodStart = new Date();
     periodStart.setDate(periodStart.getDate() - periodDays);
@@ -96,9 +83,9 @@ export class SupportDashboardController {
       },
     });
 
-    const openDisputes = disputes.filter(d => d.status === 'OPEN').length;
-    const escalatedDisputes = disputes.filter(d => d.status === 'ESCALATED').length;
-    const resolvedDisputes = disputes.filter(d => d.status === 'RESOLVED').length;
+    const openDisputes = disputes.filter((d) => d.status === 'OPEN').length;
+    const escalatedDisputes = disputes.filter((d) => d.status === 'ESCALATED').length;
+    const resolvedDisputes = disputes.filter((d) => d.status === 'RESOLVED').length;
 
     const [refunds, totalRefunds] = await this.refundRepository.findAndCount({
       where: {
@@ -106,8 +93,8 @@ export class SupportDashboardController {
       },
     });
 
-    const pendingRefunds = refunds.filter(r => r.status === 'PENDING').length;
-    const completedRefunds = refunds.filter(r => r.status === 'COMPLETED').length;
+    const pendingRefunds = refunds.filter((r) => r.status === 'PENDING').length;
+    const completedRefunds = refunds.filter((r) => r.status === 'COMPLETED').length;
 
     return {
       totalDisputes,
@@ -133,7 +120,7 @@ export class SupportDashboardController {
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
     const [entities, total] = await this.disputeRepository.findAndCount({
-      where: filter ,
+      where: filter,
       order,
       skip: pagination.offset,
       take: pagination.limit,
@@ -203,7 +190,7 @@ export class SupportDashboardController {
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
     const [entities, total] = await this.refundRepository.findAndCount({
-      where: filter ,
+      where: filter,
       order,
       skip: pagination.offset,
       take: pagination.limit,
@@ -238,7 +225,7 @@ export class SupportDashboardController {
     const order = sort ? { [sort.field]: sort.order } : { createdAt: 'DESC' as const };
 
     const [entities, total] = await this.paymentIntentRepository.findAndCount({
-      where: filter ,
+      where: filter,
       order,
       skip: pagination.offset,
       take: pagination.limit,

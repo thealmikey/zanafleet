@@ -55,7 +55,7 @@ export class CalendarService {
     private readonly timeWindowRepo: Repository<TimeWindowEntity>,
     @InjectRepository(CalendarRuleEntity)
     private readonly calendarRuleRepo: Repository<CalendarRuleEntity>,
-    private readonly eventBusService: EventBusService,
+    private readonly eventBusService: EventBusService
   ) {}
 
   /**
@@ -86,10 +86,12 @@ export class CalendarService {
       ownerScopeId: saved.ownerScopeId,
     });
 
-    this.eventBusService.publish(NatsSubjects.Calendar.CREATED_V1, event).catch((publishError: unknown) => {
-      const err = publishError instanceof Error ? publishError : new Error(String(publishError));
-      this.logger.warn(`Failed to publish CalendarCreatedEventV1: ${err.message}`);
-    });
+    this.eventBusService
+      .publish(NatsSubjects.Calendar.CREATED_V1, event)
+      .catch((publishError: unknown) => {
+        const err = publishError instanceof Error ? publishError : new Error(String(publishError));
+        this.logger.warn(`Failed to publish CalendarCreatedEventV1: ${err.message}`);
+      });
 
     return this.toCalendarResponse(saved);
   }
@@ -113,7 +115,7 @@ export class CalendarService {
    */
   async updateCalendar(
     calendarId: string,
-    updates: UpdateCalendarInput,
+    updates: UpdateCalendarInput
   ): Promise<CalendarResponse> {
     const entity = await this.calendarRepository.findById(calendarId);
     if (!entity) {
@@ -152,7 +154,7 @@ export class CalendarService {
    */
   async addTimeWindow(
     calendarId: string,
-    input: Omit<CreateTimeWindowInput, 'calendarId'>,
+    input: Omit<CreateTimeWindowInput, 'calendarId'>
   ): Promise<TimeWindowResponse> {
     const calendar = await this.calendarRepository.findById(calendarId);
     if (!calendar) {
@@ -190,10 +192,7 @@ export class CalendarService {
    * @param calendarId The calendar ID
    * @param input Rule creation input
    */
-  async addRule(
-    calendarId: string,
-    input: CreateCalendarRuleInput,
-  ): Promise<CalendarRuleResponse> {
+  async addRule(calendarId: string, input: CreateCalendarRuleInput): Promise<CalendarRuleResponse> {
     const calendar = await this.calendarRepository.findById(calendarId);
     if (!calendar) {
       throw new NotFoundException(`Calendar not found: ${calendarId}`);
@@ -222,10 +221,7 @@ export class CalendarService {
    * @param calendarId The calendar ID
    * @param date The date to resolve windows for
    */
-  async getEffectiveTimeWindows(
-    calendarId: string,
-    date: Date,
-  ): Promise<TimeWindowResponse[]> {
+  async getEffectiveTimeWindows(calendarId: string, date: Date): Promise<TimeWindowResponse[]> {
     const calendar = await this.calendarRepository.findById(calendarId);
     if (!calendar) {
       throw new NotFoundException(`Calendar not found: ${calendarId}`);
@@ -270,16 +266,12 @@ export class CalendarService {
       startTime: domain.startTime,
       endTime: domain.endTime,
       dayOfWeek: domain.dayOfWeek,
-      recurrenceRule: domain.recurrenceRule
-        ? JSON.stringify(domain.recurrenceRule)
-        : null,
+      recurrenceRule: domain.recurrenceRule ? JSON.stringify(domain.recurrenceRule) : null,
       isActive: domain.isActive,
     };
   }
 
-  private toCalendarRuleResponse(
-    entity: CalendarRuleEntity,
-  ): CalendarRuleResponse {
+  private toCalendarRuleResponse(entity: CalendarRuleEntity): CalendarRuleResponse {
     const domain = entity.toDomain();
     return {
       ruleId: domain.ruleId,

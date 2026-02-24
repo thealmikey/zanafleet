@@ -1,12 +1,5 @@
 import { GeoJsonPoint } from '@api/core/utils/geo.utils';
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity({ name: 'delivery_locations' })
 @Index('IDX_delivery_locations_created_at', ['createdAt'])

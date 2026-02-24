@@ -20,7 +20,9 @@ describe('AdminDashboardController (e2e)', () => {
   };
   let mockCapabilityAccessController: { hasCapability: jest.Mock };
 
-  const createMockSettlement = (overrides: Partial<SettlementBatchEntity> = {}): Partial<SettlementBatchEntity> => ({
+  const createMockSettlement = (
+    overrides: Partial<SettlementBatchEntity> = {}
+  ): Partial<SettlementBatchEntity> => ({
     id: overrides.id ?? 'batch-123',
     riderAccountId: overrides.riderAccountId ?? 'rider-123',
     status: overrides.status ?? ('COMPLETED' as any),
@@ -112,9 +114,7 @@ describe('AdminDashboardController (e2e)', () => {
       mockSettlementRepository.findAndCount.mockResolvedValue([[], 0]);
       mockPolicyRepository.findAndCount.mockResolvedValue([[], 0]);
 
-      await request(app.getHttpServer())
-        .get('/dashboards/admin/metrics?periodDays=7')
-        .expect(200);
+      await request(app.getHttpServer()).get('/dashboards/admin/metrics?periodDays=7').expect(200);
 
       expect(mockSettlementRepository.findAndCount).toHaveBeenCalled();
     });
@@ -180,9 +180,7 @@ describe('AdminDashboardController (e2e)', () => {
     it('should return 403 when user lacks dashboard.admin.read capability', async () => {
       mockCapabilityAccessController.hasCapability.mockResolvedValue(false);
 
-      await request(app.getHttpServer())
-        .get('/dashboards/admin/metrics')
-        .expect(403);
+      await request(app.getHttpServer()).get('/dashboards/admin/metrics').expect(403);
     });
   });
 });

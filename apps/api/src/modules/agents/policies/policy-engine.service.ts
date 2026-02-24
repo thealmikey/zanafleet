@@ -52,11 +52,7 @@ export class PolicyEngine {
   /**
    * Evaluate agent execution against policy
    */
-  async evaluate(
-    agent: Agent,
-    context: AgentContext,
-    aiResult?: AIResult,
-  ): Promise<AgentDecision> {
+  async evaluate(agent: Agent, context: AgentContext, aiResult?: AIResult): Promise<AgentDecision> {
     const policy = await this.getPolicy(agent.policyId);
 
     // Check capability whitelist
@@ -131,9 +127,10 @@ export class PolicyEngine {
 
       // Default to suggest for moderate confidence
       return {
-        decision: aiResult.confidence >= policy.confidenceThreshold
-          ? PolicyDecision.EXECUTE
-          : PolicyDecision.SUGGEST,
+        decision:
+          aiResult.confidence >= policy.confidenceThreshold
+            ? PolicyDecision.EXECUTE
+            : PolicyDecision.SUGGEST,
         reason: aiResult.explanation,
         policyId: policy.id,
         riskScore: aiResult.riskScore,
@@ -161,9 +158,7 @@ export class PolicyEngine {
       return true; // Empty means allow all
     }
 
-    return agent.allowedCapabilities.every((cap) =>
-      policy.allowedCapabilities.includes(cap),
-    );
+    return agent.allowedCapabilities.every((cap) => policy.allowedCapabilities.includes(cap));
   }
 
   /**

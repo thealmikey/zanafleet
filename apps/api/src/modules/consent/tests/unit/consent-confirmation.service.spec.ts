@@ -5,7 +5,12 @@ import { Repository } from 'typeorm';
 import { InteractionEventRepository } from '../../../interaction/repositories/interaction-event.repository';
 import { CapabilityProposalEntity } from '../../entities/capability-proposal.entity';
 import { ProposalStatus, ConfirmationAction } from '../../enums/consent.enums';
-import { ConsentConfirmationService, ProposalNotFoundError, InvalidProposalStateError, ProposalExpiredError } from '../../services/consent-confirmation.service';
+import {
+  ConsentConfirmationService,
+  ProposalNotFoundError,
+  InvalidProposalStateError,
+  ProposalExpiredError,
+} from '../../services/consent-confirmation.service';
 
 describe('ConsentConfirmationService', () => {
   let service: ConsentConfirmationService;
@@ -76,7 +81,7 @@ describe('ConsentConfirmationService', () => {
         { amount: 100 },
         0.85,
         [],
-        'Create order for $100',
+        'Create order for $100'
       );
 
       expect(result).toBeDefined();
@@ -88,7 +93,7 @@ describe('ConsentConfirmationService', () => {
 
     it('should set expiration to 5 minutes by default', async () => {
       const beforeCreate = new Date();
-      
+
       const mockProposal = {
         proposalId: 'uuid-1',
         streamId: 'stream-1',
@@ -108,7 +113,9 @@ describe('ConsentConfirmationService', () => {
       mockProposalRepository.create.mockImplementation((data) => {
         return { ...data, proposalId: 'uuid-1' };
       });
-      mockProposalRepository.save.mockImplementation((proposal) => Promise.resolve({ ...proposal, ...mockProposal }));
+      mockProposalRepository.save.mockImplementation((proposal) =>
+        Promise.resolve({ ...proposal, ...mockProposal })
+      );
 
       const result = await service.createProposal(
         'stream-1',
@@ -118,12 +125,12 @@ describe('ConsentConfirmationService', () => {
         {},
         0.85,
         [],
-        'Test',
+        'Test'
       );
 
       const expiresAt = new Date(result.expiresAt!);
       const afterCreate = new Date(beforeCreate.getTime() + 5 * 60 * 1000 + 1000);
-      
+
       expect(expiresAt.getTime()).toBeGreaterThan(beforeCreate.getTime());
       expect(expiresAt.getTime()).toBeLessThanOrEqual(afterCreate.getTime());
     });
@@ -158,12 +165,14 @@ describe('ConsentConfirmationService', () => {
 
     it('should confirm a proposal and transition to CONFIRMED', async () => {
       const updatedProposal = { ...createMockProposal(), status: ProposalStatus.CONFIRMED };
-      mockProposalRepository.save.mockResolvedValue(updatedProposal as unknown as CapabilityProposalEntity);
+      mockProposalRepository.save.mockResolvedValue(
+        updatedProposal as unknown as CapabilityProposalEntity
+      );
 
       const result = await service.processConfirmation(
         'proposal-1',
         ConfirmationAction.CONFIRM,
-        'user-1',
+        'user-1'
       );
 
       expect(result.success).toBe(true);
@@ -172,14 +181,16 @@ describe('ConsentConfirmationService', () => {
 
     it('should reject a proposal and transition to REJECTED', async () => {
       const rejectedProposal = { ...createMockProposal(), status: ProposalStatus.REJECTED };
-      mockProposalRepository.save.mockResolvedValue(rejectedProposal as unknown as CapabilityProposalEntity);
+      mockProposalRepository.save.mockResolvedValue(
+        rejectedProposal as unknown as CapabilityProposalEntity
+      );
 
       const result = await service.processConfirmation(
         'proposal-1',
         ConfirmationAction.REJECT,
         'user-1',
         undefined,
-        'Not needed',
+        'Not needed'
       );
 
       expect(result.success).toBe(true);
@@ -188,12 +199,14 @@ describe('ConsentConfirmationService', () => {
 
     it('should cancel a proposal and transition to CANCELLED', async () => {
       const cancelledProposal = { ...createMockProposal(), status: ProposalStatus.CANCELLED };
-      mockProposalRepository.save.mockResolvedValue(cancelledProposal as unknown as CapabilityProposalEntity);
+      mockProposalRepository.save.mockResolvedValue(
+        cancelledProposal as unknown as CapabilityProposalEntity
+      );
 
       const result = await service.processConfirmation(
         'proposal-1',
         ConfirmationAction.CANCEL,
-        'user-1',
+        'user-1'
       );
 
       expect(result.success).toBe(true);
@@ -206,13 +219,15 @@ describe('ConsentConfirmationService', () => {
         status: ProposalStatus.PROPOSED,
         extractedInputs: { amount: 200 },
       };
-      mockProposalRepository.save.mockResolvedValue(modifiedProposal as unknown as CapabilityProposalEntity);
+      mockProposalRepository.save.mockResolvedValue(
+        modifiedProposal as unknown as CapabilityProposalEntity
+      );
 
       const result = await service.processConfirmation(
         'proposal-1',
         ConfirmationAction.MODIFY,
         'user-1',
-        { amount: 200 },
+        { amount: 200 }
       );
 
       expect(result.success).toBe(true);
@@ -223,7 +238,7 @@ describe('ConsentConfirmationService', () => {
       mockProposalRepository.findOne.mockResolvedValue(null);
 
       await expect(
-        service.processConfirmation('non-existent', ConfirmationAction.CONFIRM, 'user-1'),
+        service.processConfirmation('non-existent', ConfirmationAction.CONFIRM, 'user-1')
       ).rejects.toThrow(ProposalNotFoundError);
     });
 
@@ -234,7 +249,7 @@ describe('ConsentConfirmationService', () => {
       } as unknown as CapabilityProposalEntity);
 
       await expect(
-        service.processConfirmation('proposal-1', ConfirmationAction.CONFIRM, 'user-1'),
+        service.processConfirmation('proposal-1', ConfirmationAction.CONFIRM, 'user-1')
       ).rejects.toThrow(InvalidProposalStateError);
     });
 
@@ -244,11 +259,16 @@ describe('ConsentConfirmationService', () => {
         status: ProposalStatus.PROPOSED,
         expiresAt: new Date(Date.now() - 1000),
       };
-      mockProposalRepository.findOne.mockResolvedValue(expiredProposal as unknown as CapabilityProposalEntity);
-      mockProposalRepository.save.mockResolvedValue({ ...expiredProposal, status: ProposalStatus.EXPIRED } as unknown as CapabilityProposalEntity);
+      mockProposalRepository.findOne.mockResolvedValue(
+        expiredProposal as unknown as CapabilityProposalEntity
+      );
+      mockProposalRepository.save.mockResolvedValue({
+        ...expiredProposal,
+        status: ProposalStatus.EXPIRED,
+      } as unknown as CapabilityProposalEntity);
 
       await expect(
-        service.processConfirmation('proposal-1', ConfirmationAction.CONFIRM, 'user-1'),
+        service.processConfirmation('proposal-1', ConfirmationAction.CONFIRM, 'user-1')
       ).rejects.toThrow(ProposalExpiredError);
     });
   });
@@ -313,9 +333,7 @@ describe('ConsentConfirmationService', () => {
     it('should throw error for non-existent proposal', async () => {
       mockProposalRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.expireProposal('non-existent')).rejects.toThrow(
-        ProposalNotFoundError,
-      );
+      await expect(service.expireProposal('non-existent')).rejects.toThrow(ProposalNotFoundError);
     });
   });
 });
