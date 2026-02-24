@@ -65,6 +65,9 @@ jobs:
       - name: Build contracts package
         run: npm run build --workspace=@zanafleet/contracts
 
+      - name: Rebuild native modules
+        run: npm rebuild pg
+
       - name: Run Prettier format check
         run: npm run format:check
         continue-on-error: false
@@ -177,6 +180,9 @@ jobs:
 
       - name: Build contracts package
         run: npm run build --workspace=@zanafleet/contracts
+
+      - name: Rebuild native modules
+        run: npm rebuild pg
 
       - name: Wait for services to be ready
         run: |
@@ -323,6 +329,9 @@ jobs:
 
       - name: Build contracts package
         run: npm run build --workspace=@zanafleet/contracts
+
+      - name: Rebuild native modules
+        run: npm rebuild pg
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
