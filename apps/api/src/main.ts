@@ -23,7 +23,7 @@ async function bootstrap(): Promise<void> {
         description: 'Enter JWT token',
         in: 'header',
       },
-      'JWT-auth',
+      'JWT-auth'
     )
     .addApiKey(
       {
@@ -32,7 +32,7 @@ async function bootstrap(): Promise<void> {
         in: 'header',
         description: 'Workspace identifier for multi-tenancy',
       },
-      'workspaceId',
+      'workspaceId'
     )
     .addTag('Authentication', 'User authentication and authorization endpoints')
     .addTag('Health', 'System health check endpoints')

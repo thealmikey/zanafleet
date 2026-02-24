@@ -11,17 +11,17 @@ import { SearchModule } from '../search/search.module';
 import { DashboardSeedService } from './dashboard-seed.service';
 
 @Module({
-    imports: [
-        TypeOrmModule.forFeature([
-            OrderEntity,
-            DeliveryEntity,
-            BusinessEntity,
-            SaccoEntity,
-            RiderEntity,
-        ]),
-        SearchModule,
-    ],
-    providers: [DashboardSeedService],
-    exports: [DashboardSeedService],
+  imports: [
+    TypeOrmModule.forFeature([
+      OrderEntity,
+      DeliveryEntity,
+      BusinessEntity,
+      SaccoEntity,
+      RiderEntity,
+    ]),
+    SearchModule,
+  ],
+  providers: [DashboardSeedService],
+  exports: [DashboardSeedService],
 })
-export class SeedModule { }
+export class SeedModule {}
