@@ -58,7 +58,7 @@ export class WorkspaceThrottlerStorage implements ThrottlerStorage {
     ttl: number,
     limit: number,
     blockDuration: number,
-    throttlerName: string,
+    throttlerName: string
   ): Promise<ThrottlerStorageRecord> {
     const storageKey = this.getKey(key, throttlerName);
 
@@ -104,7 +104,7 @@ export class WorkspaceThrottlerStorage implements ThrottlerStorage {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       this.logger.error(
-        `Error incrementing throttler record for key ${storageKey}: ${errorMessage}`,
+        `Error incrementing throttler record for key ${storageKey}: ${errorMessage}`
       );
       // Return a record that allows the request through on error
       return {

@@ -33,7 +33,7 @@ export class ConflictResolutionService {
     }
   ): ConflictResolutionResult {
     // 1. Filter to valid contexts only
-    const validContexts = contexts.filter(c =>
+    const validContexts = contexts.filter((c) =>
       this.isValidMembership(c.workspaceId, c.role, memberships)
     );
 
@@ -43,14 +43,18 @@ export class ConflictResolutionService {
 
     // 2. Apply priority based on context source
     validContexts.sort((a, b) => {
-      const priorityA = CONTEXT_SOURCE_PRIORITY[a.source as keyof typeof CONTEXT_SOURCE_PRIORITY] || 50;
-      const priorityB = CONTEXT_SOURCE_PRIORITY[b.source as keyof typeof CONTEXT_SOURCE_PRIORITY] || 50;
+      const priorityA =
+        CONTEXT_SOURCE_PRIORITY[a.source as keyof typeof CONTEXT_SOURCE_PRIORITY] || 50;
+      const priorityB =
+        CONTEXT_SOURCE_PRIORITY[b.source as keyof typeof CONTEXT_SOURCE_PRIORITY] || 50;
       return priorityB - priorityA;
     });
 
     // 3. If job context exists, use it
     if (requestContext?.jobId) {
-      const jobContext = validContexts.find(c => c.source === 'job_event' || c.source === 'active_job');
+      const jobContext = validContexts.find(
+        (c) => c.source === 'job_event' || c.source === 'active_job'
+      );
       if (jobContext) {
         this.logger.debug(
           `Resolved conflict using job context: ${jobContext.workspaceId}/${jobContext.role}`
@@ -84,23 +88,17 @@ export class ConflictResolutionService {
     role: MembershipRole,
     memberships: MembershipEntity[]
   ): boolean {
-    return memberships.some(
-      m => m.workspaceId === workspaceId && m.role === role
-    );
+    return memberships.some((m) => m.workspaceId === workspaceId && m.role === role);
   }
 
   /**
    * Fallback to default workspace/role
    */
-  private fallbackToDefault(
-    memberships: MembershipEntity[]
-  ): ConflictResolutionResult {
-    const defaultMembership = memberships.find(m => m.defaultWorkspace);
+  private fallbackToDefault(memberships: MembershipEntity[]): ConflictResolutionResult {
+    const defaultMembership = memberships.find((m) => m.defaultWorkspace);
     const fallback = defaultMembership || memberships[0];
 
-    this.logger.debug(
-      `Falling back to default: ${fallback.workspaceId}/${fallback.role}`
-    );
+    this.logger.debug(`Falling back to default: ${fallback.workspaceId}/${fallback.role}`);
 
     return {
       selectedRole: fallback.role,
@@ -117,7 +115,7 @@ export class ConflictResolutionService {
     workspaces: { workspaceId: string; isDefault: boolean }[]
   ): ConflictResolutionResult {
     // 1. Prefer default workspace
-    const defaultWorkspace = workspaces.find(w => w.isDefault);
+    const defaultWorkspace = workspaces.find((w) => w.isDefault);
     if (defaultWorkspace) {
       return {
         selectedRole: role,
@@ -201,10 +199,7 @@ export class ConflictResolutionService {
   /**
    * Get resolution explanation for UI
    */
-  getResolutionExplanation(
-    contexts: ResolvedContext[],
-    result: ConflictResolutionResult
-  ): string {
+  getResolutionExplanation(contexts: ResolvedContext[], result: ConflictResolutionResult): string {
     if (contexts.length === 0) {
       return 'No valid contexts found, using default workspace';
     }
@@ -213,7 +208,7 @@ export class ConflictResolutionService {
       return `Single context available: ${contexts[0].source}`;
     }
 
-    const sources = contexts.map(c => c.source).join(', ');
+    const sources = contexts.map((c) => c.source).join(', ');
     return `Resolved from multiple contexts (${sources}): selected ${result.selectedRole} in ${result.selectedWorkspaceId}`;
   }
 }

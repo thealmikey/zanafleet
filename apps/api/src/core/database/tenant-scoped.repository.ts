@@ -13,15 +13,15 @@ import { TenantAware } from './interfaces/tenant-aware.interface';
 
 /**
  * TenantScopedRepository<T>
- * 
+ *
  * Base repository that enforces workspaceId filtering on ALL queries.
  * All tenant-scoped entities MUST use this repository.
- * 
+ *
  * KEY FEATURES:
  * - Auto-injects workspaceId into ALL queries
  * - Throws if workspaceId is missing
  * - Provides scoped variants of all standard TypeORM methods
- * 
+ *
  * Usage:
  * ```typescript
  * @EntityRepository(OrderEntity)
@@ -31,9 +31,7 @@ import { TenantAware } from './interfaces/tenant-aware.interface';
  * ```
  */
 @Injectable()
-export abstract class TenantScopedRepository<T extends TenantAware> 
-  extends Repository<T> {
-  
+export abstract class TenantScopedRepository<T extends TenantAware> extends Repository<T> {
   protected readonly logger = new Logger(TenantScopedRepository.name);
 
   /**
@@ -141,8 +139,10 @@ export abstract class TenantScopedRepository<T extends TenantAware>
     additionalConditions?: Record<string, unknown>
   ): SelectQueryBuilder<T> {
     const ws = this.validateWorkspaceId(workspaceId);
-    let query = this.createQueryBuilder(alias)
-      .andWhere(`"${alias}"."workspace_id" = :workspaceId`, { workspaceId: ws });
+    let query = this.createQueryBuilder(alias).andWhere(
+      `"${alias}"."workspace_id" = :workspaceId`,
+      { workspaceId: ws }
+    );
 
     if (additionalConditions) {
       Object.entries(additionalConditions).forEach(([key, value]) => {
@@ -156,10 +156,7 @@ export abstract class TenantScopedRepository<T extends TenantAware>
   /**
    * Save with workspaceId auto-injected.
    */
-  async saveScoped(
-    workspaceId: string,
-    entity: DeepPartial<T>
-  ): Promise<T> {
+  async saveScoped(workspaceId: string, entity: DeepPartial<T>): Promise<T> {
     const ws = this.validateWorkspaceId(workspaceId);
     const entityToSave = {
       ...entity,

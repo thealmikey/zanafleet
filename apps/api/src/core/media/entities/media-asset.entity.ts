@@ -1,8 +1,4 @@
-import {
-  MediaAssetMetadata,
-  MediaAssetStatus,
-  OwnerEntityType,
-} from '@zanafleet/contracts';
+import { MediaAssetMetadata, MediaAssetStatus, OwnerEntityType } from '@zanafleet/contracts';
 import {
   Column,
   CreateDateColumn,

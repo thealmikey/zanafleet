@@ -29,7 +29,7 @@ export class WebhookSubscriber {
     private readonly webhookService: WebhookService,
     private readonly idempotencyService: IdempotencyService,
     private readonly eventLogger: EventLoggerService,
-    private readonly metricsService: MetricsService,
+    private readonly metricsService: MetricsService
   ) {}
 
   /**
@@ -38,7 +38,7 @@ export class WebhookSubscriber {
   @MessagePattern(NatsSubjects.Payment.ALL)
   async handlePaymentEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     await this.handleEvent(data, context, 'payment');
   }
@@ -49,7 +49,7 @@ export class WebhookSubscriber {
   @MessagePattern(NatsSubjects.Delivery.ALL)
   async handleDeliveryEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     await this.handleEvent(data, context, 'delivery');
   }
@@ -60,7 +60,7 @@ export class WebhookSubscriber {
   @MessagePattern(NatsSubjects.Billing.ALL)
   async handleBillingEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     await this.handleEvent(data, context, 'billing');
   }
@@ -71,7 +71,7 @@ export class WebhookSubscriber {
   @MessagePattern(NatsSubjects.Settlement.ALL)
   async handleSettlementEvent(
     @Payload() data: SerializedEvent,
-    @Ctx() context: NatsContext,
+    @Ctx() context: NatsContext
   ): Promise<void> {
     await this.handleEvent(data, context, 'settlement');
   }
@@ -82,7 +82,7 @@ export class WebhookSubscriber {
   private async handleEvent(
     data: SerializedEvent,
     context: NatsContext,
-    moduleName: string,
+    moduleName: string
   ): Promise<void> {
     const subject = context.getSubject();
     this.logger.debug(`Received ${moduleName} event on subject: ${String(subject)}`);
@@ -117,20 +117,14 @@ export class WebhookSubscriber {
       await this.webhookService.dispatchEvent(webhookEvent);
 
       const duration = (Date.now() - startTime) / 1000;
-      this.logger.log(
-        `Processed ${data.eventType} webhook dispatch in ${duration}ms`,
-      );
+      this.logger.log(`Processed ${data.eventType} webhook dispatch in ${duration}ms`);
 
       // Record metrics
-      this.metricsService.incrementEventsConsumed(
-        data.eventType,
-        'WebhookSubscriber',
-        'success',
-      );
+      this.metricsService.incrementEventsConsumed(data.eventType, 'WebhookSubscriber', 'success');
       this.metricsService.observeEventConsumeDuration(
         data.eventType,
         'WebhookSubscriber',
-        duration,
+        duration
       );
 
       this.eventLogger.logProcessed(data as unknown as BaseEvent, 'WebhookSubscriber');
@@ -140,19 +134,15 @@ export class WebhookSubscriber {
 
       this.logger.error(
         `Failed to process ${data.eventType} webhook dispatch: ${err.message}`,
-        err.stack,
+        err.stack
       );
 
       // Record metrics for failed consumption
-      this.metricsService.incrementEventsConsumed(
-        data.eventType,
-        'WebhookSubscriber',
-        'error',
-      );
+      this.metricsService.incrementEventsConsumed(data.eventType, 'WebhookSubscriber', 'error');
       this.metricsService.observeEventConsumeDuration(
         data.eventType,
         'WebhookSubscriber',
-        duration,
+        duration
       );
 
       this.eventLogger.logFailed(data as unknown as BaseEvent, err);
@@ -189,9 +179,8 @@ export class WebhookSubscriber {
 
     // If we can't determine workspace, log warning but still try to process
     this.logger.warn(
-      `Could not extract workspaceId from event ${data.eventId}, using aggregateId as fallback`,
+      `Could not extract workspaceId from event ${data.eventId}, using aggregateId as fallback`
     );
     return data.aggregateId;
   }
 }
-

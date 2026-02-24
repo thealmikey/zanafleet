@@ -70,7 +70,7 @@ describe('TenantScopedRepository', () => {
     it('should enforce workspaceId for all queries - validation layer', () => {
       // The key security feature is that validateWorkspaceId throws
       // This prevents any query from executing without workspaceId
-      
+
       // Valid workspaceId should not throw
       expect(() => repository.testValidate('valid-workspace')).not.toThrow();
 
@@ -83,17 +83,17 @@ describe('TenantScopedRepository', () => {
     it('provides consistent enforcement across all methods', () => {
       // All scoped methods use validateWorkspaceId internally
       // This ensures consistent security regardless of which method is called
-      
+
       const validWorkspace = 'workspace-123';
-      
+
       // All these would use validateWorkspaceId internally:
       // - findOneScoped
-      // - findScoped  
+      // - findScoped
       // - findAndCountScoped
       // - saveScoped
       // - deleteScoped
       // - updateScoped
-      
+
       expect(() => repository.testValidate(validWorkspace)).not.toThrow();
     });
   });
@@ -103,14 +103,14 @@ describe('TenantScopedRepository', () => {
       // The critical security guarantee:
       // Every query MUST provide a workspaceId
       // Without it, the request fails
-      
+
       const workspaceA = 'workspace-a';
       const workspaceB = 'workspace-b';
-      
+
       // Both would be validated
       expect(() => repository.testValidate(workspaceA)).not.toThrow();
       expect(() => repository.testValidate(workspaceB)).not.toThrow();
-      
+
       // But no workspaceId fails
       expect(() => repository.testValidate('')).toThrow();
       expect(() => repository.testValidate(null as any)).toThrow();

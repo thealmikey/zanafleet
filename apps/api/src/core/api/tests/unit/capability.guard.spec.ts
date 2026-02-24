@@ -1,4 +1,4 @@
-import { ExecutionContext, ForbiddenException , Controller, Get, UseGuards } from '@nestjs/common';
+import { ExecutionContext, ForbiddenException, Controller, Get, UseGuards } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
 
@@ -91,10 +91,10 @@ describe('CapabilityGuard', () => {
     it('should allow access when user has all required capabilities', async () => {
       mockCapabilityAccessController.hasCapability.mockResolvedValue(true);
 
-      const context = createMockExecutionContext(
-        { actorId: 'actor-123' },
-        ['read_users', 'write_users']
-      );
+      const context = createMockExecutionContext({ actorId: 'actor-123' }, [
+        'read_users',
+        'write_users',
+      ]);
 
       const result = await guard.canActivate(context);
 
@@ -126,10 +126,10 @@ describe('CapabilityGuard', () => {
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(false);
 
-      const context = createMockExecutionContext(
-        { actorId: 'actor-123' },
-        ['read_users', 'delete_users']
-      );
+      const context = createMockExecutionContext({ actorId: 'actor-123' }, [
+        'read_users',
+        'delete_users',
+      ]);
 
       await expect(guard.canActivate(context)).rejects.toThrow(
         new ForbiddenException('Missing required capability: delete_users')
@@ -192,10 +192,7 @@ describe('RequireCapability decorator', () => {
       }
     }
 
-    const metadata = Reflect.getMetadata(
-      CAPABILITY_KEY,
-      TestController.prototype.getData
-    );
+    const metadata = Reflect.getMetadata(CAPABILITY_KEY, TestController.prototype.getData);
 
     expect(metadata).toEqual(['read_data']);
   });
@@ -210,10 +207,7 @@ describe('RequireCapability decorator', () => {
       }
     }
 
-    const metadata = Reflect.getMetadata(
-      CAPABILITY_KEY,
-      TestController.prototype.manageData
-    );
+    const metadata = Reflect.getMetadata(CAPABILITY_KEY, TestController.prototype.manageData);
 
     expect(metadata).toEqual(['read_data', 'write_data', 'delete_data']);
   });
@@ -269,10 +263,7 @@ describe('CapabilityGuard with real controller (integration scaffold)', () => {
       CAPABILITY_KEY,
       TestController.prototype.protectedEndpoint
     );
-    const adminMeta = Reflect.getMetadata(
-      CAPABILITY_KEY,
-      TestController.prototype.adminEndpoint
-    );
+    const adminMeta = Reflect.getMetadata(CAPABILITY_KEY, TestController.prototype.adminEndpoint);
 
     expect(protectedMeta).toEqual(['view_protected']);
     expect(adminMeta).toEqual(['admin_read', 'admin_write']);

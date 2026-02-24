@@ -1,11 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import {
-  Registry,
-  Counter,
-  Histogram,
-  Gauge,
-  collectDefaultMetrics,
-} from 'prom-client';
+import { Registry, Counter, Histogram, Gauge, collectDefaultMetrics } from 'prom-client';
 
 /**
  * Label types for metrics
@@ -189,7 +183,11 @@ export class MetricsService {
    * @param subscriber - The subscriber name
    * @param status - The processing status (success/error)
    */
-  incrementEventsConsumed(eventType: string, subscriber: string, status: 'success' | 'error'): void {
+  incrementEventsConsumed(
+    eventType: string,
+    subscriber: string,
+    status: 'success' | 'error'
+  ): void {
     if (this.eventsConsumedTotal) {
       this.eventsConsumedTotal.inc({ eventType, subscriber, status });
     }
@@ -215,11 +213,7 @@ export class MetricsService {
    * @param help - Help text
    * @param labelNames - Label names
    */
-  createCounter(
-    name: string,
-    help: string,
-    labelNames: string[] = [],
-  ): Counter {
+  createCounter(name: string, help: string, labelNames: string[] = []): Counter {
     const counter = new Counter({
       name,
       help,
@@ -240,7 +234,7 @@ export class MetricsService {
     name: string,
     help: string,
     labelNames: string[] = [],
-    buckets: number[] = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1],
+    buckets: number[] = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1]
   ): Histogram {
     const histogram = new Histogram({
       name,
@@ -258,11 +252,7 @@ export class MetricsService {
    * @param help - Help text
    * @param labelNames - Label names
    */
-  createGauge(
-    name: string,
-    help: string,
-    labelNames: string[] = [],
-  ): Gauge {
+  createGauge(name: string, help: string, labelNames: string[] = []): Gauge {
     const gauge = new Gauge({
       name,
       help,

@@ -76,12 +76,14 @@ export class CapabilityGuard implements CanActivate {
 
     // Sandbox mode bypass - check env var directly
     const isSandboxMode = process.env.USE_IN_MEMORY_DB === 'true';
-    
+
     // Sandbox mode bypass - allow all requests without authentication
     if (isSandboxMode) {
       this.logger.debug('CapabilityGuard: Sandbox mode - bypassing capability checks');
       // In sandbox mode, inject a mock user for capability checking
-      const request = context.switchToHttp().getRequest<{ user?: { actorId: string; email: string; type: string } }>();
+      const request = context
+        .switchToHttp()
+        .getRequest<{ user?: { actorId: string; email: string; type: string } }>();
       request.user = {
         actorId: 'sandbox-test-actor',
         email: 'sandbox@test.com',
@@ -118,7 +120,9 @@ export class CapabilityGuard implements CanActivate {
     }
 
     this.logger.debug(
-      `CapabilityGuard: Actor ${user.actorId} authorized with capabilities: ${requiredCapabilities.join(', ')}`
+      `CapabilityGuard: Actor ${
+        user.actorId
+      } authorized with capabilities: ${requiredCapabilities.join(', ')}`
     );
 
     return true;

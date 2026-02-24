@@ -16,7 +16,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     @Inject(REDIS_MODULE_OPTIONS)
-    options: RedisModuleOptions,
+    options: RedisModuleOptions
   ) {
     this.url = options.url || process.env.REDIS_URL || DEFAULT_REDIS_URL;
   }

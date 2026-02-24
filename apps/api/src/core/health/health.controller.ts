@@ -22,7 +22,7 @@ export class HealthController {
     private readonly neo4jHealthIndicator: Neo4jHealthIndicator,
     private readonly natsHealthIndicator: NatsHealthIndicator,
     private readonly redisHealthIndicator: RedisHealthIndicator,
-    @Optional() @Inject(DataSource) private readonly dataSource: DataSource | null,
+    @Optional() @Inject(DataSource) private readonly dataSource: DataSource | null
   ) {}
 
   /**

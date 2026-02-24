@@ -10,9 +10,7 @@ export class SmsProvider implements MessagingProvider {
   async send(message: MessagePayload): Promise<SendResult> {
     const messageId = `sms_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    this.logger.log(
-      `[SMS] Sending to ${message.recipient} | MessageId: ${messageId}`,
-    );
+    this.logger.log(`[SMS] Sending to ${message.recipient} | MessageId: ${messageId}`);
 
     if (message.metadata) {
       this.logger.debug(`[SMS] Metadata: ${JSON.stringify(message.metadata)}`);

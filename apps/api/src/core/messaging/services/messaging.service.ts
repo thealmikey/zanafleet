@@ -13,12 +13,12 @@ export class MessagingService {
   constructor(
     private readonly emailProvider: EmailProvider,
     private readonly smsProvider: SmsProvider,
-    private readonly pushProvider: PushProvider,
+    private readonly pushProvider: PushProvider
   ) {}
 
   async send(message: MessagePayload): Promise<SendResult> {
     this.logger.debug(
-      `Routing message to ${message.channel} provider for recipient: ${message.recipient}`,
+      `Routing message to ${message.channel} provider for recipient: ${message.recipient}`
     );
 
     switch (message.channel) {

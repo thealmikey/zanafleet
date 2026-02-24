@@ -11,7 +11,7 @@ export class PushProvider implements MessagingProvider {
     const messageId = `push_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     this.logger.log(
-      `[PUSH] Sending to ${message.recipient} | Title: ${message.subject} | MessageId: ${messageId}`,
+      `[PUSH] Sending to ${message.recipient} | Title: ${message.subject} | MessageId: ${messageId}`
     );
 
     if (message.metadata) {

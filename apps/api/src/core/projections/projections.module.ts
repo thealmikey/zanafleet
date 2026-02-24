@@ -1,7 +1,6 @@
 import { Neo4jModule } from '@api/core/neo4j';
 import { Module, DynamicModule } from '@nestjs/common';
 
-
 /**
  * Configuration options for the Projections module
  */

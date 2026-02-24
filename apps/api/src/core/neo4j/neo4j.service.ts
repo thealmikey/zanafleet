@@ -168,7 +168,10 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
 class MockSession {
   private readonly logger = new Logger('MockNeo4jSession');
 
-  run(_query: string, _parameters?: Record<string, unknown>): {
+  run(
+    _query: string,
+    _parameters?: Record<string, unknown>
+  ): {
     then: (onfulfilled?: (value: unknown) => void) => unknown;
   } {
     this.logger.debug('Mock Neo4j run called (sandbox mode)');

@@ -172,7 +172,10 @@ describe('DomainEventRouter', () => {
     });
 
     it('should require both aggregateType and eventType to match', () => {
-      const event = createMockEvent({ aggregateType: 'Actor', eventType: 'ActorOnboardedEvent-V1' });
+      const event = createMockEvent({
+        aggregateType: 'Actor',
+        eventType: 'ActorOnboardedEvent-V1',
+      });
       const filter: EventFilter = { aggregateType: 'Actor', eventType: 'DeliveryCreatedEvent-V1' };
 
       expect(router.matchesFilter(event, filter)).toBe(false);

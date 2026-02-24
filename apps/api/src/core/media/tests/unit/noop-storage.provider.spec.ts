@@ -93,7 +93,7 @@ describe('NoOpStorageProvider', () => {
         'upload-123',
         'test-key',
         3,
-        Buffer.from('part data'),
+        Buffer.from('part data')
       );
 
       expect(result).toEqual({
@@ -136,7 +136,7 @@ describe('NoOpStorageProvider', () => {
   describe('abortMultipartUpload', () => {
     it('should resolve without error', async () => {
       await expect(
-        provider.abortMultipartUpload('upload-123', 'test-key'),
+        provider.abortMultipartUpload('upload-123', 'test-key')
       ).resolves.toBeUndefined();
     });
   });

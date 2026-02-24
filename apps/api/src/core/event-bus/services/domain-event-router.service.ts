@@ -239,9 +239,7 @@ export class DomainEventRouter {
     }
 
     if (filter.eventType) {
-      const eventTypes = Array.isArray(filter.eventType)
-        ? filter.eventType
-        : [filter.eventType];
+      const eventTypes = Array.isArray(filter.eventType) ? filter.eventType : [filter.eventType];
 
       const matches = eventTypes.some((pattern) => {
         if (pattern.includes('*')) {
@@ -285,7 +283,9 @@ export class DomainEventRouter {
           await sub.handler(envelope as DomainEventEnvelope);
         } catch (error) {
           this.logger.error(
-            `Subscriber ${sub.id} failed to handle event ${envelope.normalizedType}: ${(error as Error).message}`
+            `Subscriber ${sub.id} failed to handle event ${envelope.normalizedType}: ${
+              (error as Error).message
+            }`
           );
           throw error;
         }

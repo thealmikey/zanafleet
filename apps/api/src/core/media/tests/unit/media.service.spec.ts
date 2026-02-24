@@ -1,18 +1,13 @@
 import { NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import {
-  CreateMediaAssetInput,
-  MediaAssetStatus,
-  OwnerEntityType,
-} from '@zanafleet/contracts';
+import { CreateMediaAssetInput, MediaAssetStatus, OwnerEntityType } from '@zanafleet/contracts';
 import { Repository, OptimisticLockVersionMismatchError } from 'typeorm';
 
 import { MediaAssetEntity } from '../../entities/media-asset.entity';
 import { StorageProviderRegistry } from '../../providers/storage-provider-registry.service';
 import { StorageProvider } from '../../providers/storage-provider.interface';
 import { MediaService } from '../../services/media.service';
-
 
 describe('MediaService', () => {
   let service: MediaService;
@@ -142,7 +137,7 @@ describe('MediaService', () => {
       repository.save.mockImplementation(async (entity) => {
         const typedEntity = entity as MediaAssetEntity;
         expect(typedEntity.storageKey).toMatch(
-          new RegExp(`^${OwnerEntityType.Delivery}/${mockOwnerId}/[a-f0-9-]+/document\\.pdf$`),
+          new RegExp(`^${OwnerEntityType.Delivery}/${mockOwnerId}/[a-f0-9-]+/document\\.pdf$`)
         );
         typedEntity.updatedAt = new Date();
         return typedEntity;
@@ -167,7 +162,7 @@ describe('MediaService', () => {
       };
 
       await expect(service.createMediaAsset(input, body)).rejects.toThrow(
-        'No storage provider configured',
+        'No storage provider configured'
       );
     });
 
@@ -182,12 +177,8 @@ describe('MediaService', () => {
       };
       const body = Buffer.from('short');
 
-      await expect(service.createMediaAsset(input, body)).rejects.toThrow(
-        BadRequestException,
-      );
-      await expect(service.createMediaAsset(input, body)).rejects.toThrow(
-        'Size mismatch',
-      );
+      await expect(service.createMediaAsset(input, body)).rejects.toThrow(BadRequestException);
+      await expect(service.createMediaAsset(input, body)).rejects.toThrow('Size mismatch');
     });
 
     it('should cleanup uploaded file when database save fails', async () => {
@@ -209,8 +200,8 @@ describe('MediaService', () => {
       expect(mockProvider.upload).toHaveBeenCalled();
       expect(mockProvider.delete).toHaveBeenCalledWith(
         expect.stringMatching(
-          new RegExp(`^${OwnerEntityType.Business}/${mockOwnerId}/[a-f0-9-]+/cleanup-test\\.jpg$`),
-        ),
+          new RegExp(`^${OwnerEntityType.Business}/${mockOwnerId}/[a-f0-9-]+/cleanup-test\\.jpg$`)
+        )
       );
     });
   });
@@ -331,7 +322,7 @@ describe('MediaService', () => {
       repository.findOne.mockResolvedValue(null);
 
       await expect(service.generateSignedDownloadUrl('non-existent')).rejects.toThrow(
-        NotFoundException,
+        NotFoundException
       );
     });
 
@@ -343,7 +334,7 @@ describe('MediaService', () => {
       repository.findOne.mockResolvedValue(entity);
 
       await expect(service.generateSignedDownloadUrl(mockMediaAssetId)).rejects.toThrow(
-        'is not active',
+        'is not active'
       );
     });
 
@@ -355,7 +346,7 @@ describe('MediaService', () => {
       repository.findOne.mockResolvedValue(entity);
 
       await expect(service.generateSignedDownloadUrl(mockMediaAssetId)).rejects.toThrow(
-        'is not active',
+        'is not active'
       );
     });
 
@@ -417,7 +408,7 @@ describe('MediaService', () => {
       repository.findOne.mockResolvedValue(null);
 
       await expect(service.generateSignedUploadUrl('non-existent')).rejects.toThrow(
-        NotFoundException,
+        NotFoundException
       );
     });
 
@@ -429,7 +420,7 @@ describe('MediaService', () => {
       repository.findOne.mockResolvedValue(entity);
 
       await expect(service.generateSignedUploadUrl(mockMediaAssetId)).rejects.toThrow(
-        'is not in an uploadable state',
+        'is not in an uploadable state'
       );
     });
 
@@ -441,7 +432,7 @@ describe('MediaService', () => {
       repository.findOne.mockResolvedValue(entity);
 
       await expect(service.generateSignedUploadUrl(mockMediaAssetId)).rejects.toThrow(
-        'is not in an uploadable state',
+        'is not in an uploadable state'
       );
     });
 
@@ -453,7 +444,7 @@ describe('MediaService', () => {
       repository.findOne.mockResolvedValue(entity);
 
       await expect(service.generateSignedUploadUrl(mockMediaAssetId)).rejects.toThrow(
-        'is not in an uploadable state',
+        'is not in an uploadable state'
       );
     });
 
@@ -469,7 +460,7 @@ describe('MediaService', () => {
       storageRegistry.getDefault.mockReturnValue(undefined);
 
       await expect(service.generateSignedUploadUrl(mockMediaAssetId)).rejects.toThrow(
-        'No storage provider available',
+        'No storage provider available'
       );
     });
   });
@@ -490,7 +481,7 @@ describe('MediaService', () => {
         expect.objectContaining({
           status: MediaAssetStatus.Deleted,
           deletedAt: expect.any(Date),
-        }),
+        })
       );
       expect(mockProvider.delete).not.toHaveBeenCalled();
       expect(repository.remove).not.toHaveBeenCalled();
@@ -527,7 +518,7 @@ describe('MediaService', () => {
       storageRegistry.getDefault.mockReturnValue(undefined);
 
       await expect(service.deleteMediaAsset(mockMediaAssetId, true)).rejects.toThrow(
-        'no storage provider available',
+        'no storage provider available'
       );
       expect(repository.remove).not.toHaveBeenCalled();
     });
@@ -540,7 +531,7 @@ describe('MediaService', () => {
 
       repository.findOne.mockResolvedValue(entity);
       repository.save.mockRejectedValue(
-        new OptimisticLockVersionMismatchError('MediaAssetEntity', 1, 2),
+        new OptimisticLockVersionMismatchError('MediaAssetEntity', 1, 2)
       );
 
       let thrownError: Error | undefined;
@@ -584,7 +575,7 @@ describe('MediaService', () => {
         expect.objectContaining({
           status: MediaAssetStatus.Archived,
           archivedAt: expect.any(Date),
-        }),
+        })
       );
     });
 
@@ -601,7 +592,7 @@ describe('MediaService', () => {
 
       repository.findOne.mockResolvedValue(entity);
       repository.save.mockRejectedValue(
-        new OptimisticLockVersionMismatchError('MediaAssetEntity', 1, 2),
+        new OptimisticLockVersionMismatchError('MediaAssetEntity', 1, 2)
       );
 
       let thrownError: Error | undefined;

@@ -98,7 +98,7 @@ export interface StorageProvider {
   generateSignedUrl(
     key: string,
     operation: 'GET' | 'PUT',
-    options: SignedUrlOptions,
+    options: SignedUrlOptions
   ): Promise<string>;
 
   /**
@@ -121,7 +121,7 @@ export interface StorageProvider {
     uploadId: string,
     key: string,
     partNumber: number,
-    body: Buffer,
+    body: Buffer
   ): Promise<MultipartUploadPart>;
 
   /**
@@ -134,7 +134,7 @@ export interface StorageProvider {
   completeMultipartUpload(
     uploadId: string,
     key: string,
-    parts: MultipartUploadPart[],
+    parts: MultipartUploadPart[]
   ): Promise<StorageUploadResult>;
 
   /**

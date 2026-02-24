@@ -3,7 +3,6 @@ import { Neo4jService } from '@api/core/neo4j';
 import { Logger } from '@nestjs/common';
 import { Session } from 'neo4j-driver';
 
-
 /**
  * Projection state tracking for replay support
  */
@@ -298,10 +297,7 @@ export abstract class ProjectionBuilder<TEvent extends BaseEvent = BaseEvent> {
    * Execute a custom Cypher query
    * Use this for complex operations not covered by the helper methods
    */
-  protected async executeQuery(
-    query: string,
-    params: Record<string, unknown> = {}
-  ): Promise<void> {
+  protected async executeQuery(query: string, params: Record<string, unknown> = {}): Promise<void> {
     const session = this.neo4jService.getWriteSession();
 
     try {

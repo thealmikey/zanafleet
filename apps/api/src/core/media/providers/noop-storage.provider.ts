@@ -49,17 +49,17 @@ export class NoOpStorageProvider implements StorageProvider {
   async generateSignedUrl(
     key: string,
     operation: 'GET' | 'PUT',
-    options: SignedUrlOptions,
+    options: SignedUrlOptions
   ): Promise<string> {
     this.logger.debug(
-      `NoOp generateSignedUrl called for key: ${key}, operation: ${operation}, expires: ${options.expiresInSeconds}s`,
+      `NoOp generateSignedUrl called for key: ${key}, operation: ${operation}, expires: ${options.expiresInSeconds}s`
     );
     return `https://noop.local/${key}?signature=noop`;
   }
 
   async initiateMultipartUpload(key: string, contentType: string): Promise<MultipartUploadInit> {
     this.logger.debug(
-      `NoOp initiateMultipartUpload called for key: ${key}, contentType: ${contentType}`,
+      `NoOp initiateMultipartUpload called for key: ${key}, contentType: ${contentType}`
     );
     return {
       uploadId: 'noop-upload-id',
@@ -71,10 +71,10 @@ export class NoOpStorageProvider implements StorageProvider {
     uploadId: string,
     key: string,
     partNumber: number,
-    body: Buffer,
+    body: Buffer
   ): Promise<MultipartUploadPart> {
     this.logger.debug(
-      `NoOp uploadPart called for uploadId: ${uploadId}, key: ${key}, partNumber: ${partNumber}, size: ${body.length}`,
+      `NoOp uploadPart called for uploadId: ${uploadId}, key: ${key}, partNumber: ${partNumber}, size: ${body.length}`
     );
     return {
       partNumber,
@@ -85,10 +85,10 @@ export class NoOpStorageProvider implements StorageProvider {
   async completeMultipartUpload(
     uploadId: string,
     key: string,
-    parts: MultipartUploadPart[],
+    parts: MultipartUploadPart[]
   ): Promise<StorageUploadResult> {
     this.logger.debug(
-      `NoOp completeMultipartUpload called for uploadId: ${uploadId}, key: ${key}, parts: ${parts.length}`,
+      `NoOp completeMultipartUpload called for uploadId: ${uploadId}, key: ${key}, parts: ${parts.length}`
     );
     return {
       storageKey: key,

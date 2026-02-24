@@ -70,32 +70,21 @@ export class ContaminationPreventionService {
     // Business owner cannot access rider personal data
     {
       sourceRole: MembershipRole.BUSINESS_OWNER,
-      targetDataTypes: [
-        'rider_location',
-        'rider_personal_info',
-        'rider_bank_details',
-      ],
+      targetDataTypes: ['rider_location', 'rider_personal_info', 'rider_bank_details'],
       action: 'block',
     },
 
     // Admin accessing sensitive data requires audit
     {
       sourceRole: MembershipRole.ADMIN,
-      targetDataTypes: [
-        'rider_bank_details',
-        'customer_payment_methods',
-        'system_credentials',
-      ],
+      targetDataTypes: ['rider_bank_details', 'customer_payment_methods', 'system_credentials'],
       action: 'audit',
     },
 
     // OPS accessing operational data requires audit
     {
       sourceRole: MembershipRole.OPS,
-      targetDataTypes: [
-        'rider_personal_info',
-        'customer_payment_methods',
-      ],
+      targetDataTypes: ['rider_personal_info', 'customer_payment_methods'],
       action: 'audit',
     },
   ];
@@ -122,13 +111,7 @@ export class ContaminationPreventionService {
     switch (rule.action) {
       case 'block':
         // Log blocked access
-        await this.logBlockedAccess(
-          actorId,
-          projectedRole,
-          workspaceId,
-          dataType,
-          action
-        );
+        await this.logBlockedAccess(actorId, projectedRole, workspaceId, dataType, action);
         return {
           allowed: false,
           reason: `Role ${projectedRole} cannot access ${dataType} data`,
@@ -137,13 +120,7 @@ export class ContaminationPreventionService {
 
       case 'audit':
         // Log for audit but allow
-        await this.createAuditLog(
-          actorId,
-          projectedRole,
-          workspaceId,
-          dataType,
-          action
-        );
+        await this.createAuditLog(actorId, projectedRole, workspaceId, dataType, action);
         return { allowed: true };
 
       case 'allow':
@@ -170,13 +147,7 @@ export class ContaminationPreventionService {
     const blockedTypes: string[] = [];
 
     for (const dataType of dataTypes) {
-      const result = await this.checkAccess(
-        actorId,
-        projectedRole,
-        workspaceId,
-        dataType,
-        action
-      );
+      const result = await this.checkAccess(actorId, projectedRole, workspaceId, dataType, action);
       results.push(result);
 
       if (!result.allowed && result.code === 'CONTAMINATION_PREVENTED') {
@@ -196,13 +167,9 @@ export class ContaminationPreventionService {
    */
   private findRule(role: MembershipRole, dataType: string): ContaminationRule | undefined {
     return this.CONTAMINATION_RULES.find(
-      rule =>
+      (rule) =>
         rule.sourceRole === role &&
-        rule.targetDataTypes.some(dt =>
-          dt === dataType ||
-          dataType.startsWith(dt) ||
-          dt === '*'
-        )
+        rule.targetDataTypes.some((dt) => dt === dataType || dataType.startsWith(dt) || dt === '*')
     );
   }
 
@@ -210,18 +177,18 @@ export class ContaminationPreventionService {
    * Get all blocked data types for a role
    */
   getBlockedDataTypes(role: MembershipRole): string[] {
-    return this.CONTAMINATION_RULES
-      .filter(rule => rule.sourceRole === role && rule.action === 'block')
-      .flatMap(rule => rule.targetDataTypes);
+    return this.CONTAMINATION_RULES.filter(
+      (rule) => rule.sourceRole === role && rule.action === 'block'
+    ).flatMap((rule) => rule.targetDataTypes);
   }
 
   /**
    * Get all audited data types for a role
    */
   getAuditedDataTypes(role: MembershipRole): string[] {
-    return this.CONTAMINATION_RULES
-      .filter(rule => rule.sourceRole === role && rule.action === 'audit')
-      .flatMap(rule => rule.targetDataTypes);
+    return this.CONTAMINATION_RULES.filter(
+      (rule) => rule.sourceRole === role && rule.action === 'audit'
+    ).flatMap((rule) => rule.targetDataTypes);
   }
 
   /**
@@ -237,9 +204,7 @@ export class ContaminationPreventionService {
       'personal_info',
     ];
 
-    return sensitiveTypes.some(sensitive =>
-      dataType.toLowerCase().includes(sensitive)
-    );
+    return sensitiveTypes.some((sensitive) => dataType.toLowerCase().includes(sensitive));
   }
 
   /**
@@ -299,14 +264,13 @@ export class ContaminationPreventionService {
 
     // Check for duplicates
     const existing = this.CONTAMINATION_RULES.find(
-      r => r.sourceRole === rule.sourceRole &&
-           r.targetDataTypes.some(dt => rule.targetDataTypes.includes(dt))
+      (r) =>
+        r.sourceRole === rule.sourceRole &&
+        r.targetDataTypes.some((dt) => rule.targetDataTypes.includes(dt))
     );
 
     if (existing) {
-      this.logger.warn(
-        `Overriding existing contamination rule for ${rule.sourceRole}`
-      );
+      this.logger.warn(`Overriding existing contamination rule for ${rule.sourceRole}`);
       // Replace existing
       const index = this.CONTAMINATION_RULES.indexOf(existing);
       this.CONTAMINATION_RULES[index] = rule;
@@ -315,7 +279,9 @@ export class ContaminationPreventionService {
     }
 
     this.logger.log(
-      `Added contamination rule: ${rule.sourceRole} -> ${rule.targetDataTypes.join(', ')} (${rule.action})`
+      `Added contamination rule: ${rule.sourceRole} -> ${rule.targetDataTypes.join(', ')} (${
+        rule.action
+      })`
     );
   }
 
@@ -324,15 +290,12 @@ export class ContaminationPreventionService {
    */
   removeRule(sourceRole: MembershipRole, dataType: string): boolean {
     const index = this.CONTAMINATION_RULES.findIndex(
-      r => r.sourceRole === sourceRole &&
-           r.targetDataTypes.includes(dataType)
+      (r) => r.sourceRole === sourceRole && r.targetDataTypes.includes(dataType)
     );
 
     if (index >= 0) {
       this.CONTAMINATION_RULES.splice(index, 1);
-      this.logger.log(
-        `Removed contamination rule: ${sourceRole} -> ${dataType}`
-      );
+      this.logger.log(`Removed contamination rule: ${sourceRole} -> ${dataType}`);
       return true;
     }
 

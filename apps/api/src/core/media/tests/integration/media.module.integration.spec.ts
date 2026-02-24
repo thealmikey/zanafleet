@@ -1,11 +1,7 @@
 import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
-import {
-  CreateMediaAssetInput,
-  MediaAssetStatus,
-  OwnerEntityType,
-} from '@zanafleet/contracts';
+import { CreateMediaAssetInput, MediaAssetStatus, OwnerEntityType } from '@zanafleet/contracts';
 import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -51,13 +47,10 @@ describeWithDb('MediaModule Integration', () => {
       mediaService = module.get<MediaService>(MediaService);
       storageRegistry = module.get<StorageProviderRegistry>(StorageProviderRegistry);
       mediaAssetRepository = module.get<Repository<MediaAssetEntity>>(
-        getRepositoryToken(MediaAssetEntity),
+        getRepositoryToken(MediaAssetEntity)
       );
     } catch (error) {
-      console.warn(
-        'MediaModule integration test setup failed:',
-        (error as Error).message,
-      );
+      console.warn('MediaModule integration test setup failed:', (error as Error).message);
       throw error;
     }
   });
@@ -137,7 +130,7 @@ describeWithDb('MediaModule Integration', () => {
 
     it('should not allow download URL for archived asset', async () => {
       await expect(mediaService.generateSignedDownloadUrl(createdAssetId)).rejects.toThrow(
-        'is not active',
+        'is not active'
       );
     });
 
@@ -170,10 +163,7 @@ describeWithDb('MediaModule Integration', () => {
         ownerType: OwnerEntityType.Delivery,
       };
 
-      const created = await mediaService.createMediaAsset(
-        permanentInput,
-        permanentBody,
-      );
+      const created = await mediaService.createMediaAsset(permanentInput, permanentBody);
       await mediaService.deleteMediaAsset(created.mediaAssetId, true);
 
       const result = await mediaService.getMediaAsset(created.mediaAssetId);
@@ -195,9 +185,7 @@ describeWithDb('MediaModule Integration', () => {
       };
       const body = Buffer.from('short');
 
-      await expect(mediaService.createMediaAsset(input, body)).rejects.toThrow(
-        'Size mismatch',
-      );
+      await expect(mediaService.createMediaAsset(input, body)).rejects.toThrow('Size mismatch');
     });
 
     it('should accept asset creation when input.size matches body.length', async () => {
@@ -287,9 +275,9 @@ describeWithDb('MediaModule Integration', () => {
 
       const created = await mediaService.createMediaAsset(input, body);
 
-      await expect(
-        mediaService.generateSignedUploadUrl(created.mediaAssetId),
-      ).rejects.toThrow('is not in an uploadable state');
+      await expect(mediaService.generateSignedUploadUrl(created.mediaAssetId)).rejects.toThrow(
+        'is not in an uploadable state'
+      );
     });
   });
 
@@ -301,19 +289,19 @@ describeWithDb('MediaModule Integration', () => {
 
     it('should throw NotFoundException for signed URL of non-existent asset', async () => {
       await expect(
-        mediaService.generateSignedDownloadUrl('00000000-0000-0000-0000-000000000000'),
+        mediaService.generateSignedDownloadUrl('00000000-0000-0000-0000-000000000000')
       ).rejects.toThrow('not found');
     });
 
     it('should throw NotFoundException when deleting non-existent asset', async () => {
       await expect(
-        mediaService.deleteMediaAsset('00000000-0000-0000-0000-000000000000'),
+        mediaService.deleteMediaAsset('00000000-0000-0000-0000-000000000000')
       ).rejects.toThrow('not found');
     });
 
     it('should throw NotFoundException when archiving non-existent asset', async () => {
       await expect(
-        mediaService.archiveMediaAsset('00000000-0000-0000-0000-000000000000'),
+        mediaService.archiveMediaAsset('00000000-0000-0000-0000-000000000000')
       ).rejects.toThrow('not found');
     });
   });
@@ -380,9 +368,7 @@ describeWithDb('MediaModule Integration', () => {
       ]);
 
       const fulfilled = results.filter((r) => r.status === 'fulfilled');
-      const rejected = results.filter(
-        (r): r is PromiseRejectedResult => r.status === 'rejected',
-      );
+      const rejected = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
 
       expect(fulfilled.length).toBeGreaterThanOrEqual(1);
 
@@ -418,9 +404,7 @@ describeWithDb('MediaModule Integration', () => {
       ]);
 
       const fulfilled = results.filter((r) => r.status === 'fulfilled');
-      const rejected = results.filter(
-        (r): r is PromiseRejectedResult => r.status === 'rejected',
-      );
+      const rejected = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
 
       expect(fulfilled.length).toBeGreaterThanOrEqual(1);
 
@@ -453,9 +437,7 @@ describeWithDb('MediaModule Integration', () => {
       ]);
 
       const fulfilled = results.filter((r) => r.status === 'fulfilled');
-      const rejected = results.filter(
-        (r): r is PromiseRejectedResult => r.status === 'rejected',
-      );
+      const rejected = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
 
       expect(fulfilled.length).toBeGreaterThanOrEqual(1);
 

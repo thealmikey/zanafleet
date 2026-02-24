@@ -121,7 +121,7 @@ describe('StorageProviderRegistry', () => {
   describe('setDefault', () => {
     it('should throw when provider is not registered', () => {
       expect(() => registry.setDefault('non-existent')).toThrow(
-        "Cannot set default: provider 'non-existent' is not registered",
+        "Cannot set default: provider 'non-existent' is not registered"
       );
     });
 

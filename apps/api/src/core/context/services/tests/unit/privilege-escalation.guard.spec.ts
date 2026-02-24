@@ -142,46 +142,31 @@ describe('PrivilegeEscalationGuard', () => {
 
     describe('privilege escalation detection', () => {
       it('should detect RIDER -> ADMIN as escalation', () => {
-        const isEscalation = guard.isRoleEscalation(
-          MembershipRole.RIDER,
-          MembershipRole.ADMIN
-        );
+        const isEscalation = guard.isRoleEscalation(MembershipRole.RIDER, MembershipRole.ADMIN);
 
         expect(isEscalation).toBe(true);
       });
 
       it('should detect CUSTOMER -> RIDER as escalation', () => {
-        const isEscalation = guard.isRoleEscalation(
-          MembershipRole.CUSTOMER,
-          MembershipRole.RIDER
-        );
+        const isEscalation = guard.isRoleEscalation(MembershipRole.CUSTOMER, MembershipRole.RIDER);
 
         expect(isEscalation).toBe(true);
       });
 
       it('should detect OPS -> ADMIN as escalation', () => {
-        const isEscalation = guard.isRoleEscalation(
-          MembershipRole.OPS,
-          MembershipRole.ADMIN
-        );
+        const isEscalation = guard.isRoleEscalation(MembershipRole.OPS, MembershipRole.ADMIN);
 
         expect(isEscalation).toBe(true);
       });
 
       it('should NOT detect RIDER -> CUSTOMER as escalation', () => {
-        const isEscalation = guard.isRoleEscalation(
-          MembershipRole.RIDER,
-          MembershipRole.CUSTOMER
-        );
+        const isEscalation = guard.isRoleEscalation(MembershipRole.RIDER, MembershipRole.CUSTOMER);
 
         expect(isEscalation).toBe(false);
       });
 
       it('should NOT detect ADMIN -> ADMIN as escalation', () => {
-        const isEscalation = guard.isRoleEscalation(
-          MembershipRole.ADMIN,
-          MembershipRole.ADMIN
-        );
+        const isEscalation = guard.isRoleEscalation(MembershipRole.ADMIN, MembershipRole.ADMIN);
 
         expect(isEscalation).toBe(false);
       });
@@ -202,11 +187,7 @@ describe('PrivilegeEscalationGuard', () => {
       it('should deny when rate limit exceeded', async () => {
         // Record many role switches to exceed limit
         for (let i = 0; i < 5; i++) {
-          await guard.recordRoleSwitch(
-            actorId,
-            MembershipRole.RIDER,
-            MembershipRole.ADMIN
-          );
+          await guard.recordRoleSwitch(actorId, MembershipRole.RIDER, MembershipRole.ADMIN);
         }
 
         const result = await guard.checkRoleSwitch(
@@ -224,11 +205,7 @@ describe('PrivilegeEscalationGuard', () => {
 
   describe('recordRoleSwitch', () => {
     it('should record role switches', async () => {
-      await guard.recordRoleSwitch(
-        actorId,
-        MembershipRole.RIDER,
-        MembershipRole.ADMIN
-      );
+      await guard.recordRoleSwitch(actorId, MembershipRole.RIDER, MembershipRole.ADMIN);
 
       const switches = await guard['getRecentRoleSwitches'](actorId);
       expect(switches.length).toBe(1);
@@ -254,11 +231,7 @@ describe('PrivilegeEscalationGuard', () => {
     it('should deny if actor not in workspace', async () => {
       membershipRepository.findOne.mockResolvedValue(null);
 
-      const result = await guard.validateRoleAssumption(
-        actorId,
-        MembershipRole.ADMIN,
-        workspaceId
-      );
+      const result = await guard.validateRoleAssumption(actorId, MembershipRole.ADMIN, workspaceId);
 
       expect(result.allowed).toBe(false);
       expect(result.code).toBe('NOT_IN_WORKSPACE');
@@ -273,11 +246,7 @@ describe('PrivilegeEscalationGuard', () => {
         defaultWorkspace: false,
       } as MembershipEntity);
 
-      const result = await guard.validateRoleAssumption(
-        actorId,
-        MembershipRole.ADMIN,
-        workspaceId
-      );
+      const result = await guard.validateRoleAssumption(actorId, MembershipRole.ADMIN, workspaceId);
 
       expect(result.allowed).toBe(false);
       expect(result.code).toBe('INSUFFICIENT_ROLE');
@@ -292,11 +261,7 @@ describe('PrivilegeEscalationGuard', () => {
         defaultWorkspace: false,
       } as MembershipEntity);
 
-      const result = await guard.validateRoleAssumption(
-        actorId,
-        MembershipRole.ADMIN,
-        workspaceId
-      );
+      const result = await guard.validateRoleAssumption(actorId, MembershipRole.ADMIN, workspaceId);
 
       expect(result.allowed).toBe(true);
     });
@@ -393,11 +358,7 @@ describe('PrivilegeEscalationGuard', () => {
 
       // Record many recent switches
       for (let i = 0; i < 4; i++) {
-        await guard.recordRoleSwitch(
-          actorId,
-          MembershipRole.RIDER,
-          MembershipRole.ADMIN
-        );
+        await guard.recordRoleSwitch(actorId, MembershipRole.RIDER, MembershipRole.ADMIN);
       }
 
       const result = await guard.getEscalationRiskLevel(actorId);
@@ -451,14 +412,18 @@ describe('PrivilegeEscalationGuard', () => {
     it('should handle all role precedence levels correctly', () => {
       // ADMIN > OPS > BUSINESS_OWNER > RIDER > CUSTOMER
       expect(guard.isRoleEscalation(MembershipRole.CUSTOMER, MembershipRole.RIDER)).toBe(true);
-      expect(guard.isRoleEscalation(MembershipRole.RIDER, MembershipRole.BUSINESS_OWNER)).toBe(true);
+      expect(guard.isRoleEscalation(MembershipRole.RIDER, MembershipRole.BUSINESS_OWNER)).toBe(
+        true
+      );
       expect(guard.isRoleEscalation(MembershipRole.BUSINESS_OWNER, MembershipRole.OPS)).toBe(true);
       expect(guard.isRoleEscalation(MembershipRole.OPS, MembershipRole.ADMIN)).toBe(true);
 
       // Reverse should not be escalation
       expect(guard.isRoleEscalation(MembershipRole.ADMIN, MembershipRole.OPS)).toBe(false);
       expect(guard.isRoleEscalation(MembershipRole.OPS, MembershipRole.BUSINESS_OWNER)).toBe(false);
-      expect(guard.isRoleEscalation(MembershipRole.BUSINESS_OWNER, MembershipRole.RIDER)).toBe(false);
+      expect(guard.isRoleEscalation(MembershipRole.BUSINESS_OWNER, MembershipRole.RIDER)).toBe(
+        false
+      );
       expect(guard.isRoleEscalation(MembershipRole.RIDER, MembershipRole.CUSTOMER)).toBe(false);
     });
   });

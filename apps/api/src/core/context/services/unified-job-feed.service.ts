@@ -75,9 +75,7 @@ export class UnifiedJobFeedService {
     }
 
     // 2. Get active jobs from those workspaces
-    const jobStatuses = status
-      ? status
-      : [FEED_JOB_STATUSES[0], FEED_JOB_STATUSES[1]];
+    const jobStatuses = status ? status : [FEED_JOB_STATUSES[0], FEED_JOB_STATUSES[1]];
 
     const deliveries = await this.deliveryRepository.find({
       where: {
@@ -100,7 +98,12 @@ export class UnifiedJobFeedService {
           const workspace = accessibleWorkspaces.find(
             (w) => w.workspaceId === delivery.workspaceId
           );
-          return this.scoreJob(delivery, workspace?.workspaceName ?? 'Unknown', scoreFactors, scoringConfig);
+          return this.scoreJob(
+            delivery,
+            workspace?.workspaceName ?? 'Unknown',
+            scoreFactors,
+            scoringConfig
+          );
         })
     );
 
@@ -138,13 +141,19 @@ export class UnifiedJobFeedService {
     // Calculate individual factor scores (normalized 0-1)
 
     // Distance score (closer = higher, so we use 1 - normalized distance)
-    const distanceScore = this.normalizeDistance(delivery.scheduledPickupTime ? 3000 : 5000, config.factors.maxDistanceMeters);
+    const distanceScore = this.normalizeDistance(
+      delivery.scheduledPickupTime ? 3000 : 5000,
+      config.factors.maxDistanceMeters
+    );
 
     // Earnings score (normalized 0-1 based on typical range)
     const earningsScore = 0.6; // Would calculate from delivery pricing
 
     // SLA urgency (higher when approaching deadline but not yet expired)
-    const slaScore = this.calculateSlaScore(delivery.scheduledDropoffTime, config.factors.slaWindowMinutes);
+    const slaScore = this.calculateSlaScore(
+      delivery.scheduledDropoffTime,
+      config.factors.slaWindowMinutes
+    );
 
     // Acceptance probability (based on historical acceptance rate)
     const acceptanceScore = 0.5; // Would calculate from rider history
@@ -418,4 +427,3 @@ export class UnifiedJobFeedService {
     }));
   }
 }
-

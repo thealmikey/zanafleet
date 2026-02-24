@@ -1,6 +1,12 @@
 import { createHash } from 'crypto';
 
-import { Injectable, Logger, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   CreateMediaAssetInput,
@@ -23,24 +29,21 @@ export class MediaService {
   constructor(
     private readonly storageRegistry: StorageProviderRegistry,
     @InjectRepository(MediaAssetEntity)
-    private readonly mediaAssetRepository: Repository<MediaAssetEntity>,
+    private readonly mediaAssetRepository: Repository<MediaAssetEntity>
   ) {}
 
-  async createMediaAsset(
-    input: CreateMediaAssetInput,
-    body: Buffer,
-  ): Promise<MediaAssetResponse> {
+  async createMediaAsset(input: CreateMediaAssetInput, body: Buffer): Promise<MediaAssetResponse> {
     const mediaAssetId = uuidv4();
     const storageKey = this.generateStorageKey(
       input.ownerType,
       input.ownerId,
       mediaAssetId,
-      input.filename,
+      input.filename
     );
 
     if (input.size !== body.length) {
       throw new BadRequestException(
-        `Size mismatch: declared size (${input.size}) does not match actual body length (${body.length})`,
+        `Size mismatch: declared size (${input.size}) does not match actual body length (${body.length})`
       );
     }
 
@@ -76,13 +79,13 @@ export class MediaService {
       saved = await this.mediaAssetRepository.save(entity);
     } catch (error) {
       this.logger.warn(
-        `Database save failed for media asset ${mediaAssetId}, cleaning up uploaded file`,
+        `Database save failed for media asset ${mediaAssetId}, cleaning up uploaded file`
       );
       try {
         await provider.delete(storageKey);
       } catch (deleteError) {
         this.logger.error(
-          `Failed to clean up orphaned file ${storageKey}: ${(deleteError as Error).message}`,
+          `Failed to clean up orphaned file ${storageKey}: ${(deleteError as Error).message}`
         );
       }
       throw error;
@@ -136,7 +139,7 @@ export class MediaService {
 
   async generateSignedDownloadUrl(
     mediaAssetId: string,
-    expiresInSeconds = 3600,
+    expiresInSeconds = 3600
   ): Promise<SignedUrlResponse> {
     const entity = await this.mediaAssetRepository.findOne({
       where: { id: mediaAssetId },
@@ -173,7 +176,7 @@ export class MediaService {
 
   async generateSignedUploadUrl(
     mediaAssetId: string,
-    expiresInSeconds = 3600,
+    expiresInSeconds = 3600
   ): Promise<SignedUrlResponse> {
     const entity = await this.mediaAssetRepository.findOne({
       where: { id: mediaAssetId },
@@ -185,7 +188,7 @@ export class MediaService {
 
     if (![MediaAssetStatus.Pending, MediaAssetStatus.Uploading].includes(entity.status)) {
       throw new Error(
-        `Media asset ${mediaAssetId} is not in an uploadable state (status: ${entity.status})`,
+        `Media asset ${mediaAssetId} is not in an uploadable state (status: ${entity.status})`
       );
     }
 
@@ -227,7 +230,7 @@ export class MediaService {
 
       if (!provider) {
         throw new Error(
-          `Cannot permanently delete media asset ${mediaAssetId}: no storage provider available to delete file from storage`,
+          `Cannot permanently delete media asset ${mediaAssetId}: no storage provider available to delete file from storage`
         );
       }
 
@@ -249,7 +252,7 @@ export class MediaService {
       } catch (error) {
         if (error instanceof OptimisticLockVersionMismatchError) {
           throw new ConflictException(
-            `Media asset ${mediaAssetId} was modified by another request. Please retry.`,
+            `Media asset ${mediaAssetId} was modified by another request. Please retry.`
           );
         }
         throw error;
@@ -267,7 +270,9 @@ export class MediaService {
     }
 
     if (entity.status === MediaAssetStatus.Deleted) {
-      throw new ConflictException(`Media asset ${mediaAssetId} has been deleted and cannot be archived`);
+      throw new ConflictException(
+        `Media asset ${mediaAssetId} has been deleted and cannot be archived`
+      );
     }
 
     if (entity.status === MediaAssetStatus.Archived) {
@@ -284,7 +289,7 @@ export class MediaService {
     } catch (error) {
       if (error instanceof OptimisticLockVersionMismatchError) {
         throw new ConflictException(
-          `Media asset ${mediaAssetId} was modified by another request. Please retry.`,
+          `Media asset ${mediaAssetId} was modified by another request. Please retry.`
         );
       }
       throw error;
@@ -295,7 +300,7 @@ export class MediaService {
     ownerType: OwnerEntityType,
     ownerId: string,
     assetId: string,
-    filename: string,
+    filename: string
   ): string {
     return `${ownerType}/${ownerId}/${assetId}/${filename}`;
   }

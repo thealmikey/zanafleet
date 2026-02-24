@@ -1,8 +1,4 @@
-export {
-  parseQueryParams,
-  createPaginationMeta,
-  getStringFilterValue,
-} from './query-params.util';
+export { parseQueryParams, createPaginationMeta, getStringFilterValue } from './query-params.util';
 export type {
   PaginationParams,
   SortParam,

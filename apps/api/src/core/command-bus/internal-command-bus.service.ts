@@ -35,10 +35,7 @@ export class InternalCommandBus {
   private readonly logger = new Logger(InternalCommandBus.name);
   private readonly options: InternalCommandBusOptions;
 
-  constructor(
-    private readonly commandBus: CommandBus,
-    options?: InternalCommandBusOptions
-  ) {
+  constructor(private readonly commandBus: CommandBus, options?: InternalCommandBusOptions) {
     this.options = {
       enableAuditLogging: options?.enableAuditLogging ?? true,
       enforceCapabilityCheck: options?.enforceCapabilityCheck ?? false,
@@ -56,20 +53,23 @@ export class InternalCommandBus {
    * @returns The command result
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async execute(command: ICommand, options?: {
-    /**
-     * Correlation ID for tracing
-     */
-    correlationId?: string;
-    /**
-     * Skip capability check (for internal/system commands)
-     */
-    skipCapabilityCheck?: boolean;
-    /**
-     * Actor ID executing this command
-     */
-    actorId?: string;
-  }): Promise<any> {
+  async execute(
+    command: ICommand,
+    options?: {
+      /**
+       * Correlation ID for tracing
+       */
+      correlationId?: string;
+      /**
+       * Skip capability check (for internal/system commands)
+       */
+      skipCapabilityCheck?: boolean;
+      /**
+       * Actor ID executing this command
+       */
+      actorId?: string;
+    }
+  ): Promise<any> {
     const correlationId = options?.correlationId ?? crypto.randomUUID();
 
     this.logger.debug(
@@ -113,9 +113,7 @@ export class InternalCommandBus {
    *
    * Useful for logging, metrics, etc.
    */
-  onCommandExecuted(
-    _callback: (command: ICommand, result: unknown) => void
-  ): void {
+  onCommandExecuted(_callback: (command: ICommand, result: unknown) => void): void {
     // This would need to be implemented based on NestJS CQRS internals
     this.logger.warn('InternalCommandBus: onCommandExecuted not fully implemented');
   }

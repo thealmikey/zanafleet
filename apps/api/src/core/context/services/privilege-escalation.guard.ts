@@ -57,9 +57,7 @@ export class PrivilegeEscalationGuard {
     const isEscalation = this.isRoleEscalation(fromRole, toRole);
 
     if (isEscalation) {
-      this.logger.debug(
-        `Role escalation detected: ${fromRole} -> ${toRole} for actor ${actorId}`
-      );
+      this.logger.debug(`Role escalation detected: ${fromRole} -> ${toRole} for actor ${actorId}`);
 
       // 2a. Check for suspicious activity patterns
       const recentSwitches = await this.getRecentRoleSwitches(actorId);
@@ -76,13 +74,7 @@ export class PrivilegeEscalationGuard {
       }
 
       // 2b. Log for security review
-      await this.logSuspiciousActivity(
-        actorId,
-        fromRole,
-        toRole,
-        workspaceId,
-        'ROLE_ESCALATION'
-      );
+      await this.logSuspiciousActivity(actorId, fromRole, toRole, workspaceId, 'ROLE_ESCALATION');
 
       // 2c. Check role hold time
       const roleHoldTime = await this.getRoleHoldTime(actorId, workspaceId, toRole);
@@ -129,12 +121,17 @@ export class PrivilegeEscalationGuard {
   /**
    * Get recent role switches for an actor (in-memory for now, would be Redis in production)
    */
-  private recentRoleSwitches: Map<string, { timestamp: number; fromRole: string; toRole: string }[]> = new Map();
+  private recentRoleSwitches: Map<
+    string,
+    { timestamp: number; fromRole: string; toRole: string }[]
+  > = new Map();
 
-  private async getRecentRoleSwitches(actorId: string): Promise<{ timestamp: number; fromRole: string; toRole: string }[]> {
+  private async getRecentRoleSwitches(
+    actorId: string
+  ): Promise<{ timestamp: number; fromRole: string; toRole: string }[]> {
     const oneMinuteAgo = Date.now() - 60000;
     const switches = this.recentRoleSwitches.get(actorId) || [];
-    return switches.filter(s => s.timestamp > oneMinuteAgo);
+    return switches.filter((s) => s.timestamp > oneMinuteAgo);
   }
 
   /**
@@ -253,8 +250,8 @@ export class PrivilegeEscalationGuard {
     }
 
     // Factor 2: High-privilege roles
-    const hasAdminRole = memberships.some(m => m.role === MembershipRole.ADMIN);
-    const hasOpsRole = memberships.some(m => m.role === MembershipRole.OPS);
+    const hasAdminRole = memberships.some((m) => m.role === MembershipRole.ADMIN);
+    const hasOpsRole = memberships.some((m) => m.role === MembershipRole.OPS);
 
     if (hasAdminRole) {
       factors.push('Has ADMIN role');

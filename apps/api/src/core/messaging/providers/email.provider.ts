@@ -11,7 +11,7 @@ export class EmailProvider implements MessagingProvider {
     const messageId = `email_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     this.logger.log(
-      `[EMAIL] Sending to ${message.recipient} | Subject: ${message.subject} | MessageId: ${messageId}`,
+      `[EMAIL] Sending to ${message.recipient} | Subject: ${message.subject} | MessageId: ${messageId}`
     );
 
     if (message.metadata) {

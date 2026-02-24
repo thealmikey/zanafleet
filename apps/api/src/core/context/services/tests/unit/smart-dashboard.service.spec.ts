@@ -17,13 +17,14 @@ describe('SmartDashboardService', () => {
     workspaceId: string,
     role: MembershipRole,
     defaultWorkspace = false
-  ): MembershipEntity => ({
-    actorId,
-    workspaceId,
-    role,
-    since: new Date(),
-    defaultWorkspace,
-  } as MembershipEntity);
+  ): MembershipEntity =>
+    ({
+      actorId,
+      workspaceId,
+      role,
+      since: new Date(),
+      defaultWorkspace,
+    } as MembershipEntity);
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -109,15 +110,15 @@ describe('SmartDashboardService', () => {
       expect(config.role).toBe(MembershipRole.RIDER);
       expect(config.priority).toBe(10);
       expect(config.dataSources).toHaveLength(4);
-      expect(config.dataSources.map(ds => ds.type)).toContain('my_jobs');
-      expect(config.dataSources.map(ds => ds.type)).toContain('available_jobs');
+      expect(config.dataSources.map((ds) => ds.type)).toContain('my_jobs');
+      expect(config.dataSources.map((ds) => ds.type)).toContain('available_jobs');
     });
 
     it('should return config for CUSTOMER role', () => {
       const config = service.getMergeConfig(MembershipRole.CUSTOMER);
 
       expect(config.role).toBe(MembershipRole.CUSTOMER);
-      expect(config.dataSources.map(ds => ds.type)).toContain('my_orders');
+      expect(config.dataSources.map((ds) => ds.type)).toContain('my_orders');
     });
 
     it('should return config for BUSINESS_OWNER role', () => {
@@ -134,7 +135,7 @@ describe('SmartDashboardService', () => {
       expect(config.role).toBe(MembershipRole.ADMIN);
       expect(config.priority).toBe(30);
       expect(config.layout).toBe('sidebar');
-      expect(config.dataSources.map(ds => ds.type)).toContain('system_settings');
+      expect(config.dataSources.map((ds) => ds.type)).toContain('system_settings');
     });
 
     it('should return config for OPS role', () => {
@@ -213,9 +214,7 @@ describe('SmartDashboardService', () => {
 
   describe('shouldShowRoleSwitcher', () => {
     it('should return false for single membership', () => {
-      const memberships = [
-        createMembership(actorId, workspaceId, MembershipRole.RIDER, true),
-      ];
+      const memberships = [createMembership(actorId, workspaceId, MembershipRole.RIDER, true)];
 
       expect(service.shouldShowRoleSwitcher(memberships)).toBe(false);
     });
@@ -249,9 +248,7 @@ describe('SmartDashboardService', () => {
     });
 
     it('should handle single membership', () => {
-      const memberships = [
-        createMembership(actorId, workspaceId, MembershipRole.CUSTOMER, true),
-      ];
+      const memberships = [createMembership(actorId, workspaceId, MembershipRole.CUSTOMER, true)];
 
       const result = service.getPrimaryRole(memberships);
 
@@ -279,7 +276,7 @@ describe('SmartDashboardService', () => {
     it('should include rider-specific data sources', () => {
       const config = service.getMergeConfig(MembershipRole.RIDER);
 
-      expect(config.dataSources.map(ds => ds.type)).toEqual(
+      expect(config.dataSources.map((ds) => ds.type)).toEqual(
         expect.arrayContaining(['my_jobs', 'available_jobs', 'earnings', 'performance'])
       );
     });
@@ -287,7 +284,7 @@ describe('SmartDashboardService', () => {
     it('should include customer-specific data sources', () => {
       const config = service.getMergeConfig(MembershipRole.CUSTOMER);
 
-      expect(config.dataSources.map(ds => ds.type)).toEqual(
+      expect(config.dataSources.map((ds) => ds.type)).toEqual(
         expect.arrayContaining(['my_orders', 'addresses', 'payment_methods'])
       );
     });
@@ -295,7 +292,7 @@ describe('SmartDashboardService', () => {
     it('should include business owner-specific data sources', () => {
       const config = service.getMergeConfig(MembershipRole.BUSINESS_OWNER);
 
-      expect(config.dataSources.map(ds => ds.type)).toEqual(
+      expect(config.dataSources.map((ds) => ds.type)).toEqual(
         expect.arrayContaining(['my_jobs', 'team_members', 'analytics', 'pricing'])
       );
     });
@@ -303,7 +300,7 @@ describe('SmartDashboardService', () => {
     it('should include admin-specific data sources', () => {
       const config = service.getMergeConfig(MembershipRole.ADMIN);
 
-      expect(config.dataSources.map(ds => ds.type)).toEqual(
+      expect(config.dataSources.map((ds) => ds.type)).toEqual(
         expect.arrayContaining(['workspace_overview', 'member_list', 'system_settings'])
       );
     });
@@ -311,7 +308,7 @@ describe('SmartDashboardService', () => {
     it('should include ops-specific data sources', () => {
       const config = service.getMergeConfig(MembershipRole.OPS);
 
-      expect(config.dataSources.map(ds => ds.type)).toEqual(
+      expect(config.dataSources.map((ds) => ds.type)).toEqual(
         expect.arrayContaining(['active_jobs', 'rider_overview', 'analytics', 'reassignments'])
       );
     });
@@ -322,7 +319,7 @@ describe('SmartDashboardService', () => {
       const config = service.getMergeConfig(MembershipRole.ADMIN);
 
       const currentScopeSources = config.dataSources.filter(
-        ds => ds.workspaceScope === 'current'
+        (ds) => ds.workspaceScope === 'current'
       );
 
       expect(currentScopeSources.length).toBeGreaterThan(0);
@@ -331,7 +328,7 @@ describe('SmartDashboardService', () => {
     it('should use all_rider_workspaces scope for rider earnings', () => {
       const config = service.getMergeConfig(MembershipRole.RIDER);
 
-      const earningsSource = config.dataSources.find(ds => ds.type === 'earnings');
+      const earningsSource = config.dataSources.find((ds) => ds.type === 'earnings');
 
       expect(earningsSource?.workspaceScope).toBe('all_rider_workspaces');
     });

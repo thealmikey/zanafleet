@@ -35,7 +35,7 @@ export class EventBusService implements OnModuleInit {
     @Inject(NATS_CLIENT) private readonly natsClient: ClientProxy,
     private readonly eventLogger: EventLoggerService,
     private readonly retryService: RetryService,
-    @Optional() private readonly metricsService?: MetricsService,
+    @Optional() private readonly metricsService?: MetricsService
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -58,7 +58,7 @@ export class EventBusService implements OnModuleInit {
   async publish(
     subject: string,
     event: BaseEvent,
-    options: Omit<PublishOptions, 'subject'> = {},
+    options: Omit<PublishOptions, 'subject'> = {}
   ): Promise<void> {
     const startTime = Date.now();
 
@@ -94,8 +94,8 @@ export class EventBusService implements OnModuleInit {
           timeout(timeoutMs),
           catchError((error) => {
             throw error;
-          }),
-        ),
+          })
+        )
       );
     };
 

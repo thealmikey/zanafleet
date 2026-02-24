@@ -18,11 +18,7 @@ import { HealthController } from './health.controller';
 @Module({
   imports: [TerminusModule],
   controllers: [HealthController],
-  providers: [
-    Neo4jHealthIndicator,
-    NatsHealthIndicator,
-    RedisHealthIndicator,
-  ],
+  providers: [Neo4jHealthIndicator, NatsHealthIndicator, RedisHealthIndicator],
   exports: [Neo4jHealthIndicator, NatsHealthIndicator, RedisHealthIndicator],
 })
 export class HealthModule {}

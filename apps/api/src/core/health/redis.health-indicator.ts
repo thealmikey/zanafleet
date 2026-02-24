@@ -35,7 +35,7 @@ export class RedisHealthIndicator extends HealthIndicator {
       return result;
     } catch (error) {
       this.logger.warn(`Redis health check failed: ${(error as Error).message}`);
-      
+
       // Return a healthy result if Redis is optional
       return {
         status: 'ok',

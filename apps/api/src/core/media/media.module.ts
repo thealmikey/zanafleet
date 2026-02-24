@@ -16,7 +16,7 @@ import { MediaService } from './services/media.service';
 export class MediaModule implements OnModuleInit {
   constructor(
     private readonly registry: StorageProviderRegistry,
-    private readonly noopProvider: NoOpStorageProvider,
+    private readonly noopProvider: NoOpStorageProvider
   ) {}
 
   onModuleInit(): void {

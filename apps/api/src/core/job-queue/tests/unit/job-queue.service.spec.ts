@@ -5,11 +5,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { JobQueueService } from '../../job-queue.service';
-import {
-  JOB_QUEUE_DEFAULTS,
-  QUEUE_NAMES,
-  JobPriority,
-} from '../../job-queue.constants';
+import { JOB_QUEUE_DEFAULTS, QUEUE_NAMES, JobPriority } from '../../job-queue.constants';
 
 // Mock Redis
 const mockRedis = {
@@ -98,11 +94,9 @@ describe('JobQueueService', () => {
 
   describe('enqueue', () => {
     it('should enqueue a job with default options', async () => {
-      const jobId = await service.enqueue(
-        QUEUE_NAMES.DEFAULT,
-        'test-job',
-        { payload: { test: 'data' } },
-      );
+      const jobId = await service.enqueue(QUEUE_NAMES.DEFAULT, 'test-job', {
+        payload: { test: 'data' },
+      });
 
       expect(jobId).toBeDefined();
       expect(typeof jobId).toBe('string');
@@ -117,18 +111,16 @@ describe('JobQueueService', () => {
           priority: JobPriority.HIGH,
           delay: 1000,
           attempts: 5,
-        },
+        }
       );
 
       expect(jobId).toBeDefined();
     });
 
     it('should generate UUID if no jobId provided', async () => {
-      const jobId = await service.enqueue(
-        QUEUE_NAMES.DEFAULT,
-        'test-job',
-        { payload: { test: 'data' } },
-      );
+      const jobId = await service.enqueue(QUEUE_NAMES.DEFAULT, 'test-job', {
+        payload: { test: 'data' },
+      });
 
       // UUID v4 format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -139,12 +131,9 @@ describe('JobQueueService', () => {
   describe('enqueueInWorkspace', () => {
     it('should enqueue a job with workspace isolation', async () => {
       const workspaceId = 'workspace-123';
-      const jobId = await service.enqueueInWorkspace(
-        workspaceId,
-        QUEUE_NAMES.DEFAULT,
-        'test-job',
-        { test: 'payload' },
-      );
+      const jobId = await service.enqueueInWorkspace(workspaceId, QUEUE_NAMES.DEFAULT, 'test-job', {
+        test: 'payload',
+      });
 
       expect(jobId).toBeDefined();
     });
@@ -156,7 +145,7 @@ describe('JobQueueService', () => {
         QUEUE_NAMES.SETTLEMENT,
         'settlement-job',
         { riderId: 'rider-123' },
-        { jobId: 'custom-job-id' },
+        { jobId: 'custom-job-id' }
       );
 
       expect(jobId).toBe('custom-job-id');
@@ -171,11 +160,7 @@ describe('JobQueueService', () => {
         attempts: 1,
       });
 
-      await service.process(
-        QUEUE_NAMES.DEFAULT,
-        processor,
-        5,
-      );
+      await service.process(QUEUE_NAMES.DEFAULT, processor, 5);
 
       // Worker should be registered
       expect(service).toBeDefined();
@@ -198,16 +183,16 @@ describe('JobQueueService', () => {
 
   describe('retryJob', () => {
     it('should throw error for non-existent queue', async () => {
-      await expect(
-        service.retryJob('non-existent-queue', 'job-id'),
-      ).rejects.toThrow('Queue not found');
+      await expect(service.retryJob('non-existent-queue', 'job-id')).rejects.toThrow(
+        'Queue not found'
+      );
     });
   });
 
   describe('moveToDeadLetter', () => {
     it('should throw error for non-existent queue', async () => {
       await expect(
-        service.moveToDeadLetter('non-existent-queue', 'job-id', 'test error'),
+        service.moveToDeadLetter('non-existent-queue', 'job-id', 'test error')
       ).rejects.toThrow('Queue not found');
     });
   });
@@ -240,17 +225,13 @@ describe('JobQueueService', () => {
 
   describe('pauseQueue', () => {
     it('should pause a queue', async () => {
-      await expect(
-        service.pauseQueue(QUEUE_NAMES.DEFAULT),
-      ).resolves.not.toThrow();
+      await expect(service.pauseQueue(QUEUE_NAMES.DEFAULT)).resolves.not.toThrow();
     });
   });
 
   describe('resumeQueue', () => {
     it('should resume a queue', async () => {
-      await expect(
-        service.resumeQueue(QUEUE_NAMES.DEFAULT),
-      ).resolves.not.toThrow();
+      await expect(service.resumeQueue(QUEUE_NAMES.DEFAULT)).resolves.not.toThrow();
     });
   });
 
@@ -356,14 +337,14 @@ describe('JobQueueService - Integration Scenarios', () => {
       'workspace-1',
       QUEUE_NAMES.SETTLEMENT,
       'process-settlement',
-      { riderId: 'rider-1' },
+      { riderId: 'rider-1' }
     );
 
     const workspace2Job = await service.enqueueInWorkspace(
       'workspace-2',
       QUEUE_NAMES.SETTLEMENT,
       'process-settlement',
-      { riderId: 'rider-2' },
+      { riderId: 'rider-2' }
     );
 
     expect(workspace1Job).not.toBe(workspace2Job);
@@ -374,21 +355,21 @@ describe('JobQueueService - Integration Scenarios', () => {
       QUEUE_NAMES.DEFAULT,
       'low-priority',
       { payload: {} },
-      { priority: JobPriority.LOW },
+      { priority: JobPriority.LOW }
     );
 
     const highPriorityJob = await service.enqueue(
       QUEUE_NAMES.DEFAULT,
       'high-priority',
       { payload: {} },
-      { priority: JobPriority.HIGH },
+      { priority: JobPriority.HIGH }
     );
 
     const criticalPriorityJob = await service.enqueue(
       QUEUE_NAMES.DEFAULT,
       'critical-priority',
       { payload: {} },
-      { priority: JobPriority.CRITICAL },
+      { priority: JobPriority.CRITICAL }
     );
 
     expect(lowPriorityJob).toBeDefined();
@@ -402,7 +383,7 @@ describe('JobQueueService - Integration Scenarios', () => {
       QUEUE_NAMES.DEFAULT,
       'delayed-job',
       { payload: {} },
-      { delay: delayMs },
+      { delay: delayMs }
     );
 
     expect(jobId).toBeDefined();
@@ -419,7 +400,7 @@ describe('JobQueueService - Integration Scenarios', () => {
           type: 'exponential',
           delay: 500,
         },
-      },
+      }
     );
 
     expect(jobId).toBeDefined();
