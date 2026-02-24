@@ -20,7 +20,9 @@ function buildQueryString(params: Record<string, string | number | undefined>): 
     (entry): entry is [string, string | number] => entry[1] !== undefined
   );
   if (entries.length === 0) return '';
-  return '?' + entries.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+  return (
+    '?' + entries.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&')
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -217,11 +219,14 @@ export async function checkServiceAreaContains(
     lat: params.lat,
     lng: params.lng,
   });
-  const response = await fetch(`${API_BASE_URL}/geo/service-area/${encodeURIComponent(areaId)}/contains${qs}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/geo/service-area/${encodeURIComponent(areaId)}/contains${qs}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+  );
   return handleResponse<ServiceAreaContainsResult>(response);
 }

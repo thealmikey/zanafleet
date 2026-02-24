@@ -71,10 +71,7 @@ export async function getNotifications(
   };
 }
 
-export async function markNotificationRead(
-  id: string,
-  token?: string
-): Promise<NotificationItem> {
+export async function markNotificationRead(id: string, token?: string): Promise<NotificationItem> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };

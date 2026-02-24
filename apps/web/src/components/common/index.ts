@@ -30,9 +30,4 @@ export {
   sampleDeliveryVolumes,
   sampleSettlementStatusBreakdown,
 } from './Charts';
-export type {
-  BaseChartProps,
-  LineChartProps,
-  BarChartProps,
-  DoughnutChartProps,
-} from './Charts';
+export type { BaseChartProps, LineChartProps, BarChartProps, DoughnutChartProps } from './Charts';

@@ -1,10 +1,5 @@
 import { setupServer } from 'msw/node';
-import {
-  handlers,
-  getTestAccounts,
-  getTestAccountByEmail,
-  createMockToken,
-} from './handlers';
+import { handlers, getTestAccounts, getTestAccountByEmail, createMockToken } from './handlers';
 import { TEST_PASSWORD } from '@zanafleet/contracts';
 
 const server = setupServer(...handlers);
@@ -18,8 +13,8 @@ describe('Auth Mock Handlers', () => {
     it('getTestAccounts returns all test accounts', () => {
       const accounts = getTestAccounts();
       expect(accounts.length).toBeGreaterThanOrEqual(6);
-      expect(accounts.some(a => a.type === 'Admin')).toBe(true);
-      expect(accounts.some(a => a.type === 'Rider')).toBe(true);
+      expect(accounts.some((a) => a.type === 'Admin')).toBe(true);
+      expect(accounts.some((a) => a.type === 'Rider')).toBe(true);
     });
 
     it('getTestAccountByEmail finds account by email', () => {

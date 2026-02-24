@@ -20,7 +20,9 @@ function buildQueryString(params: Record<string, string | number | undefined>): 
     (entry): entry is [string, string | number] => entry[1] !== undefined
   );
   if (entries.length === 0) return '';
-  return '?' + entries.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+  return (
+    '?' + entries.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&')
+  );
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -305,10 +307,7 @@ export interface PaymentActivitySummary {
 // Admin Dashboard API
 // ─────────────────────────────────────────────────────────────────────────────
 
-export async function getAdminMetrics(
-  token: string,
-  periodDays?: number
-): Promise<SystemMetrics> {
+export async function getAdminMetrics(token: string, periodDays?: number): Promise<SystemMetrics> {
   const qs = buildQueryString({ periodDays });
   const response = await fetch(`${API_BASE_URL}/dashboard/admin/metrics${qs}`, {
     method: 'GET',
@@ -473,13 +472,16 @@ export async function getBusinessDeliveryDetail(
   businessId: string,
   deliveryId: string
 ): Promise<DeliveryDetail> {
-  const response = await fetch(`${API_BASE_URL}/businesses/${businessId}/deliveries/${deliveryId}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/businesses/${businessId}/deliveries/${deliveryId}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return handleResponse<DeliveryDetail>(response);
 }
 
@@ -500,7 +502,7 @@ export async function getDeliveryTimeline(
 
 export async function getBusinessBillingSummary(
   token: string,
-  businessId: string,
+  businessId: string
 ): Promise<BillingSummary> {
   const response = await fetch(`${API_BASE_URL}/businesses/${businessId}/billing/summary`, {
     method: 'GET',
@@ -522,13 +524,16 @@ export async function getRiderActiveDeliveries(
   params?: PaginationParams
 ): Promise<PaginatedResponse<ActiveDeliverySummary>> {
   const qs = buildQueryString({ page: params?.page, limit: params?.limit });
-  const response = await fetch(`${API_BASE_URL}/dashboard/rider/${riderId}/deliveries/active${qs}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/dashboard/rider/${riderId}/deliveries/active${qs}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return handleResponse<PaginatedResponse<ActiveDeliverySummary>>(response);
 }
 
@@ -538,13 +543,16 @@ export async function getRiderDeliveryHistory(
   params?: PaginationParams
 ): Promise<PaginatedResponse<ActiveDeliverySummary>> {
   const qs = buildQueryString({ page: params?.page, limit: params?.limit });
-  const response = await fetch(`${API_BASE_URL}/dashboard/rider/${riderId}/deliveries/history${qs}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/dashboard/rider/${riderId}/deliveries/history${qs}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return handleResponse<PaginatedResponse<ActiveDeliverySummary>>(response);
 }
 
@@ -632,13 +640,16 @@ export async function getOperatorDeliveryCandidates(
   params?: DeliveryCandidatesParams
 ): Promise<CandidateInfo[]> {
   const qs = buildQueryString({ radius: params?.radius, limit: params?.limit });
-  const response = await fetch(`${API_BASE_URL}/dashboard/operator/deliveries/${deliveryId}/candidates${qs}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await fetch(
+    `${API_BASE_URL}/dashboard/operator/deliveries/${deliveryId}/candidates${qs}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
   return handleResponse<CandidateInfo[]>(response);
 }
 

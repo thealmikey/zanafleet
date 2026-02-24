@@ -1,8 +1,4 @@
-import {
-  getHighestPriorityRole,
-  getDashboardRoute,
-  DASHBOARD_ROUTES,
-} from '../roleRouting';
+import { getHighestPriorityRole, getDashboardRoute, DASHBOARD_ROUTES } from '../roleRouting';
 
 describe('roleRouting utilities', () => {
   describe('getHighestPriorityRole', () => {

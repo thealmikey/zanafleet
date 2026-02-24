@@ -93,7 +93,7 @@ export function createZoneClusters(): ZoneCluster[] {
       zoneId: 'zone_westlands',
       name: 'Westlands',
       centerLat: -1.2673,
-      centerLng: 36.8110,
+      centerLng: 36.811,
       riderCount: 18,
       demandLevel: 'medium',
     },

@@ -1,7 +1,4 @@
-import type {
-  ActiveDeliverySummary,
-  EarningsSummary,
-} from '../../services/dashboardApi';
+import type { ActiveDeliverySummary, EarningsSummary } from '../../services/dashboardApi';
 
 export function createActiveDeliveries(riderId: string): ActiveDeliverySummary[] {
   const now = new Date();

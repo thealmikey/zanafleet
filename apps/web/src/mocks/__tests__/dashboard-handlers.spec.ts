@@ -295,7 +295,9 @@ describe('Dashboard MSW Handlers', () => {
     });
 
     it('returns candidates by area', async () => {
-      const response = await fetch('/api/dashboard/operator/candidates?lat=-1.28&lng=36.81&limit=3');
+      const response = await fetch(
+        '/api/dashboard/operator/candidates?lat=-1.28&lng=36.81&limit=3'
+      );
       expect(response.ok).toBe(true);
       const data = await response.json();
 
@@ -414,7 +416,9 @@ describe('Dashboard MSW Handlers', () => {
 
   describe('Geo Endpoints', () => {
     it('returns nearby riders', async () => {
-      const response = await fetch('/api/geo/nearby-riders?lat=-1.2864&lng=36.8172&radius=2000&limit=3');
+      const response = await fetch(
+        '/api/geo/nearby-riders?lat=-1.2864&lng=36.8172&radius=2000&limit=3'
+      );
       expect(response.ok).toBe(true);
       const data = await response.json();
 
@@ -453,7 +457,9 @@ describe('Dashboard MSW Handlers', () => {
     });
 
     it('returns zone clusters', async () => {
-      const response = await fetch('/api/geo/zones?minLat=-1.4&maxLat=-1.2&minLng=36.7&maxLng=36.9');
+      const response = await fetch(
+        '/api/geo/zones?minLat=-1.4&maxLat=-1.2&minLng=36.7&maxLng=36.9'
+      );
       expect(response.ok).toBe(true);
       const data = await response.json();
 
@@ -497,7 +503,9 @@ describe('Dashboard MSW Handlers', () => {
     });
 
     it('checks service area containment', async () => {
-      const response = await fetch('/api/geo/service-area/nairobi-central/contains?lat=-1.28&lng=36.82');
+      const response = await fetch(
+        '/api/geo/service-area/nairobi-central/contains?lat=-1.28&lng=36.82'
+      );
       expect(response.ok).toBe(true);
       const data = await response.json();
 

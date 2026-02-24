@@ -143,10 +143,7 @@ export async function getMessages(
   };
 }
 
-export async function getThread(
-  id: string,
-  token?: string
-): Promise<MessageThread> {
+export async function getThread(id: string, token?: string): Promise<MessageThread> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };

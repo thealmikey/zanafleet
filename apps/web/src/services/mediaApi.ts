@@ -86,7 +86,9 @@ export async function getSignedUrl(
   }
 
   const response = await fetch(
-    `${API_BASE_URL}/media/assets/${encodeURIComponent(mediaAssetId)}/signed-url?${params.toString()}`,
+    `${API_BASE_URL}/media/assets/${encodeURIComponent(
+      mediaAssetId
+    )}/signed-url?${params.toString()}`,
     {
       method: 'GET',
       headers,

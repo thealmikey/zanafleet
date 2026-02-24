@@ -79,7 +79,11 @@ describe('signupApi', () => {
       expect(mockFetch).toHaveBeenCalledWith('/api/signup/test-session-id', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stepName: 'personal-details', fullName: 'Test User', location: 'Nairobi' }),
+        body: JSON.stringify({
+          stepName: 'personal-details',
+          fullName: 'Test User',
+          location: 'Nairobi',
+        }),
       });
       expect(result).toEqual(mockResponse);
     });

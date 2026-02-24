@@ -27,7 +27,7 @@ export const addDebugListener = (listener: DebugListener) => {
 };
 
 const notifyListeners = () => {
-  debugListeners.forEach(l => l([...requestHistory]));
+  debugListeners.forEach((l) => l([...requestHistory]));
 };
 
 /**
@@ -40,10 +40,10 @@ export async function apiRequest<T = unknown>(
   options: { workspaceId?: string; token?: string } = {}
 ): Promise<ApiResponse<T>> {
   const { workspaceId = '00000000-0000-0000-0000-000000000000', token } = options;
-  
+
   const url = `${API_BASE_URL}${API_PREFIX}${endpoint}`;
   const startTime = Date.now();
-  
+
   const request: ApiRequest = {
     id: crypto.randomUUID(),
     method,
@@ -51,37 +51,37 @@ export async function apiRequest<T = unknown>(
     body: body as Record<string, unknown>,
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': token ? `Bearer ${token}` : '',
-      'workspaceId': workspaceId,
+      Authorization: token ? `Bearer ${token}` : '',
+      workspaceId: workspaceId,
     },
     timestamp: new Date().toISOString(),
     status: 'pending',
   };
-  
+
   requestHistory.unshift(request);
   if (requestHistory.length > MAX_HISTORY) requestHistory.pop();
   notifyListeners();
-  
+
   try {
     const response = await fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
-        'workspaceId': workspaceId,
+        ...(token && { Authorization: `Bearer ${token}` }),
+        workspaceId: workspaceId,
       },
       body: body ? JSON.stringify(body) : undefined,
     });
-    
+
     const duration = Date.now() - startTime;
     const responseData = await response.json().catch(() => ({}));
-    
+
     request.status = response.ok ? 'success' : 'error';
     request.statusCode = response.status;
     request.duration = duration;
     request.response = responseData;
     notifyListeners();
-    
+
     return {
       success: response.ok,
       data: response.ok ? responseData : undefined,
@@ -95,7 +95,7 @@ export async function apiRequest<T = unknown>(
     request.duration = duration;
     request.response = { message: (error as Error).message };
     notifyListeners();
-    
+
     return {
       success: false,
       error: { message: (error as Error).message },
@@ -106,83 +106,207 @@ export async function apiRequest<T = unknown>(
 
 // API Methods - Business
 export const BusinessApi = {
-  create: (data: { businessName: string; phone: string; location: unknown; businessType: string; email?: string }, options: { workspaceId: string; token: string }) =>
-    apiRequest<{ id: string }>('/businesses', 'POST', data, options),
-  
+  create: (
+    data: {
+      businessName: string;
+      phone: string;
+      location: unknown;
+      businessType: string;
+      email?: string;
+    },
+    options: { workspaceId: string; token: string }
+  ) => apiRequest<{ id: string }>('/businesses', 'POST', data, options),
+
   getAll: (options: { workspaceId: string; token: string; page?: number; limit?: number }) =>
-    apiRequest<{ data: unknown[]; meta: unknown }>(`/businesses?page=${options.page || 1}&limit=${options.limit || 20}`, 'GET', undefined, options),
-  
+    apiRequest<{ data: unknown[]; meta: unknown }>(
+      `/businesses?page=${options.page || 1}&limit=${options.limit || 20}`,
+      'GET',
+      undefined,
+      options
+    ),
+
   getById: (id: string, options: { workspaceId: string; token: string }) =>
     apiRequest<unknown>(`/businesses/${id}`, 'GET', undefined, options),
-  
-  update: (id: string, data: Partial<{ businessName: string; phone: string; location: unknown; businessType: string; email: string }>, options: { workspaceId: string; token: string }) =>
-    apiRequest<unknown>(`/businesses/${id}`, 'PATCH', data, options),
-  
+
+  update: (
+    id: string,
+    data: Partial<{
+      businessName: string;
+      phone: string;
+      location: unknown;
+      businessType: string;
+      email: string;
+    }>,
+    options: { workspaceId: string; token: string }
+  ) => apiRequest<unknown>(`/businesses/${id}`, 'PATCH', data, options),
+
   delete: (id: string, options: { workspaceId: string; token: string }) =>
     apiRequest<{ deleted: boolean }>(`/businesses/${id}`, 'DELETE', undefined, options),
 };
 
 // API Methods - Rider
 export const RiderApi = {
-  create: (data: { fullName: string; nationalId: string; phone: string; vehicleType: string; saccoId?: string; email?: string; location?: unknown }, options: { workspaceId: string; token: string }) =>
-    apiRequest<{ id: string }>('/riders', 'POST', data, options),
-  
+  create: (
+    data: {
+      fullName: string;
+      nationalId: string;
+      phone: string;
+      vehicleType: string;
+      saccoId?: string;
+      email?: string;
+      location?: unknown;
+    },
+    options: { workspaceId: string; token: string }
+  ) => apiRequest<{ id: string }>('/riders', 'POST', data, options),
+
   getAll: (options: { workspaceId: string; token: string; page?: number; limit?: number }) =>
-    apiRequest<{ data: unknown[]; meta: unknown }>(`/riders?page=${options.page || 1}&limit=${options.limit || 20}`, 'GET', undefined, options),
-  
+    apiRequest<{ data: unknown[]; meta: unknown }>(
+      `/riders?page=${options.page || 1}&limit=${options.limit || 20}`,
+      'GET',
+      undefined,
+      options
+    ),
+
   getById: (id: string, options: { workspaceId: string; token: string }) =>
     apiRequest<unknown>(`/riders/${id}`, 'GET', undefined, options),
-  
-  update: (id: string, data: Partial<{ fullName: string; phone: string; vehicleType: string; location: unknown }>, options: { workspaceId: string; token: string }) =>
-    apiRequest<unknown>(`/riders/${id}`, 'PATCH', data, options),
+
+  update: (
+    id: string,
+    data: Partial<{ fullName: string; phone: string; vehicleType: string; location: unknown }>,
+    options: { workspaceId: string; token: string }
+  ) => apiRequest<unknown>(`/riders/${id}`, 'PATCH', data, options),
 };
 
 // API Methods - Order
 export const OrderApi = {
-  create: (data: { businessId: string; itemSummary?: string; itemMetadata?: unknown; customerName?: string; customerPhone?: string; scheduledTime?: string }, options: { workspaceId: string; token: string }) =>
-    apiRequest<{ id: string }>('/orders', 'POST', data, options),
-  
-  getAll: (options: { workspaceId: string; token: string; page?: number; limit?: number; search?: string; filter?: string }) => {
-    const params = new URLSearchParams({ page: String(options.page || 1), limit: String(options.limit || 20) });
+  create: (
+    data: {
+      businessId: string;
+      itemSummary?: string;
+      itemMetadata?: unknown;
+      customerName?: string;
+      customerPhone?: string;
+      scheduledTime?: string;
+    },
+    options: { workspaceId: string; token: string }
+  ) => apiRequest<{ id: string }>('/orders', 'POST', data, options),
+
+  getAll: (options: {
+    workspaceId: string;
+    token: string;
+    page?: number;
+    limit?: number;
+    search?: string;
+    filter?: string;
+  }) => {
+    const params = new URLSearchParams({
+      page: String(options.page || 1),
+      limit: String(options.limit || 20),
+    });
     if (options.search) params.set('search', options.search);
     if (options.filter) params.set('filter', options.filter);
-    return apiRequest<{ data: unknown[]; meta: unknown }>(`/orders?${params}`, 'GET', undefined, options);
+    return apiRequest<{ data: unknown[]; meta: unknown }>(
+      `/orders?${params}`,
+      'GET',
+      undefined,
+      options
+    );
   },
-  
+
   getById: (id: string, options: { workspaceId: string; token: string }) =>
     apiRequest<unknown>(`/orders/${id}`, 'GET', undefined, options),
 };
 
 // API Methods - Delivery
 export const DeliveryApi = {
-  request: (data: { businessId: string; workspaceId: string; actorId: string; pickup: unknown; dropoff: unknown; recipientName: string; recipientPhone: string; distanceKm?: number }, options: { workspaceId: string; token: string }) =>
-    apiRequest<{ deliveryId: string; orderId: string; estimatedCharges: number; assignedRiderId: string | null }>('/deliveries/request', 'POST', data, options),
-  
-  getAll: (options: { workspaceId: string; token: string; page?: number; limit?: number; filter?: string }) => {
-    const params = new URLSearchParams({ page: String(options.page || 1), limit: String(options.limit || 20) });
+  request: (
+    data: {
+      businessId: string;
+      workspaceId: string;
+      actorId: string;
+      pickup: unknown;
+      dropoff: unknown;
+      recipientName: string;
+      recipientPhone: string;
+      distanceKm?: number;
+    },
+    options: { workspaceId: string; token: string }
+  ) =>
+    apiRequest<{
+      deliveryId: string;
+      orderId: string;
+      estimatedCharges: number;
+      assignedRiderId: string | null;
+    }>('/deliveries/request', 'POST', data, options),
+
+  getAll: (options: {
+    workspaceId: string;
+    token: string;
+    page?: number;
+    limit?: number;
+    filter?: string;
+  }) => {
+    const params = new URLSearchParams({
+      page: String(options.page || 1),
+      limit: String(options.limit || 20),
+    });
     if (options.filter) params.set('filter', options.filter);
-    return apiRequest<{ data: unknown[]; meta: unknown }>(`/deliveries?${params}`, 'GET', undefined, options);
+    return apiRequest<{ data: unknown[]; meta: unknown }>(
+      `/deliveries?${params}`,
+      'GET',
+      undefined,
+      options
+    );
   },
-  
+
   getById: (id: string, options: { workspaceId: string; token: string }) =>
     apiRequest<unknown>(`/deliveries/${id}`, 'GET', undefined, options),
-  
+
   assignRider: (id: string, options: { workspaceId: string; token: string }) =>
     apiRequest<unknown>(`/deliveries/${id}/assign`, 'POST', undefined, options),
-  
-  confirmPickup: (id: string, riderId: string, proofData?: unknown, options: { workspaceId: string; token: string }) =>
-    apiRequest<unknown>(`/deliveries/${id}/pickup`, 'POST', { riderId, proofData }, options),
-  
-  confirmDropoff: (id: string, riderId: string, proofData?: unknown, options: { workspaceId: string; token: string }) =>
-    apiRequest<unknown>(`/deliveries/${id}/dropoff`, 'POST', { riderId, proofData }, options),
-  
-  transition: (id: string, targetState: string, triggeredBy?: string, options: { workspaceId: string; token: string }) =>
-    apiRequest<unknown>(`/deliveries/${id}/transition`, 'POST', { targetState, triggeredBy }, options),
+
+  confirmPickup: (
+    id: string,
+    riderId: string,
+    proofData?: unknown,
+    options: { workspaceId: string; token: string }
+  ) => apiRequest<unknown>(`/deliveries/${id}/pickup`, 'POST', { riderId, proofData }, options),
+
+  confirmDropoff: (
+    id: string,
+    riderId: string,
+    proofData?: unknown,
+    options: { workspaceId: string; token: string }
+  ) => apiRequest<unknown>(`/deliveries/${id}/dropoff`, 'POST', { riderId, proofData }, options),
+
+  transition: (
+    id: string,
+    targetState: string,
+    triggeredBy?: string,
+    options: { workspaceId: string; token: string }
+  ) =>
+    apiRequest<unknown>(
+      `/deliveries/${id}/transition`,
+      'POST',
+      { targetState, triggeredBy },
+      options
+    ),
 };
 
 // API Methods - Auth
 export const AuthApi = {
-  login: async (phone: string, password: string): Promise<ApiResponse<{ actorId: string; workspaceId: string; token: string; type: string; expiresAt: string }>> => {
+  login: async (
+    phone: string,
+    password: string
+  ): Promise<
+    ApiResponse<{
+      actorId: string;
+      workspaceId: string;
+      token: string;
+      type: string;
+      expiresAt: string;
+    }>
+  > => {
     // For sandbox mode, return mock token
     // In real mode, would call: return apiRequest('/auth/login', 'POST', { phone, password }, {});
     return {

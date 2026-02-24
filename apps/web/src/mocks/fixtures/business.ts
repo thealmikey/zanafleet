@@ -174,8 +174,12 @@ export function createBusinessOverview(businessId: string): BusinessOverview {
   const activeDeliveries = deliveries.filter((d) =>
     ['requested', 'assigned', 'pickedup', 'intransit'].includes(d.status.toLowerCase())
   ).length;
-  const successfulDeliveries = deliveries.filter((d) => d.status.toLowerCase() === 'delivered').length;
-  const cancelledDeliveries = deliveries.filter((d) => d.status.toLowerCase() === 'cancelled').length;
+  const successfulDeliveries = deliveries.filter(
+    (d) => d.status.toLowerCase() === 'delivered'
+  ).length;
+  const cancelledDeliveries = deliveries.filter(
+    (d) => d.status.toLowerCase() === 'cancelled'
+  ).length;
   const spendThisMonth = deliveries.reduce((sum, d) => sum + (d.price ?? 0), 0);
 
   return {
@@ -215,10 +219,7 @@ export function createDeliveryTimeline(
   ];
 }
 
-export function createDeliveryDetail(
-  businessId: string,
-  deliveryId: string
-): DeliveryDetail {
+export function createDeliveryDetail(businessId: string, deliveryId: string): DeliveryDetail {
   const deliveries = createDeliveryHistory(businessId);
   const match = deliveries.find((d) => d.deliveryId === deliveryId) ?? deliveries[0];
   const createdAt = match?.createdAt ? new Date(match.createdAt) : new Date();

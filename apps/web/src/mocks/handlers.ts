@@ -31,7 +31,10 @@ function futureIso(minutesFromNow: number): string {
 }
 
 function createId(prefix: string): string {
-  const id = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2);
+  const id =
+    typeof crypto !== 'undefined' && 'randomUUID' in crypto
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2);
   return `${prefix}_${id}`;
 }
 
@@ -187,7 +190,10 @@ function createSeededNotifications(): MockNotification[] {
 }
 
 let notifications: MockNotification[] = createSeededNotifications();
-const businessOwnerDeliveriesByBusinessId = new Map<string, ReturnType<typeof businessFixtures.createDeliveryHistory>>();
+const businessOwnerDeliveriesByBusinessId = new Map<
+  string,
+  ReturnType<typeof businessFixtures.createDeliveryHistory>
+>();
 
 // Pagination helper
 function createPaginationMeta<T>(
@@ -212,7 +218,9 @@ function parseQueryParams(url: URL): { page: number; limit: number; periodDays: 
   return { page, limit, periodDays };
 }
 
-function getBusinessOwnerDeliveries(businessId: string): ReturnType<typeof businessFixtures.createDeliveryHistory> {
+function getBusinessOwnerDeliveries(
+  businessId: string
+): ReturnType<typeof businessFixtures.createDeliveryHistory> {
   const existing = businessOwnerDeliveriesByBusinessId.get(businessId);
   if (existing) {
     return existing;
@@ -265,7 +273,9 @@ function applyUpdate(session: SignupSession, data: UpdateStepRequest): void {
     session.completedSteps = Array.from(set);
     // If moving to review step, mark pending finalization, else partial
     session.status =
-      data.stepName === 'review' ? SignUpSessionStatus.PENDING_FINALIZATION : SignUpSessionStatus.PARTIAL;
+      data.stepName === 'review'
+        ? SignUpSessionStatus.PENDING_FINALIZATION
+        : SignUpSessionStatus.PARTIAL;
   } else if (session.status === SignUpSessionStatus.INITIATED) {
     // Any update without step marks partial progress
     session.status = SignUpSessionStatus.PARTIAL;
@@ -415,14 +425,14 @@ export function seedMockSession(partial?: Partial<SignupSession>): SignupSession
 export const handlers: HttpHandler[] = [
   // POST /api/signup
   http.post('/api/signup', async ({ request }) => {
-    const body = (await request.json()) as { actorType?: ActorType | null; idempotencyKey?: string };
+    const body = (await request.json()) as {
+      actorType?: ActorType | null;
+      idempotencyKey?: string;
+    };
     const actorType = body.actorType ?? null;
 
     if (!actorType) {
-      return HttpResponse.json(
-        { message: 'actorType is required' },
-        { status: 400 }
-      );
+      return HttpResponse.json({ message: 'actorType is required' }, { status: 400 });
     }
 
     const sessionId = createId('sess');
@@ -570,7 +580,10 @@ export const handlers: HttpHandler[] = [
       userSettings.businessLocations = body.businessLocations;
     }
     if (body.riderVehicleInfo) {
-      userSettings.riderVehicleInfo = { ...userSettings.riderVehicleInfo, ...body.riderVehicleInfo };
+      userSettings.riderVehicleInfo = {
+        ...userSettings.riderVehicleInfo,
+        ...body.riderVehicleInfo,
+      };
     }
     if (typeof body.profileImage !== 'undefined') {
       userSettings.profileImage = body.profileImage;
@@ -669,7 +682,10 @@ export const handlers: HttpHandler[] = [
   // ─────────────────────────────────────────────────────────────────────────
 
   http.get('/api/businesses/mine', () => {
-    return HttpResponse.json({ data: businessFixtures.createBusinessIdentities() }, { status: 200 });
+    return HttpResponse.json(
+      { data: businessFixtures.createBusinessIdentities() },
+      { status: 200 }
+    );
   }),
 
   http.get('/api/businesses/:businessId/stats/overview', ({ params }) => {
@@ -718,7 +734,11 @@ export const handlers: HttpHandler[] = [
     const activeStatuses = new Set(['requested', 'assigned', 'pickedup', 'intransit']);
     const deliveries = getBusinessOwnerDeliveries(businessId).filter((delivery) => {
       if (status && delivery.status !== status) return false;
-      if (locationId && delivery.pickupLocationId !== locationId && delivery.dropoffLocationId !== locationId) {
+      if (
+        locationId &&
+        delivery.pickupLocationId !== locationId &&
+        delivery.dropoffLocationId !== locationId
+      ) {
         return false;
       }
       if (riderId && delivery.assignedRiderId !== riderId) return false;
@@ -1066,12 +1086,19 @@ export const handlers: HttpHandler[] = [
 
     // Generate a canned response based on the prompt
     const responses = [
-      `I understand you're asking about "${prompt.slice(0, 50)}${prompt.length > 50 ? '...' : ''}". Let me help you with that.`,
-      `Based on your question, here's what I can tell you about ${prompt.slice(0, 30)}${prompt.length > 30 ? '...' : ''}.`,
-      `Great question! Regarding "${prompt.slice(0, 40)}${prompt.length > 40 ? '...' : ''}", here's my response.`,
+      `I understand you're asking about "${prompt.slice(0, 50)}${
+        prompt.length > 50 ? '...' : ''
+      }". Let me help you with that.`,
+      `Based on your question, here's what I can tell you about ${prompt.slice(0, 30)}${
+        prompt.length > 30 ? '...' : ''
+      }.`,
+      `Great question! Regarding "${prompt.slice(0, 40)}${
+        prompt.length > 40 ? '...' : ''
+      }", here's my response.`,
     ];
 
-    const content = responses[Math.floor(Math.random() * responses.length)] +
+    const content =
+      responses[Math.floor(Math.random() * responses.length)] +
       '\n\nThis is a mock AI response. In production, this would be connected to a real AI service. ' +
       'For now, I can confirm your message was received successfully.';
 
@@ -1128,7 +1155,13 @@ export const handlers: HttpHandler[] = [
       ownerType?: string;
     };
 
-    if (!body.filename || !body.mimeType || typeof body.size !== 'number' || !body.ownerId || !body.ownerType) {
+    if (
+      !body.filename ||
+      !body.mimeType ||
+      typeof body.size !== 'number' ||
+      !body.ownerId ||
+      !body.ownerType
+    ) {
       return HttpResponse.json(
         { message: 'filename, mimeType, size, ownerId, and ownerType are required' },
         { status: 400 }

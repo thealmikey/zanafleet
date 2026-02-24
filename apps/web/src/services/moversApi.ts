@@ -99,7 +99,9 @@ export interface LocationSuggestionsParams {
   limit?: number;
 }
 
-export async function getLocationSuggestions(params: LocationSuggestionsParams): Promise<LocationSuggestion[]> {
+export async function getLocationSuggestions(
+  params: LocationSuggestionsParams
+): Promise<LocationSuggestion[]> {
   const searchParams = new URLSearchParams();
   searchParams.set('q', params.query);
   if (params.latitude) searchParams.set('lat', params.latitude.toString());

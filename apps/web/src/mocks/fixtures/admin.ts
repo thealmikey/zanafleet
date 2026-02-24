@@ -1,8 +1,4 @@
-import type {
-  SystemMetrics,
-  SettlementSummary,
-  PolicySummary,
-} from '../../services/dashboardApi';
+import type { SystemMetrics, SettlementSummary, PolicySummary } from '../../services/dashboardApi';
 
 export function createAdminMetrics(periodDays = 30): SystemMetrics {
   return {

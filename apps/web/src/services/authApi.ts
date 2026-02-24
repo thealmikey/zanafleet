@@ -98,10 +98,7 @@ export async function getProfile(token?: string): Promise<User> {
  * Update the current user's profile
  * PUT /api/user/profile
  */
-export async function updateProfile(
-  update: Partial<User>,
-  token?: string
-): Promise<User> {
+export async function updateProfile(update: Partial<User>, token?: string): Promise<User> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };

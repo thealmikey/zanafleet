@@ -48,7 +48,7 @@ export function getTestAccounts(): readonly TestAccount[] {
 
 // Helper to find test account by email
 export function getTestAccountByEmail(email: string): TestAccount | undefined {
-  return TEST_ACCOUNTS.find(account => account.email === email);
+  return TEST_ACCOUNTS.find((account) => account.email === email);
 }
 
 // Helper to create a mock JWT token (simple base64-encoded JSON, no real signing)
@@ -153,29 +153,20 @@ export const handlers = [
     const authHeader = request.headers.get('Authorization');
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return HttpResponse.json(
-        { message: 'Unauthorized', statusCode: 401 },
-        { status: 401 }
-      );
+      return HttpResponse.json({ message: 'Unauthorized', statusCode: 401 }, { status: 401 });
     }
 
     const token = authHeader.replace('Bearer ', '');
     const userId = decodeTokenUserId(token);
 
     if (!userId) {
-      return HttpResponse.json(
-        { message: 'Invalid token', statusCode: 401 },
-        { status: 401 }
-      );
+      return HttpResponse.json({ message: 'Invalid token', statusCode: 401 }, { status: 401 });
     }
 
-    const account = TEST_ACCOUNTS.find(a => a.id === userId);
+    const account = TEST_ACCOUNTS.find((a) => a.id === userId);
 
     if (!account) {
-      return HttpResponse.json(
-        { message: 'User not found', statusCode: 404 },
-        { status: 404 }
-      );
+      return HttpResponse.json({ message: 'User not found', statusCode: 404 }, { status: 404 });
     }
 
     return HttpResponse.json(testAccountToUser(account));
@@ -285,7 +276,10 @@ export const handlers = [
     // Validate required fields are set
     if (!session.fullName || !session.nationalId || !session.location) {
       return HttpResponse.json(
-        { message: 'fullName, nationalId, and location are required for finalization', statusCode: 400 },
+        {
+          message: 'fullName, nationalId, and location are required for finalization',
+          statusCode: 400,
+        },
         { status: 400 }
       );
     }

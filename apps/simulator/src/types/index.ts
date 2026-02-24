@@ -75,12 +75,12 @@ export interface Order {
 }
 
 // Delivery Status (matching DeliveryStatus enum)
-export type DeliveryStatus = 
-  | 'Requested' 
-  | 'Assigned' 
-  | 'PickedUp' 
-  | 'InTransit' 
-  | 'Delivered' 
+export type DeliveryStatus =
+  | 'Requested'
+  | 'Assigned'
+  | 'PickedUp'
+  | 'InTransit'
+  | 'Delivered'
   | 'Cancelled';
 
 // Delivery entity
