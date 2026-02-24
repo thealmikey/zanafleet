@@ -59,4 +59,5 @@ export interface WebhookProcessingResult {
   transactionId?: string;
   status?: PaymentStatus;
   errorMessage?: string;
+  metadata?: Record<string, unknown>;
 }

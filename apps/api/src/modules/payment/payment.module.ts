@@ -16,6 +16,8 @@ import { PaymentTransactionEntity } from './entities/payment-transaction.entity'
 import { RefundEntity } from './entities/refund.entity';
 import { CreatePaymentIntentCommandHandler } from './handlers/create-payment-intent.handler';
 import { ProcessPaymentCommandHandler } from './handlers/process-payment.handler';
+import { MpesaDarajaProvider } from './providers/mpesa-daraja/mpesa-daraja.provider';
+import { MpesaDarajaService } from './providers/mpesa-daraja/mpesa-daraja.service';
 import { NoOpPaymentProvider } from './providers/noop-payment.provider';
 import { PaymentProviderRegistry } from './providers/payment-provider-registry.service';
 import { FraudCheckService } from './services/fraud-check.service';
@@ -39,6 +41,8 @@ const CommandHandlers = [CreatePaymentIntentCommandHandler, ProcessPaymentComman
   providers: [
     PaymentProviderRegistry,
     NoOpPaymentProvider,
+    MpesaDarajaProvider,
+    MpesaDarajaService,
     FraudCheckService,
     PaymentFlowOrchestrator,
     RefundDisputeCoordinator,
@@ -47,6 +51,8 @@ const CommandHandlers = [CreatePaymentIntentCommandHandler, ProcessPaymentComman
   exports: [
     PaymentProviderRegistry,
     NoOpPaymentProvider,
+    MpesaDarajaProvider,
+    MpesaDarajaService,
     FraudCheckService,
     PaymentFlowOrchestrator,
     RefundDisputeCoordinator,
