@@ -5,6 +5,32 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+const isSandboxMode = process.env.SANDBOX_MODE === 'true';
+
+/**
+ * Database configuration for sandbox mode (SQLite in-memory)
+ * vs production mode (PostgreSQL)
+ */
+const dbConfig = isSandboxMode
+  ? {
+      type: 'sqljs' as const,
+      autoLoadEntities: true,
+      synchronize: true,
+      location: ':memory:',
+    }
+  : {
+      type: 'postgres' as const,
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      username: process.env.DB_USERNAME || 'postgres',
+      password: process.env.DB_PASSWORD || 'postgres',
+      database: process.env.DB_NAME || 'zanafleet',
+      autoLoadEntities: true,
+      synchronize: process.env.NODE_ENV !== 'production',
+      migrations: [path.join(__dirname, '../../../infra/db/migrations/*.{ts,js}')],
+      migrationsRun: process.env.NODE_ENV === 'production',
+    };
+
 import { EventBusModule } from './core/event-bus';
 import { MediaModule } from './core/media';
 import { HttpMetricsInterceptor } from './core/metrics/interceptors/http-metrics.interceptor';
@@ -51,21 +77,15 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
  * AppModule
  *
  * Root application module that configures global services.
+ *
+ * SANDBOX MODE: Set SANDBOX_MODE=true environment variable to run with:
+ * - SQLite database (in-memory) instead of PostgreSQL
+ * - Mock Neo4j service
+ * - No external dependencies required
  */
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432', 10),
-      username: process.env.DB_USERNAME || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres',
-      database: process.env.DB_NAME || 'zanafleet',
-      autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV !== 'production',
-      migrations: [path.join(__dirname, '../../../infra/db/migrations/*.{ts,js}')],
-      migrationsRun: process.env.NODE_ENV === 'production',
-    }),
+    TypeOrmModule.forRoot(dbConfig),
     EventBusModule.forRoot({
       isGlobal: true,
     }),

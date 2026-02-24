@@ -20,6 +20,9 @@ export interface Neo4jModuleOptions {
  * Provides Neo4j driver management and session creation for the application.
  * Handles connection lifecycle with graceful initialization and shutdown.
  *
+ * In sandbox mode (SANDBOX_MODE=true), Neo4j is mocked to allow running without
+ * a real Neo4j database.
+ *
  * Usage:
  * ```typescript
  * const session = this.neo4jService.getSession();
@@ -38,6 +41,8 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
   private readonly user: string | undefined;
   private readonly password: string | undefined;
   private readonly database: string;
+  private readonly isSandboxMode: boolean;
+  private readonly mockSession: MockSession;
 
   constructor(
     @Inject(NEO4J_MODULE_OPTIONS)
@@ -47,12 +52,19 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
     this.user = options.user;
     this.password = options.password;
     this.database = options.database || DEFAULT_NEO4J_DATABASE;
+    this.isSandboxMode = process.env.SANDBOX_MODE === 'true';
+    this.mockSession = new MockSession();
   }
 
   /**
    * Initialize the Neo4j driver and verify connectivity
    */
   async onModuleInit(): Promise<void> {
+    if (this.isSandboxMode) {
+      this.logger.warn('Running in SANDBOX MODE - Neo4j is mocked');
+      return;
+    }
+
     this.logger.log(`Connecting to Neo4j at ${this.uri}`);
 
     try {
@@ -77,6 +89,10 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
    * Gracefully close the Neo4j driver connection
    */
   async onModuleDestroy(): Promise<void> {
+    if (this.isSandboxMode) {
+      return;
+    }
+
     if (this.driver) {
       this.logger.log('Closing Neo4j driver connection');
       await this.driver.close();
@@ -90,6 +106,10 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
    * @returns Neo4j Session instance
    */
   getSession(options?: SessionConfig): Session {
+    if (this.isSandboxMode) {
+      return this.mockSession as unknown as Session;
+    }
+
     const sessionOptions: SessionConfig = {
       database: this.database,
       ...options,
@@ -103,6 +123,10 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
    * @returns Neo4j Session with READ access mode
    */
   getReadSession(database?: string): Session {
+    if (this.isSandboxMode) {
+      return this.mockSession as unknown as Session;
+    }
+
     return this.driver.session({
       database: database || this.database,
       defaultAccessMode: neo4j.session.READ,
@@ -115,6 +139,10 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
    * @returns Neo4j Session with WRITE access mode
    */
   getWriteSession(database?: string): Session {
+    if (this.isSandboxMode) {
+      return this.mockSession as unknown as Session;
+    }
+
     return this.driver.session({
       database: database || this.database,
       defaultAccessMode: neo4j.session.WRITE,
@@ -126,6 +154,40 @@ export class Neo4jService implements OnModuleInit, OnModuleDestroy {
    * @returns Neo4j Driver instance
    */
   getDriver(): Driver {
+    if (this.isSandboxMode) {
+      throw new Error('Neo4j driver not available in sandbox mode');
+    }
+
     return this.driver;
+  }
+}
+
+/**
+ * Mock session for sandbox mode - provides no-op implementations
+ */
+class MockSession {
+  private readonly logger = new Logger('MockNeo4jSession');
+
+  run(_query: string, _parameters?: Record<string, unknown>): {
+    then: (onfulfilled?: (value: unknown) => void) => unknown;
+  } {
+    this.logger.debug('Mock Neo4j run called (sandbox mode)');
+    return {
+      then: (onfulfilled?: (value: unknown) => void) => {
+        if (onfulfilled) {
+          return onfulfilled({ records: [], summary: {} });
+        }
+        return Promise.resolve({ records: [], summary: {} });
+      },
+    };
+  }
+
+  close(): Promise<void> {
+    this.logger.debug('Mock Neo4j close called (sandbox mode)');
+    return Promise.resolve();
+  }
+
+  subscribe(): void {
+    this.logger.debug('Mock Neo4j subscribe called (sandbox mode)');
   }
 }
