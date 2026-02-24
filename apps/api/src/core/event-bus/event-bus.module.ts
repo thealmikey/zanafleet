@@ -86,7 +86,13 @@ export class EventBusModule {
     return {
       module: EventBusModule,
       providers: [IdempotencyService, RetryService, EventLoggerService, DomainEventRouter],
-      exports: [IdempotencyService, RetryService, EventLoggerService, DomainEventRouter],
+      exports: [
+        IdempotencyService,
+        RetryService,
+        EventLoggerService,
+        DomainEventRouter,
+        EventBusService,
+      ],
     };
   }
 }

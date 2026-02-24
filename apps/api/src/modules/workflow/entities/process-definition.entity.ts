@@ -1,46 +1,18 @@
 import {
-  Entity,
-  PrimaryColumn,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
+  Entity,
   Index,
+  OneToMany,
+  PrimaryColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 
-import { ProcessTransitionEntity } from './process-transition.entity';
+import { ProcessState } from './process-state.enum';
 
-/**
- * Process State Enum
- *
- * Defines all possible states for process instances.
- * States are process-agnostic - specific processes use subsets.
- */
-export enum ProcessState {
-  // Initial states
-  DRAFT = 'draft',
-  ESTIMATE_REQUESTED = 'estimate_requested',
-  OPTIONS_PRESENTED = 'options_presented',
-
-  // Confirmation states
-  BOOKING_CONFIRMED = 'booking_confirmed',
-  PAYMENT_AUTHORIZED = 'payment_authorized',
-
-  // Assignment states
-  DRIVER_ASSIGNED = 'driver_assigned',
-  VEHICLE_ASSIGNED = 'vehicle_assigned',
-
-  // Active states
-  IN_PROGRESS = 'in_progress',
-  ARRIVED = 'arrived',
-  LOADING = 'loading',
-  UNLOADING = 'unloading',
-
-  // Terminal states
-  COMPLETED = 'completed',
-  CANCELLED = 'cancelled',
-  FAILED = 'failed',
-}
+// Note: ProcessTransitionEntity is referenced by name in the decorator to avoid circular dependency
+// Import ProcessState for use in the entity class
+type ProcessStateEnum = typeof ProcessState;
 
 /**
  * Process Definition Entity
@@ -80,8 +52,9 @@ export class ProcessDefinitionEntity {
   @Column('simple-array', { nullable: true })
   terminalStates!: string[];
 
-  @OneToMany(() => ProcessTransitionEntity, (transition) => transition.definition)
-  transitions!: ProcessTransitionEntity[];
+  @OneToMany('ProcessTransitionEntity', (transition: any) => transition.definition)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  transitions!: any[];
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;

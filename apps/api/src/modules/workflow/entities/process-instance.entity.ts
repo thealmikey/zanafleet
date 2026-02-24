@@ -9,7 +9,9 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-import { ProcessDefinitionEntity, ProcessState } from './process-definition.entity';
+// Import enum from separate file to avoid circular dependency
+import { ProcessState } from './process-state.enum';
+// ProcessDefinitionEntity is referenced by name in the decorator
 
 /**
  * Process Instance Status Enum
@@ -83,9 +85,10 @@ export class ProcessInstanceEntity {
   @Column('uuid')
   definitionId!: string;
 
-  @ManyToOne(() => ProcessDefinitionEntity)
+  @ManyToOne('ProcessDefinitionEntity')
   @JoinColumn({ name: 'definitionId' })
-  definition!: ProcessDefinitionEntity;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  definition!: any;
 
   @Column()
   name!: string;

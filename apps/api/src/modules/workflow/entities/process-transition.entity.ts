@@ -1,15 +1,15 @@
 import {
-  Entity,
-  PrimaryColumn,
   Column,
-  ManyToOne,
-  JoinColumn,
-  Index,
   CreateDateColumn,
+  Entity,
+  Index,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
-import { ProcessDefinitionEntity } from './process-definition.entity';
+// Note: ProcessDefinitionEntity is referenced by name in the decorator to avoid circular dependency
 
 /**
  * Transition Trigger Type
@@ -78,9 +78,10 @@ export class ProcessTransitionEntity {
   @Column('uuid')
   definitionId!: string;
 
-  @ManyToOne(() => ProcessDefinitionEntity)
+  @ManyToOne('ProcessDefinitionEntity')
   @JoinColumn({ name: 'definitionId' })
-  definition!: ProcessDefinitionEntity;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  definition!: any;
 
   @Column()
   name!: string;
