@@ -313,6 +313,17 @@ jobs:
           - 7687:7687
           - 7474:7474
 
+      nats:
+        image: nats:latest
+        options: >-
+          --health-cmd "wget --quiet --tries=1 --spider http://0.0.0.0:8222/health || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 4222:4222
+          - 8222:8222
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -350,6 +361,12 @@ jobs:
             sleep 2
           done
 
+          echo "Waiting for NATS..."
+          for i in {1..60}; do
+            nc -z nats 4222 && echo "✓ NATS ready" && break
+            sleep 2
+          done
+
       - name: Run E2E tests with Playwright
         run: npx playwright test
         env:
@@ -361,6 +378,8 @@ jobs:
           DB_NAME: zanafleet_test
           NEO4J_HOST: neo4j
           NEO4J_PORT: 7687
+          NATS_HOST: nats
+          NATS_PORT: 4222
           API_URL: http://localhost:3000
           CI: 'true'
         continue-on-error: false
