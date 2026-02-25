@@ -1,4 +1,4 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Logger, Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
 import { DEFAULT_NATS_URL, NATS_CLIENT } from './event-bus.constants';
@@ -14,6 +14,28 @@ import { RetryService } from './services/retry.service';
 export interface EventBusModuleOptions {
   natsUrl?: string;
   isGlobal?: boolean;
+}
+
+/**
+ * Mock NATS client for sandbox mode
+ */
+class MockNatsClient {
+  private readonly logger = new Logger('MockNatsClient');
+
+  async connect(): Promise<void> {
+    this.logger.log('Mock NATS client connected (sandbox mode)');
+  }
+
+  emit(_subject: string, _data: unknown): { pipe: () => unknown } {
+    this.logger.debug(`Mock NATS emit (sandbox mode): ${_subject}`);
+    return {
+      pipe: () => ({ subscribe: () => ({}) }),
+    };
+  }
+
+  close(): void {
+    this.logger.log('Mock NATS client closed (sandbox mode)');
+  }
 }
 
 /**
@@ -44,6 +66,32 @@ export class EventBusModule {
    */
   static forRoot(options: EventBusModuleOptions = {}): DynamicModule {
     const natsUrl = options.natsUrl || process.env.NATS_URL || DEFAULT_NATS_URL;
+    const isSandboxMode = process.env.SANDBOX_MODE === 'true';
+
+    if (isSandboxMode) {
+      return {
+        module: EventBusModule,
+        global: options.isGlobal ?? false,
+        providers: [
+          {
+            provide: NATS_CLIENT,
+            useClass: MockNatsClient,
+          },
+          EventBusService,
+          IdempotencyService,
+          RetryService,
+          EventLoggerService,
+          DomainEventRouter,
+        ],
+        exports: [
+          EventBusService,
+          IdempotencyService,
+          RetryService,
+          EventLoggerService,
+          DomainEventRouter,
+        ],
+      };
+    }
 
     return {
       module: EventBusModule,
