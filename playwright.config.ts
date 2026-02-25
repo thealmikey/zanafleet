@@ -37,10 +37,10 @@ export default defineConfig({
 
   webServer: [
     {
-      command: 'cd apps/api && npm run start:dev',
+      command: 'npm run start:dev -- --config nest-cli.json api',
       url: 'http://localhost:3000/health',
       reuseExistingServer: !process.env.CI,
-      timeout: 180 * 1000,
+      timeout: 300 * 1000,
       stdout: 'pipe',
       stderr: 'pipe',
     },
