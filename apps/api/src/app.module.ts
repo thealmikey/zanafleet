@@ -32,6 +32,7 @@ const dbConfig = isSandboxMode
     };
 
 import { EventBusModule } from './core/event-bus';
+import { HealthModule } from './core/health/health.module';
 import { MediaModule } from './core/media';
 import { HttpMetricsInterceptor } from './core/metrics/interceptors/http-metrics.interceptor';
 import { MetricsModule } from './core/metrics/metrics.module';
@@ -94,6 +95,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     }),
     ScheduleModule.forRoot(),
     MetricsModule,
+    HealthModule,
     MediaModule,
     WebhookModule,
     AccountModule,

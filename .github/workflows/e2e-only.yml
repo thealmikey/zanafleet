@@ -1,0 +1,252 @@
+name: E2E Tests (Playwright Only)
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - feature/**
+      - fix/**
+  pull_request:
+    branches:
+      - main
+      - develop
+
+# Environment variables
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  # ============================================================================
+  # SETUP JOB: Verify Node.js and prepare environment
+  # ============================================================================
+  setup:
+    name: Setup CI Environment
+    runs-on: ubuntu-latest
+    outputs:
+      node-version: ${{ steps.setup.outputs.node-version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        id: setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'package.json'
+
+      - name: Verify Node.js and npm versions
+        run: |
+          echo "✓ Node.js version: $(node --version)"
+          echo "✓ npm version: $(npm --version)"
+
+  # ============================================================================
+  # BUILD JOB: Build contracts and application
+  # ============================================================================
+  build:
+    name: Build Application
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js with cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'package.json'
+
+      - name: Install dependencies
+        run: npm install --prefer-offline --no-audit
+
+      - name: Build contracts package
+        run: npm run build --workspace=@zanafleet/contracts
+        continue-on-error: false
+
+      - name: Rebuild native modules
+        run: npm rebuild pg
+
+      - name: Build application
+        run: npm run build
+        continue-on-error: false
+
+      - name: Verify build artifacts
+        run: |
+          if [ -d "apps/api/dist" ]; then
+            echo "✓ API build artifacts generated"
+            ls -la apps/api/dist | head -10
+          else
+            echo "✗ API build artifacts not found"
+            exit 1
+          fi
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            apps/api/dist/
+            apps/simulator/dist/
+            packages/contracts/dist/
+          retention-days: 1
+
+  # ============================================================================
+  # E2E TESTS JOB: Playwright E2E tests with full stack
+  # ============================================================================
+  e2e-tests:
+    name: E2E Tests (Playwright)
+    needs: build
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: zanafleet_test
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd "pg_isready -U postgres -d zanafleet_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+        ports:
+          - 5432:5432
+
+      neo4j:
+        image: neo4j:5-community
+        env:
+          NEO4J_AUTH: none
+          NEO4J_dbms_default__listen__address: 0.0.0.0
+        options: >-
+          --health-cmd "wget --quiet --tries=1 --spider http://0.0.0.0:7474 || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 7687:7687
+          - 7474:7474
+
+      nats:
+        image: nats:latest
+        options: >-
+          --health-cmd "wget --quiet --tries=1 --spider http://0.0.0.0:8222/health || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+        ports:
+          - 4222:4222
+          - 8222:8222
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js with cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: 'package.json'
+
+      - name: Install dependencies
+        run: npm install --prefer-offline --no-audit
+
+      - name: Build contracts package
+        run: npm run build --workspace=@zanafleet/contracts
+
+      - name: Rebuild native modules
+        run: npm rebuild pg
+
+      - name: Build application
+        run: npm run build
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for PostgreSQL..."
+          for i in {1..60}; do
+            nc -z postgres 5432 && echo "✓ PostgreSQL ready" && break
+            sleep 2
+          done
+
+          echo "Waiting for Neo4j..."
+          for i in {1..60}; do
+            curl -sf http://neo4j:7474 > /dev/null && echo "✓ Neo4j ready" && break
+            sleep 2
+          done
+
+          echo "Waiting for NATS..."
+          for i in {1..60}; do
+            nc -z nats 4222 && echo "✓ NATS ready" && break
+            sleep 2
+          done
+
+      - name: Run E2E tests with Playwright
+        run: npx playwright test
+        env:
+          RUN_INTEGRATION_TESTS: 'true'
+          DB_HOST: postgres
+          DB_PORT: 5432
+          DB_USER: postgres
+          DB_PASSWORD: postgres
+          DB_NAME: zanafleet_test
+          NEO4J_HOST: neo4j
+          NEO4J_PORT: 7687
+          NATS_HOST: nats
+          NATS_PORT: 4222
+          API_URL: http://localhost:3000
+          CI: 'true'
+        continue-on-error: false
+
+      - name: Upload Playwright test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+
+      - name: Report E2E test results
+        if: always()
+        run: |
+          echo "## 🔬 E2E Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "Playwright E2E tests completed" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # SUMMARY JOB: Final CI/CD status report
+  # ============================================================================
+  ci-summary:
+    name: CI/CD Summary
+    needs: [setup, build, e2e-tests]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Generate final summary
+        run: |
+          echo "## 📊 E2E Test Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Workflow Status" >> $GITHUB_STEP_SUMMARY
+          echo "- **Setup:** ${{ needs.setup.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Build:** ${{ needs.build.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **E2E Tests:** ${{ needs.e2e-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Notes" >> $GITHUB_STEP_SUMMARY
+          echo "- Unit tests and Integration tests are skipped in this workflow" >> $GITHUB_STEP_SUMMARY
+          echo "- Only Playwright E2E tests are executed" >> $GITHUB_STEP_SUMMARY
+
+      - name: Fail if any job failed
+        if: failure()
+        run: exit 1
+
+      - name: Success
+        if: success()
+        run: echo "✓ All E2E tests passed successfully!"

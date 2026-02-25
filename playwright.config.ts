@@ -37,8 +37,11 @@ export default defineConfig({
 
   webServer: [
     {
-      command: 'npm run start:dev -- --config nest-cli.json api',
-      url: 'http://localhost:3000/health',
+      // Use ts-node with tsconfig-paths for proper module resolution
+      // This ensures @zanafleet/contracts and other path aliases resolve correctly
+      command:
+        'node -r tsconfig-paths/register node_modules/.bin/nest start --config nest-cli.json api',
+      url: 'http://localhost:3000',
       reuseExistingServer: !process.env.CI,
       timeout: 300 * 1000,
       stdout: 'pipe',
