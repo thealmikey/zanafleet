@@ -76,9 +76,9 @@ jobs:
 
       - name: Verify build artifacts
         run: |
-          if [ -d "apps/api/dist" ]; then
+          if [ -d "dist/api" ]; then
             echo "✓ API build artifacts generated"
-            ls -la apps/api/dist | head -10
+            ls -la dist/api | head -10
           else
             echo "✗ API build artifacts not found"
             exit 1
@@ -89,7 +89,7 @@ jobs:
         with:
           name: build-artifacts
           path: |
-            apps/api/dist/
+            dist/api/
             apps/simulator/dist/
             packages/contracts/dist/
           retention-days: 1
