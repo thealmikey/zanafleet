@@ -1,7 +1,7 @@
-import { Module, DynamicModule } from '@nestjs/common';
+import { DynamicModule, Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 
-import { NATS_CLIENT, DEFAULT_NATS_URL } from './event-bus.constants';
+import { DEFAULT_NATS_URL, NATS_CLIENT } from './event-bus.constants';
 import { EventBusService } from './event-bus.service';
 import { DomainEventRouter } from './services/domain-event-router.service';
 import { EventLoggerService } from './services/event-logger.service';
@@ -85,13 +85,19 @@ export class EventBusModule {
   static forFeature(): DynamicModule {
     return {
       module: EventBusModule,
-      providers: [IdempotencyService, RetryService, EventLoggerService, DomainEventRouter],
-      exports: [
+      providers: [
+        EventBusService,
         IdempotencyService,
         RetryService,
         EventLoggerService,
         DomainEventRouter,
+      ],
+      exports: [
         EventBusService,
+        IdempotencyService,
+        RetryService,
+        EventLoggerService,
+        DomainEventRouter,
       ],
     };
   }

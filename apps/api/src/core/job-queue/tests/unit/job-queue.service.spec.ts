@@ -41,9 +41,9 @@ jest.mock('bullmq', () => ({
   })),
 }));
 
-jest.mock('ioredis', () => {
-  return jest.fn().mockImplementation(() => mockRedis);
-});
+jest.mock('ioredis', () => ({
+  Redis: jest.fn().mockImplementation(() => mockRedis),
+}));
 
 describe('JobQueueService', () => {
   let service: JobQueueService;

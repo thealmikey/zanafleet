@@ -1,20 +1,20 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ComponentRegistryService } from '../registry/component-registry.service';
 import {
-  UISchema,
-  DataSource,
-  Binding,
   ActionDefinition,
-  ValidatorDefinition,
+  Binding,
+  CapabilityRequirement,
+  Condition,
+  DataSource,
+  LayoutNode,
+  ResponseMetadata,
   SchemaMetadata,
+  ScreenState,
   TelemetryConfig,
   UIComposeRequest,
   UIComposeResponse,
-  ResponseMetadata,
-  CapabilityRequirement,
-  ScreenState,
-  Condition,
-  LayoutNode,
+  UISchema,
+  ValidatorDefinition,
 } from '../schema/v1/types';
 
 /**
@@ -277,7 +277,30 @@ export class UISchemaCompilerService {
   /**
    * Resolve value from binding or context
    */
-  private resolveValue(value: unknown, _context: Record<string, unknown>): unknown {
+  private resolveValue(value: unknown, context: Record<string, unknown>): unknown {
+    if (typeof value !== 'string') {
+      return value;
+    }
+
+    // Check if it's a path reference (contains dots)
+    if (value.includes('.')) {
+      const parts = value.split('.');
+      let result: unknown = context;
+      for (const part of parts) {
+        if (result && typeof result === 'object' && part in result) {
+          result = (result as Record<string, unknown>)[part];
+        } else {
+          return value; // Return original if path not found
+        }
+      }
+      return result;
+    }
+
+    // Check if it's a direct context key
+    if (value in context) {
+      return context[value];
+    }
+
     return value;
   }
 

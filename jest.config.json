@@ -1,41 +1,41 @@
 {
-  "moduleFileExtensions": [
-    "js",
-    "json",
-    "ts"
-  ],
+  "moduleFileExtensions": ["js", "json", "ts"],
   "rootDir": ".",
   "testRegex": ".*\\.spec\\.ts$",
   "transform": {
-    "^.+\\.(t|j)s$": ["@swc/jest", {
-      "jsc": {
-        "parser": {
-          "syntax": "typescript",
-          "tsx": false,
-          "decorators": true,
-          "dynamicImport": true
+    "^.+\\.(t|j)s$": [
+      "@swc/jest",
+      {
+        "swcrc": false,
+        "jsc": {
+          "parser": {
+            "syntax": "typescript",
+            "tsx": false,
+            "decorators": true,
+            "dynamicImport": true
+          },
+          "transform": {
+            "legacyDecorator": true,
+            "decoratorMetadata": true
+          },
+          "target": "es2020",
+          "baseUrl": ".",
+          "paths": {
+            "@zanafleet/contracts": ["packages/contracts/src"],
+            "@zanafleet/contracts/*": ["packages/contracts/src/*"],
+            "@zanafleet/domain": ["packages/domain/src"],
+            "@zanafleet/domain/*": ["packages/domain/src/*"],
+            "@zanafleet/utils": ["packages/utils/src"],
+            "@zanafleet/utils/*": ["packages/utils/src/*"],
+            "@api/*": ["apps/api/src/*"]
+          }
         },
-        "transform": {
-          "legacyDecorator": true,
-          "decoratorMetadata": true
-        },
-        "target": "es2020",
-        "baseUrl": ".",
-        "paths": {
-          "@zanafleet/contracts": ["packages/contracts/src"],
-          "@zanafleet/contracts/*": ["packages/contracts/src/*"],
-          "@zanafleet/domain": ["packages/domain/src"],
-          "@zanafleet/domain/*": ["packages/domain/src/*"],
-          "@zanafleet/utils": ["packages/utils/src"],
-          "@zanafleet/utils/*": ["packages/utils/src/*"],
-          "@api/*": ["apps/api/src/*"]
+        "module": {
+          "type": "commonjs",
+          "noInterop": false
         }
-      },
-      "module": {
-        "type": "commonjs",
-        "noInterop": false
       }
-    }]
+    ]
   },
   "collectCoverageFrom": [
     "apps/api/src/**/*.(t|j)s",
@@ -51,9 +51,7 @@
   "coverageDirectory": "coverage",
   "testEnvironment": "node",
   "passWithNoTests": true,
-  "roots": [
-    "<rootDir>/apps/api/src"
-  ],
+  "roots": ["<rootDir>/apps/api/src"],
   "moduleNameMapper": {
     "^@api/(.*)$": "<rootDir>/apps/api/src/$1",
     "^@zanafleet/contracts$": "<rootDir>/packages/contracts/src",
@@ -63,9 +61,7 @@
     "^@zanafleet/utils$": "<rootDir>/packages/utils/src",
     "^@zanafleet/utils/(.*)$": "<rootDir>/packages/utils/src/$1"
   },
-  "setupFilesAfterEnv": [
-    "<rootDir>/apps/api/test/jest-setup.ts"
-  ],
+  "setupFilesAfterEnv": ["<rootDir>/apps/api/test/jest-setup.ts"],
   "testTimeout": 30000,
   "verbose": true,
   "coverageThreshold": {
