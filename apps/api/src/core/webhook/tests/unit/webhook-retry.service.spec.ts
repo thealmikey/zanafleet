@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 
 import { RetryDefaults } from '../../../event-bus/event-bus.constants';
+import { JobQueueService } from '../../../job-queue/job-queue.service';
 import {
   WebhookDeliveryLog,
   WebhookDeliveryStatus,
@@ -17,6 +18,11 @@ describe('WebhookRetryService', () => {
     update: jest.fn(),
   };
 
+  const _jobQueueService = {
+    enqueue: jest.fn().mockResolvedValue('test-job-id'),
+    enqueueInWorkspace: jest.fn().mockResolvedValue('test-job-id'),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -24,6 +30,10 @@ describe('WebhookRetryService', () => {
         {
           provide: getRepositoryToken(WebhookDeliveryLog),
           useValue: _repository,
+        },
+        {
+          provide: JobQueueService,
+          useValue: _jobQueueService,
         },
       ],
     }).compile();

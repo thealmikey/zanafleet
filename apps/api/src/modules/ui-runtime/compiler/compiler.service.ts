@@ -290,7 +290,7 @@ export class UISchemaCompilerService {
         if (result && typeof result === 'object' && part in result) {
           result = (result as Record<string, unknown>)[part];
         } else {
-          return value; // Return original if path not found
+          return undefined; // Return undefined if path not found
         }
       }
       return result;

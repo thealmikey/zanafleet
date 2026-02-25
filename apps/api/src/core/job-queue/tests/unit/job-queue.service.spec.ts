@@ -19,7 +19,11 @@ const mockRedis = {
 // Mock BullMQ classes
 jest.mock('bullmq', () => ({
   Queue: jest.fn().mockImplementation(() => ({
-    add: jest.fn().mockResolvedValue({ id: 'test-job-id' }),
+    add: jest.fn().mockImplementation((name, data, options) => {
+      // Return the jobId from options, or generate a UUID if not provided
+      const jobId = options?.jobId || require('uuid').v4();
+      return Promise.resolve({ id: jobId });
+    }),
     getJob: jest.fn().mockResolvedValue(null),
     pause: jest.fn().mockResolvedValue(undefined),
     resume: jest.fn().mockResolvedValue(undefined),
