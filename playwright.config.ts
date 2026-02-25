@@ -37,15 +37,26 @@ export default defineConfig({
 
   webServer: [
     {
-      // Use ts-node with tsconfig-paths for proper module resolution
-      // This ensures @zanafleet/contracts and other path aliases resolve correctly
-      command:
-        'node -r tsconfig-paths/register node_modules/.bin/nest start --config nest-cli.json api',
-      url: 'http://localhost:3000',
+      // Run the compiled API directly from dist/api/src
+      command: 'node dist/api/src/main.js',
+      url: 'http://localhost:3000/health',
       reuseExistingServer: !process.env.CI,
       timeout: 300 * 1000,
       stdout: 'pipe',
       stderr: 'pipe',
+      env: {
+        NODE_ENV: 'test',
+        PORT: '3000',
+        DB_HOST: '127.0.0.1',
+        DB_PORT: '5432',
+        DB_USER: 'postgres',
+        DB_PASSWORD: 'postgres',
+        DB_NAME: 'zanafleet_test',
+        NEO4J_HOST: '127.0.0.1',
+        NEO4J_PORT: '7687',
+        NATS_HOST: '127.0.0.1',
+        NATS_PORT: '4222',
+      },
     },
     {
       command: 'cd apps/simulator && npm run dev',
