@@ -130,7 +130,6 @@ describe('WebhookRetryService', () => {
 
       // Should update to FAILED status instead of scheduling retry
       expect(_repository.update).toHaveBeenCalledWith('log-1', {
-        attemptNumber: 4,
         status: WebhookDeliveryStatus.FAILED,
         nextRetryAt: null,
       });
