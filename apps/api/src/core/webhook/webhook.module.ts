@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '../event-bus/event-bus.module';
 import { MetricsModule } from '../metrics/metrics.module';
 import { JobQueueModule } from '../job-queue/job-queue.module';
 import { WebhookController } from './controllers';
@@ -24,7 +23,6 @@ import { WebhookSubscriber } from './webhook.subscriber';
 @Module({
   imports: [
     TypeOrmModule.forFeature([WebhookSubscription, WebhookDeliveryLog]),
-    EventBusModule,
     MetricsModule,
     JobQueueModule,
   ],

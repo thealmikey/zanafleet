@@ -2,7 +2,6 @@ import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { JobQueueModule } from '../../core/job-queue/job-queue.module';
 import { AccountModule } from '../account/account.module';
 import { LedgerModule } from '../ledger/ledger.module';
@@ -23,7 +22,6 @@ const CommandHandlers = [CreateSettlementBatchCommandHandler, ProcessPayoutComma
   imports: [
     TypeOrmModule.forFeature([SettlementBatchEntity, SettlementItemEntity]),
     CqrsModule,
-    EventBusModule,
     JobQueueModule,
     AccountModule,
     forwardRef(() => LedgerModule),

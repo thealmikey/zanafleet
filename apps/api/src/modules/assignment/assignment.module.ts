@@ -1,7 +1,6 @@
 import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { JobTypeModule } from '../job-type/job-type.module';
 
 import { AssignmentStrategyRegistry } from './registry/assignment-strategy.registry';
@@ -48,7 +47,6 @@ import { AssignmentMetrics } from './metrics/assignment.metrics';
 @Module({
   imports: [
     TypeOrmModule.forFeature([JobWorkerAssignmentEntity, AssignmentAuditLogEntity]),
-    EventBusModule,
     JobTypeModule,
   ],
   controllers: [AssignmentController],

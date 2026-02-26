@@ -2,7 +2,6 @@ import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { AccountModule } from '../account/account.module';
 import { LedgerModule } from '../ledger/ledger.module';
 
@@ -33,7 +32,6 @@ const CommandHandlers = [CreatePaymentIntentCommandHandler, ProcessPaymentComman
       RefundEntity,
     ]),
     CqrsModule,
-    forwardRef(() => EventBusModule),
     forwardRef(() => LedgerModule),
     AccountModule,
   ],

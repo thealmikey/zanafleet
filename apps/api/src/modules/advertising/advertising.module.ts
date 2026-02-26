@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '../../core/event-bus/event-bus.module';
-
 import { AdCampaign } from './entities/ad-campaign.entity';
 import { AdClick } from './entities/ad-click.entity';
 import { AdImpression } from './entities/ad-impression.entity';
@@ -24,7 +22,6 @@ export * from './services/visibility-scoring.service';
   imports: [
     TypeOrmModule.forFeature([AdCampaign, AdImpression, AdClick, VisibilityToken]),
     CqrsModule,
-    EventBusModule,
   ],
   providers: [VisibilityScoringService],
   exports: [TypeOrmModule, VisibilityScoringService],

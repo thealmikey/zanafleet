@@ -1,8 +1,7 @@
-import { Module, OnModuleInit, Logger, forwardRef } from '@nestjs/common';
+import { Logger, Module, OnModuleInit, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { CalendarModule } from '../calendar/calendar.module';
 
 import { PolicyDecisionLogEntity } from './entities/policy-decision-log.entity';
@@ -27,7 +26,6 @@ import { PolicyEvaluationEngineService } from './services/policy-evaluation-engi
   imports: [
     TypeOrmModule.forFeature([PolicyEntity, PolicyDecisionLogEntity]),
     CqrsModule,
-    EventBusModule,
     forwardRef(() => CalendarModule),
   ],
   providers: [

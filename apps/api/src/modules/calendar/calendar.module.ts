@@ -1,16 +1,14 @@
-import { Module, OnModuleInit, Logger } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '../../core/event-bus/event-bus.module';
-
 import {
-  CalendarEntity,
-  TimeWindowEntity,
-  CalendarRuleEntity,
-  CalendarEventEntity,
   CalendarBindingEntity,
+  CalendarEntity,
+  CalendarEventEntity,
   CalendarOverrideEntity,
+  CalendarRuleEntity,
+  TimeWindowEntity,
 } from './entities';
 import { CalendarEventRepository } from './repositories/calendar-event.repository';
 import { CalendarRepository } from './repositories/calendar.repository';
@@ -31,7 +29,6 @@ import { SchedulingConstraintService } from './services/scheduling-constraint.se
       CalendarOverrideEntity,
     ]),
     CqrsModule,
-    EventBusModule,
   ],
   providers: [
     CalendarRepository,
