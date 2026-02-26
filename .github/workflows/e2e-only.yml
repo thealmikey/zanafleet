@@ -34,7 +34,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'none'
+         
 
       - name: Verify Node.js and npm versions
         run: |
@@ -56,7 +56,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'none'
+         
 
       - name: Install dependencies
         run: npm install --prefer-offline --no-audit
@@ -167,7 +167,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'none'
+         
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
