@@ -1,5 +1,6 @@
 import { DynamicModule, Logger, Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { ClientNats } from '@nestjs/microservices/client';
 
 import { DEFAULT_NATS_URL, NATS_CLIENT } from './event-bus.constants';
 import { EventBusService } from './event-bus.service';
@@ -111,6 +112,17 @@ export class EventBusModule {
         ]),
       ],
       providers: [
+        {
+          provide: NATS_CLIENT,
+          useFactory: () => {
+            const client = new ClientNats({
+              servers: [natsUrl],
+              maxReconnectAttempts: 10,
+              reconnectTimeWait: 1000,
+            });
+            return client;
+          },
+        },
         EventBusService,
         IdempotencyService,
         RetryService,
