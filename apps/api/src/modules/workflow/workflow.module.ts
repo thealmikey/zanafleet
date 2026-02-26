@@ -2,8 +2,6 @@ import { Module, Type } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '@api/core/event-bus';
-
 import { ProcessDefinitionEntity } from './entities/process-definition.entity';
 import { ProcessInstanceEntity } from './entities/process-instance.entity';
 import { ProcessTransitionEntity } from './entities/process-transition.entity';
@@ -43,7 +41,7 @@ const EventHandlers = [ProcessInstanceNeo4jProjection, ProcessStateChangedNeo4jP
 @Module({
   imports: [
     CqrsModule,
-    EventBusModule.forFeature(),
+
     TypeOrmModule.forFeature([
       ProcessDefinitionEntity,
       ProcessInstanceEntity,

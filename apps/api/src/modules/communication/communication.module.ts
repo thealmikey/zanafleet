@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { MessagingModule } from '../../core/messaging/messaging.module';
 
 import { NotificationsController } from './controllers/notifications.controller';
@@ -33,7 +32,7 @@ import { NotificationSubscriber } from './subscribers/notification.subscriber';
   imports: [
     CqrsModule,
     MessagingModule,
-    EventBusModule.forFeature(),
+
     TypeOrmModule.forFeature([NotificationEntity, TemplateEntity, NotificationPreferenceEntity]),
   ],
   controllers: [NotificationsController],

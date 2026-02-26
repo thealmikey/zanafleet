@@ -2,7 +2,6 @@ import { Module, Type } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '@api/core/event-bus';
 import { Neo4jModule } from '@api/core/neo4j';
 
 import { AISuggestionEntity } from './entities/ai-suggestion.entity';
@@ -37,7 +36,7 @@ const EventHandlers: Type<any>[] = [AISuggestionNeo4jProjection];
 @Module({
   imports: [
     CqrsModule,
-    EventBusModule.forFeature(),
+
     Neo4jModule,
     TypeOrmModule.forFeature([AISuggestionEntity, AIFeedbackEntity, AITelemetryEntity]),
   ],

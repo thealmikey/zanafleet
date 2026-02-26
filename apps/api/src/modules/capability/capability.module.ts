@@ -96,7 +96,6 @@ export const CommandHandlers = [
     CapabilityAuditService,
 
     // Re-export events
-    './events/capability-used.event',
   ],
 })
 export class CapabilityModule implements OnModuleInit {

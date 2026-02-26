@@ -2,7 +2,6 @@ import { Module, OnModuleInit, Logger } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { Neo4jModule } from '../../core/neo4j/neo4j.module';
 
 import { SlackAdapter } from './adapters/slack/slack.adapter';
@@ -50,7 +49,7 @@ export const EventHandlers = [InteractionEventAIOHandler];
 @Module({
   imports: [
     CqrsModule,
-    EventBusModule.forFeature(),
+
     Neo4jModule,
     TypeOrmModule.forFeature([InteractionStreamEntity, InteractionEventEntity]),
   ],

@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { NatsSubjects } from '../../../core/event-bus/event-bus.constants';
 import { EventBusService } from '../../../core/event-bus/event-bus.service';
+import { Inject, forwardRef } from '@nestjs/common';
 import { PolicyEvaluationEngineService } from '../../policy/services/policy-evaluation-engine.service';
 import { RecordLedgerEntryCommand } from '../commands/record-ledger-entry.command';
 import {
@@ -65,7 +66,9 @@ export class RevenueDistributionEngine {
     private readonly ledgerService: LedgerService,
     private readonly commandBus: CommandBus,
     @Optional() private readonly eventBusService?: EventBusService,
-    @Optional() private readonly policyEngine?: PolicyEvaluationEngineService
+    @Inject(forwardRef(() => PolicyEvaluationEngineService))
+    @Optional()
+    private readonly policyEngine?: PolicyEvaluationEngineService
   ) {}
 
   async distributeDeliveryRevenue(input: RevenueDistributionInput): Promise<DistributionResult> {

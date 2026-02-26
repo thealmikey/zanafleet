@@ -1,4 +1,3 @@
-import { EventBusModule } from '@api/core/event-bus';
 import { Module, forwardRef, Provider } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
@@ -100,7 +99,7 @@ function getTypeOrmImports() {
 const imports = [
   ...getTypeOrmImports(),
   CqrsModule,
-  EventBusModule.forFeature(),
+
   forwardRef(() => PolicyModule),
   forwardRef(() => BillingModule),
   forwardRef(() => CalendarModule),

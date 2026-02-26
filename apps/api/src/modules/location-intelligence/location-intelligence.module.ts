@@ -2,7 +2,6 @@ import { Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '../../core/event-bus/event-bus.module';
 import { Neo4jModule } from '../../core/neo4j/neo4j.module';
 import { RedisModule } from '../../core/redis/redis.module';
 
@@ -40,7 +39,7 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
   imports: [
     TypeOrmModule.forFeature([RiderLocationSnapshotEntity, RiderLocationHistoryEntity]),
     CqrsModule,
-    EventBusModule.forFeature(),
+
     Neo4jModule,
     RedisModule.forRoot(),
   ],

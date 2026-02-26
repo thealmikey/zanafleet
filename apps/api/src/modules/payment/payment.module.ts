@@ -33,7 +33,7 @@ const CommandHandlers = [CreatePaymentIntentCommandHandler, ProcessPaymentComman
       RefundEntity,
     ]),
     CqrsModule,
-    EventBusModule,
+    forwardRef(() => EventBusModule),
     forwardRef(() => LedgerModule),
     AccountModule,
   ],

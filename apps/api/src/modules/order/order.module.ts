@@ -1,4 +1,3 @@
-import { EventBusModule } from '@api/core/event-bus';
 import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -19,7 +18,7 @@ import { ActivitySeederService } from './services/activity-seeder.service';
   imports: [
     TypeOrmModule.forFeature([OrderEntity, DeliveryEntity, BusinessEntity, CustomerEntity]),
     CqrsModule,
-    EventBusModule.forFeature(),
+
     forwardRef(() => DeliveryModule),
     forwardRef(() => PaymentModule),
   ],

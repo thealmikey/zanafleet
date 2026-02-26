@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { EventBusModule } from '../../core/event-bus/event-bus.module';
-
 import { CapabilityProposalEntity } from './entities/capability-proposal.entity';
 import { CapabilityOrchestrator } from './services/capability-orchestrator.service';
 import { ConfidenceThresholdService } from './services/confidence-threshold.service';
@@ -29,11 +27,7 @@ import { ConsentConfirmationService } from './services/consent-confirmation.serv
  * - Page independence: Works without chat context
  */
 @Module({
-  imports: [
-    CqrsModule,
-    EventBusModule.forFeature(),
-    TypeOrmModule.forFeature([CapabilityProposalEntity]),
-  ],
+  imports: [CqrsModule, TypeOrmModule.forFeature([CapabilityProposalEntity])],
   providers: [ConsentConfirmationService, CapabilityOrchestrator, ConfidenceThresholdService],
   exports: [
     ConsentConfirmationService,
