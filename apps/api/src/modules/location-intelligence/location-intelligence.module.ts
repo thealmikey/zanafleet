@@ -1,4 +1,5 @@
 import { Module, OnModuleInit } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -37,6 +38,7 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
  */
 @Module({
   imports: [
+    ConfigModule,
     TypeOrmModule.forFeature([RiderLocationSnapshotEntity, RiderLocationHistoryEntity]),
     CqrsModule,
 

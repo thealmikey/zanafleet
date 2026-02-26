@@ -6,6 +6,7 @@ import { MessagingModule } from '../../core/messaging/messaging.module';
 
 import { NotificationsController } from './controllers/notifications.controller';
 import { NotificationDispatchCoordinator } from './coordinators/notification-dispatch.coordinator';
+import { NotificationChannel } from './dto/notification.enums';
 import { NotificationEntity } from './entities/notification.entity';
 import { NotificationPreferenceEntity } from './entities/preference.entity';
 import { TemplateEntity } from './entities/template.entity';
@@ -46,7 +47,23 @@ import { NotificationSubscriber } from './subscribers/notification.subscriber';
     NotificationSubscriber,
     NotificationDispatchCoordinator,
     ChannelProviderRegistry,
-    ...createNoOpProviders(),
+    // No-op providers for each channel using useFactory for dependency injection
+    {
+      provide: 'NOOP_SMS_PROVIDER',
+      useFactory: () => new NoOpChannelProvider(NotificationChannel.SMS),
+    },
+    {
+      provide: 'NOOP_EMAIL_PROVIDER',
+      useFactory: () => new NoOpChannelProvider(NotificationChannel.EMAIL),
+    },
+    {
+      provide: 'NOOP_PUSH_PROVIDER',
+      useFactory: () => new NoOpChannelProvider(NotificationChannel.PUSH),
+    },
+    {
+      provide: 'NOOP_WHATSAPP_PROVIDER',
+      useFactory: () => new NoOpChannelProvider(NotificationChannel.WHATSAPP),
+    },
   ],
   exports: [
     TemplateService,
