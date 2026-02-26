@@ -1,6 +1,28 @@
 import { defineConfig, devices } from '@playwright/test';
 import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
+import { execSync } from 'child_process';
+
+/**
+ * Build a package if its output directory doesn't exist
+ */
+function buildPackageIfNeeded(name: string, workspace: string, outputPath: string): boolean {
+  if (existsSync(resolve(process.cwd(), outputPath))) {
+    return true;
+  }
+
+  console.log(`  🔨 Building ${name}...`);
+  try {
+    execSync(`npm run build --workspace=${workspace}`, {
+      stdio: 'inherit',
+      cwd: process.cwd(),
+    });
+    return existsSync(resolve(process.cwd(), outputPath));
+  } catch (err) {
+    console.error(`  ❌ Failed to build ${name}`);
+    return false;
+  }
+}
 
 /**
  * Pre-flight check to verify build artifacts and module resolution
@@ -8,8 +30,8 @@ import { resolve } from 'path';
 function preFlightCheck(): void {
   const checks = [
     { name: 'API entry point', path: 'dist/api/src/main.js' },
-    { name: 'Contracts package', path: 'packages/contracts/dist/src/index.js' },
-    { name: 'Utils package', path: 'packages/utils/dist/index.js' },
+    { name: 'Contracts package', path: 'packages/contracts/dist/src/index.js', workspace: '@zanafleet/contracts', buildRequired: true },
+    { name: 'Utils package', path: 'packages/utils/dist/index.js', workspace: '@zanafleet/utils', buildRequired: true },
   ];
 
   let allPassed = true;
@@ -21,7 +43,18 @@ function preFlightCheck(): void {
       console.log(`  ✓ ${check.name}: ${check.path}`);
     } else {
       console.log(`  ✗ ${check.name}: ${check.path} - NOT FOUND`);
-      allPassed = false;
+
+      // Try to build if not found
+      if (check.buildRequired) {
+        const built = buildPackageIfNeeded(check.name, check.workspace, check.path);
+        if (built) {
+          console.log(`  ✓ ${check.name}: Built successfully`);
+        } else {
+          allPassed = false;
+        }
+      } else {
+        allPassed = false;
+      }
     }
   }
 
