@@ -66,33 +66,6 @@ export class EventBusModule {
    */
   static forRoot(options: EventBusModuleOptions = {}): DynamicModule {
     const natsUrl = options.natsUrl || process.env.NATS_URL || DEFAULT_NATS_URL;
-    const isSandboxMode = process.env.SANDBOX_MODE === 'true';
-
-    if (isSandboxMode) {
-      return {
-        module: EventBusModule,
-        global: options.isGlobal ?? false,
-        providers: [
-          {
-            provide: NATS_CLIENT,
-            useClass: MockNatsClient,
-          },
-          EventBusService,
-          IdempotencyService,
-          RetryService,
-          EventLoggerService,
-          DomainEventRouter,
-        ],
-        exports: [
-          EventBusService,
-          NATS_CLIENT,
-          IdempotencyService,
-          RetryService,
-          EventLoggerService,
-          DomainEventRouter,
-        ],
-      };
-    }
 
     return {
       module: EventBusModule,
