@@ -46,7 +46,7 @@ import { NotificationSubscriber } from './subscribers/notification.subscriber';
     NotificationSubscriber,
     NotificationDispatchCoordinator,
     ChannelProviderRegistry,
-    NoOpChannelProvider,
+    ...createNoOpProviders(),
   ],
   exports: [
     TemplateService,
