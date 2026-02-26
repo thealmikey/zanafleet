@@ -96,7 +96,7 @@ export class EventBusModule {
 
     return {
       module: EventBusModule,
-      global: options.isGlobal ?? false,
+      global: true,
       imports: [
         ClientsModule.register([
           {
@@ -119,7 +119,6 @@ export class EventBusModule {
       ],
       exports: [
         EventBusService,
-        NATS_CLIENT,
         IdempotencyService,
         RetryService,
         EventLoggerService,
