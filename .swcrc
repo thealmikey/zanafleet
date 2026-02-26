@@ -16,10 +16,10 @@
     "paths": {
       "@zanafleet/contracts": ["packages/contracts/dist/src"],
       "@zanafleet/contracts/*": ["packages/contracts/dist/src/*"],
-      "@zanafleet/domain": ["packages/domain/dist/src"],
-      "@zanafleet/domain/*": ["packages/domain/dist/src/*"],
-      "@zanafleet/utils": ["packages/utils/dist/src"],
-      "@zanafleet/utils/*": ["packages/utils/dist/src/*"],
+      "@zanafleet/domain": ["packages/domain/dist"],
+      "@zanafleet/domain/*": ["packages/domain/dist/*"],
+      "@zanafleet/utils": ["packages/utils/dist"],
+      "@zanafleet/utils/*": ["packages/utils/dist/*"],
       "@api/*": ["apps/api/src/*"]
     }
   },
@@ -28,9 +28,5 @@
     "noInterop": false
   },
   "sourceMaps": true,
-  "exclude": [
-    "node_modules",
-    "dist",
-    "apps/web"
-  ]
+  "exclude": ["node_modules", "dist", "apps/web"]
 }

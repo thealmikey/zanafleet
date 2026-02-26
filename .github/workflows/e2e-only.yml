@@ -79,7 +79,7 @@ jobs:
             echo "✗ contracts package not built"
             exit 1
           fi
-          if [ -d "packages/utils/dist/src" ]; then
+          if [ -d "packages/utils/dist" ]; then
             echo "✓ utils package built"
           else
             echo "✗ utils package not built"

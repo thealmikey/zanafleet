@@ -9,7 +9,7 @@ function preFlightCheck(): void {
   const checks = [
     { name: 'API entry point', path: 'dist/api/src/main.js' },
     { name: 'Contracts package', path: 'packages/contracts/dist/src/index.js' },
-    { name: 'Utils package', path: 'packages/utils/dist/src/index.js' },
+    { name: 'Utils package', path: 'packages/utils/dist/index.js' },
   ];
 
   let allPassed = true;
