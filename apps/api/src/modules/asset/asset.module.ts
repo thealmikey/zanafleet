@@ -1,4 +1,4 @@
-import { Module, OnModuleInit } from '@nestjs/common';
+import { Module, forwardRef, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -23,7 +23,7 @@ import { BundleService } from './services/bundle.service';
   imports: [
     CqrsModule,
     TypeOrmModule.forFeature([AssetEntity, TripEntity, BundleEntity]),
-    PolicyModule,
+    forwardRef(() => PolicyModule),
     SearchModule,
   ],
   controllers: [AssetController, TripController, BundleController, IntegrationController],

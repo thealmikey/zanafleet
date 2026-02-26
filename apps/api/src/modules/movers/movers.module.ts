@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { EventBusModule } from '../../core/event-bus/event-bus.module';
@@ -28,7 +28,13 @@ import { VehicleRecommendationService } from './services/vehicle-recommendation.
  * - Move intelligence layer for recommendations
  */
 @Module({
-  imports: [CqrsModule, LocationIntelligenceModule, AssetModule, PolicyModule, EventBusModule],
+  imports: [
+    CqrsModule,
+    LocationIntelligenceModule,
+    AssetModule,
+    forwardRef(() => PolicyModule),
+    EventBusModule,
+  ],
   controllers: [MoversController],
   providers: [
     VehicleRecommendationService,

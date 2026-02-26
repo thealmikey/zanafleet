@@ -1,4 +1,4 @@
-import { Logger, Module, Type, Provider } from '@nestjs/common';
+import { Logger, Module, Type, Provider, forwardRef } from '@nestjs/common';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 
 import { CalendarModule } from '../calendar/calendar.module';
@@ -101,7 +101,11 @@ const repositoryProviders = getCustomerRepositoryProvider();
 console.log('[DEBUG] CustomerModule repository providers:', repositoryProviders);
 
 @Module({
-  imports: [...getTypeOrmImports(), CalendarModule, PolicyModule],
+  imports: [
+    ...getTypeOrmImports(),
+    forwardRef(() => CalendarModule),
+    forwardRef(() => PolicyModule),
+  ],
   controllers: [CustomerController],
   providers: [
     CommerceContextEngine,
