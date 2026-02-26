@@ -34,8 +34,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'package.json'
+          cache: 'none'
 
       - name: Verify Node.js and npm versions
         run: |
@@ -53,12 +52,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js with cache
+      - name: Setup Node.js without cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'package.json'
+          cache: 'none'
 
       - name: Install dependencies
         run: npm install --prefer-offline --no-audit
@@ -165,12 +163,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js with cache
+      - name: Setup Node.js without cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'package.json'
+          cache: 'none'
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4

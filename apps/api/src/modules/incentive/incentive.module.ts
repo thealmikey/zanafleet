@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -17,7 +17,7 @@ const CommandHandlers = [CreateCampaignCommandHandler, ApplyIncentiveCommandHand
   imports: [
     TypeOrmModule.forFeature([CampaignEntity, IncentiveApplicationEntity]),
     CqrsModule,
-    LedgerModule,
+    forwardRef(() => LedgerModule),
   ],
   providers: [IncentiveEligibilityService, IncentiveEngineService, ...CommandHandlers],
   exports: [TypeOrmModule, IncentiveEligibilityService, IncentiveEngineService],

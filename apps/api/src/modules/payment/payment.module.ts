@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -34,7 +34,7 @@ const CommandHandlers = [CreatePaymentIntentCommandHandler, ProcessPaymentComman
     ]),
     CqrsModule,
     EventBusModule,
-    LedgerModule,
+    forwardRef(() => LedgerModule),
     AccountModule,
   ],
   controllers: [PaymentController, PaymentWebhookController],

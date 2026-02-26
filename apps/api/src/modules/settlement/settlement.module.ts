@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -26,7 +26,7 @@ const CommandHandlers = [CreateSettlementBatchCommandHandler, ProcessPayoutComma
     EventBusModule,
     JobQueueModule,
     AccountModule,
-    LedgerModule,
+    forwardRef(() => LedgerModule),
     PaymentModule,
   ],
   controllers: [SettlementsController],
