@@ -13,7 +13,7 @@ const path = require('path');
 const fs = require('fs');
 
 const ROOT = path.resolve(__dirname, '..');
-const CONTRACTS_DIST = path.join(ROOT, 'packages/contracts/dist');
+const CONTRACTS_DIST = path.join(ROOT, 'packages/contracts/dist/src');
 
 console.log('🔍 Verifying @zanafleet/contracts resolution...\n');
 
