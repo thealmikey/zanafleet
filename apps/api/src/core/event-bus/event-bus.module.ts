@@ -67,20 +67,20 @@ export class EventBusModule {
   static forRoot(options: EventBusModuleOptions = {}): DynamicModule {
     const natsUrl = options.natsUrl || process.env.NATS_URL || DEFAULT_NATS_URL;
 
+    // Create NATS client instance directly
+    const natsClient = new ClientNats({
+      servers: [natsUrl],
+      maxReconnectAttempts: 10,
+      reconnectTimeWait: 1000,
+    });
+
     return {
       module: EventBusModule,
-      global: true,
+      global: options.isGlobal ?? true,
       providers: [
         {
           provide: NATS_CLIENT,
-          useFactory: () => {
-            const client = new ClientNats({
-              servers: [natsUrl],
-              maxReconnectAttempts: 10,
-              reconnectTimeWait: 1000,
-            });
-            return client;
-          },
+          useValue: natsClient,
         },
         EventBusService,
         IdempotencyService,
