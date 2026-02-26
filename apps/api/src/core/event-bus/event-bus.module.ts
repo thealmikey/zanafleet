@@ -85,6 +85,7 @@ export class EventBusModule {
         ],
         exports: [
           EventBusService,
+          NATS_CLIENT,
           IdempotencyService,
           RetryService,
           EventLoggerService,
@@ -118,6 +119,7 @@ export class EventBusModule {
       ],
       exports: [
         EventBusService,
+        NATS_CLIENT,
         IdempotencyService,
         RetryService,
         EventLoggerService,
@@ -142,6 +144,7 @@ export class EventBusModule {
       ],
       exports: [
         EventBusService,
+        NATS_CLIENT,
         IdempotencyService,
         RetryService,
         EventLoggerService,
