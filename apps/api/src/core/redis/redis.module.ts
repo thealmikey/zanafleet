@@ -8,12 +8,11 @@ export class RedisModule {
   static forRoot(options: RedisModuleOptions = {}): DynamicModule {
     const resolvedOptions: RedisModuleOptions = {
       url: options.url || process.env.REDIS_URL || DEFAULT_REDIS_URL,
-      isGlobal: options.isGlobal,
     };
 
     return {
       module: RedisModule,
-      global: resolvedOptions.isGlobal ?? false,
+      global: true,
       providers: [
         {
           provide: REDIS_MODULE_OPTIONS,
