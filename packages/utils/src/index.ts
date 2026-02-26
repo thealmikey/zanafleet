@@ -66,10 +66,7 @@ export interface RetryOptions {
   onRetry?: (attempt: number, error: Error, delayMs: number) => void;
 }
 
-export async function withRetry<T>(
-  fn: () => Promise<T>,
-  options: RetryOptions = {},
-): Promise<T> {
+export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
   const { maxRetries = 3, baseDelayMs = 100, multiplier = 2, onRetry } = options;
 
   let lastError: Error | undefined;
@@ -99,10 +96,7 @@ export function sleep(ms: number): Promise<void> {
 // Object Utilities
 // ============================================================================
 
-export function omit<T extends object, K extends keyof T>(
-  obj: T,
-  keys: K[],
-): Omit<T, K> {
+export function omit<T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> {
   const result = { ...obj };
   for (const key of keys) {
     delete result[key];
@@ -110,10 +104,7 @@ export function omit<T extends object, K extends keyof T>(
   return result as Omit<T, K>;
 }
 
-export function pick<T extends object, K extends keyof T>(
-  obj: T,
-  keys: K[],
-): Pick<T, K> {
+export function pick<T extends object, K extends keyof T>(obj: T, keys: K[]): Pick<T, K> {
   const result = {} as Pick<T, K>;
   for (const key of keys) {
     if (key in obj) {
@@ -161,7 +152,7 @@ export class DomainError extends Error {
   constructor(
     message: string,
     public readonly code: string,
-    public readonly details?: Record<string, unknown>,
+    public readonly details?: Record<string, unknown>
   ) {
     super(message);
     this.name = 'DomainError';
@@ -197,4 +188,4 @@ export class ConflictError extends DomainError {
 // Password Utilities
 // ============================================================================
 
-export { hashPassword, verifyPassword } from './password.util';
+export { hashPassword, verifyPassword } from './password.util.js';
