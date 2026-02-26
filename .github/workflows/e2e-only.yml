@@ -67,6 +67,25 @@ jobs:
         run: npm run build --workspace=@zanafleet/contracts
         continue-on-error: false
 
+      - name: Build utils package
+        run: npm run build --workspace=@zanafleet/utils
+        continue-on-error: false
+
+      - name: Verify packages are built
+        run: |
+          if [ -d "packages/contracts/dist/src" ]; then
+            echo "✓ contracts package built"
+          else
+            echo "✗ contracts package not built"
+            exit 1
+          fi
+          if [ -d "packages/utils/dist/src" ]; then
+            echo "✓ utils package built"
+          else
+            echo "✗ utils package not built"
+            exit 1
+          fi
+
       - name: Rebuild native modules
         run: npm rebuild pg
 

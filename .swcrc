@@ -14,12 +14,12 @@
     "target": "es2020",
     "baseUrl": ".",
     "paths": {
-      "@zanafleet/contracts": ["packages/contracts/src"],
-      "@zanafleet/contracts/*": ["packages/contracts/src/*"],
-      "@zanafleet/domain": ["packages/domain/src"],
-      "@zanafleet/domain/*": ["packages/domain/src/*"],
-      "@zanafleet/utils": ["packages/utils/src"],
-      "@zanafleet/utils/*": ["packages/utils/src/*"],
+      "@zanafleet/contracts": ["packages/contracts/dist/src"],
+      "@zanafleet/contracts/*": ["packages/contracts/dist/src/*"],
+      "@zanafleet/domain": ["packages/domain/dist/src"],
+      "@zanafleet/domain/*": ["packages/domain/dist/src/*"],
+      "@zanafleet/utils": ["packages/utils/dist/src"],
+      "@zanafleet/utils/*": ["packages/utils/dist/src/*"],
       "@api/*": ["apps/api/src/*"]
     }
   },
