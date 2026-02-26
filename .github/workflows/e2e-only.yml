@@ -153,17 +153,28 @@ jobs:
           cache: 'npm'
           cache-dependency-path: 'package.json'
 
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          path: .
+
+      - name: Verify build artifacts
+        run: |
+          if [ -f "dist/api/src/main.js" ]; then
+            echo "✓ API build artifacts found"
+            ls -la dist/api/src/main.js
+          else
+            echo "✗ API build artifacts not found"
+            ls -la dist/ 2>/dev/null || echo "dist folder not found"
+            exit 1
+          fi
+
       - name: Install dependencies
         run: npm install --prefer-offline --no-audit
 
-      - name: Build contracts package
-        run: npm run build --workspace=@zanafleet/contracts
-
       - name: Rebuild native modules
         run: npm rebuild pg
-
-      - name: Build application
-        run: npm run build
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
