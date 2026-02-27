@@ -34,7 +34,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-         
 
       - name: Verify Node.js and npm versions
         run: |
@@ -56,7 +55,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-         
 
       - name: Install dependencies
         run: npm install --prefer-offline --no-audit
@@ -71,13 +69,13 @@ jobs:
 
       - name: Verify packages are built
         run: |
-          if [ -d "packages/contracts/dist/src" ]; then
+          if [ -d "packages/contracts/dist" ] && [ -f "packages/contracts/dist/index.js" ]; then
             echo "✓ contracts package built"
           else
             echo "✗ contracts package not built"
             exit 1
           fi
-          if [ -d "packages/utils/dist" ]; then
+          if [ -d "packages/utils/dist" ] && [ -f "packages/utils/dist/index.js" ]; then
             echo "✓ utils package built"
           else
             echo "✗ utils package not built"
@@ -167,7 +165,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-         
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
