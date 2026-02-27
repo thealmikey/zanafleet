@@ -25,8 +25,8 @@
             "@zanafleet/contracts/*": ["packages/contracts/dist/src/*"],
             "@zanafleet/domain": ["packages/domain/dist/src"],
             "@zanafleet/domain/*": ["packages/domain/dist/src/*"],
-            "@zanafleet/utils": ["packages/utils/dist"],
-            "@zanafleet/utils/*": ["packages/utils/dist/*"],
+            "@zanafleet/utils": ["packages/utils/dist/src"],
+            "@zanafleet/utils/*": ["packages/utils/dist/src/*"],
             "@api/*": ["apps/api/src/*"]
           }
         },
