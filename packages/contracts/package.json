@@ -2,7 +2,6 @@
   "name": "@zanafleet/contracts",
   "version": "0.0.1",
   "description": "Shared DTOs, event interfaces, and type definitions for ZanaFleet",
-  "type": "module",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "exports": {
@@ -17,7 +16,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "swc src --out-dir dist --extensions .ts",
+    "build": "swc src --out-dir dist --extensions .ts && node scripts/add-cjs-exports.js",
     "clean": "rimraf dist",
     "prebuild": "npm run clean",
     "prepare": "npm run build"
