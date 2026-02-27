@@ -188,4 +188,4 @@ export class ConflictError extends DomainError {
 // Password Utilities
 // ============================================================================
 
-export { hashPassword, verifyPassword } from './password.util.js';
+export { hashPassword, verifyPassword } from './password.util';

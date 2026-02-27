@@ -5,7 +5,7 @@ services:
   # PostgreSQL - Primary data store for ZanaFleet primitives
   # ========================================================================
   postgres:
-    image: postgres:15-alpine
+    image: postgis/postgis:15-3.4-alpine
     container_name: zanafleet-postgres-test
     environment:
       POSTGRES_USER: postgres
@@ -34,17 +34,13 @@ services:
       NEO4J_apoc_import_file_enabled: 'true'
       NEO4J_apoc_export_file_enabled: 'true'
     ports:
-      - '7687:7687'  # Bolt protocol
-      - '7474:7474'  # HTTP (Browser)
+      - '7687:7687' # Bolt protocol
+      - '7474:7474' # HTTP (Browser)
     volumes:
       - neo4j_data:/var/lib/neo4j/data
       - neo4j_logs:/var/lib/neo4j/logs
     healthcheck:
-      test:
-        [
-          'CMD-SHELL',
-          'wget --quiet --tries=1 --spider http://localhost:7474 || exit 1',
-        ]
+      test: ['CMD-SHELL', 'wget --quiet --tries=1 --spider http://localhost:7474 || exit 1']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -69,7 +65,11 @@ services:
     volumes:
       - keycloak_data:/opt/keycloak/data
     healthcheck:
-      test: ['CMD-SHELL', 'exec 3<>/dev/tcp/localhost/8080 && echo -e "GET /health/ready HTTP/1.1\nHost: localhost\nConnection: close\n\n" >&3 && cat <&3 | grep -q "200 OK"']
+      test:
+        [
+          'CMD-SHELL',
+          'exec 3<>/dev/tcp/localhost/8080 && echo -e "GET /health/ready HTTP/1.1\nHost: localhost\nConnection: close\n\n" >&3 && cat <&3 | grep -q "200 OK"',
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -100,7 +100,6 @@ services:
   # ========================================================================
   # Redis (Optional) - Caching for future use
   # ========================================================================
-
 
 volumes:
   postgres_data:

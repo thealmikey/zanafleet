@@ -45,7 +45,7 @@
     "ci:all": "npm run ci:lint && npm run verify:contracts && npm run ci:test",
     "ci:all:legacy": "npm run ci:lint:legacy && npm run verify:contracts && npm run ci:test:legacy",
     "prepare": "husky install",
-    "postinstall": "npm --workspace @zanafleet/contracts run build"
+    "postinstall": "npm --workspace @zanafleet/contracts run build && npm --workspace @zanafleet/utils run build"
   },
   "dependencies": {
     "@craco/craco": "^7.1.0",
