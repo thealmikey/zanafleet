@@ -1,7 +1,5 @@
-import { PaymentMethod } from '@zanafleet/contracts';
-
-// Re-export PaymentMethod for convenience
-export { PaymentMethod };
+// Re-export PaymentMethod from contracts using TypeScript re-export syntax
+export { PaymentMethod } from '@zanafleet/contracts';
 
 export enum PaymentIntentStatus {
   CREATED = 'CREATED',

@@ -1,0 +1,816 @@
+/**
+ * @zanafleet/contracts
+ *
+ * Shared DTOs, event interfaces, and type definitions for the ZanaFleet platform.
+ * All cross-module contracts should be defined here to ensure consistency.
+ */
+export interface BaseEvent {
+  readonly eventId: string;
+  readonly eventType: string;
+  readonly eventVersion: string;
+  readonly occurredAt: Date;
+  readonly aggregateId: string;
+  readonly aggregateType: string;
+  readonly correlationId?: string;
+  readonly causationId?: string;
+}
+export interface SerializedEvent {
+  eventId: string;
+  eventType: string;
+  eventVersion: string;
+  occurredAt: string;
+  aggregateId: string;
+  aggregateType: string;
+  correlationId?: string;
+  causationId?: string;
+  payload: Record<string, unknown>;
+}
+export interface JwtPayload {
+  sub: string;
+  email: string;
+  workspaceId: string;
+  roles: string[];
+  iss?: string;
+  iat?: number;
+  exp?: number;
+}
+export interface ValidatedUser {
+  actorId: string;
+  email: string;
+  workspaceId: string;
+  roles: string[];
+}
+export declare enum ActorType {
+  Rider = 'Rider',
+  Driver = 'Driver',
+  Admin = 'Admin',
+  Support = 'Support',
+  HUMAN = 'HUMAN',
+  SaccoAdmin = 'SaccoAdmin',
+  Business = 'Business',
+  BusinessOwner = 'BusinessOwner',
+  Customer = 'Customer',
+  Internal = 'Internal',
+  AIService = 'AIService',
+}
+export declare enum RoleScope {
+  Global = 'Global',
+  Organization = 'Organization',
+  Workspace = 'Workspace',
+}
+export declare enum WorkspaceType {
+  Operations = 'Operations',
+  Support = 'Support',
+  Admin = 'Admin',
+}
+export declare enum WorkspaceStatus {
+  Active = 'ACTIVE',
+  Inactive = 'INACTIVE',
+  Suspended = 'SUSPENDED',
+}
+export declare enum OwnerType {
+  Actor = 'Actor',
+  Organization = 'Organization',
+}
+export declare enum WalletType {
+  Primary = 'Primary',
+  Escrow = 'Escrow',
+  Rewards = 'Rewards',
+}
+export declare enum SignUpSessionStatus {
+  Partial = 'PARTIAL',
+  PendingVerification = 'PENDING_VERIFICATION',
+  Completed = 'COMPLETED',
+  Expired = 'EXPIRED',
+}
+export declare enum VehicleType {
+  Bike = 'Bike',
+  Car = 'Car',
+  TukTuk = 'TukTuk',
+  Pickup = 'Pickup',
+  Lorry = 'Lorry',
+  Van = 'Van',
+}
+export declare enum AssetType {
+  VEHICLE = 'VEHICLE',
+  EQUIPMENT = 'EQUIPMENT',
+  WAREHOUSE = 'WAREHOUSE',
+  OTHER = 'OTHER',
+}
+export declare enum AssetStatus {
+  ACTIVE = 'ACTIVE',
+  MAINTENANCE = 'MAINTENANCE',
+  OUT_OF_SERVICE = 'OUT_OF_SERVICE',
+  ARCHIVED = 'ARCHIVED',
+}
+export declare enum BusinessType {
+  Retail = 'Retail',
+  Restaurant = 'Restaurant',
+  Logistics = 'Logistics',
+  Wholesale = 'Wholesale',
+  Services = 'Services',
+  Other = 'Other',
+}
+export declare enum PaymentStatus {
+  Pending = 'Pending',
+  Processing = 'Processing',
+  Succeeded = 'Succeeded',
+  Failed = 'Failed',
+  Cancelled = 'Cancelled',
+  Refunded = 'Refunded',
+}
+export declare enum PaymentMethod {
+  CARD = 'CARD',
+  MOBILE_MONEY = 'MOBILE_MONEY',
+  BANK_TRANSFER = 'BANK_TRANSFER',
+  WALLET_BALANCE = 'WALLET_BALANCE',
+}
+export interface CreateActorInput {
+  type: ActorType;
+  email: string;
+  username: string;
+  password: string;
+  location?: string | null;
+  roles: string[];
+  workspaceId: string;
+  linkedWallets?: string[];
+}
+export interface SignUpSessionResponse {
+  sessionId: string;
+  status: SignUpSessionStatus;
+  actorType: ActorType;
+  workspaceIds: string[];
+  roles: string[];
+  linkedWallets: string[];
+  completedSteps: string[];
+  expiresAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+export interface LocationData {
+  latitude: number;
+  longitude: number;
+  humanReadableName: string;
+  administrativeArea: string;
+  country: string;
+}
+/**
+ * Raw telemetry data from rider mobile devices.
+ * Used for ingesting real-time location updates.
+ */
+export interface RiderTelemetryData {
+  riderId: string;
+  latitude: number;
+  longitude: number;
+  heading?: number | null;
+  speed?: number | null;
+  accuracy?: number | null;
+  timestamp: Date;
+}
+/**
+ * Event published when a rider's location is updated.
+ * Event type follows naming convention: Location.RiderLocation.UpdatedV1
+ */
+export interface RiderLocationUpdatedEventV1 extends BaseEvent {
+  readonly aggregateType: 'RiderLocation';
+  readonly payload: {
+    riderId: string;
+    latitude: number;
+    longitude: number;
+    h3IndexFine: string;
+    h3IndexMedium: string;
+    h3IndexCoarse: string;
+    heading: number | null;
+    speed: number | null;
+    accuracy: number | null;
+    timestamp: Date;
+  };
+}
+export interface GeoPoint {
+  latitude: number;
+  longitude: number;
+}
+export interface GeoBounds {
+  minLat: number;
+  maxLat: number;
+  minLng: number;
+  maxLng: number;
+}
+export interface ZoneCluster {
+  zoneId: string;
+  center: GeoPoint;
+  bounds: GeoBounds;
+  riderCount: number;
+  averageLoad: number;
+}
+export interface ETAResult {
+  durationSeconds: number;
+  distanceMeters: number;
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW';
+  calculatedAt: Date;
+}
+export interface DistanceResult {
+  distanceMeters: number;
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW';
+  calculatedAt: Date;
+}
+export interface NearbyRidersParams {
+  latitude: number;
+  longitude: number;
+  radiusMeters: number;
+  limit?: number;
+  now?: Date;
+}
+export interface CreateLocationInput {
+  latitude?: number;
+  longitude?: number;
+  humanReadableName: string;
+  administrativeArea: string;
+  country?: string;
+}
+export interface Address {
+  formattedAddress: string;
+  street?: string;
+  city?: string;
+  region?: string;
+  postalCode?: string;
+  country?: string;
+}
+export interface CreateSaccoInput {
+  name: string;
+  location: LocationData;
+  contactPhone: string;
+}
+export interface SaccoResponse {
+  saccoId: string;
+  name: string;
+  location: LocationData;
+  contactPhone: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+export interface CreateRiderInput {
+  fullName: string;
+  nationalId: string;
+  phone: string;
+  location: LocationData | undefined;
+  vehicleType: VehicleType;
+  saccoId?: string | null;
+  email?: string | null;
+}
+export interface RiderResponse {
+  riderId: string;
+  fullName: string;
+  nationalId: string;
+  phone: string;
+  location: LocationData;
+  vehicleType: VehicleType;
+  saccoId: string | null;
+  email: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+export interface CreateBusinessInput {
+  businessName: string;
+  phone: string;
+  location: LocationData;
+  businessType: BusinessType;
+  email?: string | null;
+}
+export interface BusinessResponse {
+  businessId: string;
+  businessName: string;
+  phone: string;
+  location: LocationData;
+  businessType: BusinessType;
+  email: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+export declare enum DeliveryStatus {
+  Requested = 'Requested',
+  Assigned = 'Assigned',
+  PickedUp = 'PickedUp',
+  InTransit = 'InTransit',
+  Delivered = 'Delivered',
+  Cancelled = 'Cancelled',
+}
+export interface DeliveryResponse {
+  deliveryId: string;
+  businessId: string;
+  pickupLocationId: string;
+  dropoffLocationId: string;
+  assignedRiderId: string | null;
+  status: DeliveryStatus;
+  scheduledPickupTime?: Date | null;
+  scheduledDropoffTime?: Date | null;
+  isScheduled?: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+/**
+ * ============================================================================
+ * Order Contracts
+ * ============================================================================
+ */
+export declare enum OrderStatus {
+  Pending = 'Pending',
+  Confirmed = 'Confirmed',
+  Fulfilled = 'Fulfilled',
+  Cancelled = 'Cancelled',
+}
+export interface CreateOrderInput {
+  businessId: string;
+  itemSummary?: string;
+  itemMetadata?: Record<string, unknown>;
+  customerName?: string;
+  customerPhone?: string;
+  scheduledTime?: Date;
+  totalAmount?: number;
+  currency?: string;
+}
+export interface OrderResponse {
+  orderId: string;
+  businessId: string;
+  deliveryId: string | null;
+  itemSummary: string | null;
+  itemMetadata?: Record<string, unknown> | null;
+  customerName: string | null;
+  customerPhone: string | null;
+  scheduledTime: Date | null;
+  status: OrderStatus;
+  totalAmount: number | null;
+  currency: string | null;
+  paymentStatus: PaymentStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
+export declare enum MediaType {
+  Image = 'Image',
+  Video = 'Video',
+  Document = 'Document',
+  Audio = 'Audio',
+}
+export declare enum MediaAssetStatus {
+  Pending = 'Pending',
+  Uploading = 'Uploading',
+  Active = 'Active',
+  Archived = 'Archived',
+  Deleted = 'Deleted',
+}
+export declare enum OwnerEntityType {
+  Rider = 'Rider',
+  Business = 'Business',
+  Delivery = 'Delivery',
+  Sacco = 'Sacco',
+  Order = 'Order',
+  Asset = 'Asset',
+  Operator = 'Operator',
+}
+export interface MediaAssetMetadata {
+  width?: number;
+  height?: number;
+  duration?: number;
+  contentType?: string;
+  originalFilename?: string;
+}
+export interface CreateMediaAssetInput {
+  filename: string;
+  mimeType: string;
+  size: number;
+  checksum: string;
+  ownerId: string;
+  ownerType: OwnerEntityType;
+  metadata?: MediaAssetMetadata;
+}
+export interface MediaAssetResponse {
+  mediaAssetId: string;
+  filename: string;
+  mimeType: string;
+  size: number;
+  checksum: string;
+  ownerId: string;
+  ownerType: OwnerEntityType;
+  status: MediaAssetStatus;
+  storageKey: string;
+  metadata: MediaAssetMetadata | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+export interface SignedUrlResponse {
+  url: string;
+  expiresAt: Date;
+  method: 'GET' | 'PUT';
+}
+export interface InitiateMultipartUploadInput {
+  filename: string;
+  mimeType: string;
+  ownerId: string;
+  ownerType: OwnerEntityType;
+}
+export interface InitiateMultipartUploadResponse {
+  uploadId: string;
+  mediaAssetId: string;
+  partSize: number;
+}
+export interface UploadPartInput {
+  uploadId: string;
+  partNumber: number;
+  body: Buffer | Uint8Array;
+}
+export interface UploadPartResponse {
+  etag: string;
+  partNumber: number;
+}
+export interface CompleteMultipartUploadInput {
+  uploadId: string;
+  parts: Array<{
+    partNumber: number;
+    etag: string;
+  }>;
+}
+export interface AbortMultipartUploadInput {
+  uploadId: string;
+}
+export interface ArchiveMediaAssetInput {
+  mediaAssetId: string;
+  reason?: string;
+}
+export interface DeleteMediaAssetInput {
+  mediaAssetId: string;
+  permanent?: boolean;
+}
+/**
+ * Policy Scope Enum
+ * Defines the hierarchical scope levels for policies.
+ * More specific scopes (RIDER) override more general scopes (GLOBAL).
+ * Hierarchy: GLOBAL < NATIONAL < SACCO < BUSINESS < RIDER
+ */
+export declare enum PolicyScope {
+  GLOBAL = 'GLOBAL',
+  NATIONAL = 'NATIONAL',
+  SACCO = 'SACCO',
+  BUSINESS = 'BUSINESS',
+  RIDER = 'RIDER',
+  ASSET = 'ASSET',
+  OPERATOR = 'OPERATOR',
+}
+/**
+ * Policy Effect Enum
+ * Defines the possible outcomes when a policy matches.
+ */
+export declare enum PolicyEffect {
+  ALLOW = 'ALLOW',
+  BLOCK = 'BLOCK',
+  MODIFY = 'MODIFY',
+  REQUIRE_APPROVAL = 'REQUIRE_APPROVAL',
+}
+/**
+ * Policy Status Enum
+ * Defines the lifecycle states of a policy.
+ */
+export declare enum PolicyStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  DRAFT = 'DRAFT',
+  ARCHIVED = 'ARCHIVED',
+}
+/**
+ * Policy Trigger Enum
+ * Defines the events that can trigger policy evaluation.
+ */
+export declare enum PolicyTrigger {
+  DELIVERY_CREATION = 'DELIVERY_CREATION',
+  RIDER_ASSIGNMENT = 'RIDER_ASSIGNMENT',
+  STATUS_TRANSITION = 'STATUS_TRANSITION',
+  SLA_CHECK = 'SLA_CHECK',
+  REVENUE_DISTRIBUTION = 'REVENUE_DISTRIBUTION',
+  ORDER_PLACEMENT = 'ORDER_PLACEMENT',
+}
+/**
+ * PolicyDecision Interface
+ * Represents the outcome of a single policy evaluation.
+ */
+export interface PolicyDecision {
+  /** The effect to apply */
+  effect: PolicyEffect;
+  /** ID of the policy that produced this decision */
+  policyId: string;
+  /** Human-readable name of the policy */
+  policyName: string;
+  /** Explanation of why this decision was made */
+  reason: string;
+  /** Field modifications to apply (when effect is MODIFY) */
+  modifications?: Record<string, unknown>;
+  /** Actor IDs required to approve (when effect is REQUIRE_APPROVAL) */
+  requiresApprovalFrom?: string[];
+}
+/**
+ * PolicyCondition Interface
+ * Represents a JSON Logic-style condition for policy evaluation.
+ */
+export interface PolicyCondition {
+  /** The field path to evaluate (e.g., 'delivery.status', 'rider.vehicleType') */
+  field: string;
+  /** The comparison operator (e.g., 'eq', 'ne', 'gt', 'lt', 'in', 'contains') */
+  operator: string;
+  /** The value to compare against */
+  value: unknown;
+  /** Logical operator for combining with sibling conditions */
+  logic?: 'AND' | 'OR';
+  /** Nested conditions for complex expressions */
+  children?: PolicyCondition[];
+}
+/**
+ * Calendar Scope Enum
+ * Defines the hierarchical scope levels for calendars.
+ * Mirrors PolicyScope hierarchy for consistency.
+ * Hierarchy: GLOBAL < NATIONAL < SACCO < BUSINESS < RIDER
+ */
+export declare enum CalendarScope {
+  GLOBAL = 'GLOBAL',
+  NATIONAL = 'NATIONAL',
+  SACCO = 'SACCO',
+  BUSINESS = 'BUSINESS',
+  RIDER = 'RIDER',
+  ASSET = 'ASSET',
+  OPERATOR = 'OPERATOR',
+}
+/**
+ * Calendar Rule Type Enum
+ * Defines the types of rules that can be applied to calendars.
+ */
+export declare enum CalendarRuleType {
+  WORKING_HOURS = 'WORKING_HOURS',
+  WEEKEND = 'WEEKEND',
+  HOLIDAY = 'HOLIDAY',
+  CLOSURE = 'CLOSURE',
+  BLACKOUT = 'BLACKOUT',
+}
+/**
+ * Calendar Event Type Enum
+ * Defines the types of events that can be recorded in calendars.
+ */
+export declare enum CalendarEventType {
+  PUBLIC_HOLIDAY = 'PUBLIC_HOLIDAY',
+  BUSINESS_CLOSURE = 'BUSINESS_CLOSURE',
+  NATIONAL_EVENT = 'NATIONAL_EVENT',
+  WEATHER_DISRUPTION = 'WEATHER_DISRUPTION',
+  STRIKE_ADVISORY = 'STRIKE_ADVISORY',
+  PROMOTIONAL_CAMPAIGN = 'PROMOTIONAL_CAMPAIGN',
+}
+/**
+ * Recurrence Pattern Enum
+ * Defines patterns for recurring calendar events and time windows.
+ */
+export declare enum RecurrencePattern {
+  NONE = 'NONE',
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
+  MONTHLY = 'MONTHLY',
+  YEARLY = 'YEARLY',
+  CUSTOM = 'CUSTOM',
+}
+/**
+ * Binding Target Type Enum
+ * Defines the entity types that can be bound to a calendar.
+ */
+export declare enum BindingTargetType {
+  BUSINESS = 'BUSINESS',
+  SACCO = 'SACCO',
+  RIDER = 'RIDER',
+  WORKSPACE = 'WORKSPACE',
+  ASSET = 'ASSET',
+  OPERATOR = 'OPERATOR',
+}
+/**
+ * CalendarResponse Interface
+ * Represents a calendar definition returned from the API.
+ */
+export interface CalendarResponse {
+  calendarId: string;
+  name: string;
+  timezone: string;
+  locale: string;
+  ownerScope: CalendarScope;
+  ownerScopeId: string | null;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+/**
+ * TimeWindowResponse Interface
+ * Represents a time window (operating hours) within a calendar.
+ */
+export interface TimeWindowResponse {
+  timeWindowId: string;
+  calendarId: string;
+  startTime: string;
+  endTime: string;
+  dayOfWeek: number | null;
+  recurrenceRule: string | null;
+  isActive: boolean;
+}
+/**
+ * CalendarRuleResponse Interface
+ * Represents a rule that modifies calendar behavior.
+ */
+export interface CalendarRuleResponse {
+  ruleId: string;
+  calendarId: string;
+  ruleType: CalendarRuleType;
+  scope: CalendarScope;
+  priority: number;
+  conditions: Record<string, unknown>;
+  isActive: boolean;
+}
+/**
+ * RegionScopeResponse Interface
+ * Represents geographic applicability for calendar events.
+ * Events can target specific regions hierarchically: country > administrativeArea > locality
+ */
+export interface RegionScopeResponse {
+  country?: string;
+  administrativeArea?: string;
+  locality?: string;
+}
+/**
+ * CalendarEventResponse Interface
+ * Represents a calendar event (holiday, closure, etc.).
+ */
+export interface CalendarEventResponse {
+  eventId: string;
+  eventType: CalendarEventType;
+  title: string;
+  description: string | null;
+  startTime: Date;
+  endTime: Date;
+  regionScope: RegionScopeResponse;
+  recurrencePattern: RecurrencePattern;
+  isActive: boolean;
+}
+/**
+ * CalendarBindingResponse Interface
+ * Represents a binding between a calendar and a target entity.
+ */
+export interface CalendarBindingResponse {
+  bindingId: string;
+  calendarId: string;
+  targetType: BindingTargetType;
+  targetId: string;
+  priority: number;
+  inheritParent: boolean;
+}
+/**
+ * CalendarOverrideResponse Interface
+ * Represents an exception/override to normal calendar rules.
+ */
+export interface CalendarOverrideResponse {
+  overrideId: string;
+  targetScope: CalendarScope;
+  targetScopeId: string | null;
+  exceptionType: string;
+  reason: string | null;
+  validFrom: Date;
+  validUntil: Date;
+  priority: number;
+  isActive: boolean;
+}
+/**
+ * CreateCalendarInput Interface
+ * Input for creating a new calendar.
+ */
+export interface CreateCalendarInput {
+  name: string;
+  timezone: string;
+  locale?: string;
+  ownerScope: CalendarScope;
+  ownerScopeId?: string | null;
+  isActive?: boolean;
+}
+/**
+ * CreateTimeWindowInput Interface
+ * Input for creating a time window within a calendar.
+ */
+export interface CreateTimeWindowInput {
+  calendarId: string;
+  startTime: string;
+  endTime: string;
+  dayOfWeek?: number | null;
+  recurrenceRule?: string | null;
+  isActive?: boolean;
+}
+/**
+ * CreateCalendarEventInput Interface
+ * Input for creating a calendar event.
+ */
+export interface CreateCalendarEventInput {
+  eventType: CalendarEventType;
+  title: string;
+  description?: string | null;
+  startTime: Date;
+  endTime: Date;
+  regionScope: CalendarScope;
+  recurrencePattern?: RecurrencePattern;
+  isActive?: boolean;
+}
+/**
+ * CreateCalendarBindingInput Interface
+ * Input for binding a calendar to a target entity.
+ */
+export interface CreateCalendarBindingInput {
+  calendarId: string;
+  targetType: BindingTargetType;
+  targetId: string;
+  priority?: number;
+  inheritParent?: boolean;
+}
+/**
+ * CreateCalendarOverrideInput Interface
+ * Input for creating a calendar override/exception.
+ */
+export interface CreateCalendarOverrideInput {
+  targetScope: CalendarScope;
+  targetScopeId?: string | null;
+  exceptionType: string;
+  reason?: string | null;
+  validFrom: Date;
+  validUntil: Date;
+  priority?: number;
+  metadata?: Record<string, unknown> | null;
+  isActive?: boolean;
+}
+/**
+ * AccessContext Interface
+ * Contextual data for policy-aware capability checks
+ */
+export interface AccessContext {
+  resourceType?: string;
+  resourceId?: string;
+  action?: string;
+  metadata?: Record<string, unknown>;
+}
+/**
+ * Capability Interface
+ * Represents a specific capability
+ */
+export interface Capability {
+  capabilityId: string;
+  name: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+/**
+ * ActorCapability Interface
+ * Represents a capability assigned to an actor
+ */
+export interface ActorCapability {
+  capabilityId: string;
+  capabilityName: string;
+  grantedAt: Date;
+  source: 'direct' | 'inherited';
+  sourceId?: string;
+}
+/**
+ * AccessDecision Interface
+ * Result of an access check
+ */
+export interface AccessDecision {
+  allowed: boolean;
+  capabilityName: string;
+  reason: string;
+  grantedAt?: Date;
+  source: 'direct' | 'inherited' | 'policy';
+  sourceId?: string;
+}
+/**
+ * Capability.Access.GrantedV1 Event
+ * Emitted when a capability is granted to an actor
+ */
+export interface CapabilityAccessGrantedV1 extends BaseEvent {
+  readonly aggregateType: 'CapabilityAccess';
+  readonly payload: {
+    actorId: string;
+    capabilityId: string;
+    capabilityName: string;
+    grantedBy: string;
+    source: 'direct' | 'inherited';
+  };
+}
+/**
+ * Capability.Access.DeniedV1 Event
+ * Emitted when access is denied for a capability
+ */
+export interface CapabilityAccessDeniedV1 extends BaseEvent {
+  readonly aggregateType: 'CapabilityAccess';
+  readonly payload: {
+    actorId: string;
+    capabilityName: string;
+    reason: string;
+    deniedAt: Date;
+    context?: Record<string, unknown>;
+  };
+}
+export { TEST_ACCOUNTS, TEST_PASSWORD, TEST_WORKSPACE_ID } from './test-accounts.js';
+export type { TestAccount } from './test-accounts.js';
+//# sourceMappingURL=index.d.ts.map

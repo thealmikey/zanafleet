@@ -5,11 +5,11 @@
     "rootDir": "./src",
     "composite": true,
     "declaration": true,
-    "declarationMap": true
+    "declarationMap": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "target": "ES2020"
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"],
-  "references": [
-    { "path": "../contracts" }
-  ]
+  "exclude": ["node_modules", "dist"]
 }
