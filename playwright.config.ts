@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
+import { execSync } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
-import { execSync } from 'child_process';
 
 /**
  * Build a package if its output directory doesn't exist
@@ -30,8 +30,18 @@ function buildPackageIfNeeded(name: string, workspace: string, outputPath: strin
 function preFlightCheck(): void {
   const checks = [
     { name: 'API entry point', path: 'dist/api/src/main.js' },
-    { name: 'Contracts package', path: 'packages/contracts/dist/src/index.js', workspace: '@zanafleet/contracts', buildRequired: true },
-    { name: 'Utils package', path: 'packages/utils/dist/index.js', workspace: '@zanafleet/utils', buildRequired: true },
+    {
+      name: 'Contracts package',
+      path: 'packages/contracts/dist/src/index.js',
+      workspace: '@zanafleet/contracts',
+      buildRequired: true,
+    },
+    {
+      name: 'Utils package',
+      path: 'packages/utils/dist/src/index.js',
+      workspace: '@zanafleet/utils',
+      buildRequired: true,
+    },
   ];
 
   let allPassed = true;
