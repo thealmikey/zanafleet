@@ -1,4 +1,4 @@
-import { Module, OnModuleInit, Logger } from '@nestjs/common';
+import { Logger, Module, OnModuleInit } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -6,17 +6,17 @@ import { Neo4jModule } from '../../core/neo4j/neo4j.module';
 
 import { SlackAdapter } from './adapters/slack/slack.adapter';
 import { WebChatAdapter } from './adapters/webchat/webchat.adapter';
-import { InteractionStreamEntity, InteractionEventEntity } from './entities';
+import { InteractionEventEntity, InteractionStreamEntity } from './entities';
 import { CreateInteractionEventCommandHandler } from './handlers/create-interaction-event.handler';
 import { CreateInteractionStreamCommandHandler } from './handlers/create-interaction-stream.handler';
 import {
-  InteractionEventAIOHandler,
   InteractionAIOrchestratorService,
+  InteractionEventAIOHandler,
 } from './intelligence/interaction-ai-orchestrator';
 import { InteractionIntelligenceEngine } from './intelligence/interaction-intelligence-engine';
 import {
-  InteractionNeo4jProjection,
   InteractionNeo4jInitializer,
+  InteractionNeo4jProjection,
 } from './projections/interaction-neo4j.projection';
 import { InteractionEventRepository } from './repositories/interaction-event.repository';
 import { InteractionStreamRepository } from './repositories/interaction-stream.repository';
@@ -64,9 +64,25 @@ export const EventHandlers = [InteractionEventAIOHandler];
     // Neo4j projections
     InteractionNeo4jProjection,
     InteractionNeo4jInitializer,
-    // Intelligence
-    InteractionIntelligenceEngine,
-    InteractionAIOrchestratorService,
+    // Intelligence - use factory to avoid DI resolution issues with optional config
+    {
+      provide: InteractionIntelligenceEngine,
+      useFactory: () => new InteractionIntelligenceEngine(),
+    },
+    {
+      provide: InteractionAIOrchestratorService,
+      useFactory: (
+        intelligenceEngine: InteractionIntelligenceEngine,
+        eventRepository: InteractionEventRepository,
+        streamRepository: InteractionStreamRepository
+      ) =>
+        new InteractionAIOrchestratorService(intelligenceEngine, eventRepository, streamRepository),
+      inject: [
+        InteractionIntelligenceEngine,
+        InteractionEventRepository,
+        InteractionStreamRepository,
+      ],
+    },
     // Adapters
     SlackAdapter,
     WebChatAdapter,

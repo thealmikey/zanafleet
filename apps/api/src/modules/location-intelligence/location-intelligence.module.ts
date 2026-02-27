@@ -1,6 +1,6 @@
 import { Module, OnModuleInit } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { CqrsModule } from '@nestjs/cqrs';
+import { CommandBus, CqrsModule } from '@nestjs/cqrs';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Neo4jModule } from '../../core/neo4j/neo4j.module';
@@ -55,7 +55,12 @@ import { RiderTelemetrySubscriber } from './subscribers/rider-telemetry.subscrib
     RiderLocationRepository,
     Neo4jRiderCandidateRepository,
     UpdateRiderLocationHandler,
-    RiderTelemetrySubscriber,
+    // Use factory to avoid DI resolution issues with optional config
+    {
+      provide: RiderTelemetrySubscriber,
+      useFactory: (commandBus: CommandBus) => new RiderTelemetrySubscriber(commandBus),
+      inject: [CommandBus],
+    },
     GeoQueryCoordinator,
   ],
   exports: [
